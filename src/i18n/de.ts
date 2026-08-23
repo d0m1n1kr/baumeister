@@ -84,6 +84,9 @@ export const t = {
   winner: 'Gewinner',
   playAgain: 'Neue Partie',
 
+  aliceMode: 'Alice-Modus',
+  aliceModeHint: 'Alle Karten dauerhaft mit Beschreibung zeigen',
+
   cavernRule: 'Höhlen-Regel',
   cavernRuleHint: 'Bis zu 2 fremd angesagte Materialien pro Partie beiseitelegen (zählen am Ende nicht).',
   cavernButton: 'In die Höhle',

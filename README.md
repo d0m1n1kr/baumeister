@@ -26,6 +26,8 @@ an den vier Ecken des Geräts, die 7 Gebäudekarten der Partie liegen in der Mit
   Bestätigung („Alle anderen wegschauen!“).
 - **Karten-Zoom:** Tippen vergrößert jede Karte, zum antippenden Spieler gedreht;
   Mini-Karten zeigen Baumuster, Feature-Symbole und schematisches Artwork.
+  In der Einzelansicht (eigenes Gerät) blendet der **Alice-Modus** alle Karten
+  dauerhaft samt Beschreibung ein — nichts muss mehr angetippt werden.
 - **Zwei Spielweisen:**
   - *An einem Gerät* (Standard, unverändert): reihum am selben iPad, **komplett offline**.
   - *Mit eigenen Geräten*: Der Host öffnet einen Raum, Mitspieler treten per QR-Code

@@ -23,6 +23,31 @@
   const st = $derived(game.state!);
   const named = $derived(st.phase.t === 'round' ? st.phase.resource : null);
 
+  // Alice-Modus (Einzelansicht): alle Karten dauerhaft samt Beschreibung offen,
+  // damit niemand jede Karte einzeln antippen muss. Reine Anzeige-Präferenz
+  // dieses Geräts — sie überlebt Reloads im localStorage.
+  const ALICE_KEY = 'tinytowns.aliceMode';
+  let alice = $state(readAlice());
+
+  function readAlice(): boolean {
+    try {
+      return localStorage.getItem(ALICE_KEY) === '1';
+    } catch {
+      return false;
+    }
+  }
+
+  function toggleAlice() {
+    alice = !alice;
+    try {
+      localStorage.setItem(ALICE_KEY, alice ? '1' : '0');
+    } catch {
+      // privater Modus — gilt dann nur für diese Sitzung
+    }
+  }
+
+  const aliceOn = $derived(solo && alice);
+
   let overlay = $state<{ card: CardDef; rotation: number } | null>(null);
 
   function open(card: CardDef, e: PointerEvent) {
@@ -45,11 +70,17 @@
         {t.resourceNames[named]}
       </span>
     {/if}
+    {#if solo}
+      <button class="aliceBtn" class:active={alice} onpointerup={toggleAlice} title={t.aliceModeHint}>
+        📖 {t.aliceMode}
+      </button>
+    {/if}
   </div>
-  <div class="cards">
+  <div class="cards" class:alice={aliceOn}>
     {#each [...st.config.activeCards, ...extraCards] as id}
       <div class="cardWrap">
         <CardMini card={catalog[id]} onclick={(e) => open(catalog[id], e)} />
+        {#if aliceOn}<p class="desc">{catalog[id].text.de}</p>{/if}
       </div>
     {/each}
   </div>
@@ -154,5 +185,38 @@
       touch-action: auto;
     }
     .strip.soloStrip.horizontal .cardWrap { width: calc(25% - 5px); }
+  }
+
+  /* Alice-Modus: Karten samt Beschreibung dauerhaft offen (Einzelansicht) */
+  .aliceBtn {
+    font-size: 11px;
+    padding: 3px 8px;
+    opacity: 0.7;
+  }
+  .aliceBtn.active {
+    opacity: 1;
+    border-color: var(--accent);
+    color: var(--accent);
+  }
+  .strip.horizontal .cards.alice {
+    flex-wrap: wrap;
+    justify-content: center;
+    align-content: flex-start;
+    row-gap: 8px;
+    overflow-x: hidden;
+    overflow-y: auto;
+    touch-action: pan-y;
+    max-height: 46vh;
+  }
+  .strip.horizontal .cards.alice .cardWrap { width: clamp(150px, 23vw, 210px); }
+  .desc {
+    margin: 3px 2px 0;
+    font-size: 10.5px;
+    line-height: 1.35;
+    color: var(--text-dim);
+  }
+  @media (max-width: 720px) and (orientation: portrait) {
+    /* Am Handy: zwei Spalten mit Text, bei Bedarf scrollbar */
+    .strip.soloStrip.horizontal .cards.alice .cardWrap { width: calc(50% - 5px); }
   }
 </style>
