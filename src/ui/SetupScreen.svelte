@@ -9,6 +9,7 @@
   import type { Seat } from '../net/seats';
   import { t } from '../i18n/de';
   import CreditsFooter from './CreditsFooter.svelte';
+  import HelpDialog from './HelpDialog.svelte';
 
   let { onjoin }: { onjoin: () => void } = $props();
 
@@ -28,6 +29,7 @@
   let remote = $state([false, true, true, true]);
   let error = $state('');
   let busy = $state(false);
+  let showHelp = $state(false);
 
   function toggleSet(id: string) {
     chosenSets = chosenSets.includes(id)
@@ -121,7 +123,10 @@
         </button>
       </div>
     </div>
-    <p class="modeHint">{multiDevice ? t.ownDevicesHint : t.oneDeviceHint}</p>
+    <p class="modeHint">
+      {multiDevice ? t.ownDevicesHint : t.oneDeviceHint}
+      <button class="link helpLink" onpointerup={() => (showHelp = true)}>📖 {t.helpButton}</button>
+    </p>
 
     {#each Array.from({ length: count }) as _, i}
       <div class="field playerRow">
@@ -189,6 +194,10 @@
   <button class="link" onpointerup={onjoin}>{t.joinTitle} →</button>
   <CreditsFooter />
 </main>
+
+{#if showHelp}
+  <HelpDialog mode={multiDevice ? 'host' : 'single'} onclose={() => (showHelp = false)} />
+{/if}
 
 <style>
   main {
@@ -260,4 +269,5 @@
     font-size: 14px;
     text-decoration: underline;
   }
+  .helpLink { font-size: 12px; padding: 0 0 0 8px; }
 </style>
