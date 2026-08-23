@@ -303,3 +303,45 @@ describe('Spielende', () => {
     expect(s.players[1].pending).toBe('wood');
   });
 });
+
+describe('Baumeister-Folge und Bank-Sperre', () => {
+  it('überspringt fertige Spieler bei der Baumeister-Übergabe', () => {
+    let s = inRound(freshGame(3));
+    s.players[1].done = true;
+    s.players[1].roundDone = true;
+    s.players[0].pending = null;
+    s.players[2].pending = null;
+    s = a(s, { t: 'roundDone', player: 0 });
+    s = a(s, { t: 'roundDone', player: 2 });
+    expect(s.phase.t).toBe('nameResource');
+    expect(s.masterBuilder).toBe(2); // Spieler 1 ist fertig und wird übersprungen
+  });
+
+  it('Fort Ironweed: Besitzer wird Baumeister, wenn sonst niemand mehr aktiv ist', () => {
+    let s = inRound(freshGame(2));
+    put(s, 1, 15, 'fort_ironweed');
+    s.players[0].done = true;
+    s.players[0].roundDone = true;
+    s.players[0].pending = null;
+    s.players[1].pending = null;
+    s = a(s, { t: 'roundDone', player: 1 });
+    expect(s.phase.t).toBe('nameResource');
+    expect(s.masterBuilder).toBe(1); // 1. Wahl meidet das Fort, 2. Wahl greift
+  });
+
+  it('Bank: dasselbe Material darf nicht auf zwei Banken liegen', () => {
+    let s = inRound(freshGame(2, ['cottage', 'farm', 'well', 'bank', 'theater', 'tavern', 'factory']));
+    s.players[0].pending = null;
+    put(s, 0, 15, 'bank', { marked: 'wood' });
+    // zweite Bank regulär bauen: Muster [wheat,wheat,·],[wood,glass,brick]
+    res(s, 0, 0, 'wheat'); res(s, 0, 1, 'wheat');
+    res(s, 0, 4, 'wood'); res(s, 0, 5, 'glass'); res(s, 0, 6, 'brick');
+    s = a(s, { t: 'build', player: 0, squares: [0, 1, 4, 5, 6], card: 'bank', target: 0 });
+    expect(s.players[0].choices[0]?.t).toBe('markResource');
+
+    expect(() => a(s, { t: 'resolveMark', player: 0, resource: 'wood' })).toThrow(RuleError);
+    s = a(s, { t: 'resolveMark', player: 0, resource: 'stone' });
+    expect(s.players[0].board[0].building?.marked).toBe('stone');
+    expect(s.players[0].choices.length).toBe(0);
+  });
+});

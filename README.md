@@ -42,7 +42,8 @@ an den vier Ecken des Geräts, die 7 Gebäudekarten der Partie liegen in der Mit
 ```bash
 npm install
 npm run dev        # Dev-Server
-npm test           # Engine- und Netzwerk-Tests (Vitest)
+npm test           # Engine-, Netzwerk- und Store-Tests (Vitest)
+npx vitest run --coverage   # dito mit Coverage-Bericht
 npm run check      # svelte-check
 npm run build      # Produktions-Build (dist/)
 node scripts/smoke.mjs        # E2E: Ein-Gerät-Modus (Chromium)

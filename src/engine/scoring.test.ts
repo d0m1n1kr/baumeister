@@ -298,3 +298,14 @@ describe('Leere Felder & Monument-Modifikatoren', () => {
     expect(line(s, 0, 'the_starloom')).toBe(3); // Rang 2 (geteilt)
   });
 });
+
+describe('Fütterung: sehr viele Kombinationen', () => {
+  it('Fallback füttert trotzdem die volle Bauernhof-Kapazität', () => {
+    // 14 Hütten + 2 Bauernhöfe → C(14,8) = 3003 Kombinationen > Grenze von 2000
+    const s = freshGame();
+    for (let i = 0; i < 14; i++) put(s, 0, i, 'cottage');
+    put(s, 0, 14, 'farm');
+    put(s, 0, 15, 'farm');
+    expect(line(s, 0, 'cottage')).toBe(24); // 8 gefütterte Hütten à 3 SP
+  });
+});
