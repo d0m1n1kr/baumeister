@@ -4,3 +4,8 @@ dev-dist/
 *.local
 .DS_Store
 coverage/
+
+# Screenshots aus E2E-Prüfskripten (landen sonst versehentlich im Repo)
+*.png
+!public/**/*.png
+!icons/**/*.png
