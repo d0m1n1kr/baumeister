@@ -2,7 +2,7 @@
   import { game } from '../store/gameStore.svelte';
   import { buildGameConfig } from '../store/newGameConfig';
   import { session } from '../net/session.svelte';
-  import { joinCodeFromUrl, selectedTransport } from '../net';
+  import { clearJoinHash, joinCodeFromUrl, selectedTransport } from '../net';
   import { clearSession, loadSession, restoreSeats } from '../net/sessionPersist';
   import { t } from '../i18n/de';
   import SetupScreen from './SetupScreen.svelte';
@@ -14,12 +14,24 @@
   import CreditsFooter from './CreditsFooter.svelte';
 
   let showResume = $state(game.hasSave());
+  let urlJoin = $state(joinCodeFromUrl());
   let joining = $state(joinCodeFromUrl() !== null);
   let setupError = $state('');
 
   // Unterbrochene Mehrgeräte-Sitzung (Reload, iOS-Tab-Rauswurf) wieder aufnehmen.
+  // Ein Code in der Adresszeile ist dabei der stärkste Wunsch: Wer einen QR-Code
+  // scannt, will in DIESEN Raum — nicht zurück in eine alte gemerkte Sitzung.
   const stored = loadSession();
-  if (stored?.role === 'guest' && stored.name) {
+  // Bewusst der Anfangswert (Startlogik läuft genau einmal beim Laden).
+  // svelte-ignore state_referenced_locally
+  const initialUrlJoin = joinCodeFromUrl();
+  if (initialUrlJoin && stored && stored.code !== initialUrlJoin) {
+    if (stored.role === 'guest' && stored.name) {
+      // Name ist bekannt: direkt in den neuen Raum
+      void session.join(initialUrlJoin, stored.name, selectedTransport());
+    }
+    joining = true;
+  } else if (stored?.role === 'guest' && stored.name) {
     // Gast: nahtlos zurück in die Partie — der Host erkennt uns an der clientId.
     joining = true;
     void session.join(stored.code, stored.name, selectedTransport());
@@ -29,6 +41,34 @@
     void session.openRoom(stored.code, restoreSeats(stored.seats ?? []), selectedTransport())
       .catch((e) => (setupError = e instanceof Error ? e.message : String(e)));
   }
+
+  // iOS öffnet den QR-Link gern im BEREITS offenen Tab: Dann gibt es keinen
+  // Reload, nur ein hashchange (bzw. pageshow aus dem bfcache) — darauf muss
+  // die laufende App genauso reagieren wie auf einen frischen Start.
+  $effect(() => {
+    const onHash = () => {
+      const code = joinCodeFromUrl();
+      if (!code || code === session.roomCode) return; // kein/derselbe Raum
+      if (session.role !== 'off') session.leave();
+      urlJoin = code;
+      joining = true;
+      showResume = false;
+      if (stored?.role === 'guest' && stored.name) {
+        void session.join(code, stored.name, selectedTransport());
+      }
+    };
+    window.addEventListener('hashchange', onHash);
+    window.addEventListener('pageshow', onHash);
+    return () => {
+      window.removeEventListener('hashchange', onHash);
+      window.removeEventListener('pageshow', onHash);
+    };
+  });
+
+  // Nach gelungenem (Auto-)Beitritt den Code aus der Adresszeile räumen.
+  $effect(() => {
+    if (session.role === 'guest' && session.status !== 'connecting') clearJoinHash();
+  });
 
   /** „Weiterspielen": Spielstand laden und — falls Host einer Sitzung — den Raum
    *  wieder öffnen; die Gäste verbinden sich dann von selbst neu. */
@@ -72,7 +112,9 @@
       <GameView />
     {/if}
   {:else}
-    <JoinScreen initialCode={stored?.code} initialName={stored?.name} onback={() => (joining = false)} />
+    {#key urlJoin}
+      <JoinScreen initialCode={urlJoin ?? stored?.code} initialName={stored?.name} onback={() => (joining = false)} />
+    {/key}
   {/if}
 {:else if session.role === 'host' && !game.state}
   <HostLobby onstart={startFromLobby} oncancel={() => session.leave()} />
@@ -84,7 +126,9 @@
     <GameView />
   {/if}
 {:else if joining}
-  <JoinScreen initialCode={stored?.code} initialName={stored?.name} onback={() => (joining = false)} />
+  {#key urlJoin}
+    <JoinScreen initialCode={urlJoin ?? stored?.code} initialName={stored?.name} onback={() => (joining = false)} />
+  {/key}
 {:else if showResume}
   <main class="resume">
     <h1>🏘 {t.appTitle}</h1>
