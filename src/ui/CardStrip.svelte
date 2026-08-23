@@ -202,26 +202,30 @@
     color: var(--accent);
   }
   .strip.horizontal .cards.alice {
-    flex-wrap: wrap;
-    justify-content: center;
-    align-content: flex-start;
-    row-gap: 8px;
+    /* Raster statt Flex: grid-auto-rows 1fr macht alle Karten gleich hoch */
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    grid-auto-rows: 1fr;
+    gap: 8px;
+    width: min(100%, 900px);
+    margin: 0 auto;
     overflow-x: hidden;
     overflow-y: auto;
     touch-action: pan-y;
     max-height: 46vh;
   }
-  .strip.horizontal .cards.alice .cardWrap { width: clamp(150px, 23vw, 210px); }
+  .strip.horizontal .cards.alice .cardWrap {
+    width: auto;
+    display: flex; /* Karte füllt die Rasterzelle in voller Höhe */
+  }
   @media (max-width: 720px) and (orientation: portrait) {
     /* Am Handy: zwei Spalten, Leiste fest gedeckelt und in sich scrollbar —
        das Spielbrett darunter muss immer erreichbar bleiben */
     .strip.soloStrip.horizontal .cards.alice {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 5px;
       max-height: 30vh;
-      overflow-y: auto;
-      overflow-x: hidden;
-      touch-action: pan-y;
-      align-content: flex-start;
     }
-    .strip.soloStrip.horizontal .cards.alice .cardWrap { width: calc(50% - 5px); }
+    .strip.soloStrip.horizontal .cards.alice .cardWrap { width: auto; }
   }
 </style>
