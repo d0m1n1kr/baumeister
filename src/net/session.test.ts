@@ -1,5 +1,5 @@
-import { describe, it, expect, beforeEach } from 'vitest';
-import { Session, type GameBridge, type NetBridgeLike } from './session.svelte';
+import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
+import { clientId, Session, type GameBridge, type NetBridgeLike } from './session.svelte';
 import { LoopbackNetwork } from './loopback';
 import { HIDDEN_MONUMENT } from './redact';
 import type { Seat } from './seats';
@@ -224,6 +224,192 @@ describe('Sitzung: Host und Gäste', () => {
     expect(host.session.seats[1].kind).toBe('local');
     expect(host.session.controls(1)).toBe(true);
     expect(host.session.controls(2)).toBe(false);
+  });
+
+  it('übernimmt einen getrennten Platz mitten im Spiel — der alte Gast bleibt draußen', () => {
+    host.session.startGame(gameConfig());
+    net.goOffline('g1');
+    expect(host.session.seats[1].connected).toBe(false);
+
+    host.session.takeOverSeat(1);
+    expect(host.session.controls(1)).toBe(true);
+
+    // Der frühere Gast hat seine Reservierung verloren und erfährt das auch
+    net.goOnline('g1');
+    g1.session.requestResync();
+    expect(g1.session.status).toBe('error');
+    expect(g1.session.netError).toMatch(/übernommen/);
+  });
+
+  it('ignoriert Host-Nachrichten, die nicht vom Host stammen', () => {
+    host.session.startGame(gameConfig());
+    const before = JSON.stringify(g1.game.state);
+    const fake = JSON.parse(before) as GameState;
+    fake.players[0].name = 'GEKAPERT';
+
+    const evil = net.connect('evil', {
+      onMessage: () => {},
+      onPeerJoin: () => {},
+      onPeerLeave: () => {}
+    });
+    evil.send({ t: 'error', message: 'Böse Nachricht' }, 'g1');
+    evil.send({ t: 'lobby', seats: [] }, 'g1');
+    evil.send({ t: 'welcome', seat: 0, protocolVersion: PROTOCOL_VERSION }, 'g1');
+    evil.send({ t: 'state', state: fake, version: 999 }, 'g1');
+
+    expect(g1.session.netError).toBe('');
+    expect(g1.session.mySeat).toBe(1);
+    expect(g1.session.lobbySeats.length).toBe(3);
+    expect(g1.game.state!.players[0].name).toBe('Host');
+  });
+
+  it('übersteht kaputte und werfende Nachrichten — Fehler geht an den Absender', async () => {
+    const net2 = new LoopbackNetwork();
+    const bridge: NetBridgeLike = { sendAction: null, onLocalApplied: null };
+    const state = newGame(gameConfig());
+    const boom: GameBridge = {
+      get state() {
+        return state;
+      },
+      start() {},
+      dispatch() {
+        throw new Error('Engine kaputt'); // kein RuleError → früher riss das den Host mit
+      },
+      setRemoteState() {}
+    };
+    const h = new Session(boom, bridge);
+    await h.openRoom('XYZ234', seats(), async (_c, hd) => net2.connect('host', hd));
+
+    const received: Array<{ t: string }> = [];
+    const evil = net2.connect('e', {
+      onMessage: (m) => received.push(m as { t: string }),
+      onPeerJoin: () => {},
+      onPeerLeave: () => {}
+    });
+    // Unbrauchbare Nachrichten werden kommentarlos verworfen (kein Absturz)
+    evil.send('quatsch');
+    evil.send({ t: 'action' });
+    evil.send({ t: 'resync' });
+    evil.send({ t: 'hello', clientId: 42 });
+
+    evil.send({ t: 'hello', clientId: 'ce', name: 'E', protocolVersion: PROTOCOL_VERSION });
+    evil.send({ t: 'action', action: { t: 'chooseMonument', player: 1, card: 'x' } });
+    expect(received.some((m) => m.t === 'error')).toBe(true);
+    // Der Host lebt weiter und beantwortet die nächste Anfrage noch
+    evil.send({ t: 'resync', clientId: 'ce', lastSeen: -1 });
+    expect(received.filter((m) => m.t === 'state').length).toBeGreaterThan(0);
+  });
+
+  it('schickt bei unverändertem Stand keinen Zustand erneut (Heartbeat bleibt still)', () => {
+    host.session.startGame(gameConfig());
+    let applied = 0;
+    const orig = g1.game.setRemoteState.bind(g1.game);
+    g1.game.setRemoteState = (next: GameState) => {
+      applied++;
+      orig(next);
+    };
+
+    g1.session.requestResync();
+    g1.session.requestResync();
+    expect(applied).toBe(0); // Gast war schon auf Stand
+
+    host.game.dispatch({ t: 'chooseMonument', player: 0, card: 'the_starloom' });
+    expect(applied).toBe(1);
+
+    g1.session.requestResync();
+    expect(applied).toBe(1); // wieder auf Stand — Host schweigt
+  });
+
+  it('bricht den Beitritt ab, wenn sich kein Host meldet', async () => {
+    const net2 = new LoopbackNetwork();
+    const d = device();
+    await d.session.join('QQQ234', 'X', async (_c, hd) => net2.connect('solo', hd), 'cx', 20);
+    expect(d.session.status).toBe('connecting'); // Raum betreten, aber niemand da
+    await new Promise((r) => setTimeout(r, 60));
+    expect(d.session.role).toBe('off');
+    expect(d.session.netError).toMatch(/Kein Host/);
+  });
+
+  it('schließt einen Transport, der erst nach leave() fertig wird', async () => {
+    const net2 = new LoopbackNetwork();
+    const events: string[] = [];
+    net2.connect('witness', {
+      onMessage: () => {},
+      onPeerJoin: (peer) => events.push(`join:${peer}`),
+      onPeerLeave: (peer) => events.push(`leave:${peer}`)
+    });
+
+    const d = device();
+    let release!: () => void;
+    const gate = new Promise<void>((r) => (release = r));
+    const pending = d.session.join(
+      'ABC234',
+      'X',
+      async (_c, hd) => {
+        await gate;
+        return net2.connect('late', hd);
+      },
+      'cx'
+    );
+    d.session.leave(); // Nutzer bricht ab, während die Fabrik noch arbeitet
+    release();
+    await pending;
+
+    expect(d.session.role).toBe('off');
+    expect(d.session.netError).toBe(''); // Abbruch ist kein Fehler
+    expect(events).toEqual(['join:late', 'leave:late']); // Geister-Transport sofort geschlossen
+  });
+
+  it('scheitert openRoom sauber, wenn der Transport nicht zustande kommt', async () => {
+    const d = device();
+    await expect(
+      d.session.openRoom('ABC234', seats(), async () => {
+        throw new Error('Vermittlung nicht erreichbar');
+      })
+    ).rejects.toThrow(/nicht erreichbar/);
+    expect(d.session.role).toBe('off'); // nichts halb-initialisiert
+    expect(d.session.seats.length).toBe(0);
+    expect(d.bridge.onLocalApplied).toBeNull();
+  });
+});
+
+describe('Gerätekennung', () => {
+  afterEach(() => vi.unstubAllGlobals());
+
+  function fakeStorage() {
+    const data = new Map<string, string>();
+    return {
+      getItem: (k: string) => data.get(k) ?? null,
+      setItem: (k: string, v: string) => void data.set(k, v),
+      removeItem: (k: string) => void data.delete(k),
+      data
+    };
+  }
+
+  it('liegt je Tab im sessionStorage, wenn der Tab-Transport aktiv ist', () => {
+    const sess = fakeStorage();
+    const local = fakeStorage();
+    vi.stubGlobal('location', { search: '?transport=channel' });
+    vi.stubGlobal('sessionStorage', sess);
+    vi.stubGlobal('localStorage', local);
+
+    const id = clientId();
+    expect(clientId()).toBe(id); // stabil über Aufrufe
+    expect(sess.data.size).toBe(1);
+    expect(local.data.size).toBe(0); // sonst „wären" zwei Tabs dasselbe Gerät
+  });
+
+  it('liegt sonst im localStorage (überlebt Reloads des Geräts)', () => {
+    const sess = fakeStorage();
+    const local = fakeStorage();
+    vi.stubGlobal('location', { search: '' });
+    vi.stubGlobal('sessionStorage', sess);
+    vi.stubGlobal('localStorage', local);
+
+    const id = clientId();
+    expect(clientId()).toBe(id);
+    expect(local.data.size).toBe(1);
+    expect(sess.data.size).toBe(0);
   });
 });
 

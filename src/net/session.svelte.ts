@@ -17,6 +17,13 @@ import { redactFor } from './redact';
 import { actionAllowed, seatOfClient, seatOfPeer, toSeatInfo, type Seat } from './seats';
 import type { PeerId, Transport, TransportFactory } from './transport';
 
+/** Wird geworfen, wenn `leave()` einen noch laufenden Verbindungsaufbau überholt. */
+class ConnectAborted extends Error {
+  constructor() {
+    super('Verbindungsaufbau abgebrochen.');
+  }
+}
+
 export type Role = 'off' | 'host' | 'guest';
 export type Status = 'idle' | 'connecting' | 'lobby' | 'playing' | 'error';
 
@@ -36,13 +43,20 @@ export interface NetBridgeLike {
 
 const CLIENT_ID_KEY = 'tinytowns.clientId';
 
-/** Stabile Gerätekennung — überlebt Verbindungsabbrüche und Reloads. */
+/**
+ * Stabile Gerätekennung — überlebt Verbindungsabbrüche und Reloads.
+ * Beim Tab-zu-Tab-Transport (`?transport=channel`) teilen sich alle Tabs
+ * denselben localStorage; dort gilt die Kennung je Tab (sessionStorage),
+ * sonst „wäre" jeder Tab dasselbe Gerät und bekäme denselben Platz.
+ */
 export function clientId(): string {
   try {
-    let id = localStorage.getItem(CLIENT_ID_KEY);
+    const perTab = new URLSearchParams(location.search).get('transport') === 'channel';
+    const store = perTab ? sessionStorage : localStorage;
+    let id = store.getItem(CLIENT_ID_KEY);
     if (!id) {
       id = Math.random().toString(36).slice(2) + Date.now().toString(36);
-      localStorage.setItem(CLIENT_ID_KEY, id);
+      store.setItem(CLIENT_ID_KEY, id);
     }
     return id;
   } catch {
@@ -67,12 +81,20 @@ export class Session {
   private lastSeenVersion = -1;
   private myName = '';
   private myClientId = '';
+  /** Zählt Verbindungsläufe: Kehrt eine Transport-Fabrik erst zurück, nachdem
+   *  `leave()` (oder ein neuer Aufbau) lief, gehört ihr Ergebnis zu einem alten
+   *  Lauf und wird geschlossen statt übernommen. */
+  private epoch = 0;
+  /** Frist für den Beitritt: Ein Raum lässt sich auch ohne Host „betreten"
+   *  (z. B. bei einem Tippfehler im Code) — dann darf es kein ewiges Warten geben. */
+  private joinTimer: ReturnType<typeof setTimeout> | null = null;
   /** Transporte melden Peers teils schon, bevor die Fabrik zurückgekehrt ist —
    *  solche Ereignisse werden bis zur Einsatzbereitschaft zurückgestellt. */
   private ready = false;
   private queued: Array<() => void> = [];
 
-  private later(fn: () => void): void {
+  private later(epoch: number, fn: () => void): void {
+    if (epoch !== this.epoch) return; // Ereignis aus einem beendeten Lauf
     if (this.ready) fn();
     else this.queued.push(fn);
   }
@@ -90,13 +112,21 @@ export class Session {
     onPeerJoin(peer: PeerId): void;
     onPeerLeave(peer: PeerId): void;
   }): Promise<void> {
+    const myEpoch = ++this.epoch;
     this.ready = false;
     this.queued = [];
-    this.transport = await factory(code, {
-      onMessage: (msg, from) => this.later(() => handlers.onMessage(msg, from)),
-      onPeerJoin: (peer) => this.later(() => handlers.onPeerJoin(peer)),
-      onPeerLeave: (peer) => this.later(() => handlers.onPeerLeave(peer))
+    const transport = await factory(code, {
+      onMessage: (msg, from) => this.later(myEpoch, () => handlers.onMessage(msg, from)),
+      onPeerJoin: (peer) => this.later(myEpoch, () => handlers.onPeerJoin(peer)),
+      onPeerLeave: (peer) => this.later(myEpoch, () => handlers.onPeerLeave(peer))
     });
+    if (myEpoch !== this.epoch) {
+      // Während des Aufbaus kam ein leave() oder ein neuer Aufbau dazwischen —
+      // dieser Transport gehört niemandem mehr.
+      transport.close();
+      throw new ConnectAborted();
+    }
+    this.transport = transport;
     this.ready = true;
     const pending = this.queued;
     this.queued = [];
@@ -122,27 +152,36 @@ export class Session {
   // ---------------- Host ----------------
 
   async openRoom(code: string, initialSeats: Seat[], factory: TransportFactory): Promise<void> {
+    // Die Plätze müssen vor dem Verbinden stehen: `hello`-Nachrichten können
+    // schon während des Aufbaus eintreffen (und werden bis dahin gepuffert).
+    this.seats = initialSeats;
+    try {
+      await this.connect(code, factory, {
+        onMessage: (msg, from) => this.onClientMessage(msg, from),
+        onPeerJoin: () => this.sendLobby(),
+        onPeerLeave: (peer) => {
+          const seat = seatOfPeer(this.seats, peer);
+          if (seat) {
+            // Platz bleibt reserviert — der Spieler kommt typischerweise zurück,
+            // sobald er die App wieder in den Vordergrund holt.
+            seat.connected = false;
+            seat.peerId = undefined;
+          }
+          this.sendLobby();
+        }
+      });
+    } catch (e) {
+      // Nichts halb-initialisiert zurücklassen: sauber zurück in den Ein-Gerät-Modus.
+      this.leave();
+      throw e;
+    }
+    // Erst nach erfolgreichem Aufbau wird dieses Gerät zum Host.
     this.role = 'host';
     this.status = 'lobby';
     this.roomCode = code;
-    this.seats = initialSeats;
     this.mySeat = initialSeats.find((s) => s.kind === 'local')?.index ?? null;
     this.bridge.sendAction = null;
     this.bridge.onLocalApplied = () => this.broadcastState();
-    await this.connect(code, factory, {
-      onMessage: (msg, from) => this.onClientMessage(msg, from),
-      onPeerJoin: () => this.sendLobby(),
-      onPeerLeave: (peer) => {
-        const seat = seatOfPeer(this.seats, peer);
-        if (seat) {
-          // Platz bleibt reserviert — der Spieler kommt typischerweise zurück,
-          // sobald er die App wieder in den Vordergrund holt.
-          seat.connected = false;
-          seat.peerId = undefined;
-        }
-        this.sendLobby();
-      }
-    });
     this.sendLobby();
   }
 
@@ -152,6 +191,8 @@ export class Session {
     this.broadcastState();
   }
 
+  /** Einzige Stelle, die die Zustandsversion erhöht — Antworten auf `hello`
+   *  und `resync` schicken die aktuelle Version unverändert mit. */
   broadcastState(): void {
     if (this.role !== 'host' || !this.transport) return;
     const state = this.game.state;
@@ -181,7 +222,8 @@ export class Session {
     code: string,
     name: string,
     factory: TransportFactory,
-    id: string = clientId()
+    id: string = clientId(),
+    timeoutMs = 15000
   ): Promise<void> {
     this.role = 'guest';
     this.status = 'connecting';
@@ -192,16 +234,35 @@ export class Session {
     this.myClientId = id;
     this.bridge.sendAction = (action) => this.sendAction(action);
     this.bridge.onLocalApplied = null;
-    await this.connect(code, factory, {
-      onMessage: (msg, from) => this.onHostMessage(msg, from),
-      onPeerJoin: (peer) => this.sendHello(peer),
-      onPeerLeave: (peer) => {
-        if (peer === this.hostPeer) {
-          this.hostPeer = null;
-          this.status = 'connecting';
+    try {
+      await this.connect(code, factory, {
+        onMessage: (msg, from) => this.onHostMessage(msg, from),
+        onPeerJoin: (peer) => this.sendHello(peer),
+        onPeerLeave: (peer) => {
+          if (peer === this.hostPeer) {
+            this.hostPeer = null;
+            this.status = 'connecting';
+          }
         }
-      }
-    });
+      });
+    } catch (e) {
+      if (e instanceof ConnectAborted) return; // leave() kam zuvor — nichts zu melden
+      // Aufbau gescheitert (Vermittlung nicht erreichbar o. Ä.): sauber zurück;
+      // die Meldung nach leave() setzen, weil leave() sie räumt.
+      this.leave();
+      this.netError = e instanceof Error && e.message ? e.message : 'Verbindung fehlgeschlagen.';
+      return;
+    }
+    // Meldet sich binnen Frist kein Host (falscher Code, Host offline),
+    // wird der Beitritt abgebrochen statt ewig zu „verbinden".
+    this.clearJoinTimer();
+    if (this.status !== 'connecting') return; // Host hat sich schon gemeldet
+    this.joinTimer = setTimeout(() => {
+      this.joinTimer = null;
+      if (this.role !== 'guest' || this.status !== 'connecting') return;
+      this.leave();
+      this.netError = 'Kein Host unter diesem Code erreichbar — Code prüfen und erneut versuchen.';
+    }, timeoutMs);
   }
 
   sendAction(action: Action): void {
@@ -219,9 +280,13 @@ export class Session {
     else if (this.role === 'host') this.sendLobby();
   }
 
-  /** Regelmäßiger Abgleich, falls ein Verbindungsverlust unbemerkt bleibt. */
+  /** Regelmäßiger Abgleich, falls ein Verbindungsverlust unbemerkt bleibt.
+   *  Nur Gäste fragen zyklisch nach; dank `lastSeen` antwortet der Host bei
+   *  unverändertem Stand gar nicht — im Ruhezustand fließen keine Zustände. */
   startHeartbeat(intervalMs = 20000): () => void {
-    const timer = setInterval(() => this.onResume(), intervalMs);
+    const timer = setInterval(() => {
+      if (this.role === 'guest') this.requestResync();
+    }, intervalMs);
     return () => clearInterval(timer);
   }
 
@@ -229,7 +294,10 @@ export class Session {
   requestResync(): void {
     if (this.role !== 'guest' || !this.transport) return;
     if (this.hostPeer) {
-      this.post({ t: 'resync', clientId: this.myClientId }, this.hostPeer);
+      this.post(
+        { t: 'resync', clientId: this.myClientId, lastSeen: this.lastSeenVersion },
+        this.hostPeer
+      );
     } else {
       // Verbindung war weg: neu anmelden, der Host erkennt uns an der clientId
       this.post({
@@ -244,6 +312,8 @@ export class Session {
   // ---------------- gemeinsam ----------------
 
   leave(): void {
+    this.epoch++; // ein evtl. noch laufender Verbindungsaufbau gehört ab jetzt niemandem
+    this.clearJoinTimer();
     this.transport?.close();
     this.transport = null;
     this.hostPeer = null;
@@ -257,6 +327,13 @@ export class Session {
     this.version = 0;
     this.bridge.sendAction = null;
     this.bridge.onLocalApplied = null;
+  }
+
+  private clearJoinTimer(): void {
+    if (this.joinTimer !== null) {
+      clearTimeout(this.joinTimer);
+      this.joinTimer = null;
+    }
   }
 
   // ---------------- Nachrichtenbehandlung ----------------
@@ -279,9 +356,21 @@ export class Session {
     );
   }
 
+  /** Nachrichten kommen von fremden Geräten: Ein Fehler bei der Verarbeitung
+   *  geht als Antwort an den Absender zurück, statt den Host mitzureißen. */
   private onClientMessage(raw: unknown, from: PeerId): void {
-    const transport = this.transport;
-    if (!transport || !isClientMessage(raw)) return;
+    if (!this.transport || !isClientMessage(raw)) return;
+    try {
+      this.handleClientMessage(raw, from);
+    } catch (e) {
+      this.post(
+        { t: 'error', message: e instanceof Error ? e.message : 'Ungültige Nachricht.' },
+        from
+      );
+    }
+  }
+
+  private handleClientMessage(raw: ClientMessage, from: PeerId): void {
     const reply = (msg: HostMessage) => this.post(msg, from);
 
     switch (raw.t) {
@@ -306,7 +395,6 @@ export class Session {
         reply({ t: 'welcome', seat: seat.index, protocolVersion: PROTOCOL_VERSION });
         this.sendLobby();
         if (this.game.state) {
-          this.version++;
           reply({ t: 'state', state: redactFor(this.game.state, seat.index), version: this.version });
         }
         return;
@@ -337,14 +425,19 @@ export class Session {
       case 'resync': {
         // Peer-Kennung wechselt bei jeder Verbindung; die Gerätekennung nicht.
         const seat = seatOfPeer(this.seats, from) ?? seatOfClient(this.seats, raw.clientId);
-        if (!seat) return;
+        if (!seat) {
+          // Platz wurde inzwischen übernommen (oder war nie vergeben) — dem
+          // Gerät Bescheid geben statt es ewig weiterfragen zu lassen.
+          reply({ t: 'reject', reason: 'Dein Platz wurde am Host-Gerät übernommen.' });
+          return;
+        }
         if (seat.peerId !== from || !seat.connected) {
           seat.peerId = from;
           seat.connected = true;
           this.sendLobby();
         }
         if (!this.game.state) return;
-        this.version++;
+        if (raw.lastSeen >= this.version) return; // Gast ist auf Stand — nichts zu tun
         reply({ t: 'state', state: redactFor(this.game.state, seat.index), version: this.version });
         return;
       }
@@ -353,32 +446,41 @@ export class Session {
 
   private onHostMessage(raw: unknown, from: PeerId): void {
     if (!isHostMessage(raw)) return;
+    // In einem Raum können auch andere Gäste (oder Fremde) senden: Als Host
+    // gilt nur, wer uns per `welcome` aufgenommen hat — alle anderen Absender
+    // werden für Host-Nachrichten ignoriert.
+    const fromHost = this.hostPeer !== null && this.hostPeer === from;
 
     switch (raw.t) {
       case 'welcome':
+        if (this.hostPeer !== null && !fromHost) return; // zweiter „Host" — ignorieren
+        this.clearJoinTimer();
         this.hostPeer = from;
         this.mySeat = raw.seat;
         this.status = this.game.state ? 'playing' : 'lobby';
         this.netError = '';
         return;
       case 'reject':
+        if (this.hostPeer !== null && !fromHost) return;
+        this.clearJoinTimer();
         this.hostPeer = null;
         this.status = 'error';
         this.netError = raw.reason;
         return;
       case 'lobby':
-        this.hostPeer = from;
+        if (!fromHost) return;
         this.lobbySeats = raw.seats;
         if (this.status === 'connecting') this.status = 'lobby';
         return;
       case 'state':
-        if (raw.version <= this.lastSeenVersion) return; // veraltete Nachricht verwerfen
+        if (!fromHost) return;
+        if (raw.version <= this.lastSeenVersion) return; // veraltet/unverändert — verwerfen
         this.lastSeenVersion = raw.version;
-        this.hostPeer = from;
         this.game.setRemoteState(raw.state);
         this.status = 'playing';
         return;
       case 'error':
+        if (!fromHost) return;
         this.netError = raw.message;
         return;
     }

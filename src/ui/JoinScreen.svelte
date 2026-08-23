@@ -20,6 +20,8 @@
     try {
       await session.join(normalizeRoomCode(code), name.trim(), selectedTransport());
       clearJoinHash();
+    } catch {
+      // Die Sitzung räumt selbst auf und stellt die Meldung in netError bereit.
     } finally {
       busy = false;
     }
