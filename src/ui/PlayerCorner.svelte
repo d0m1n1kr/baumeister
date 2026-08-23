@@ -401,7 +401,11 @@
       {:else}
       {#if st.phase.t === 'monumentDraft'}
         {#if !p.monument}
-          <button class="primary" onpointerup={() => (confirming = 'draft')}>{t.monumentDraftButton}</button>
+          <!-- Solo-Ansicht: eigenes Gerät, niemand muss wegschauen -->
+          <button
+            class="primary"
+            onpointerup={() => (solo ? (monumentPick = true) : (confirming = 'draft'))}
+          >{t.monumentDraftButton}</button>
         {:else}
           <span class="status">{t.monumentChosen} ✓</span>
         {/if}
@@ -598,10 +602,17 @@
 
       <!-- Monument-Slot -->
       {#if p.monument && !p.monument.built && st.phase.t !== 'monumentDraft'}
-        <button class="monBack" onpointerup={() => (confirming = 'reveal')} title={t.monument}>
-          <span>🏛</span>
-          <span class="monLabel">{t.monument}</span>
-        </button>
+        {#if solo && monumentDef}
+          <!-- Eigenes Gerät: das Monument darf offen liegen -->
+          <button class="monBuilt" onpointerup={() => (overlayCard = monumentDef)}>
+            🏛 {monumentDef.name.de}
+          </button>
+        {:else}
+          <button class="monBack" onpointerup={() => (confirming = 'reveal')} title={t.monument}>
+            <span>🏛</span>
+            <span class="monLabel">{t.monument}</span>
+          </button>
+        {/if}
       {:else if p.monument?.built && monumentDef}
         <button class="monBuilt" onpointerup={() => (overlayCard = monumentDef)}>
           🏛 {monumentDef.name.de} — {t.monumentBuilt}
