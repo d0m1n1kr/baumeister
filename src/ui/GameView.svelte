@@ -4,12 +4,15 @@
   import { t } from '../i18n/de';
   import GameTable from './GameTable.svelte';
   import SoloView from './SoloView.svelte';
+  import HandoverDialog from './HandoverDialog.svelte';
 
   // Gäste sehen immer ihr eigenes Brett; der Host kann zwischen Spieltisch
   // (alle Bretter, wie im Ein-Gerät-Modus) und eigener Ansicht umschalten.
   const isHost = $derived(session.role === 'host');
   let soloView = $state(false);
-  const useSolo = $derived(session.role === 'guest' || (isHost && soloView));
+  let handover = $state(false);
+  const hasLocalSeat = $derived(session.seats.some((s) => s.kind === 'local'));
+  const useSolo = $derived(session.role === 'guest' || (isHost && soloView && hasLocalSeat));
 
   // Displaysperre verhindern, solange gespielt wird (nützt auch am Einzelgerät).
   $effect(() => keepScreenAwake());
@@ -40,13 +43,23 @@
 {/if}
 
 {#if isHost}
-  <button class="viewToggle" onpointerup={() => (soloView = !soloView)}>
-    {soloView ? `▦ ${t.tableView}` : `👤 ${t.myBoard}`}
+  {#if hasLocalSeat}
+    <button class="viewToggle" onpointerup={() => (soloView = !soloView)}>
+      {soloView ? `▦ ${t.tableView}` : `👤 ${t.myBoard}`}
+    </button>
+  {/if}
+  <button class="qrToggle" onpointerup={() => (handover = true)} title={t.handoverTitle}>
+    ⌗ {t.roomCode}
   </button>
 {/if}
 
+{#if handover}
+  <HandoverDialog onclose={() => (handover = false)} />
+{/if}
+
 <style>
-  .viewToggle {
+  .viewToggle,
+  .qrToggle {
     position: fixed;
     top: calc(6px + env(safe-area-inset-top, 0px));
     right: calc(6px + env(safe-area-inset-right, 0px));
@@ -55,4 +68,5 @@
     opacity: 0.7;
     z-index: 60;
   }
+  .qrToggle { top: calc(40px + env(safe-area-inset-top, 0px)); }
 </style>

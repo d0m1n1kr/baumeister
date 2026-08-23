@@ -85,8 +85,12 @@ beendet iOS jede Verbindung — dagegen hilft keine Technik. Die App hält desha
 der Partie den Bildschirm wach (Wake Lock) und gleicht bei jeder Rückkehr in den
 Vordergrund den vollen Zustand ab; getrennte Plätze bleiben reserviert. Wird der Tab
 komplett neu geladen (auch das macht iOS gern), tritt ein Gast automatisch wieder bei
-(Sitzung liegt im `localStorage`), und der Host stellt mit „Weiterspielen" Partie
-**und** Raum wieder her — die Gäste verbinden sich dann von selbst neu.
+(Sitzung liegt im `localStorage`; beim Verbinden ruft er alle 3 s erneut, Frist 30 s,
+und selbst nach einem Fehlschlag bleibt die Sitzung für den nächsten Versuch gemerkt).
+Der Host stellt mit „Weiterspielen" Partie **und** Raum wieder her — die Gäste
+verbinden sich dann von selbst neu. Über den Raum-Code-Knopf im Spiel kann der Host
+außerdem jederzeit Plätze **per QR an (neue) Geräte übergeben** — auch mitten in
+der Partie, samt Spielstand.
 
 **Neue Karten** brauchen nur eine JSON-Datei (+ optional SVG) in `src/data/buildings/`
 bzw. `src/data/monuments/` — solange sie vorhandene Wertungs-/Effekt-Bausteine nutzen,
