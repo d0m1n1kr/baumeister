@@ -812,7 +812,9 @@
     .corner { padding: 4px; gap: 4px; }
     /* 2 Spieler am Handy: Brett mittig, Panel darunter */
     .corner.wide .row { flex-direction: column; align-items: center; gap: 4px; }
-    .corner.wide .boardWrap { width: min(26vh, 60vw); }
+    /* align-self: flex-start (oben andocken) gilt nur im Zeilen-Layout —
+       im Spalten-Layout würde es das Brett nach links statt mittig setzen */
+    .corner.wide .boardWrap { width: min(26vh, 60vw); align-self: center; }
     .corner.wide .panel { align-items: center; width: 100%; flex: 1; }
     .corner.wide header { justify-content: center; }
     .boardWrap { width: min(26vh, 40vw); }
