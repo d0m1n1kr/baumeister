@@ -33,6 +33,7 @@ an den vier Ecken des Geräts, die 7 Gebäudekarten der Partie liegen in der Mit
 - **Zwei Spielweisen:**
   - *An einem Gerät* (Standard, unverändert): reihum am selben iPad, **komplett offline**.
   - *Mit eigenen Geräten*: Der Host öffnet einen Raum, Mitspieler treten per QR-Code
+    (Kamera-App oder eingebauter Scanner — wichtig für die installierte PWA)
     oder 6-stelligem Code bei — **ohne Server**, direkt von Gerät zu Gerät (WebRTC).
     Sitzplätze lassen sich mischen: einige Spieler am Host-Gerät, andere mit eigenem
     Handy. Monumente sind dabei erstmals wirklich geheim.
