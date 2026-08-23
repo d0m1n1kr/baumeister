@@ -15,6 +15,8 @@
     session.mySeat ?? st.players.findIndex((_, i) => session.controls(i))
   );
   const others = $derived(st.players.map((_, i) => i).filter((i) => i !== me));
+  /** Eigenes Monument mit in die offene Kartenleiste — hier schaut niemand mit. */
+  const myMonument = $derived(st.players[me]?.monument?.card);
 
   let confirmLeave = $state(false);
 </script>
@@ -27,7 +29,12 @@
   </div>
 
   <div class="strip">
-    <CardStrip horizontal solo onabort={() => (confirmLeave = true)} />
+    <CardStrip
+      horizontal
+      solo
+      extraCards={myMonument ? [myMonument] : []}
+      onabort={() => (confirmLeave = true)}
+    />
   </div>
 
   <div class="own">

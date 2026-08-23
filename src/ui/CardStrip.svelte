@@ -10,8 +10,15 @@
   let {
     onabort,
     horizontal = false,
-    solo = false
-  }: { onabort?: () => void; horizontal?: boolean; solo?: boolean } = $props();
+    solo = false,
+    extraCards = []
+  }: {
+    onabort?: () => void;
+    horizontal?: boolean;
+    solo?: boolean;
+    /** Zusätzliche Karten (Einzelansicht: das eigene Monument). */
+    extraCards?: string[];
+  } = $props();
 
   const st = $derived(game.state!);
   const named = $derived(st.phase.t === 'round' ? st.phase.resource : null);
@@ -40,7 +47,7 @@
     {/if}
   </div>
   <div class="cards">
-    {#each st.config.activeCards as id}
+    {#each [...st.config.activeCards, ...extraCards] as id}
       <div class="cardWrap">
         <CardMini card={catalog[id]} onclick={(e) => open(catalog[id], e)} />
       </div>
