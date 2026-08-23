@@ -1,0 +1,40 @@
+{
+  "id": "prism_forge",
+  "set": "fortune",
+  "kind": "monument",
+  "category": "monument",
+  "color": "pink",
+  "name": {
+    "de": "Die Prismenschmiede",
+    "en": "The Prism Forge"
+  },
+  "text": {
+    "de": "Einmal pro Runde darfst du ein Gebäude bauen, OHNE die Materialien zu entfernen — sie können in derselben Runde für einen zweiten, anderen Bau genutzt werden.",
+    "en": "Once per round you may construct without removing the resources; they may be used again this round for a different building."
+  },
+  "pattern": [
+    [
+      "glass",
+      "glass"
+    ],
+    [
+      "stone",
+      "brick"
+    ],
+    [
+      "wood",
+      null
+    ]
+  ],
+  "features": [
+    "interactive"
+  ],
+  "scoring": {
+    "type": "none"
+  },
+  "effects": [
+    "prismForge"
+  ],
+  "art": "prism_forge.svg",
+  "unverified": true
+}

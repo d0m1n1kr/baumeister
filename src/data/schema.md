@@ -17,7 +17,8 @@ und Effekt-Bausteine verwenden.
 | `name`, `text` | `{ de: string, en?: string }` | Name und Regeltext (i18n) |
 | `pattern` | `(Ressource \| null)[][]` | Baumuster als Raster; Ressourcen: `wood`, `brick`, `stone`, `wheat`, `glass`. Rotation & Spiegelung erledigt die Engine. Max. 4×4. |
 | `features` | string[] | Symbole der Mini-Karte, siehe unten |
-| `feeding` | optional | Nur rote Karten: `{ "mode": "anywhere"\|"surrounding8"\|"rowAndColumn"\|"contiguousGroup", "count"?: n }` |
+| `feeding` | optional | Nur rote Karten: `{ "mode": "anywhere"\|"surrounding8"\|"rowAndColumn"\|"contiguousGroup"\|"rowOrColumnPerCoin"\|"adjacentPlusPerCoinPer2", "count"?: n }` |
+| `unverified` | optional bool | Kartentext/-muster nicht aus Primärquellen belegt (⚠ auf der Mini-Karte) |
 | `scoring` | object | Deklarative Wertung, siehe unten |
 | `effects` | string[] | Benannte Spiellogik-Effekte (Code in `engine/`), siehe unten |
 | `art` | string | Dateiname des SVG in `art/` |
@@ -39,17 +40,32 @@ und Effekt-Bausteine verwenden.
 - `ifAloneInRowAndCol` — `{ "target": SEL, "vp": n }`
 - `perOwnCountVsRightNeighbor` — `{ "baseEach": n, "bonusEach": n }`
 - `perStoredResource` — `{ "vpEach": n }` (z. B. Lagerhaus: −1)
-- `handler` — `{ "handler": "archive"\|"mandras"\|"skyBaths"\|"silva"\|"shrine"\|"starloom", "vp"?: n }`
+- `handler` — `{ "handler": "archive"\|"mandras"\|"skyBaths"\|"silva"\|"shrine"\|"starloom"\|"schoolhouse"\|"eraflage", "vp"?: n }`
 
 **Selektoren (SEL):** `"cottage"` (Hütten-Gebäude; Schloss Barrett zählt doppelt),
 `"fedCottage"`, `"self"` (gleiche Farbe wie die Karte), `{ "color": "…" }`, `{ "card": "id" }`.
 
 ## Effekte (`effects`)
 
-`factory`, `bank`, `tradingPost`, `warehouse`, `buildAnywhereSelf`, `buildAnywhereAll`,
-`architectsGuild`, `groveUniversity`, `opaleye`, `bondmaker`, `fortIronweed`,
-`cathedral`, `mausoleum`, `barrettCastle` — implementiert in `src/engine/game.ts` und
-`src/engine/scoring.ts`. Neue Mechaniken brauchen einen neuen Effekt-Handler dort.
+*Basisspiel:* `factory`, `bank`, `tradingPost`, `warehouse`, `buildAnywhereSelf`,
+`buildAnywhereAll`, `architectsGuild`, `groveUniversity`, `opaleye`, `bondmaker`,
+`fortIronweed`, `cathedral`, `mausoleum`, `barrettCastle`
+
+*Fortune:* `coinOnConstruct`, `coinOnConstruct2`, `statueCoins`, `gamblersDen`,
+`teahouseCoins`, `jewelerToll`, `parsonageCheck`, `constructCost2`, `coinValue2`,
+`masonsGuild`, `oddityShop`, `museum`, `cathedralTransform`, `grottoCoins`,
+`promenadeCoins`, `prismForge`, `southernSemaphore`
+
+Implementiert in `src/engine/game.ts` und `src/engine/scoring.ts`. Neue Mechaniken
+brauchen einen neuen Effekt-Handler dort.
+
+## Sets & Systeme
+
+Sets werden in `src/data/sets.ts` registriert; Karten tragen das passende `set`-Feld
+und mischen sich beim Setup in die Kategorie-/Monument-Pools (`randomSetup`).
+Systeme: `coins` (Fortune: 1 Münze bei 2+ Bauten pro Runde, max. 4, Tausch gegen
+1 Münze außer als Baumeister, 1 SP je Münze am Ende) und `trees` (Tiny Trees:
+Samen-Phase, Gratis-Material beim Überbauen, Baum = 2 SP als einziges unbebautes Feld).
 
 ## Features (Symbolzeile der Mini-Karte)
 
@@ -68,3 +84,23 @@ Rulebook + gängigen Klarstellungen (UltraBoardGames/BGG):
 - **Mausoleum:** ungefütterte Hütten (nur Kategorie `cottage`) zählen 3 Punkte; macht sie nicht „gefüttert“ für Kapelle/Tempel.
 - **Sternenwebstuhl:** 1.→6, 2.→3, 3.→2, ab 4.→0; gleiche Runde = gleicher Rang.
 - **Opaleyes Wacht:** Basispunkte 0.
+
+## Unverifizierte Karten (Fortune) — `unverified: true`
+
+Diese Karten sind aus öffentlichen Quellen (Rulebook-PDF, UltraBoardGames, BGG-Fotos)
+nicht vollständig belegbar und nach bester Quellenlage bzw. mit gekennzeichneten
+Annahmen umgesetzt. **Korrektur = JSON-Edit** in `buildings/`/`monuments/`:
+
+| Karte | Annahme |
+|---|---|
+| `cathedral_fortune` | Muster erfunden; 2 SP ohne Kathedralen-Nachbar; Bau: 3 Münzen oder → Hütte (Effekt aus Klarstellungen) |
+| `teahouse` | Muster erfunden; Münzen je Typ in Zeile ODER Spalte, max 3 (aus Klarstellungen) |
+| `museum` | Muster erfunden; Kapazität 2 angenommen; 1×/Runde Verkauf +1 Münze (aus Klarstellungen) |
+| `caterinas_grotto` | Muster erfunden; Münzen auf freie Mittelfelder, Einsammeln beim Bau |
+| `eraflage_vineyard` | Muster erfunden; Basis 8 SP ANGENOMMEN, −2 je Typ in Zeile ∪ Spalte |
+| `hollow_hill` | komplett vereinfacht: flat 5 SP (Original nicht rekonstruierbar) |
+| `petal_promenade` | Muster erfunden; Münzen auf bis zu 3 freie Felder, Einsammeln bei fremder Ansage |
+| `prism_forge` | Muster erfunden; vereinfacht: 1×/Runde Bau ohne Materialentfernen |
+| `southern_semaphore` | Muster erfunden; 1 Zusatz-Material je Runde, nicht tauschbar |
+| `treasury_at_okaver` | Effekt ERFUNDEN: 3 SP + 2 Münzen beim Bau (keine Quelle) |
+| `shrine_of_the_windseed` | Effekt ERFUNDEN: 1 SP, +3 in einer Ecke (keine Quelle) |

@@ -1,0 +1,35 @@
+{
+  "id": "hollow_hill",
+  "set": "fortune",
+  "kind": "monument",
+  "category": "monument",
+  "color": "pink",
+  "name": {
+    "de": "Hohler Hügel",
+    "en": "Hollow Hill"
+  },
+  "text": {
+    "de": "5 Punkte. (Vereinfachte Umsetzung — Originaleffekt nicht verifizierbar.)",
+    "en": "5 points. (Simplified — original effect unverified.)"
+  },
+  "pattern": [
+    [
+      null,
+      "wheat",
+      null
+    ],
+    [
+      "wood",
+      "stone",
+      "wood"
+    ]
+  ],
+  "features": [],
+  "scoring": {
+    "type": "flat",
+    "vp": 5
+  },
+  "effects": [],
+  "art": "hollow_hill.svg",
+  "unverified": true
+}

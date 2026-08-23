@@ -1,0 +1,43 @@
+{
+  "id": "southern_semaphore",
+  "set": "fortune",
+  "kind": "monument",
+  "category": "monument",
+  "color": "pink",
+  "name": {
+    "de": "Südliches Semaphor",
+    "en": "Southern Semaphore"
+  },
+  "text": {
+    "de": "Du erhältst jede Runde 1 zusätzliches Material des angesagten Typs (nicht tauschbar).",
+    "en": "You receive 1 additional resource of the named type each round (not swappable)."
+  },
+  "pattern": [
+    [
+      "stone",
+      null,
+      null
+    ],
+    [
+      "wood",
+      "glass",
+      "brick"
+    ],
+    [
+      "wheat",
+      null,
+      null
+    ]
+  ],
+  "features": [
+    "interactive"
+  ],
+  "scoring": {
+    "type": "none"
+  },
+  "effects": [
+    "southernSemaphore"
+  ],
+  "art": "southern_semaphore.svg",
+  "unverified": true
+}

@@ -1,0 +1,40 @@
+{
+  "id": "teahouse",
+  "set": "fortune",
+  "kind": "building",
+  "category": "theater",
+  "color": "yellow",
+  "name": {
+    "de": "Teehaus",
+    "en": "Teahouse"
+  },
+  "text": {
+    "de": "Beim Bau: +1 Münze je Gebäudetyp in seiner Zeile ODER Spalte (bessere Achse, max. 3).",
+    "en": "On construct: gain 1 coin per building type in its row OR column (max 3)."
+  },
+  "pattern": [
+    [
+      null,
+      "brick",
+      null
+    ],
+    [
+      "wood",
+      "glass",
+      "wood"
+    ]
+  ],
+  "features": [
+    "coins",
+    "row-col",
+    "on-construct"
+  ],
+  "scoring": {
+    "type": "none"
+  },
+  "effects": [
+    "teahouseCoins"
+  ],
+  "art": "teahouse.svg",
+  "unverified": true
+}

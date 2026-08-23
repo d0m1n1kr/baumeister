@@ -58,7 +58,9 @@ export type ScoreHandlerId =
   | 'skyBaths'       // 2 SP je fehlendem Gebäudetyp
   | 'silva'          // 1 SP + 1 SP je Gebäude der größten zusammenhängenden Gruppe
   | 'shrine'         // Tabelle nach Gebäudezahl zum Bauzeitpunkt
-  | 'starloom';      // Punkte nach Fertigstellungs-Reihenfolge
+  | 'starloom'       // Punkte nach Fertigstellungs-Reihenfolge
+  | 'schoolhouse'    // Fortune: 2 SP bei gefütterter Nachbar-Hütte, +2 bei Münzen ≥ rechter Nachbar
+  | 'eraflage';      // Fortune (unverifiziert): Basis −2 SP je Gebäudetyp in Zeile ∪ Spalte
 
 /** Spiellogik-Effekte, implementiert in effects.ts / game.ts. */
 export type EffectId =
@@ -75,10 +77,32 @@ export type EffectId =
   | 'fortIronweed'       // keine Master-Builder-Züge mehr
   | 'cathedral'          // leere Felder 0 statt -1
   | 'mausoleum'          // ungefütterte Hütten 3 SP
-  | 'barrettCastle';     // zählt als 2 (gefütterte) Hütten für alle Wertungen
+  | 'barrettCastle'      // zählt als 2 (gefütterte) Hütten für alle Wertungen
+  // ---------- Fortune ----------
+  | 'coinOnConstruct'    // Bau: +1 Münze (Mine, Root Cellar)
+  | 'coinOnConstruct2'   // Bau: +2 Münzen (Treasury, best effort)
+  | 'statueCoins'        // Bau: +1 Münze je Gebäudetyp mit 3+ Exemplaren
+  | 'gamblersDen'        // Bau: +2 Münzen bei genau 1 Münze
+  | 'teahouseCoins'      // Bau: +1 Münze je Typ in Zeile ODER Spalte (max 3)
+  | 'jewelerToll'        // Bau: 1 Münze zahlen, sonst +1 Münze für alle anderen
+  | 'parsonageCheck'     // Bau: Münzen ≠ Hüttenzahl → alle Münzen verlieren
+  | 'constructCost2'     // Bau kostet 2 Münzen (Pflicht)
+  | 'coinValue2'         // Endwertung: Münzen 2 statt 1 SP (Estival Festival)
+  | 'masonsGuild'        // Bau: je 1 Münze → 1 weiteres (einzigartiges) Gebäude
+  | 'oddityShop'         // hält 1 fremd angesagtes Material; MB-Zugriff gegen Münze
+  | 'museum'             // lagert Material; 1×/Runde 1 zurückgeben → +1 Münze
+  | 'cathedralTransform' // Bau: 3 Münzen zahlen, sonst wird es eine Hütte
+  | 'grottoCoins'        // Bau: Münzen auf freie Mittelfelder legen
+  | 'promenadeCoins'     // Bau: Münzen auf bis zu 3 freie Felder legen
+  | 'prismForge'         // 1×/Runde: Bauen ohne Materialentfernen (Doppelnutzung)
+  | 'southernSemaphore'; // jede Runde 1 zusätzliches angesagtes Material
 
 export interface FeedingSpec {
-  mode: 'anywhere' | 'surrounding8' | 'rowAndColumn' | 'contiguousGroup';
+  mode:
+    | 'anywhere' | 'surrounding8' | 'rowAndColumn' | 'contiguousGroup'
+    // Fortune (münzbasiert, Endwertung):
+    | 'rowOrColumnPerCoin'         // Root Cellar: 1 Münze je gewählter Zeile/Spalte
+    | 'adjacentPlusPerCoinPer2';   // Tithe Barn: Nachbarn gratis + 1 Münze je 2 Hütten
   count?: number; // nur mode=anywhere (Farm: 4)
 }
 
@@ -87,7 +111,7 @@ export type FeatureId =
   | 'feedable' | 'feeds' | 'adjacency' | 'no-adjacency' | 'row-col' | 'corners' | 'center'
   | 'count-table' | 'holds-resource' | 'wild-resource' | 'interactive'
   | 'on-construct' | 'placement-override' | 'negative-vp' | 'vs-neighbor'
-  | 'town-snapshot' | 'finish-order' | 'empty-ok' | 'unique-types';
+  | 'town-snapshot' | 'finish-order' | 'empty-ok' | 'unique-types' | 'coins';
 
 export interface CardDef {
   id: string;
@@ -103,6 +127,8 @@ export interface CardDef {
   scoring: ScoringSpec;
   effects?: EffectId[];
   art?: string;
+  /** Kartentext/-muster nicht aus Primärquellen verifiziert (siehe schema.md). */
+  unverified?: boolean;
 }
 
 export type Catalog = Record<string, CardDef>;
@@ -126,6 +152,8 @@ export interface Square {
   building?: PlacedBuilding;
   /** Material; koexistiert mit building nur via Statue des Bondmakers. */
   resource?: Resource;
+  /** Fortune: Münze auf dem Feld (Grotto/Promenade). */
+  coin?: boolean;
 }
 
 export interface PlayerState {
@@ -151,6 +179,21 @@ export interface PlayerState {
   shrineSnapshot?: number;
   masterBuilderTurns: number;
   choices: PendingChoice[];
+  /** Münzen in der Truhe (Fortune, 0–COIN_CAP). */
+  coins: number;
+  /** Bauten durch Materialentfernen in dieser Runde (Fortune: 2+ → 1 Münze). */
+  buildsThisRound: number;
+  /** Tiny Trees: Feld des Samens (-1 = verbraucht, undefined = System inaktiv/ungesetzt). */
+  seedSquare?: number;
+  /** Fortune: zusätzliches Material (Southern Semaphore); rückt nach dem Platzieren in pending nach. */
+  pendingExtra?: Resource | null;
+  /** Fortune: pending stammt aus Southern Semaphore → kein Tausch (Fabrik/Münze) erlaubt. */
+  pendingLocked?: boolean;
+  /** Fortune: Museum-Verkauf bereits in dieser Runde genutzt. */
+  museumSoldThisRound?: boolean;
+  /** Fortune: Prisma-Schmiede in dieser Runde genutzt (+ Karte der Erstnutzung). */
+  prismUsedThisRound?: boolean;
+  prismCard?: string;
 }
 
 export type PendingChoice =
@@ -158,10 +201,14 @@ export type PendingChoice =
   | { t: 'groveUniversity'; square: number }                          // Gratis-Gebäude wählen
   | { t: 'architectsGuild'; square: number; remaining: number }       // bis zu 2 Ersetzungen
   | { t: 'opaleyeSetup'; square: number; remaining: number }          // 3 Typen bevorraten
-  | { t: 'opaleyeClaim'; square: number; card: string };              // Nachbar baute Vorratstyp
+  | { t: 'opaleyeClaim'; square: number; card: string }               // Nachbar baute Vorratstyp
+  | { t: 'masonsGuild'; square: number; picked: string[] }            // Fortune: Münzen → Gebäude
+  | { t: 'promenadeCoins'; remaining: number }                        // Fortune: Münzen auf Felder
+  | { t: 'seedBonus' };                                               // Tiny Trees: Gratis-Material
 
 export type Phase =
   | { t: 'monumentDraft' }
+  | { t: 'seedPlacement' }   // Tiny Trees: jeder wählt ein Feld für seinen Samen
   | { t: 'nameResource' }
   | { t: 'round'; resource: Resource }
   | { t: 'gameOver' };
@@ -174,7 +221,14 @@ export interface GameConfig {
   monumentDeals: string[][];
   firstMasterBuilder: number;
   useMonuments: boolean;
+  /** Aktive Karten-Sets (enthält immer 'base'). */
+  sets: string[];
+  /** Aktive Zusatzsysteme (aus den gewählten Sets abgeleitet). */
+  systems: { coins: boolean; trees: boolean };
 }
+
+/** Maximale Münzen in der Truhe (Fortune). */
+export const COIN_CAP = 4;
 
 export interface GameState {
   config: GameConfig;
@@ -182,6 +236,8 @@ export interface GameState {
   phase: Phase;
   masterBuilder: number;
   round: number;
+  /** Fortune: Oddity-Shop-Zugriff des aktuellen Baumeisters bereits genutzt. */
+  oddityTaken?: boolean;
   /** Version des Save-Formats. */
   v: number;
 }
@@ -190,11 +246,19 @@ export type Action =
   | { t: 'chooseMonument'; player: number; card: string }
   | { t: 'nameResource'; resource: Resource }
   | { t: 'factorySwap'; player: number; take: Resource }
+  | { t: 'coinSwap'; player: number; take: Resource }
   | { t: 'placeResource'; player: number; square: number }
   | { t: 'moveResource'; player: number; square: number }
   | { t: 'warehouseStore'; player: number; square: number }
   | { t: 'warehouseSwap'; player: number; square: number; storedIndex: number }
-  | { t: 'build'; player: number; squares: number[]; card: string; target: number }
+  | { t: 'build'; player: number; squares: number[]; card: string; target: number; prism?: boolean }
+  | { t: 'oddityStore'; player: number; square: number }
+  | { t: 'oddityTake'; player: number; fromPlayer: number; fromSquare: number; targetSquare: number }
+  | { t: 'museumSell'; player: number; square: number; storedIndex: number }
+  | { t: 'resolveMasons'; player: number; card: string | null; square?: number }
+  | { t: 'resolvePromenade'; player: number; square: number | null }
+  | { t: 'resolveSeedBonus'; player: number; resource: Resource | null; square?: number }
+  | { t: 'placeSeed'; player: number; square: number }
   | { t: 'resolveMark'; player: number; resource: Resource }
   | { t: 'resolveGrove'; player: number; card: string | null; square?: number }
   | { t: 'resolveGuild'; player: number; square: number | null; newCard?: string }
@@ -215,6 +279,10 @@ export interface PlayerScore {
   emptyPenalty: number;
   total: number;
   fedCottages: number;
+  /** Fortune: übrige Münzen und ihre Punkte (nach Fütterungs-Ausgaben). */
+  coins?: { count: number; spent: number; points: number };
+  /** Tiny Trees: 2 Punkte, wenn der Samen zum Baum wurde. */
+  treePoints?: number;
 }
 
 // ---------- Hilfsfunktionen ----------

@@ -1,0 +1,40 @@
+{
+  "id": "treasury_at_okaver",
+  "set": "fortune",
+  "kind": "monument",
+  "category": "monument",
+  "color": "pink",
+  "name": {
+    "de": "Die Schatzkammer von Okaver",
+    "en": "The Treasury at Okaver"
+  },
+  "text": {
+    "de": "3 Punkte. Beim Bau: +2 Münzen. (Angenommener Effekt — Original nicht verifizierbar.)",
+    "en": "3 points. On construct: gain 2 coins. (Assumed effect.)"
+  },
+  "pattern": [
+    [
+      "wheat",
+      "glass",
+      "wheat"
+    ],
+    [
+      "brick",
+      null,
+      "brick"
+    ]
+  ],
+  "features": [
+    "coins",
+    "on-construct"
+  ],
+  "scoring": {
+    "type": "flat",
+    "vp": 3
+  },
+  "effects": [
+    "coinOnConstruct2"
+  ],
+  "art": "treasury_at_okaver.svg",
+  "unverified": true
+}

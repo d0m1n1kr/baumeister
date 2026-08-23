@@ -1,0 +1,41 @@
+{
+  "id": "eraflage_vineyard",
+  "set": "fortune",
+  "kind": "monument",
+  "category": "monument",
+  "color": "pink",
+  "name": {
+    "de": "Weingut Eraflage",
+    "en": "Eraflage Vineyard"
+  },
+  "text": {
+    "de": "8 Punkte, −2 Punkte je anderem Gebäudetyp in seiner Zeile und Spalte.",
+    "en": "8 points, −2 per other building type in its row and column."
+  },
+  "pattern": [
+    [
+      "wheat",
+      null
+    ],
+    [
+      "wood",
+      "glass"
+    ],
+    [
+      null,
+      "brick"
+    ]
+  ],
+  "features": [
+    "row-col",
+    "negative-vp"
+  ],
+  "scoring": {
+    "type": "handler",
+    "handler": "eraflage",
+    "vp": 8
+  },
+  "effects": [],
+  "art": "eraflage_vineyard.svg",
+  "unverified": true
+}

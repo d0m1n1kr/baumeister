@@ -1,0 +1,42 @@
+{
+  "id": "shrine_of_the_windseed",
+  "set": "fortune",
+  "kind": "monument",
+  "category": "monument",
+  "color": "pink",
+  "name": {
+    "de": "Schrein des Windsamens",
+    "en": "Shrine of the Windseed"
+  },
+  "text": {
+    "de": "1 Punkt, +3 Punkte in einer Ecke deiner Stadt. (Angenommener Effekt — Original nicht verifizierbar.)",
+    "en": "1 point, +3 if in a corner. (Assumed effect.)"
+  },
+  "pattern": [
+    [
+      null,
+      "wood",
+      null
+    ],
+    [
+      "glass",
+      "wheat",
+      "glass"
+    ]
+  ],
+  "features": [
+    "corners"
+  ],
+  "scoring": {
+    "type": "perInZone",
+    "zone": "corners",
+    "target": {
+      "card": "shrine_of_the_windseed"
+    },
+    "vpEach": 3,
+    "base": 1
+  },
+  "effects": [],
+  "art": "shrine_of_the_windseed.svg",
+  "unverified": true
+}

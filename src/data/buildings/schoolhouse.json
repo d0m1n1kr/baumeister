@@ -1,0 +1,33 @@
+{
+  "id": "schoolhouse",
+  "set": "fortune",
+  "kind": "building",
+  "category": "tavern",
+  "color": "green",
+  "name": {
+    "de": "Schulhaus",
+    "en": "Schoolhouse"
+  },
+  "text": {
+    "de": "2 Punkte, wenn an eine gefütterte Hütte angrenzend; +2 Punkte, wenn du am Ende mindestens so viele Münzen hast wie der Spieler rechts von dir.",
+    "en": "2 points if adjacent to a fed cottage; +2 if you have at least as many coins as the player on your right."
+  },
+  "pattern": [
+    [
+      "wood",
+      "wheat",
+      "glass"
+    ]
+  ],
+  "features": [
+    "adjacency",
+    "coins",
+    "vs-neighbor"
+  ],
+  "scoring": {
+    "type": "handler",
+    "handler": "schoolhouse"
+  },
+  "effects": [],
+  "art": "schoolhouse.svg"
+}

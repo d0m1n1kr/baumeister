@@ -77,11 +77,14 @@ try {
   page.on('pageerror', (e) => fail(`Seitenfehler: ${e.message}`));
   await page.goto(BASE_URL);
 
-  // Setup: 2 Spieler, ohne Monumente
+  // Setup: 2 Spieler, ohne Monumente, mit Fortune-Erweiterung
   await page.locator('.seg button', { hasText: '2' }).click();
-  await page.locator('.toggle input[type="checkbox"]').click();
+  await page.locator('.toggle input[type="checkbox"]').first().click();
+  await page.locator('.expRow', { hasText: 'Fortune' }).locator('input').click();
   await page.locator('button', { hasText: 'Los geht’s!' }).click();
-  console.log('✓ Setup');
+  const chests = await page.locator('.chest').count();
+  if (chests !== 2) fail(`Erwartet 2 Münz-Truhen (Fortune aktiv), gefunden: ${chests}`);
+  console.log('✓ Setup (mit Fortune: Truhen sichtbar)');
 
   // Hütten-Muster für Spieler 0: Weizen(0,1), Ziegel(1,0), Glas(1,1)
   await playRound('Weizen', 1);

@@ -1,6 +1,7 @@
 <script lang="ts">
   import { game } from '../store/gameStore.svelte';
   import { catalog } from '../data';
+  import { SETS, systemActive } from '../data/sets';
   import { mulberry32, randomSeed, randomSetup } from '../engine/registry';
   import { t } from '../i18n/de';
 
@@ -14,7 +15,14 @@
   let names = $state(['Spieler 1', 'Spieler 2', 'Spieler 3', 'Spieler 4']);
   let corners = $state([...DEFAULT_CORNERS[4]]);
   let useMonuments = $state(true);
+  let chosenSets = $state<string[]>([]);
   let error = $state('');
+
+  function toggleSet(id: string) {
+    chosenSets = chosenSets.includes(id)
+      ? chosenSets.filter((s) => s !== id)
+      : [...chosenSets, id];
+  }
 
   function setCount(n: number) {
     count = n;
@@ -32,8 +40,13 @@
       name: names[i].trim() || `Spieler ${i + 1}`,
       corner: corners[i]
     }));
+    const sets = ['base', ...chosenSets];
+    const systems = {
+      coins: systemActive(sets, 'coins'),
+      trees: systemActive(sets, 'trees')
+    };
     try {
-      game.start(randomSetup(catalog, players, useMonuments, mulberry32(randomSeed())));
+      game.start(randomSetup(catalog, players, useMonuments, mulberry32(randomSeed()), sets, systems));
     } catch (e) {
       error = e instanceof Error ? e.message : String(e);
     }
@@ -70,6 +83,21 @@
       <input type="checkbox" bind:checked={useMonuments} />
       <span>{t.useMonuments}</span>
     </label>
+
+    <div class="expansions">
+      <span class="expTitle">{t.expansions}</span>
+      {#each SETS.filter((s) => !s.core) as set}
+        <label class="field toggle expRow">
+          <input
+            type="checkbox"
+            checked={chosenSets.includes(set.id)}
+            onchange={() => toggleSet(set.id)}
+          />
+          <span class="expName">{set.name}</span>
+          <span class="expDesc">{set.description}</span>
+        </label>
+      {/each}
+    </div>
 
     {#if error}<div class="error">{error}</div>{/if}
     <button class="primary big" onpointerup={start}>{t.startGame}</button>
@@ -119,7 +147,18 @@
     padding: 8px;
   }
   .toggle { cursor: pointer; }
-  .toggle input { width: 20px; height: 20px; }
+  .toggle input { width: 20px; height: 20px; flex-shrink: 0; }
+  .expansions {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    border-top: 1px solid rgba(255, 255, 255, 0.12);
+    padding-top: 10px;
+  }
+  .expTitle { font-size: 13px; color: var(--text-dim); }
+  .expRow { align-items: flex-start; }
+  .expName { font-weight: 600; white-space: nowrap; }
+  .expDesc { font-size: 11px; color: var(--text-dim); line-height: 1.35; }
   .big { font-size: 17px; padding: 12px; margin-top: 6px; }
   .error { color: var(--danger); font-size: 13px; }
 </style>

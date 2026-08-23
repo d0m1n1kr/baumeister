@@ -1,0 +1,39 @@
+{
+  "id": "jeweler",
+  "set": "fortune",
+  "kind": "building",
+  "category": "theater",
+  "color": "yellow",
+  "name": {
+    "de": "Juwelier",
+    "en": "Jeweler"
+  },
+  "text": {
+    "de": "4 Punkte. Beim Bau: Zahle 1 Münze — kannst du nicht, erhalten alle anderen Spieler 1 Münze.",
+    "en": "4 points. On construct: pay 1 coin; if you cannot, every other player gains 1 coin."
+  },
+  "pattern": [
+    [
+      null,
+      "stone",
+      null
+    ],
+    [
+      "brick",
+      "glass",
+      "brick"
+    ]
+  ],
+  "features": [
+    "coins",
+    "on-construct"
+  ],
+  "scoring": {
+    "type": "flat",
+    "vp": 4
+  },
+  "effects": [
+    "jewelerToll"
+  ],
+  "art": "jeweler.svg"
+}

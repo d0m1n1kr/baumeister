@@ -11,6 +11,13 @@ an den vier Ecken des Geräts, die 7 Gebäudekarten der Partie liegen in der Mit
   Monument-Effekte und die komplette Endwertung inkl. optimaler Fütterungs-Zuordnung.
 - **Komplettes Basisspiel:** 25 Gebäudekarten + 15 Monumente als erweiterbare
   JSON/SVG-Assets (`src/data/`, Schema in [`src/data/schema.md`](src/data/schema.md)).
+- **Erweiterungen (im Setup wählbar):**
+  - *Fortune* — komplette Münz-Mechanik (verdienen bei 2+ Bauten, Truhe mit 4 Slots,
+    Münze zahlen für ein anderes Material, 1 SP je Münze) plus 12 Gebäude und
+    10 Monumente. Einzelne nicht öffentlich belegbare Karten sind „best effort“
+    umgesetzt und mit ⚠ markiert (Liste in `schema.md`).
+  - *Tiny Trees* — Samen-Marker: Überbauen bringt ein Gratis-Material, als letztes
+    unbebautes Feld wird der Samen ein Baum (2 Punkte).
 - **Multi-Touch:** Mehrere Spieler können gleichzeitig Materialien per Drag & Drop
   auf ihre Bretter ziehen; jede Ecke ist zum jeweiligen Spieler rotiert.
 - **Monument-Geheimhaltung:** 2 ziehen / 1 geheim wählen, Aufdecken nur nach
