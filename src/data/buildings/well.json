@@ -1,0 +1,31 @@
+{
+  "id": "well",
+  "set": "base",
+  "kind": "building",
+  "category": "well",
+  "color": "grey",
+  "name": {
+    "de": "Brunnen",
+    "en": "Well"
+  },
+  "text": {
+    "de": "1 Punkt für jede angrenzende Hütte (gefüttert oder nicht).",
+    "en": "1 point for each adjacent cottage."
+  },
+  "pattern": [
+    [
+      "wood",
+      "stone"
+    ]
+  ],
+  "features": [
+    "adjacency"
+  ],
+  "scoring": {
+    "type": "perAdjacent",
+    "target": "cottage",
+    "vpEach": 1
+  },
+  "effects": [],
+  "art": "well.svg"
+}

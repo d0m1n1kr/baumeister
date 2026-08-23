@@ -1,0 +1,37 @@
+{
+  "id": "orchard",
+  "set": "base",
+  "kind": "building",
+  "category": "food",
+  "color": "red",
+  "name": {
+    "de": "Obstgarten",
+    "en": "Orchard"
+  },
+  "text": {
+    "de": "Füttert alle Hütten-Gebäude in derselben Zeile und Spalte wie der Obstgarten.",
+    "en": "Feeds all cottage buildings in the same row and column as it."
+  },
+  "pattern": [
+    [
+      "stone",
+      "wheat"
+    ],
+    [
+      "wheat",
+      "wood"
+    ]
+  ],
+  "features": [
+    "feeds",
+    "row-col"
+  ],
+  "feeding": {
+    "mode": "rowAndColumn"
+  },
+  "scoring": {
+    "type": "none"
+  },
+  "effects": [],
+  "art": "orchard.svg"
+}

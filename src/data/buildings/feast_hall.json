@@ -1,0 +1,32 @@
+{
+  "id": "feast_hall",
+  "set": "base",
+  "kind": "building",
+  "category": "tavern",
+  "color": "green",
+  "name": {
+    "de": "Festhalle",
+    "en": "Feast Hall"
+  },
+  "text": {
+    "de": "2 Punkte je Festhalle; 3 Punkte je Festhalle, wenn du mehr davon hast als der Spieler rechts von dir.",
+    "en": "2 points each; 3 points each if you have more than the player on your right."
+  },
+  "pattern": [
+    [
+      "wood",
+      "wood",
+      "glass"
+    ]
+  ],
+  "features": [
+    "vs-neighbor"
+  ],
+  "scoring": {
+    "type": "perOwnCountVsRightNeighbor",
+    "baseEach": 2,
+    "bonusEach": 1
+  },
+  "effects": [],
+  "art": "feast_hall.svg"
+}

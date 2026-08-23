@@ -1,0 +1,40 @@
+{
+  "id": "statue_of_the_bondmaker",
+  "set": "base",
+  "kind": "monument",
+  "category": "monument",
+  "color": "pink",
+  "name": {
+    "de": "Statue des Bündnisschmieds",
+    "en": "Statue of the Bondmaker"
+  },
+  "text": {
+    "de": "Sagt ein anderer Spieler ein Material an, darfst du es auf ein Feld mit einer Hütte legen (1 je Hütte). Solche Materialien sind nie verbaubar.",
+    "en": "When another player names a resource, you may place it on a square with a cottage (1 per cottage); such resources can never be used to build."
+  },
+  "pattern": [
+    [
+      "wood",
+      "stone",
+      "stone",
+      "glass"
+    ],
+    [
+      "wheat",
+      null,
+      null,
+      null
+    ]
+  ],
+  "features": [
+    "holds-resource",
+    "interactive"
+  ],
+  "scoring": {
+    "type": "none"
+  },
+  "effects": [
+    "bondmaker"
+  ],
+  "art": "statue_of_the_bondmaker.svg"
+}

@@ -1,0 +1,40 @@
+{
+  "id": "warehouse",
+  "set": "base",
+  "kind": "building",
+  "category": "factory",
+  "color": "black",
+  "name": {
+    "de": "Lagerhaus",
+    "en": "Warehouse"
+  },
+  "text": {
+    "de": "−1 Punkt je Material darauf am Spielende. Statt zu platzieren darfst du das angesagte Material einlagern (max. 3) oder mit einem eingelagerten tauschen.",
+    "en": "−1 point per resource on it at game end. Instead of placing, you may store the named resource (max 3) or swap it with a stored one."
+  },
+  "pattern": [
+    [
+      "wheat",
+      "wood",
+      "wheat"
+    ],
+    [
+      "brick",
+      null,
+      "brick"
+    ]
+  ],
+  "features": [
+    "holds-resource",
+    "interactive",
+    "negative-vp"
+  ],
+  "scoring": {
+    "type": "perStoredResource",
+    "vpEach": -1
+  },
+  "effects": [
+    "warehouse"
+  ],
+  "art": "warehouse.svg"
+}

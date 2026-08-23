@@ -1,0 +1,41 @@
+{
+  "id": "the_sky_baths",
+  "set": "base",
+  "kind": "monument",
+  "category": "monument",
+  "color": "pink",
+  "name": {
+    "de": "Die Himmelsbäder",
+    "en": "The Sky Baths"
+  },
+  "text": {
+    "de": "2 Punkte für jeden Gebäudetyp dieser Partie, der in deiner Stadt fehlt.",
+    "en": "2 points for each building type missing from your town."
+  },
+  "pattern": [
+    [
+      null,
+      "wheat",
+      null
+    ],
+    [
+      "stone",
+      "glass",
+      "wood"
+    ],
+    [
+      "brick",
+      null,
+      "brick"
+    ]
+  ],
+  "features": [
+    "unique-types"
+  ],
+  "scoring": {
+    "type": "handler",
+    "handler": "skyBaths"
+  },
+  "effects": [],
+  "art": "the_sky_baths.svg"
+}

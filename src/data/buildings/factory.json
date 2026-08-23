@@ -1,0 +1,41 @@
+{
+  "id": "factory",
+  "set": "base",
+  "kind": "building",
+  "category": "factory",
+  "color": "black",
+  "name": {
+    "de": "Fabrik",
+    "en": "Factory"
+  },
+  "text": {
+    "de": "Beim Bau: Lege 1 Material auf die Fabrik. Sagt ein anderer Spieler dieses Material an, darfst du stattdessen ein beliebiges Material nehmen.",
+    "en": "On construction, place 1 resource on it. When another player names that resource, you may take a different resource instead."
+  },
+  "pattern": [
+    [
+      "wood",
+      null,
+      null,
+      null
+    ],
+    [
+      "brick",
+      "stone",
+      "stone",
+      "brick"
+    ]
+  ],
+  "features": [
+    "on-construct",
+    "holds-resource",
+    "interactive"
+  ],
+  "scoring": {
+    "type": "none"
+  },
+  "effects": [
+    "factory"
+  ],
+  "art": "factory.svg"
+}

@@ -1,0 +1,40 @@
+{
+  "id": "barrett_castle",
+  "set": "base",
+  "kind": "monument",
+  "category": "monument",
+  "color": "pink",
+  "name": {
+    "de": "Schloss Barrett",
+    "en": "Barrett Castle"
+  },
+  "text": {
+    "de": "5 Punkte, wenn gefüttert. Zählt für alle Wertungen als 2 Hütten.",
+    "en": "5 points if fed. Counts as 2 cottages for all scoring purposes."
+  },
+  "pattern": [
+    [
+      "wheat",
+      null,
+      null,
+      "stone"
+    ],
+    [
+      "wood",
+      "glass",
+      "glass",
+      "brick"
+    ]
+  ],
+  "features": [
+    "feedable"
+  ],
+  "scoring": {
+    "type": "ifFed",
+    "vp": 5
+  },
+  "effects": [
+    "barrettCastle"
+  ],
+  "art": "barrett_castle.svg"
+}

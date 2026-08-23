@@ -1,0 +1,32 @@
+{
+  "id": "shed",
+  "set": "base",
+  "kind": "building",
+  "category": "well",
+  "color": "grey",
+  "name": {
+    "de": "Schuppen",
+    "en": "Shed"
+  },
+  "text": {
+    "de": "1 Punkt. Der Schuppen darf auf einem beliebigen freien Feld deiner Stadt gebaut werden.",
+    "en": "1 point. May be constructed on any empty square in your town."
+  },
+  "pattern": [
+    [
+      "wood",
+      "stone"
+    ]
+  ],
+  "features": [
+    "placement-override"
+  ],
+  "scoring": {
+    "type": "flat",
+    "vp": 1
+  },
+  "effects": [
+    "buildAnywhereSelf"
+  ],
+  "art": "shed.svg"
+}

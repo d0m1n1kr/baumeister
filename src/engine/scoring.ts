@@ -1,0 +1,457 @@
+// Endwertung: Fütterungs-Resolver (optimal) + deklarativer Wertungs-Interpreter.
+
+import type {
+  Catalog, CardDef, GameState, PlayerState, PlayerScore, ScoreLine, Selector
+} from './types';
+import {
+  BOARD_SIZE, CORNER_SQUARES, CENTER_SQUARES,
+  neighbors4, neighbors8, rowOf, colOf, idx
+} from './types';
+
+interface Placed {
+  square: number;
+  card: string;
+  def: CardDef;
+}
+
+function placedBuildings(p: PlayerState, catalog: Catalog): Placed[] {
+  const out: Placed[] = [];
+  p.board.forEach((sq, i) => {
+    if (sq.building) out.push({ square: i, card: sq.building.card, def: catalog[sq.building.card] });
+  });
+  return out;
+}
+
+/** Hütten-artig: Kategorie cottage oder Barrett Castle. */
+function isCottage(def: CardDef): boolean {
+  return def.category === 'cottage' || (def.effects ?? []).includes('barrettCastle');
+}
+
+/** Barrett Castle zählt für alle Wertungen als 2 Hütten. */
+function cottageWeight(def: CardDef): number {
+  return (def.effects ?? []).includes('barrettCastle') ? 2 : 1;
+}
+
+function matchesSelector(sel: Selector, target: CardDef, self: CardDef, fed: Set<number>, square: number): boolean {
+  if (sel === 'cottage') return isCottage(target);
+  if (sel === 'fedCottage') return isCottage(target) && fed.has(square);
+  if (sel === 'self') return target.color === self.color;
+  if ('color' in sel) return target.color === sel.color;
+  return target.id === sel.card;
+}
+
+/** Gewicht eines Treffers (Hütten-Selektoren zählen Barrett doppelt). */
+function selectorWeight(sel: Selector, target: CardDef): number {
+  if (sel === 'cottage' || sel === 'fedCottage') return cottageWeight(target);
+  return 1;
+}
+
+// ---------- Fütterung ----------
+
+/** Zusammenhängende Gruppen von Hütten-Gebäuden (orthogonal). */
+function cottageGroups(buildings: Placed[]): number[][] {
+  const cottageSquares = new Set(buildings.filter((b) => isCottage(b.def)).map((b) => b.square));
+  const seen = new Set<number>();
+  const groups: number[][] = [];
+  for (const s of cottageSquares) {
+    if (seen.has(s)) continue;
+    const group: number[] = [];
+    const stack = [s];
+    seen.add(s);
+    while (stack.length) {
+      const cur = stack.pop()!;
+      group.push(cur);
+      for (const n of neighbors4(cur)) {
+        if (cottageSquares.has(n) && !seen.has(n)) {
+          seen.add(n);
+          stack.push(n);
+        }
+      }
+    }
+    groups.push(group);
+  }
+  return groups;
+}
+
+function combinations<T>(arr: T[], k: number): T[][] {
+  if (k >= arr.length) return [arr];
+  if (k <= 0) return [[]];
+  const out: T[][] = [];
+  const pick = (start: number, cur: T[]) => {
+    if (cur.length === k) { out.push([...cur]); return; }
+    for (let i = start; i <= arr.length - (k - cur.length); i++) {
+      cur.push(arr[i]);
+      pick(i + 1, cur);
+      cur.pop();
+    }
+  };
+  pick(0, []);
+  return out;
+}
+
+/**
+ * Alle sinnvollen Fütterungs-Kandidaten (Mengen gefütterter Hütten-Felder).
+ * Deterministische Fütterer (Kornspeicher/Obstgarten) stehen fest; pro
+ * Gewächshaus wird eine zusammenhängende Gruppe gewählt; Bauernhöfe füttern
+ * beliebige Hütten bis zur Kapazität.
+ */
+function feedingCandidates(p: PlayerState, catalog: Catalog): Set<number>[] {
+  const buildings = placedBuildings(p, catalog);
+  const cottages = buildings.filter((b) => isCottage(b.def)).map((b) => b.square);
+  if (cottages.length === 0) return [new Set()];
+
+  const fixed = new Set<number>();
+  let anywhereCapacity = 0;
+  let greenhouses = 0;
+
+  for (const b of buildings) {
+    const feeding = b.def.feeding;
+    if (!feeding) continue;
+    switch (feeding.mode) {
+      case 'anywhere':
+        anywhereCapacity += feeding.count ?? 0;
+        break;
+      case 'surrounding8':
+        for (const n of neighbors8(b.square)) if (cottages.includes(n)) fixed.add(n);
+        break;
+      case 'rowAndColumn':
+        for (const c of cottages) {
+          if (rowOf(c) === rowOf(b.square) || colOf(c) === colOf(b.square)) fixed.add(c);
+        }
+        break;
+      case 'contiguousGroup':
+        greenhouses++;
+        break;
+    }
+  }
+
+  const groups = cottageGroups(buildings);
+
+  // Gewächshaus-Kombinationen (jede Wahl unabhängig; Duplikate egal)
+  let bases: Set<number>[] = [fixed];
+  for (let g = 0; g < greenhouses && groups.length > 0; g++) {
+    const next: Set<number>[] = [];
+    for (const base of bases) {
+      for (const group of groups) {
+        const s = new Set(base);
+        for (const sq of group) s.add(sq);
+        next.push(s);
+      }
+    }
+    bases = dedupeSets(next);
+    if (bases.length > 64) bases = bases.slice(0, 64); // Sicherheitsgrenze
+  }
+
+  // Bauernhof-Kapazität auf die restlichen Hütten verteilen
+  const results: Set<number>[] = [];
+  for (const base of bases) {
+    const remaining = cottages.filter((c) => !base.has(c));
+    if (anywhereCapacity >= remaining.length) {
+      const s = new Set(base);
+      for (const c of remaining) s.add(c);
+      results.push(s);
+    } else if (anywhereCapacity === 0) {
+      results.push(base);
+    } else {
+      const combos = combinations(remaining, anywhereCapacity);
+      if (combos.length <= 2000) {
+        for (const combo of combos) {
+          const s = new Set(base);
+          for (const c of combo) s.add(c);
+          results.push(s);
+        }
+      } else {
+        // Fallback: Hütten neben Tempeln bevorzugen
+        const templeAdj = new Set<number>();
+        for (const b of buildings) {
+          if (b.def.scoring.type === 'ifAdjacentAtLeast') {
+            for (const n of neighbors4(b.square)) templeAdj.add(n);
+          }
+        }
+        const sorted = [...remaining].sort((a, b) => Number(templeAdj.has(b)) - Number(templeAdj.has(a)));
+        const s = new Set(base);
+        for (const c of sorted.slice(0, anywhereCapacity)) s.add(c);
+        results.push(s);
+      }
+    }
+  }
+  return dedupeSets(results);
+}
+
+function dedupeSets(sets: Set<number>[]): Set<number>[] {
+  const seen = new Set<string>();
+  const out: Set<number>[] = [];
+  for (const s of sets) {
+    const k = [...s].sort((a, b) => a - b).join(',');
+    if (!seen.has(k)) {
+      seen.add(k);
+      out.push(s);
+    }
+  }
+  return out;
+}
+
+// ---------- Wertung ----------
+
+export function scoreGame(state: GameState, catalog: Catalog): PlayerScore[] {
+  return state.players.map((_, i) => scorePlayer(state, i, catalog));
+}
+
+export function scorePlayer(state: GameState, playerIndex: number, catalog: Catalog): PlayerScore {
+  const p = state.players[playerIndex];
+  let best: PlayerScore | null = null;
+  for (const fed of feedingCandidates(p, catalog)) {
+    const s = scoreWithFeeding(state, playerIndex, fed, catalog);
+    if (!best || s.total > best.total) best = s;
+  }
+  return best!;
+}
+
+function scoreWithFeeding(
+  state: GameState,
+  playerIndex: number,
+  fed: Set<number>,
+  catalog: Catalog
+): PlayerScore {
+  const p = state.players[playerIndex];
+  const buildings = placedBuildings(p, catalog);
+  const hasEffect = (e: string) => buildings.some((b) => (b.def.effects ?? []).includes(e as never));
+
+  const lines = new Map<string, ScoreLine>();
+  const addPoints = (card: string, pts: number) => {
+    const line = lines.get(card) ?? { card, count: 0, points: 0 };
+    line.points += pts;
+    lines.set(card, line);
+  };
+  // Zähler je Karte
+  for (const b of buildings) {
+    const line = lines.get(b.card) ?? { card: b.card, count: 0, points: 0 };
+    line.count++;
+    lines.set(b.card, line);
+  }
+
+  const countByCardHandled = new Set<string>();
+
+  for (const b of buildings) {
+    const spec = b.def.scoring;
+    switch (spec.type) {
+      case 'none':
+        break;
+      case 'flat':
+        addPoints(b.card, spec.vp);
+        break;
+      case 'ifFed': {
+        if (fed.has(b.square)) {
+          addPoints(b.card, spec.vp);
+        } else if (b.def.category === 'cottage' && hasEffect('mausoleum')) {
+          // Mausoleum: ungefütterte Hütten (nur Kategorie cottage) sind 3 SP wert
+          addPoints(b.card, 3);
+        }
+        break;
+      }
+      case 'byCountTable': {
+        if (countByCardHandled.has(b.card)) break;
+        countByCardHandled.add(b.card);
+        const count = lines.get(b.card)!.count;
+        const pts = count <= spec.table.length ? spec.table[count - 1] : spec.overflow;
+        addPoints(b.card, pts);
+        break;
+      }
+      case 'perAdjacent': {
+        let sum = 0;
+        for (const n of neighbors4(b.square)) {
+          const nb = p.board[n].building;
+          if (!nb) continue;
+          const nd = catalog[nb.card];
+          if (matchesSelector(spec.target, nd, b.def, fed, n)) sum += selectorWeight(spec.target, nd);
+        }
+        addPoints(b.card, sum * spec.vpEach);
+        break;
+      }
+      case 'ifAdjacentAny': {
+        const hit = neighbors4(b.square).some((n) => {
+          const nb = p.board[n].building;
+          return !!nb && spec.targets.some((t) => matchesSelector(t, catalog[nb.card], b.def, fed, n));
+        });
+        if (hit) addPoints(b.card, spec.vp);
+        break;
+      }
+      case 'ifNotAdjacentAny': {
+        const hit = neighbors4(b.square).some((n) => {
+          const nb = p.board[n].building;
+          return !!nb && spec.targets.some((t) => matchesSelector(t, catalog[nb.card], b.def, fed, n));
+        });
+        if (!hit) addPoints(b.card, spec.vp);
+        break;
+      }
+      case 'ifAdjacentAtLeast': {
+        let sum = 0;
+        for (const n of neighbors4(b.square)) {
+          const nb = p.board[n].building;
+          if (!nb) continue;
+          const nd = catalog[nb.card];
+          if (matchesSelector(spec.target, nd, b.def, fed, n)) sum += selectorWeight(spec.target, nd);
+        }
+        if (sum >= spec.count) addPoints(b.card, spec.vp);
+        break;
+      }
+      case 'perInTown': {
+        let sum = 0;
+        for (const o of buildings) {
+          if (matchesSelector(spec.target, o.def, b.def, fed, o.square)) sum += selectorWeight(spec.target, o.def);
+        }
+        addPoints(b.card, sum * spec.vpEach);
+        break;
+      }
+      case 'perInZone': {
+        const zone = spec.zone === 'corners' ? CORNER_SQUARES : CENTER_SQUARES;
+        let sum = 0;
+        for (const o of buildings) {
+          if (zone.includes(o.square) && matchesSelector(spec.target, o.def, b.def, fed, o.square)) {
+            sum += selectorWeight(spec.target, o.def);
+          }
+        }
+        addPoints(b.card, (spec.base ?? 0) + sum * spec.vpEach);
+        break;
+      }
+      case 'perUniqueTypesInRowCol': {
+        const types = new Set<string>();
+        for (const o of buildings) {
+          if (o.square === b.square || o.card === b.card) continue;
+          if (rowOf(o.square) === rowOf(b.square) || colOf(o.square) === colOf(b.square)) {
+            types.add(o.card);
+          }
+        }
+        addPoints(b.card, types.size * spec.vpEach);
+        break;
+      }
+      case 'perSameCardInRowCol': {
+        // Gleiche Karte in Zeile ∪ Spalte, sich selbst einmal mitgezählt (max 7)
+        let sum = 0;
+        for (const o of buildings) {
+          if (o.card !== b.card) continue;
+          if (o.square === b.square) { sum++; continue; }
+          if (rowOf(o.square) === rowOf(b.square)) sum++;
+          if (colOf(o.square) === colOf(b.square)) sum++;
+        }
+        addPoints(b.card, sum * spec.vpEach);
+        break;
+      }
+      case 'ifAloneInRowAndCol': {
+        const other = buildings.some(
+          (o) =>
+            o.square !== b.square &&
+            matchesSelector(spec.target, o.def, b.def, fed, o.square) &&
+            (rowOf(o.square) === rowOf(b.square) || colOf(o.square) === colOf(b.square))
+        );
+        if (!other) addPoints(b.card, spec.vp);
+        break;
+      }
+      case 'perOwnCountVsRightNeighbor': {
+        if (countByCardHandled.has(b.card)) break;
+        countByCardHandled.add(b.card);
+        const own = lines.get(b.card)!.count;
+        // Rechter Nachbar = vorheriger Spieler in Zugreihenfolge (Uhrzeigersinn)
+        const n = state.players.length;
+        const right = state.players[(playerIndex + n - 1) % n];
+        const theirs = right === p ? 0 : right.board.filter((sq) => sq.building?.card === b.card).length;
+        const each = own > theirs ? spec.baseEach + spec.bonusEach : spec.baseEach;
+        addPoints(b.card, own * each);
+        break;
+      }
+      case 'perStoredResource': {
+        const stored = p.board[b.square].building?.stored?.length ?? 0;
+        addPoints(b.card, stored * spec.vpEach);
+        break;
+      }
+      case 'handler': {
+        addPoints(b.card, scoreHandler(spec.handler, spec.vp ?? 0, state, playerIndex, b, buildings, catalog));
+        break;
+      }
+    }
+  }
+
+  // Leere Felder: kein Gebäude (Restmaterial zählt als leer; Bondmaker-Material liegt AUF Gebäuden)
+  const emptySquares = p.board.filter((sq) => !sq.building).length;
+  const emptyPenalty = hasEffect('cathedral') ? 0 : -emptySquares;
+
+  const allLines = [...lines.values()];
+  const total = allLines.reduce((s, l) => s + l.points, 0) + emptyPenalty;
+
+  let fedCottages = 0;
+  for (const b of buildings) if (isCottage(b.def) && fed.has(b.square)) fedCottages += cottageWeight(b.def);
+
+  return { lines: allLines, emptySquares, emptyPenalty, total, fedCottages };
+}
+
+function scoreHandler(
+  handler: string,
+  baseVp: number,
+  state: GameState,
+  playerIndex: number,
+  self: Placed,
+  buildings: Placed[],
+  catalog: Catalog
+): number {
+  const p = state.players[playerIndex];
+  switch (handler) {
+    case 'archive': {
+      const types = new Set(buildings.filter((b) => b.def.kind !== 'monument').map((b) => b.card));
+      return baseVp + types.size;
+    }
+    case 'mandras': {
+      const types = new Set<string>();
+      for (const n of neighbors4(self.square)) {
+        const nb = p.board[n].building;
+        if (nb) types.add(nb.card);
+      }
+      return baseVp + types.size * 2;
+    }
+    case 'skyBaths': {
+      const builtTypes = new Set(buildings.map((b) => b.card));
+      const missing = state.config.activeCards.filter((c) => !builtTypes.has(c)).length;
+      return baseVp + missing * 2;
+    }
+    case 'silva': {
+      // größte zusammenhängende Gruppe gleicher Gebäudetypen
+      const seen = new Set<number>();
+      let largest = 0;
+      for (const b of buildings) {
+        if (seen.has(b.square)) continue;
+        let size = 0;
+        const stack = [b.square];
+        seen.add(b.square);
+        while (stack.length) {
+          const cur = stack.pop()!;
+          size++;
+          for (const n of neighbors4(cur)) {
+            const nb = p.board[n].building;
+            if (nb && nb.card === b.card && !seen.has(n)) {
+              seen.add(n);
+              stack.push(n);
+            }
+          }
+        }
+        largest = Math.max(largest, size);
+      }
+      return baseVp + largest;
+    }
+    case 'shrine': {
+      const n = p.shrineSnapshot ?? buildings.length;
+      const table = [1, 2, 3, 4, 5];
+      return baseVp + (n <= 0 ? 0 : n <= 5 ? table[n - 1] : 8);
+    }
+    case 'starloom': {
+      const myRound = p.finishRound ?? Number.MAX_SAFE_INTEGER;
+      const rank = 1 + state.players.filter(
+        (o) => o !== p && (o.finishRound ?? Number.MAX_SAFE_INTEGER) < myRound
+      ).length;
+      const byRank = [6, 3, 2];
+      return baseVp + (rank <= 3 ? byRank[rank - 1] : 0);
+    }
+    default:
+      return baseVp;
+  }
+}
+
+export { isCottage, cottageWeight, feedingCandidates };

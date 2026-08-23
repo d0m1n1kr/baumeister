@@ -1,0 +1,34 @@
+{
+  "id": "archive_of_the_second_age",
+  "set": "base",
+  "kind": "monument",
+  "category": "monument",
+  "color": "pink",
+  "name": {
+    "de": "Archiv des Zweiten Zeitalters",
+    "en": "Archive of the Second Age"
+  },
+  "text": {
+    "de": "1 Punkt für jeden einzigartigen Gebäudetyp in deiner Stadt (ohne Monumente).",
+    "en": "1 point for each unique building type in your town (monuments excluded)."
+  },
+  "pattern": [
+    [
+      "wheat",
+      "wheat"
+    ],
+    [
+      "brick",
+      "glass"
+    ]
+  ],
+  "features": [
+    "unique-types"
+  ],
+  "scoring": {
+    "type": "handler",
+    "handler": "archive"
+  },
+  "effects": [],
+  "art": "archive_of_the_second_age.svg"
+}

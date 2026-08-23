@@ -1,0 +1,46 @@
+{
+  "id": "opaleyes_watch",
+  "set": "base",
+  "kind": "monument",
+  "category": "monument",
+  "color": "pink",
+  "name": {
+    "de": "Opaleyes Wacht",
+    "en": "Opaleye's Watch"
+  },
+  "text": {
+    "de": "Beim Bau: Lege 3 verschiedene Gebäude aus dem Vorrat hierauf. Baut dein linker oder rechter Nachbar eines dieser Gebäude, nimm es und platziere es auf einem freien Feld.",
+    "en": "On construction, place 3 unique buildings on this card. When a neighbor constructs one of those types, take it and place it on any empty square."
+  },
+  "pattern": [
+    [
+      "wood",
+      null,
+      null,
+      null
+    ],
+    [
+      "brick",
+      "glass",
+      "wheat",
+      "wheat"
+    ],
+    [
+      "stone",
+      null,
+      null,
+      null
+    ]
+  ],
+  "features": [
+    "on-construct",
+    "interactive"
+  ],
+  "scoring": {
+    "type": "none"
+  },
+  "effects": [
+    "opaleye"
+  ],
+  "art": "opaleyes_watch.svg"
+}

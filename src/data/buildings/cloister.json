@@ -1,0 +1,38 @@
+{
+  "id": "cloister",
+  "set": "base",
+  "kind": "building",
+  "category": "chapel",
+  "color": "orange",
+  "name": {
+    "de": "Kloster",
+    "en": "Cloister"
+  },
+  "text": {
+    "de": "1 Punkt für jedes orange Gebäude in einer Ecke deiner Stadt.",
+    "en": "1 point for each orange building in a corner of your town."
+  },
+  "pattern": [
+    [
+      null,
+      null,
+      "glass"
+    ],
+    [
+      "wood",
+      "brick",
+      "stone"
+    ]
+  ],
+  "features": [
+    "corners"
+  ],
+  "scoring": {
+    "type": "perInZone",
+    "zone": "corners",
+    "target": "self",
+    "vpEach": 1
+  },
+  "effects": [],
+  "art": "cloister.svg"
+}

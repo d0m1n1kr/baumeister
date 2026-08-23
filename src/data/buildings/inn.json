@@ -1,0 +1,34 @@
+{
+  "id": "inn",
+  "set": "base",
+  "kind": "building",
+  "category": "tavern",
+  "color": "green",
+  "name": {
+    "de": "Gasthaus",
+    "en": "Inn"
+  },
+  "text": {
+    "de": "3 Punkte, wenn kein weiteres Gasthaus in derselben Zeile oder Spalte steht.",
+    "en": "3 points if not in a row or column with another Inn."
+  },
+  "pattern": [
+    [
+      "wheat",
+      "stone",
+      "glass"
+    ]
+  ],
+  "features": [
+    "row-col"
+  ],
+  "scoring": {
+    "type": "ifAloneInRowAndCol",
+    "target": {
+      "card": "inn"
+    },
+    "vp": 3
+  },
+  "effects": [],
+  "art": "inn.svg"
+}

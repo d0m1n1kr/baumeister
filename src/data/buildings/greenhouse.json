@@ -1,0 +1,36 @@
+{
+  "id": "greenhouse",
+  "set": "base",
+  "kind": "building",
+  "category": "food",
+  "color": "red",
+  "name": {
+    "de": "Gewächshaus",
+    "en": "Greenhouse"
+  },
+  "text": {
+    "de": "Füttert eine zusammenhängende Gruppe von Hütten-Gebäuden, egal wo in deiner Stadt.",
+    "en": "Feeds 1 contiguous group of cottage buildings anywhere in your town."
+  },
+  "pattern": [
+    [
+      "wheat",
+      "glass"
+    ],
+    [
+      "wood",
+      "wood"
+    ]
+  ],
+  "features": [
+    "feeds"
+  ],
+  "feeding": {
+    "mode": "contiguousGroup"
+  },
+  "scoring": {
+    "type": "none"
+  },
+  "effects": [],
+  "art": "greenhouse.svg"
+}

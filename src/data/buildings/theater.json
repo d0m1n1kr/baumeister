@@ -1,0 +1,37 @@
+{
+  "id": "theater",
+  "set": "base",
+  "kind": "building",
+  "category": "theater",
+  "color": "yellow",
+  "name": {
+    "de": "Theater",
+    "en": "Theater"
+  },
+  "text": {
+    "de": "1 Punkt für jeden anderen Gebäudetyp in derselben Zeile und Spalte wie das Theater.",
+    "en": "1 point for each other unique building type in its row and column."
+  },
+  "pattern": [
+    [
+      null,
+      "stone",
+      null
+    ],
+    [
+      "wood",
+      "glass",
+      "wood"
+    ]
+  ],
+  "features": [
+    "row-col",
+    "unique-types"
+  ],
+  "scoring": {
+    "type": "perUniqueTypesInRowCol",
+    "vpEach": 1
+  },
+  "effects": [],
+  "art": "theater.svg"
+}

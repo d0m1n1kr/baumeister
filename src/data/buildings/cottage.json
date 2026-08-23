@@ -1,0 +1,34 @@
+{
+  "id": "cottage",
+  "set": "base",
+  "kind": "cottage",
+  "category": "cottage",
+  "color": "blue",
+  "name": {
+    "de": "Hütte",
+    "en": "Cottage"
+  },
+  "text": {
+    "de": "3 Punkte, wenn diese Hütte gefüttert ist. Rote Gebäude füttern Hütten.",
+    "en": "3 points if this building is fed."
+  },
+  "pattern": [
+    [
+      null,
+      "wheat"
+    ],
+    [
+      "brick",
+      "glass"
+    ]
+  ],
+  "features": [
+    "feedable"
+  ],
+  "scoring": {
+    "type": "ifFed",
+    "vp": 3
+  },
+  "effects": [],
+  "art": "cottage.svg"
+}

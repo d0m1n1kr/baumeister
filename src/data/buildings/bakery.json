@@ -1,0 +1,44 @@
+{
+  "id": "bakery",
+  "set": "base",
+  "kind": "building",
+  "category": "theater",
+  "color": "yellow",
+  "name": {
+    "de": "Bäckerei",
+    "en": "Bakery"
+  },
+  "text": {
+    "de": "3 Punkte, wenn die Bäckerei an ein rotes oder schwarzes Gebäude angrenzt.",
+    "en": "3 points if adjacent to a red or black building."
+  },
+  "pattern": [
+    [
+      null,
+      "wheat",
+      null
+    ],
+    [
+      "brick",
+      "glass",
+      "brick"
+    ]
+  ],
+  "features": [
+    "adjacency"
+  ],
+  "scoring": {
+    "type": "ifAdjacentAny",
+    "targets": [
+      {
+        "color": "red"
+      },
+      {
+        "color": "black"
+      }
+    ],
+    "vp": 3
+  },
+  "effects": [],
+  "art": "bakery.svg"
+}

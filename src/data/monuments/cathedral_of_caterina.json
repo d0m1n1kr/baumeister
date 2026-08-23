@@ -1,0 +1,36 @@
+{
+  "id": "cathedral_of_caterina",
+  "set": "base",
+  "kind": "monument",
+  "category": "monument",
+  "color": "pink",
+  "name": {
+    "de": "Kathedrale von Caterina",
+    "en": "Cathedral of Caterina"
+  },
+  "text": {
+    "de": "2 Punkte. Leere Felder deiner Stadt zählen 0 statt −1 Punkt.",
+    "en": "2 points. Your empty squares are worth 0 instead of −1 point."
+  },
+  "pattern": [
+    [
+      null,
+      "wheat"
+    ],
+    [
+      "stone",
+      "glass"
+    ]
+  ],
+  "features": [
+    "empty-ok"
+  ],
+  "scoring": {
+    "type": "flat",
+    "vp": 2
+  },
+  "effects": [
+    "cathedral"
+  ],
+  "art": "cathedral_of_caterina.svg"
+}

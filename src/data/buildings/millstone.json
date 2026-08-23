@@ -1,0 +1,38 @@
+{
+  "id": "millstone",
+  "set": "base",
+  "kind": "building",
+  "category": "well",
+  "color": "grey",
+  "name": {
+    "de": "Mühlstein",
+    "en": "Millstone"
+  },
+  "text": {
+    "de": "2 Punkte, wenn der Mühlstein an ein rotes oder gelbes Gebäude angrenzt.",
+    "en": "2 points if adjacent to a red or yellow building."
+  },
+  "pattern": [
+    [
+      "wood",
+      "stone"
+    ]
+  ],
+  "features": [
+    "adjacency"
+  ],
+  "scoring": {
+    "type": "ifAdjacentAny",
+    "targets": [
+      {
+        "color": "red"
+      },
+      {
+        "color": "yellow"
+      }
+    ],
+    "vp": 2
+  },
+  "effects": [],
+  "art": "millstone.svg"
+}

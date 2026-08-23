@@ -1,0 +1,38 @@
+{
+  "id": "grove_university",
+  "set": "base",
+  "kind": "monument",
+  "category": "monument",
+  "color": "pink",
+  "name": {
+    "de": "Hain-Universität",
+    "en": "Grove University"
+  },
+  "text": {
+    "de": "3 Punkte. Beim Bau: Platziere sofort ein Gebäude aus dem Vorrat auf einem freien Feld deiner Stadt.",
+    "en": "3 points. On construction, immediately place a building from the supply on an empty square."
+  },
+  "pattern": [
+    [
+      null,
+      "brick",
+      null
+    ],
+    [
+      "stone",
+      "glass",
+      "stone"
+    ]
+  ],
+  "features": [
+    "on-construct"
+  ],
+  "scoring": {
+    "type": "flat",
+    "vp": 3
+  },
+  "effects": [
+    "groveUniversity"
+  ],
+  "art": "grove_university.svg"
+}

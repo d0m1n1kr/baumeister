@@ -1,0 +1,39 @@
+{
+  "id": "bank",
+  "set": "base",
+  "kind": "building",
+  "category": "factory",
+  "color": "black",
+  "name": {
+    "de": "Bank",
+    "en": "Bank"
+  },
+  "text": {
+    "de": "4 Punkte. Beim Bau: Lege 1 Material darauf, das auf keiner anderen deiner Banken liegt. Dieses Material darfst du als Baumeister nie ansagen.",
+    "en": "4 points. On construction, place a resource not on any of your other Banks; you may never name that resource as Master Builder."
+  },
+  "pattern": [
+    [
+      "wheat",
+      "wheat",
+      null
+    ],
+    [
+      "wood",
+      "glass",
+      "brick"
+    ]
+  ],
+  "features": [
+    "on-construct",
+    "holds-resource"
+  ],
+  "scoring": {
+    "type": "flat",
+    "vp": 4
+  },
+  "effects": [
+    "bank"
+  ],
+  "art": "bank.svg"
+}

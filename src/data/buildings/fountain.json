@@ -1,0 +1,35 @@
+{
+  "id": "fountain",
+  "set": "base",
+  "kind": "building",
+  "category": "well",
+  "color": "grey",
+  "name": {
+    "de": "Springbrunnen",
+    "en": "Fountain"
+  },
+  "text": {
+    "de": "2 Punkte, wenn der Springbrunnen an mindestens ein anderes graues Gebäude angrenzt.",
+    "en": "2 points if adjacent to at least one other grey building."
+  },
+  "pattern": [
+    [
+      "wood",
+      "stone"
+    ]
+  ],
+  "features": [
+    "adjacency"
+  ],
+  "scoring": {
+    "type": "ifAdjacentAny",
+    "targets": [
+      {
+        "color": "grey"
+      }
+    ],
+    "vp": 2
+  },
+  "effects": [],
+  "art": "fountain.svg"
+}

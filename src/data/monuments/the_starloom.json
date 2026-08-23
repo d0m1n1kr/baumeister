@@ -1,0 +1,34 @@
+{
+  "id": "the_starloom",
+  "set": "base",
+  "kind": "monument",
+  "category": "monument",
+  "color": "pink",
+  "name": {
+    "de": "Der Sternenwebstuhl",
+    "en": "The Starloom"
+  },
+  "text": {
+    "de": "Punkte nach Reihenfolge der Stadt-Fertigstellung: 1.→6, 2.→3, 3.→2, danach 0. Gleiche Runde = gleicher Rang.",
+    "en": "Scores by town-completion order: 1st→6, 2nd→3, 3rd→2, 4th+→0."
+  },
+  "pattern": [
+    [
+      "glass",
+      "glass"
+    ],
+    [
+      "wood",
+      "wheat"
+    ]
+  ],
+  "features": [
+    "finish-order"
+  ],
+  "scoring": {
+    "type": "handler",
+    "handler": "starloom"
+  },
+  "effects": [],
+  "art": "the_starloom.svg"
+}

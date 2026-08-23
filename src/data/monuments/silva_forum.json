@@ -1,0 +1,39 @@
+{
+  "id": "silva_forum",
+  "set": "base",
+  "kind": "monument",
+  "category": "monument",
+  "color": "pink",
+  "name": {
+    "de": "Silva-Forum",
+    "en": "Silva Forum"
+  },
+  "text": {
+    "de": "1 Punkt, plus 1 Punkt für jedes Gebäude deiner größten zusammenhängenden Gruppe gleicher Gebäude.",
+    "en": "1 point, plus 1 point per building in your largest contiguous group of same-type buildings."
+  },
+  "pattern": [
+    [
+      null,
+      null,
+      "wheat",
+      null
+    ],
+    [
+      "brick",
+      "brick",
+      "stone",
+      "wood"
+    ]
+  ],
+  "features": [
+    "adjacency"
+  ],
+  "scoring": {
+    "type": "handler",
+    "handler": "silva",
+    "vp": 1
+  },
+  "effects": [],
+  "art": "silva_forum.svg"
+}

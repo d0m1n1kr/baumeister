@@ -1,0 +1,39 @@
+{
+  "id": "almshouse",
+  "set": "base",
+  "kind": "building",
+  "category": "tavern",
+  "color": "green",
+  "name": {
+    "de": "Armenhaus",
+    "en": "Almshouse"
+  },
+  "text": {
+    "de": "Punkte nach Anzahl: 1→−1, 2→5, 3→−3, 4→15, 5→−5, 6+→26.",
+    "en": "Scores by count: 1→−1, 2→5, 3→−3, 4→15, 5→−5, 6+→26."
+  },
+  "pattern": [
+    [
+      "stone",
+      "stone",
+      "glass"
+    ]
+  ],
+  "features": [
+    "count-table",
+    "negative-vp"
+  ],
+  "scoring": {
+    "type": "byCountTable",
+    "table": [
+      -1,
+      5,
+      -3,
+      15,
+      -5
+    ],
+    "overflow": 26
+  },
+  "effects": [],
+  "art": "almshouse.svg"
+}

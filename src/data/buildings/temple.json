@@ -1,0 +1,38 @@
+{
+  "id": "temple",
+  "set": "base",
+  "kind": "building",
+  "category": "chapel",
+  "color": "orange",
+  "name": {
+    "de": "Tempel",
+    "en": "Temple"
+  },
+  "text": {
+    "de": "4 Punkte, wenn der Tempel an mindestens 2 gefütterte Hütten angrenzt.",
+    "en": "4 points if adjacent to at least 2 fed cottages."
+  },
+  "pattern": [
+    [
+      null,
+      null,
+      "glass"
+    ],
+    [
+      "brick",
+      "brick",
+      "stone"
+    ]
+  ],
+  "features": [
+    "adjacency"
+  ],
+  "scoring": {
+    "type": "ifAdjacentAtLeast",
+    "target": "fedCottage",
+    "count": 2,
+    "vp": 4
+  },
+  "effects": [],
+  "art": "temple.svg"
+}

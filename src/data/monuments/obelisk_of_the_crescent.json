@@ -1,0 +1,37 @@
+{
+  "id": "obelisk_of_the_crescent",
+  "set": "base",
+  "kind": "monument",
+  "category": "monument",
+  "color": "pink",
+  "name": {
+    "de": "Obelisk der Mondsichel",
+    "en": "Obelisk of the Crescent"
+  },
+  "text": {
+    "de": "Alle deine künftigen Gebäude dürfen auf einem beliebigen freien Feld gebaut werden.",
+    "en": "You may place all future buildings on any empty square."
+  },
+  "pattern": [
+    [
+      "wheat",
+      null,
+      null
+    ],
+    [
+      "brick",
+      "glass",
+      "brick"
+    ]
+  ],
+  "features": [
+    "placement-override"
+  ],
+  "scoring": {
+    "type": "none"
+  },
+  "effects": [
+    "buildAnywhereAll"
+  ],
+  "art": "obelisk_of_the_crescent.svg"
+}

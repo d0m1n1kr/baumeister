@@ -1,0 +1,39 @@
+{
+  "id": "tailor",
+  "set": "base",
+  "kind": "building",
+  "category": "theater",
+  "color": "yellow",
+  "name": {
+    "de": "Schneiderei",
+    "en": "Tailor"
+  },
+  "text": {
+    "de": "1 Punkt, plus 1 Punkt für jedes gelbe Gebäude auf den 4 Mittelfeldern deiner Stadt.",
+    "en": "1 point, plus 1 point for each yellow building in the 4 center squares."
+  },
+  "pattern": [
+    [
+      null,
+      "wheat",
+      null
+    ],
+    [
+      "stone",
+      "glass",
+      "stone"
+    ]
+  ],
+  "features": [
+    "center"
+  ],
+  "scoring": {
+    "type": "perInZone",
+    "zone": "center4",
+    "target": "self",
+    "vpEach": 1,
+    "base": 1
+  },
+  "effects": [],
+  "art": "tailor.svg"
+}

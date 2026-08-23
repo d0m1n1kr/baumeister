@@ -1,0 +1,47 @@
+{
+  "id": "abbey",
+  "set": "base",
+  "kind": "building",
+  "category": "chapel",
+  "color": "orange",
+  "name": {
+    "de": "Abtei",
+    "en": "Abbey"
+  },
+  "text": {
+    "de": "3 Punkte, wenn die Abtei NICHT an ein schwarzes, grünes oder gelbes Gebäude angrenzt.",
+    "en": "3 points if not adjacent to a black, green, or yellow building."
+  },
+  "pattern": [
+    [
+      null,
+      null,
+      "glass"
+    ],
+    [
+      "brick",
+      "stone",
+      "stone"
+    ]
+  ],
+  "features": [
+    "no-adjacency"
+  ],
+  "scoring": {
+    "type": "ifNotAdjacentAny",
+    "targets": [
+      {
+        "color": "black"
+      },
+      {
+        "color": "green"
+      },
+      {
+        "color": "yellow"
+      }
+    ],
+    "vp": 3
+  },
+  "effects": [],
+  "art": "abbey.svg"
+}

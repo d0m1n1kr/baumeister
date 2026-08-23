@@ -1,0 +1,35 @@
+{
+  "id": "grand_mausoleum_of_the_rodina",
+  "set": "base",
+  "kind": "monument",
+  "category": "monument",
+  "color": "pink",
+  "name": {
+    "de": "Großes Mausoleum der Rodina",
+    "en": "Grand Mausoleum of the Rodina"
+  },
+  "text": {
+    "de": "Deine ungefütterten Hütten sind 3 Punkte wert (gilt nur für die Hütten-Wertung).",
+    "en": "Your unfed cottages are worth 3 points each (cottage scoring only)."
+  },
+  "pattern": [
+    [
+      "wheat",
+      "wheat"
+    ],
+    [
+      "brick",
+      "stone"
+    ]
+  ],
+  "features": [
+    "feedable"
+  ],
+  "scoring": {
+    "type": "none"
+  },
+  "effects": [
+    "mausoleum"
+  ],
+  "art": "grand_mausoleum_of_the_rodina.svg"
+}

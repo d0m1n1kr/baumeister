@@ -1,0 +1,36 @@
+{
+  "id": "shrine_of_the_elder_tree",
+  "set": "base",
+  "kind": "monument",
+  "category": "monument",
+  "color": "pink",
+  "name": {
+    "de": "Schrein des Alten Baums",
+    "en": "Shrine of the Elder Tree"
+  },
+  "text": {
+    "de": "Punkte nach Zahl der Gebäude in deiner Stadt beim Bau des Schreins: 1→1 … 5→5, 6+→8.",
+    "en": "Scores by number of buildings in your town when constructed: 1→1 … 5→5, 6+→8."
+  },
+  "pattern": [
+    [
+      "brick",
+      "wheat",
+      "stone"
+    ],
+    [
+      "wood",
+      "glass",
+      "wood"
+    ]
+  ],
+  "features": [
+    "town-snapshot"
+  ],
+  "scoring": {
+    "type": "handler",
+    "handler": "shrine"
+  },
+  "effects": [],
+  "art": "shrine_of_the_elder_tree.svg"
+}

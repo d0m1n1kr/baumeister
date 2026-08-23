@@ -1,0 +1,38 @@
+{
+  "id": "trading_post",
+  "set": "base",
+  "kind": "building",
+  "category": "factory",
+  "color": "black",
+  "name": {
+    "de": "Handelsposten",
+    "en": "Trading Post"
+  },
+  "text": {
+    "de": "1 Punkt. Zählt beim Bauen als beliebiges Material und wird dabei nicht entfernt. Mindestens 1 echtes Material ist nötig.",
+    "en": "1 point. Counts as a wild resource for construction and is not removed when used; at least 1 real resource is required."
+  },
+  "pattern": [
+    [
+      "stone",
+      "wood",
+      null
+    ],
+    [
+      "stone",
+      "wood",
+      "brick"
+    ]
+  ],
+  "features": [
+    "wild-resource"
+  ],
+  "scoring": {
+    "type": "flat",
+    "vp": 1
+  },
+  "effects": [
+    "tradingPost"
+  ],
+  "art": "trading_post.svg"
+}

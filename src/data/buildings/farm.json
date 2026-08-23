@@ -1,0 +1,37 @@
+{
+  "id": "farm",
+  "set": "base",
+  "kind": "building",
+  "category": "food",
+  "color": "red",
+  "name": {
+    "de": "Bauernhof",
+    "en": "Farm"
+  },
+  "text": {
+    "de": "Füttert 4 Hütten-Gebäude, egal wo sie in deiner Stadt stehen.",
+    "en": "Feeds 4 cottage buildings anywhere in your town."
+  },
+  "pattern": [
+    [
+      "wheat",
+      "wheat"
+    ],
+    [
+      "wood",
+      "wood"
+    ]
+  ],
+  "features": [
+    "feeds"
+  ],
+  "feeding": {
+    "mode": "anywhere",
+    "count": 4
+  },
+  "scoring": {
+    "type": "none"
+  },
+  "effects": [],
+  "art": "farm.svg"
+}

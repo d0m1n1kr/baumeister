@@ -1,0 +1,35 @@
+{
+  "id": "mandras_palace",
+  "set": "base",
+  "kind": "monument",
+  "category": "monument",
+  "color": "pink",
+  "name": {
+    "de": "Mandras-Palast",
+    "en": "Mandras Palace"
+  },
+  "text": {
+    "de": "2 Punkte für jeden einzigartigen angrenzenden Gebäudetyp.",
+    "en": "2 points for each unique adjacent building type."
+  },
+  "pattern": [
+    [
+      "wheat",
+      "glass"
+    ],
+    [
+      "brick",
+      "wood"
+    ]
+  ],
+  "features": [
+    "adjacency",
+    "unique-types"
+  ],
+  "scoring": {
+    "type": "handler",
+    "handler": "mandras"
+  },
+  "effects": [],
+  "art": "mandras_palace.svg"
+}

@@ -1,0 +1,35 @@
+{
+  "id": "chapel",
+  "set": "base",
+  "kind": "building",
+  "category": "chapel",
+  "color": "orange",
+  "name": {
+    "de": "Kapelle",
+    "en": "Chapel"
+  },
+  "text": {
+    "de": "1 Punkt für jede gefütterte Hütte in deiner Stadt.",
+    "en": "1 point for each fed cottage in your town."
+  },
+  "pattern": [
+    [
+      null,
+      null,
+      "glass"
+    ],
+    [
+      "stone",
+      "glass",
+      "stone"
+    ]
+  ],
+  "features": [],
+  "scoring": {
+    "type": "perInTown",
+    "target": "fedCottage",
+    "vpEach": 1
+  },
+  "effects": [],
+  "art": "chapel.svg"
+}

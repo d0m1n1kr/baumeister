@@ -1,0 +1,37 @@
+{
+  "id": "tavern",
+  "set": "base",
+  "kind": "building",
+  "category": "tavern",
+  "color": "green",
+  "name": {
+    "de": "Taverne",
+    "en": "Tavern"
+  },
+  "text": {
+    "de": "Punkte nach Anzahl gebauter Tavernen: 1→2, 2→5, 3→9, 4→14, 5+→20.",
+    "en": "Scores by count: 1→2, 2→5, 3→9, 4→14, 5+→20."
+  },
+  "pattern": [
+    [
+      "brick",
+      "brick",
+      "glass"
+    ]
+  ],
+  "features": [
+    "count-table"
+  ],
+  "scoring": {
+    "type": "byCountTable",
+    "table": [
+      2,
+      5,
+      9,
+      14
+    ],
+    "overflow": 20
+  },
+  "effects": [],
+  "art": "tavern.svg"
+}

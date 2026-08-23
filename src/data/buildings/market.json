@@ -1,0 +1,36 @@
+{
+  "id": "market",
+  "set": "base",
+  "kind": "building",
+  "category": "theater",
+  "color": "yellow",
+  "name": {
+    "de": "Markt",
+    "en": "Market"
+  },
+  "text": {
+    "de": "1 Punkt für jeden Markt in derselben Zeile und Spalte (diesen Markt einmal mitgezählt).",
+    "en": "1 point for each Market in the same row and column (counting itself once)."
+  },
+  "pattern": [
+    [
+      null,
+      "wood",
+      null
+    ],
+    [
+      "stone",
+      "glass",
+      "stone"
+    ]
+  ],
+  "features": [
+    "row-col"
+  ],
+  "scoring": {
+    "type": "perSameCardInRowCol",
+    "vpEach": 1
+  },
+  "effects": [],
+  "art": "market.svg"
+}

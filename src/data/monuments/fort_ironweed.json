@@ -1,0 +1,38 @@
+{
+  "id": "fort_ironweed",
+  "set": "base",
+  "kind": "monument",
+  "category": "monument",
+  "color": "pink",
+  "name": {
+    "de": "Fort Eisenkraut",
+    "en": "Fort Ironweed"
+  },
+  "text": {
+    "de": "7 Punkte. Du bist nie mehr Baumeister — außer alle anderen Spieler sind fertig.",
+    "en": "7 points. You no longer take Master Builder turns, unless you are the last player remaining."
+  },
+  "pattern": [
+    [
+      "wheat",
+      null,
+      "brick"
+    ],
+    [
+      "stone",
+      "wood",
+      "stone"
+    ]
+  ],
+  "features": [
+    "interactive"
+  ],
+  "scoring": {
+    "type": "flat",
+    "vp": 7
+  },
+  "effects": [
+    "fortIronweed"
+  ],
+  "art": "fort_ironweed.svg"
+}

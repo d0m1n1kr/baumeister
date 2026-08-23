@@ -1,0 +1,43 @@
+{
+  "id": "architects_guild",
+  "set": "base",
+  "kind": "monument",
+  "category": "monument",
+  "color": "pink",
+  "name": {
+    "de": "Architektengilde",
+    "en": "Architect's Guild"
+  },
+  "text": {
+    "de": "1 Punkt. Beim Bau: Ersetze bis zu 2 Gebäude deiner Stadt durch beliebige andere Gebäudetypen aus dem Vorrat (keine Monumente).",
+    "en": "1 point. On construction, replace up to 2 buildings in your town with other building types from the supply."
+  },
+  "pattern": [
+    [
+      null,
+      null,
+      "glass"
+    ],
+    [
+      null,
+      "wheat",
+      "stone"
+    ],
+    [
+      "wood",
+      "brick",
+      null
+    ]
+  ],
+  "features": [
+    "on-construct"
+  ],
+  "scoring": {
+    "type": "flat",
+    "vp": 1
+  },
+  "effects": [
+    "architectsGuild"
+  ],
+  "art": "architects_guild.svg"
+}

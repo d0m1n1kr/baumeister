@@ -1,0 +1,37 @@
+{
+  "id": "granary",
+  "set": "base",
+  "kind": "building",
+  "category": "food",
+  "color": "red",
+  "name": {
+    "de": "Kornspeicher",
+    "en": "Granary"
+  },
+  "text": {
+    "de": "Füttert alle Hütten-Gebäude auf den 8 Feldern rund um den Kornspeicher.",
+    "en": "Feeds all cottage buildings in the 8 squares surrounding it."
+  },
+  "pattern": [
+    [
+      "wheat",
+      "wheat"
+    ],
+    [
+      "wood",
+      "brick"
+    ]
+  ],
+  "features": [
+    "feeds",
+    "adjacency"
+  ],
+  "feeding": {
+    "mode": "surrounding8"
+  },
+  "scoring": {
+    "type": "none"
+  },
+  "effects": [],
+  "art": "granary.svg"
+}
