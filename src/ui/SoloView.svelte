@@ -27,7 +27,7 @@
   </div>
 
   <div class="strip">
-    <CardStrip horizontal onabort={() => (confirmLeave = true)} />
+    <CardStrip horizontal solo onabort={() => (confirmLeave = true)} />
   </div>
 
   <div class="own">

@@ -7,7 +7,11 @@
   import CardMini from './CardMini.svelte';
   import CardOverlay from './CardOverlay.svelte';
 
-  let { onabort, horizontal = false }: { onabort?: () => void; horizontal?: boolean } = $props();
+  let {
+    onabort,
+    horizontal = false,
+    solo = false
+  }: { onabort?: () => void; horizontal?: boolean; solo?: boolean } = $props();
 
   const st = $derived(game.state!);
   const named = $derived(st.phase.t === 'round' ? st.phase.resource : null);
@@ -15,8 +19,9 @@
   let overlay = $state<{ card: CardDef; rotation: number } | null>(null);
 
   function open(card: CardDef, e: PointerEvent) {
-    // Zum antippenden Spieler drehen: obere Hälfte = 180°
-    overlay = { card, rotation: e.clientY < window.innerHeight / 2 ? 180 : 0 };
+    // Am Spieltisch zum antippenden Spieler drehen (obere Hälfte = 180°);
+    // in der Solo-Ansicht schaut nur einer aufs Gerät — immer aufrecht.
+    overlay = { card, rotation: !solo && e.clientY < window.innerHeight / 2 ? 180 : 0 };
   }
 </script>
 
