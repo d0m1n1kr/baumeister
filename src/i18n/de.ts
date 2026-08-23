@@ -21,7 +21,8 @@ export const t = {
     glass: 'Glas'
   } as Record<string, string>,
 
-  placeHint: 'Ziehe das Material auf ein freies Feld',
+  placeHint: 'Tippe oder ziehe das Material auf ein freies Feld',
+  moveHint: 'Tippe ein anderes freies Feld, um das Material zu verschieben',
   buildMode: 'Bauen',
   cancel: 'Abbrechen',
   confirm: 'Bestätigen',

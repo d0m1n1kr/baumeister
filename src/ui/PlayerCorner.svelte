@@ -86,6 +86,16 @@
 
   const emptySquares = $derived(p.board.map((sq, i) => (!sq.building && !sq.resource ? i : -1)).filter((i) => i >= 0));
   const boardFull = $derived(emptySquares.length === 0);
+  const bondmakerBuilt = $derived(
+    !!p.monument?.built && (catalog[p.monument.card].effects ?? []).includes('bondmaker')
+  );
+  /** Unbestätigt platziertes Material dieser Runde (per Tipp verschiebbar). */
+  const tentative = $derived(
+    inRound && !p.done && !p.roundDone && p.placedSquare != null &&
+    p.board[p.placedSquare]?.resource
+      ? p.placedSquare
+      : null
+  );
 
   const highlights = $derived(
     mode === 'target' ? targetSquares : mode === 'grovePlace' || mode === 'claimPlace' ? emptySquares
@@ -127,12 +137,26 @@
         break;
       }
       case 'idle': {
+        if (!inRound) break;
         // Lagerhaus antippen, solange Material aussteht → einlagern/tauschen
         if (
-          inRound && p.pending != null && sq.building &&
+          p.pending != null && sq.building &&
           (catalog[sq.building.card].effects ?? []).includes('warehouse')
         ) {
           warehouseSquare = square;
+          break;
+        }
+        // Tippen platziert das ausstehende Material
+        if (p.pending != null && !sq.resource && (!sq.building || bondmakerBuilt)) {
+          showError(game.dispatch({ t: 'placeResource', player, square }));
+          break;
+        }
+        // Tippen verschiebt das unbestätigte Material dieser Runde
+        if (
+          p.pending == null && !p.roundDone && tentative != null && tentative !== square &&
+          !sq.resource && (!sq.building || bondmakerBuilt)
+        ) {
+          showError(game.dispatch({ t: 'moveResource', player, square }));
         }
         break;
       }
@@ -208,7 +232,7 @@
 
   <div class="row">
     <div class="boardWrap">
-      <BoardGrid {player} board={p.board} {selected} {highlights} {oncell} />
+      <BoardGrid {player} board={p.board} {selected} {highlights} tentative={mode === 'idle' ? tentative : null} {oncell} />
       {#if mode === 'target'}<div class="hint">{t.chooseBuildTarget}</div>
       {:else if mode === 'grovePlace' || mode === 'claimPlace'}<div class="hint">{t.choosePlacement}</div>
       {:else if mode === 'guildPick' && guildSquare === null}<div class="hint">{t.guildPickBuilding}</div>{/if}
@@ -267,6 +291,9 @@
             </div>
           {/if}
           {#if mode === 'idle' && p.pending == null && !p.roundDone}
+            {#if tentative != null}
+              <span class="moveHint">{t.moveHint}</span>
+            {/if}
             <button class="primary" onpointerup={() => showError(game.dispatch({ t: 'roundDone', player }))}>
               ✓ {t.roundDone}
             </button>
@@ -495,6 +522,7 @@
 
   .pendingWrap { display: flex; flex-direction: column; gap: 6px; align-items: flex-start; }
   .pendingLabel { font-size: 11px; color: var(--text-dim); }
+  .moveHint { font-size: 11px; color: var(--text-dim); }
   .chip {
     width: 56px;
     height: 56px;

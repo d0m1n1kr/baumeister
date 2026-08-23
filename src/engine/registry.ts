@@ -62,12 +62,20 @@ function shuffled<T>(arr: T[], rng: Rng): T[] {
 
 // ---------- Partie-Setup ----------
 
+/** Ecken im Uhrzeigersinn (von oben betrachtet): unten links → oben links → oben rechts → unten rechts. */
+const CLOCKWISE_CORNERS = [0, 3, 2, 1];
+
 export function randomSetup(
   catalog: Catalog,
-  players: { name: string; corner: number }[],
+  playersInput: { name: string; corner: number }[],
   useMonuments: boolean,
   rng: Rng
 ): GameConfig {
+  // Spielerreihenfolge = Sitzreihenfolge im Uhrzeigersinn, damit der
+  // Baumeister im Uhrzeigersinn weiterwandert.
+  const players = [...playersInput].sort(
+    (a, b) => CLOCKWISE_CORNERS.indexOf(a.corner) - CLOCKWISE_CORNERS.indexOf(b.corner)
+  );
   const defs = Object.values(catalog);
   const activeCards: string[] = [];
   for (const cat of CATEGORY_ORDER) {

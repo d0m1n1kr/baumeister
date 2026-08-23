@@ -85,9 +85,22 @@ try {
 
   // Hütten-Muster für Spieler 0: Weizen(0,1), Ziegel(1,0), Glas(1,1)
   await playRound('Weizen', 1);
-  await playRound('Ziegel', 4);
+
+  // Runde 2: Platzieren per TIPP statt Drag, dann Verschieben per Tipp
+  await page.locator('.picker .chip[title="Ziegel"]').click();
+  await page.locator('[data-player="0"][data-square="8"]').click(); // Tipp platziert
+  await page.locator('[data-player="0"][data-square="4"]').click(); // Tipp verschiebt
+  const moved = await page.locator('[data-player="0"][data-square="4"] .res').count();
+  if (moved !== 1) fail('Tipp-Platzieren/Verschieben fehlgeschlagen');
+  await dragChip(1);
+  const done2 = page.locator('button', { hasText: '✓ Fertig' });
+  await done2.first().click();
+  await done2.first().click();
+  await page.locator('.picker').waitFor({ timeout: 5000 });
+  console.log('✓ Platzieren per Tipp + Verschieben');
+
   await playRound('Glas', 5, false);
-  console.log('✓ 3 Runden mit Drag & Drop-Platzierung');
+  console.log('✓ 3 Runden Platzierung (Drag & Tipp)');
 
   // Hütte bauen: Bauen → Felder 1,4,5 markieren → Match antippen → Bauplatz 5
   const corner0 = page.locator('.slot:has([data-player="0"])');

@@ -22,6 +22,7 @@ export function newGame(config: GameConfig): GameState {
     monumentOptions: config.useMonuments ? [...config.monumentDeals[i]] : undefined,
     monument: undefined,
     pending: null,
+    placedSquare: null,
     roundDone: false,
     done: false,
     masterBuilderTurns: 0,
@@ -46,6 +47,7 @@ export function apply(state: GameState, action: Action, catalog: Catalog): GameS
     case 'nameResource': return nameResource(s, action.resource, catalog);
     case 'factorySwap': return factorySwap(s, action.player, action.take, catalog);
     case 'placeResource': return placeResource(s, action.player, action.square, catalog);
+    case 'moveResource': return moveResource(s, action.player, action.square, catalog);
     case 'warehouseStore': return warehouseStore(s, action.player, action.square, catalog);
     case 'warehouseSwap': return warehouseSwap(s, action.player, action.square, action.storedIndex, catalog);
     case 'build': return build(s, action.player, action.squares, action.card, action.target, catalog);
@@ -90,6 +92,7 @@ function nameResource(s: GameState, resource: Resource, catalog: Catalog): GameS
   s.round++;
   mb.masterBuilderTurns++;
   for (const p of s.players) {
+    p.placedSquare = null;
     if (p.done) {
       p.pending = null;
       p.roundDone = true;
@@ -126,10 +129,10 @@ function factorySwap(s: GameState, player: number, take: Resource, catalog: Cata
   return s;
 }
 
-function placeResource(s: GameState, player: number, square: number, catalog: Catalog): GameState {
-  requireRound(s);
-  const p = activePlayer(s, player);
-  if (p.pending == null) fail('Kein Material zum Platzieren');
+/** Prüft, ob ein Feld das angesagte Material aufnehmen darf (leer oder Bondmaker-Hütte). */
+function checkPlacementTarget(
+  s: GameState, p: PlayerState, player: number, square: number, catalog: Catalog
+) {
   const sq = p.board[square] ?? fail('Ungültiges Feld');
   if (sq.resource) fail('Feld ist belegt');
   if (sq.building) {
@@ -142,8 +145,35 @@ function placeResource(s: GameState, player: number, square: number, catalog: Ca
     const cottageLike = def.category === 'cottage' || (def.effects ?? []).includes('barrettCastle');
     if (!cottageLike) fail('Material kann nur auf Hütten gelagert werden');
   }
+  return sq;
+}
+
+function placeResource(s: GameState, player: number, square: number, catalog: Catalog): GameState {
+  requireRound(s);
+  const p = activePlayer(s, player);
+  if (p.pending == null) fail('Kein Material zum Platzieren');
+  const sq = checkPlacementTarget(s, p, player, square, catalog);
   sq.resource = p.pending;
   p.pending = null;
+  p.placedSquare = square;
+  return s;
+}
+
+/** Unbestätigtes Material dieser Runde verschieben (bis zum „Fertig"). */
+function moveResource(s: GameState, player: number, square: number, catalog: Catalog): GameState {
+  requireRound(s);
+  const p = activePlayer(s, player);
+  if (p.roundDone) fail('Runde bereits beendet');
+  if (p.pending != null) fail('Erst das Material platzieren');
+  const src = p.placedSquare;
+  if (src == null) fail('Kein verschiebbares Material');
+  if (src === square) return s;
+  const srcSq = p.board[src];
+  if (!srcSq?.resource) fail('Material wurde bereits verbaut');
+  const sq = checkPlacementTarget(s, p, player, square, catalog);
+  sq.resource = srcSq.resource;
+  delete srcSq.resource;
+  p.placedSquare = square;
   return s;
 }
 
@@ -376,6 +406,7 @@ function roundDone(s: GameState, player: number, catalog: Catalog): GameState {
   if (p.pending != null) fail('Erst das Material platzieren');
   if (p.choices.length > 0) fail('Erst offene Entscheidungen klären');
   p.roundDone = true;
+  p.placedSquare = null;
   return maybeAdvance(s, catalog);
 }
 
@@ -386,6 +417,7 @@ function declareComplete(s: GameState, player: number, catalog: Catalog): GameSt
   p.done = true;
   p.finishRound = s.round;
   p.pending = null;
+  p.placedSquare = null;
   p.roundDone = true;
   p.choices = [];
   return maybeAdvance(s, catalog);
