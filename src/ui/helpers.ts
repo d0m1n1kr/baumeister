@@ -40,7 +40,8 @@ export const FEATURE_ICONS: Record<FeatureId, { icon: string; title: string }> =
   'town-snapshot': { icon: '⌛', title: 'Zeitpunkt des Baus zählt' },
   'finish-order': { icon: '🏁', title: 'Fertigstellungs-Reihenfolge' },
   'empty-ok': { icon: '◻', title: 'Leere Felder erlaubt' },
-  'unique-types': { icon: '❖', title: 'Verschiedene Typen zählen' }
+  'unique-types': { icon: '❖', title: 'Verschiedene Typen zählen' },
+  coins: { icon: '🪙', title: 'Münz-Effekt' }
 };
 
 /** Rotation der Ecke, damit das UI zum Spieler zeigt (Ecken 2/3 sitzen oben). */

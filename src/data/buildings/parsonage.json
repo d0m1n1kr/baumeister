@@ -1,0 +1,42 @@
+{
+  "id": "parsonage",
+  "set": "fortune",
+  "kind": "building",
+  "category": "chapel",
+  "color": "orange",
+  "name": {
+    "de": "Pfarrhaus",
+    "en": "Parsonage"
+  },
+  "text": {
+    "de": "4 Punkte, wenn an eine gefütterte Hütte angrenzend. Beim Bau: Hast du nicht GENAU 1 Münze je Hütte in deiner Stadt, verlierst du alle Münzen.",
+    "en": "4 points if adjacent to a fed cottage. On construct: you must have exactly 1 coin per cottage in town, or you lose all coins."
+  },
+  "pattern": [
+    [
+      null,
+      null,
+      "glass"
+    ],
+    [
+      "stone",
+      "wheat",
+      "stone"
+    ]
+  ],
+  "features": [
+    "adjacency",
+    "coins"
+  ],
+  "scoring": {
+    "type": "ifAdjacentAny",
+    "targets": [
+      "fedCottage"
+    ],
+    "vp": 4
+  },
+  "effects": [
+    "parsonageCheck"
+  ],
+  "art": "parsonage.svg"
+}

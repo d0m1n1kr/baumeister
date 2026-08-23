@@ -1,0 +1,32 @@
+{
+  "id": "statue",
+  "set": "fortune",
+  "kind": "building",
+  "category": "well",
+  "color": "grey",
+  "name": {
+    "de": "Statue",
+    "en": "Statue"
+  },
+  "text": {
+    "de": "Beim Bau: +1 Münze für jeden Gebäudetyp, von dem du mindestens 3 Exemplare hast.",
+    "en": "On construct: gain 1 coin per building type of which you have 3+."
+  },
+  "pattern": [
+    [
+      "wood",
+      "stone"
+    ]
+  ],
+  "features": [
+    "coins",
+    "on-construct"
+  ],
+  "scoring": {
+    "type": "none"
+  },
+  "effects": [
+    "statueCoins"
+  ],
+  "art": "statue.svg"
+}

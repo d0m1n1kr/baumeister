@@ -1,0 +1,42 @@
+{
+  "id": "museum",
+  "set": "fortune",
+  "kind": "building",
+  "category": "factory",
+  "color": "black",
+  "name": {
+    "de": "Museum",
+    "en": "Museum"
+  },
+  "text": {
+    "de": "Statt zu platzieren darfst du das angesagte Material einlagern (max. 2). Einmal pro Runde: 1 eingelagertes Material zurückgeben → +1 Münze.",
+    "en": "Instead of placing, you may store the named resource (max 2). Once per round: return 1 stored resource for 1 coin."
+  },
+  "pattern": [
+    [
+      null,
+      null,
+      "glass",
+      null
+    ],
+    [
+      "brick",
+      "stone",
+      "stone",
+      "wood"
+    ]
+  ],
+  "features": [
+    "holds-resource",
+    "coins",
+    "interactive"
+  ],
+  "scoring": {
+    "type": "none"
+  },
+  "effects": [
+    "museum"
+  ],
+  "art": "museum.svg",
+  "unverified": true
+}

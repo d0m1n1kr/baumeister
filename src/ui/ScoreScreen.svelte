@@ -59,6 +59,22 @@
             <td>{s.emptyPenalty} ({s.emptySquares})</td>
           {/each}
         </tr>
+        {#if st.config.systems.coins}
+          <tr>
+            <td class="cardName">🪙 {t.coins}</td>
+            {#each scores as s}
+              <td>{s.coins ? `+${s.coins.points} (${s.coins.count}×)` : '—'}</td>
+            {/each}
+          </tr>
+        {/if}
+        {#if st.config.systems.trees}
+          <tr>
+            <td class="cardName">🌳 {t.tree}</td>
+            {#each scores as s}
+              <td>{s.treePoints ? `+${s.treePoints}` : '—'}</td>
+            {/each}
+          </tr>
+        {/if}
         <tr class="totals">
           <td>{t.scoreTotal}</td>
           {#each scores as s, i}

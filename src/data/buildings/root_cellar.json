@@ -1,0 +1,39 @@
+{
+  "id": "root_cellar",
+  "set": "fortune",
+  "kind": "building",
+  "category": "food",
+  "color": "red",
+  "name": {
+    "de": "Wurzelkeller",
+    "en": "Root Cellar"
+  },
+  "text": {
+    "de": "Beim Bau: +1 Münze. Bei der Endwertung: Für je 1 Münze füttert der Wurzelkeller alle Hütten einer Zeile oder Spalte.",
+    "en": "On construct: gain 1 coin. At game end: for 1 coin each, feeds all cottages in one row or column."
+  },
+  "pattern": [
+    [
+      "wheat",
+      "wood"
+    ],
+    [
+      "stone",
+      "brick"
+    ]
+  ],
+  "features": [
+    "feeds",
+    "coins"
+  ],
+  "feeding": {
+    "mode": "rowOrColumnPerCoin"
+  },
+  "scoring": {
+    "type": "none"
+  },
+  "effects": [
+    "coinOnConstruct"
+  ],
+  "art": "root_cellar.svg"
+}

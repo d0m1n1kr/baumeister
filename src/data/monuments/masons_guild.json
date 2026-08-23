@@ -1,0 +1,37 @@
+{
+  "id": "masons_guild",
+  "set": "fortune",
+  "kind": "monument",
+  "category": "monument",
+  "color": "pink",
+  "name": {
+    "de": "Steinmetzgilde",
+    "en": "Masons' Guild"
+  },
+  "text": {
+    "de": "3 Punkte. Beim Bau: Gib beliebig viele Münzen aus und baue je Münze 1 weiteres, unterschiedliches Gebäude aus dem Vorrat.",
+    "en": "3 points. On construct: spend any number of coins and construct that many unique buildings."
+  },
+  "pattern": [
+    [
+      "glass",
+      "brick"
+    ],
+    [
+      "brick",
+      "stone"
+    ]
+  ],
+  "features": [
+    "coins",
+    "on-construct"
+  ],
+  "scoring": {
+    "type": "flat",
+    "vp": 3
+  },
+  "effects": [
+    "masonsGuild"
+  ],
+  "art": "masons_guild.svg"
+}

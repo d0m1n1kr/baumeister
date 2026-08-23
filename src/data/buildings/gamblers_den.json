@@ -1,0 +1,34 @@
+{
+  "id": "gamblers_den",
+  "set": "fortune",
+  "kind": "building",
+  "category": "tavern",
+  "color": "green",
+  "name": {
+    "de": "Spielhölle",
+    "en": "Gamblers' Den"
+  },
+  "text": {
+    "de": "2 Punkte. Beim Bau: Hast du genau 1 Münze, erhältst du 2 Münzen dazu.",
+    "en": "2 points. On construct: gain 2 coins if you have exactly 1 coin."
+  },
+  "pattern": [
+    [
+      "brick",
+      "wood",
+      "glass"
+    ]
+  ],
+  "features": [
+    "coins",
+    "on-construct"
+  ],
+  "scoring": {
+    "type": "flat",
+    "vp": 2
+  },
+  "effects": [
+    "gamblersDen"
+  ],
+  "art": "gamblers_den.svg"
+}

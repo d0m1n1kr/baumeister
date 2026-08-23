@@ -1,0 +1,39 @@
+{
+  "id": "estival_festival",
+  "set": "fortune",
+  "kind": "monument",
+  "category": "monument",
+  "color": "pink",
+  "name": {
+    "de": "Estival-Festival",
+    "en": "Estival Festival"
+  },
+  "text": {
+    "de": "4 Punkte. Der Bau kostet zusätzlich 2 Münzen. Am Spielende sind deine Münzen 2 statt 1 Punkt wert.",
+    "en": "4 points. Construction costs 2 coins. At game end your coins are worth 2 points each."
+  },
+  "pattern": [
+    [
+      "brick",
+      "glass",
+      "wheat"
+    ],
+    [
+      "wheat",
+      "brick",
+      "glass"
+    ]
+  ],
+  "features": [
+    "coins"
+  ],
+  "scoring": {
+    "type": "flat",
+    "vp": 4
+  },
+  "effects": [
+    "constructCost2",
+    "coinValue2"
+  ],
+  "art": "estival_festival.svg"
+}

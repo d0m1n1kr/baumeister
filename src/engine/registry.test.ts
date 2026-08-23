@@ -3,17 +3,21 @@ import { allCards, catalog } from '../data';
 import { mulberry32, randomSetup, CATEGORY_ORDER } from './registry';
 
 describe('Karten-Assets', () => {
-  it('vollständiges Basisspiel: 25 Gebäude + 15 Monumente', () => {
-    const buildings = allCards.filter((c) => c.kind !== 'monument');
-    const monuments = allCards.filter((c) => c.kind === 'monument');
-    expect(buildings.length).toBe(25);
-    expect(monuments.length).toBe(15);
+  it('Basisspiel: 25 Gebäude + 15 Monumente; Fortune: 12 + 10', () => {
+    const count = (set: string, kind: 'building' | 'monument') =>
+      allCards.filter((c) => c.set === set && (c.kind === 'monument') === (kind === 'monument')).length;
+    expect(count('base', 'building')).toBe(25);
+    expect(count('base', 'monument')).toBe(15);
+    expect(count('fortune', 'building')).toBe(12);
+    expect(count('fortune', 'monument')).toBe(10);
   });
 
-  it('je Kategorie 4 Karten (Cottage: 1)', () => {
+  it('Basisspiel: je Kategorie 4 Karten (Cottage: 1); Fortune: je 2', () => {
     for (const cat of CATEGORY_ORDER) {
-      const n = allCards.filter((c) => c.kind !== 'monument' && c.category === cat).length;
-      expect(n, `Kategorie ${cat}`).toBe(cat === 'cottage' ? 1 : 4);
+      const n = (set: string) =>
+        allCards.filter((c) => c.set === set && c.kind !== 'monument' && c.category === cat).length;
+      expect(n('base'), `base/${cat}`).toBe(cat === 'cottage' ? 1 : 4);
+      expect(n('fortune'), `fortune/${cat}`).toBe(cat === 'cottage' ? 0 : 2);
     }
   });
 

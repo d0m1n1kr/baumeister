@@ -14,14 +14,17 @@ export function config(
   n = 2,
   activeCards: string[] = ACTIVE_DEFAULT,
   useMonuments = false,
-  monumentDeals?: string[][]
+  monumentDeals?: string[][],
+  systems: { coins?: boolean; trees?: boolean } = {}
 ): GameConfig {
   return {
     players: Array.from({ length: n }, (_, i) => ({ name: `P${i + 1}`, corner: i })),
     activeCards,
     monumentDeals: monumentDeals ?? Array.from({ length: n }, () => []),
     firstMasterBuilder: 0,
-    useMonuments
+    useMonuments,
+    sets: ['base'],
+    systems: { coins: systems.coins ?? false, trees: systems.trees ?? false }
   };
 }
 
@@ -29,9 +32,10 @@ export function freshGame(
   n = 2,
   activeCards: string[] = ACTIVE_DEFAULT,
   useMonuments = false,
-  monumentDeals?: string[][]
+  monumentDeals?: string[][],
+  systems: { coins?: boolean; trees?: boolean } = {}
 ): GameState {
-  return newGame(config(n, activeCards, useMonuments, monumentDeals));
+  return newGame(config(n, activeCards, useMonuments, monumentDeals, systems));
 }
 
 /** Gebäude direkt aufs Brett setzen (Test-Abkürzung). */

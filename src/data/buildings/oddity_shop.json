@@ -1,0 +1,42 @@
+{
+  "id": "oddity_shop",
+  "set": "fortune",
+  "kind": "building",
+  "category": "factory",
+  "color": "black",
+  "name": {
+    "de": "Kuriositätenladen",
+    "en": "Oddity Shop"
+  },
+  "text": {
+    "de": "2 Punkte. Sagt ein anderer Spieler ein Material an, darfst du es hier ablegen (max. 1). Ein neuer Baumeister darf vor seiner Ansage 1 Material aus einem fremden Kuriositätenladen auf sein Brett nehmen — der Besitzer erhält 1 Münze.",
+    "en": "2 points. Holds 1 resource named by another player. A new Master Builder may first take 1 resource from another player’s Oddity Shop; the owner gains 1 coin."
+  },
+  "pattern": [
+    [
+      "wood",
+      null,
+      null,
+      null
+    ],
+    [
+      "glass",
+      "wheat",
+      "wheat",
+      "brick"
+    ]
+  ],
+  "features": [
+    "holds-resource",
+    "coins",
+    "interactive"
+  ],
+  "scoring": {
+    "type": "flat",
+    "vp": 2
+  },
+  "effects": [
+    "oddityShop"
+  ],
+  "art": "oddity_shop.svg"
+}

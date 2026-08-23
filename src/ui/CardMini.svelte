@@ -29,6 +29,9 @@
     {#each card.features as f}
       <span title={FEATURE_ICONS[f]?.title}>{FEATURE_ICONS[f]?.icon}</span>
     {/each}
+    {#if card.unverified}
+      <span title="Kartendetails nicht verifiziert — Korrekturen siehe src/data/schema.md">⚠</span>
+    {/if}
   </span>
   {#if badge}<span class="badge">{badge}</span>{/if}
 </button>

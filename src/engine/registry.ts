@@ -69,14 +69,18 @@ export function randomSetup(
   catalog: Catalog,
   playersInput: { name: string; corner: number }[],
   useMonuments: boolean,
-  rng: Rng
+  rng: Rng,
+  sets: string[] = ['base'],
+  systems: { coins?: boolean; trees?: boolean } = {}
 ): GameConfig {
   // Spielerreihenfolge = Sitzreihenfolge im Uhrzeigersinn, damit der
   // Baumeister im Uhrzeigersinn weiterwandert.
   const players = [...playersInput].sort(
     (a, b) => CLOCKWISE_CORNERS.indexOf(a.corner) - CLOCKWISE_CORNERS.indexOf(b.corner)
   );
-  const defs = Object.values(catalog);
+  if (!sets.includes('base')) sets = ['base', ...sets];
+  // Erweiterungskarten werden laut Anleitung einfach in die Stapel gemischt.
+  const defs = Object.values(catalog).filter((d) => sets.includes(d.set));
   const activeCards: string[] = [];
   for (const cat of CATEGORY_ORDER) {
     const pool = defs.filter((d) => d.kind !== 'monument' && d.category === cat);
@@ -102,6 +106,8 @@ export function randomSetup(
     activeCards,
     monumentDeals,
     firstMasterBuilder: Math.floor(rng() * players.length),
-    useMonuments
+    useMonuments,
+    sets,
+    systems: { coins: systems.coins ?? false, trees: systems.trees ?? false }
   };
 }

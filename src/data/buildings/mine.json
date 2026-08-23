@@ -1,0 +1,32 @@
+{
+  "id": "mine",
+  "set": "fortune",
+  "kind": "building",
+  "category": "well",
+  "color": "grey",
+  "name": {
+    "de": "Mine",
+    "en": "Mine"
+  },
+  "text": {
+    "de": "Beim Bau: +1 Münze.",
+    "en": "On construct: gain 1 coin."
+  },
+  "pattern": [
+    [
+      "wood",
+      "stone"
+    ]
+  ],
+  "features": [
+    "coins",
+    "on-construct"
+  ],
+  "scoring": {
+    "type": "none"
+  },
+  "effects": [
+    "coinOnConstruct"
+  ],
+  "art": "mine.svg"
+}

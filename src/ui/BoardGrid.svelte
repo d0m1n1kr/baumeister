@@ -9,6 +9,7 @@
     selected = [],
     highlights = [],
     tentative = null,
+    seed = null,
     oncell
   }: {
     player: number;
@@ -17,6 +18,8 @@
     highlights?: number[];
     /** Unbestätigt platziertes Material (noch verschiebbar). */
     tentative?: number | null;
+    /** Tiny Trees: Feld mit Samen. */
+    seed?: number | null;
     oncell?: (square: number) => void;
   } = $props();
 
@@ -62,6 +65,8 @@
       {:else if sq.resource}
         <span class="res" style="background: {RESOURCE_CSS[sq.resource]}"></span>
       {/if}
+      {#if sq.coin}<span class="coinMark">🪙</span>{/if}
+      {#if seed === i && !sq.building}<span class="seedMark">🌱</span>{/if}
     </div>
   {/each}
 </div>
@@ -125,6 +130,8 @@
   .marked { position: absolute; top: 2px; right: 2px; }
   .bond { position: absolute; top: 2px; left: 2px; }
   .stored { position: absolute; bottom: 2px; left: 2px; display: flex; gap: 2px; }
+  .coinMark { position: absolute; top: 1px; right: 2px; font-size: 12px; }
+  .seedMark { position: absolute; bottom: 1px; left: 2px; font-size: 12px; }
   .stockCount {
     position: absolute;
     bottom: 1px;

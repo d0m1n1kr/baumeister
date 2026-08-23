@@ -23,7 +23,9 @@
   const choice = $derived(p.choices[0]);
 
   // ---------- lokaler UI-Zustand ----------
-  type Mode = 'idle' | 'select' | 'target' | 'grovePlace' | 'claimPlace' | 'guildPick';
+  type Mode =
+    | 'idle' | 'select' | 'target' | 'grovePlace' | 'claimPlace' | 'guildPick'
+    | 'masonsPlace' | 'promenadePlace' | 'seedBonusPlace' | 'oddityPlace';
   let mode = $state<Mode>('idle');
   let selected = $state<number[]>([]);
   let buildCard = $state<string | null>(null);
@@ -31,6 +33,12 @@
   let guildSquare = $state<number | null>(null);
   let warehouseSquare = $state<number | null>(null);
   let factoryDialog = $state(false);
+  let coinDialog = $state(false);
+  let oddityDialog = $state(false);
+  let masonsCard = $state<string | null>(null);
+  let seedBonusResource = $state<Resource | null>(null);
+  let oddityFrom = $state<{ player: number; square: number } | null>(null);
+  let usePrism = $state(false);
   let overlayCard = $state<CardDef | null>(null);
   let confirming = $state<'' | 'complete' | 'reveal' | 'draft'>('');
   let monumentPick = $state(false);
@@ -50,6 +58,10 @@
     buildCard = null;
     groveCard = null;
     guildSquare = null;
+    masonsCard = null;
+    seedBonusResource = null;
+    oddityFrom = null;
+    usePrism = false;
   }
 
   // Wenn eine neue Entscheidung ansteht, Bau-Modus verlassen
@@ -86,6 +98,29 @@
 
   const emptySquares = $derived(p.board.map((sq, i) => (!sq.building && !sq.resource ? i : -1)).filter((i) => i >= 0));
   const boardFull = $derived(emptySquares.length === 0);
+  const coinsActive = $derived(st.config.systems.coins);
+  const treesActive = $derived(st.config.systems.trees);
+  const prismAvailable = $derived(
+    coinsActive && !p.prismUsedThisRound &&
+    p.board.some((sq) => sq.building && (catalog[sq.building.card].effects ?? []).includes('prismForge'))
+  );
+  /** Fremde Kuriositätenläden mit Material (für den Baumeister-Zugriff). */
+  const oddityTargets = $derived(
+    st.phase.t === 'nameResource' && isMB && coinsActive && !st.oddityTaken
+      ? st.players.flatMap((o, oi) =>
+          oi === player
+            ? []
+            : o.board
+                .map((sq, si) =>
+                  sq.building?.stored?.length &&
+                  (catalog[sq.building.card].effects ?? []).includes('oddityShop')
+                    ? { player: oi, square: si, resource: sq.building.stored[0], name: o.name }
+                    : null
+                )
+                .filter((x) => x !== null)
+        )
+      : []
+  );
   const bondmakerBuilt = $derived(
     !!p.monument?.built && (catalog[p.monument.card].effects ?? []).includes('bondmaker')
   );
@@ -98,15 +133,53 @@
   );
 
   const highlights = $derived(
-    mode === 'target' ? targetSquares : mode === 'grovePlace' || mode === 'claimPlace' ? emptySquares
+    mode === 'target' ? targetSquares
+    : mode === 'grovePlace' || mode === 'claimPlace' || mode === 'masonsPlace' ||
+      mode === 'promenadePlace' || mode === 'seedBonusPlace' || mode === 'oddityPlace' ? emptySquares
     : mode === 'guildPick' ? p.board.map((sq, i) => (sq.building && catalog[sq.building.card].kind !== 'monument' ? i : -1)).filter((i) => i >= 0)
+    : st.phase.t === 'seedPlacement' && p.seedSquare == null ? emptySquares
     : []
   );
 
   function oncell(square: number) {
     if (p.done) return;
     const sq = p.board[square];
+    // Tiny Trees: Samen setzen
+    if (st.phase.t === 'seedPlacement') {
+      if (p.seedSquare == null && !sq.building && !sq.resource) {
+        showError(game.dispatch({ t: 'placeSeed', player, square }));
+      }
+      return;
+    }
     switch (mode) {
+      case 'masonsPlace': {
+        if (!emptySquares.includes(square) || !masonsCard) return;
+        showError(game.dispatch({ t: 'resolveMasons', player, card: masonsCard, square }));
+        masonsCard = null;
+        mode = 'idle';
+        break;
+      }
+      case 'promenadePlace': {
+        if (!emptySquares.includes(square)) return;
+        showError(game.dispatch({ t: 'resolvePromenade', player, square }));
+        if (!p.choices.some((c) => c.t === 'promenadeCoins')) mode = 'idle';
+        break;
+      }
+      case 'seedBonusPlace': {
+        if (!emptySquares.includes(square) || !seedBonusResource) return;
+        showError(game.dispatch({ t: 'resolveSeedBonus', player, resource: seedBonusResource, square }));
+        resetMode();
+        break;
+      }
+      case 'oddityPlace': {
+        if (!emptySquares.includes(square) || !oddityFrom) return;
+        showError(game.dispatch({
+          t: 'oddityTake', player,
+          fromPlayer: oddityFrom.player, fromSquare: oddityFrom.square, targetSquare: square
+        }));
+        resetMode();
+        break;
+      }
       case 'select': {
         if (!sq.resource && !(sq.building && (catalog[sq.building.card].effects ?? []).includes('tradingPost'))) return;
         if (sq.resource && sq.building) return; // Bondmaker-Material nie verbaubar
@@ -115,7 +188,10 @@
       }
       case 'target': {
         if (!targetSquares.includes(square) || !buildCard) return;
-        showError(game.dispatch({ t: 'build', player, squares: selected, card: buildCard, target: square }));
+        showError(game.dispatch({
+          t: 'build', player, squares: selected, card: buildCard, target: square,
+          ...(usePrism ? { prism: true } : {})
+        }));
         resetMode();
         break;
       }
@@ -138,12 +214,29 @@
       }
       case 'idle': {
         if (!inRound) break;
-        // Lagerhaus antippen, solange Material aussteht → einlagern/tauschen
+        // Lagerhaus/Museum antippen, solange Material aussteht → einlagern/tauschen/verkaufen
         if (
           p.pending != null && sq.building &&
-          (catalog[sq.building.card].effects ?? []).includes('warehouse')
+          ((catalog[sq.building.card].effects ?? []).includes('warehouse') ||
+            (catalog[sq.building.card].effects ?? []).includes('museum'))
         ) {
           warehouseSquare = square;
+          break;
+        }
+        // Museum ohne pending: Verkauf möglich
+        if (
+          p.pending == null && sq.building && sq.building.stored?.length &&
+          (catalog[sq.building.card].effects ?? []).includes('museum') && !p.museumSoldThisRound
+        ) {
+          warehouseSquare = square;
+          break;
+        }
+        // Kuriositätenladen: fremd angesagtes Material ablegen
+        if (
+          p.pending != null && !isMB && sq.building &&
+          (catalog[sq.building.card].effects ?? []).includes('oddityShop')
+        ) {
+          showError(game.dispatch({ t: 'oddityStore', player, square }));
           break;
         }
         // Tippen platziert das ausstehende Material
@@ -184,13 +277,18 @@
     if (!cell || Number(cell.getAttribute('data-player')) !== player) return;
     const square = Number(cell.getAttribute('data-square'));
     const sq = p.board[square];
-    if (sq.building && (catalog[sq.building.card].effects ?? []).includes('warehouse')) {
-      const stored = sq.building.stored?.length ?? 0;
-      if (stored < 3) {
+    const cellEffects = sq.building ? (catalog[sq.building.card].effects ?? []) : [];
+    if (cellEffects.includes('warehouse') || cellEffects.includes('museum')) {
+      const cap = cellEffects.includes('warehouse') ? 3 : 2;
+      if ((sq.building!.stored?.length ?? 0) < cap) {
         showError(game.dispatch({ t: 'warehouseStore', player, square }));
       } else {
         warehouseSquare = square;
       }
+      return;
+    }
+    if (cellEffects.includes('oddityShop') && !isMB) {
+      showError(game.dispatch({ t: 'oddityStore', player, square }));
       return;
     }
     showError(game.dispatch({ t: 'placeResource', player, square }));
@@ -226,13 +324,28 @@
 <div class="corner" style="transform: rotate({rotation}deg)">
   <header>
     <span class="pname" class:mb={isMB}>{isMB ? '👑 ' : ''}{p.name}</span>
+    {#if coinsActive}
+      <span class="chest" title={t.coins}>
+        {#each Array.from({ length: 4 }) as _, i}
+          <span class="slot" class:filled={i < p.coins}>{i < p.coins ? '🪙' : ''}</span>
+        {/each}
+      </span>
+    {/if}
     {#if p.done}<span class="status done">{t.townComplete}</span>
     {:else if inRound && p.roundDone}<span class="status">{t.waitingForOthers}</span>{/if}
   </header>
 
   <div class="row">
     <div class="boardWrap">
-      <BoardGrid {player} board={p.board} {selected} {highlights} tentative={mode === 'idle' ? tentative : null} {oncell} />
+      <BoardGrid
+        {player}
+        board={p.board}
+        {selected}
+        {highlights}
+        tentative={mode === 'idle' ? tentative : null}
+        seed={treesActive && p.seedSquare != null && p.seedSquare >= 0 ? p.seedSquare : null}
+        {oncell}
+      />
       {#if mode === 'target'}<div class="hint">{t.chooseBuildTarget}</div>
       {:else if mode === 'grovePlace' || mode === 'claimPlace'}<div class="hint">{t.choosePlacement}</div>
       {:else if mode === 'guildPick' && guildSquare === null}<div class="hint">{t.guildPickBuilding}</div>{/if}
@@ -247,7 +360,14 @@
         {/if}
       {/if}
 
+      {#if st.phase.t === 'seedPlacement' && p.seedSquare == null}
+        <span class="choiceTitle">🌱 {t.seedPlaceHint}</span>
+      {/if}
+
       {#if st.phase.t === 'nameResource' && isMB && !p.done}
+        {#if oddityTargets.length > 0 && mode !== 'oddityPlace'}
+          <button onpointerup={() => (oddityDialog = true)}>🛍 {t.oddityTakeTitle}</button>
+        {/if}
         <ResourcePicker disabled={bankBlocked} onpick={(r) => showError(game.dispatch({ t: 'nameResource', resource: r }))} />
       {/if}
 
@@ -270,6 +390,9 @@
             {#if factoryAvailable}
               <button onpointerup={() => (factoryDialog = true)}>⚙ {t.factorySwap}</button>
             {/if}
+            {#if coinsActive && !isMB && !p.pendingLocked && p.pending === namedResource && p.coins >= 1}
+              <button onpointerup={() => (coinDialog = true)}>🪙 {t.coinSwap}</button>
+            {/if}
           </div>
         {/if}
 
@@ -289,6 +412,12 @@
                 />
               {/each}
             </div>
+          {/if}
+          {#if (mode === 'select' || mode === 'target') && prismAvailable}
+            <label class="prismToggle">
+              <input type="checkbox" bind:checked={usePrism} />
+              <span>✨ {t.prismToggle}</span>
+            </label>
           {/if}
           {#if mode === 'idle' && p.pending == null && !p.roundDone}
             {#if tentative != null}
@@ -356,6 +485,45 @@
             {/each}
           </div>
           <button onpointerup={() => showError(game.dispatch({ t: 'resolveOpaleyeSetup', player, card: null }))}>
+            {t.skip}
+          </button>
+        </div>
+      {:else if choice?.t === 'masonsGuild'}
+        <div class="choice">
+          <span class="choiceTitle">{t.masonsTitle} ({p.coins} 🪙)</span>
+          {#if mode !== 'masonsPlace'}
+            <div class="matches">
+              {#each st.config.activeCards.filter((id) => !choice.picked.includes(id)) as id}
+                <CardMini card={catalog[id]} compact onclick={() => { masonsCard = id; mode = 'masonsPlace'; }} />
+              {/each}
+            </div>
+          {:else}
+            <span class="choiceTitle">{t.choosePlacement}</span>
+          {/if}
+          <button onpointerup={() => { showError(game.dispatch({ t: 'resolveMasons', player, card: null })); resetMode(); }}>
+            {t.skip}
+          </button>
+        </div>
+      {:else if choice?.t === 'promenadeCoins'}
+        <div class="choice">
+          <span class="choiceTitle">{t.promenadeTitle} ({choice.remaining})</span>
+          {#if mode !== 'promenadePlace'}
+            <button class="primary" onpointerup={() => (mode = 'promenadePlace')}>{t.choosePlacement}</button>
+          {/if}
+          <button onpointerup={() => { showError(game.dispatch({ t: 'resolvePromenade', player, square: null })); resetMode(); }}>
+            {t.skip}
+          </button>
+        </div>
+      {:else if choice?.t === 'seedBonus'}
+        <div class="choice">
+          <ResourcePicker
+            label={t.seedBonusTitle}
+            onpick={(r) => { seedBonusResource = r; mode = 'seedBonusPlace'; }}
+          />
+          {#if mode === 'seedBonusPlace'}
+            <span class="choiceTitle">{t.choosePlacement}</span>
+          {/if}
+          <button onpointerup={() => { showError(game.dispatch({ t: 'resolveSeedBonus', player, resource: null })); resetMode(); }}>
             {t.skip}
           </button>
         </div>
@@ -428,18 +596,65 @@
   </div>
 {/if}
 
-{#if warehouseSquare !== null && p.board[warehouseSquare]?.building}
-  {@const wh = p.board[warehouseSquare].building!}
+{#if coinDialog}
   <div class="scrim">
     <div class="pick" style="transform: rotate({rotation}deg)">
-      <h3>{t.warehouseTitle}</h3>
-      {#if p.pending != null && (wh.stored?.length ?? 0) < 3}
+      <ResourcePicker
+        label={t.coinSwapHint}
+        disabled={namedResource ? [namedResource] : []}
+        onpick={(r) => {
+          showError(game.dispatch({ t: 'coinSwap', player, take: r }));
+          coinDialog = false;
+        }}
+      />
+      <button onpointerup={() => (coinDialog = false)}>{t.cancel}</button>
+    </div>
+  </div>
+{/if}
+
+{#if oddityDialog}
+  <div class="scrim">
+    <div class="pick" style="transform: rotate({rotation}deg)">
+      <h3>{t.oddityTakeTitle}</h3>
+      <div class="btnRow">
+        {#each oddityTargets as target}
+          <button class="chip" style="background: {RESOURCE_CSS[target.resource]}" onpointerup={() => {
+            oddityFrom = { player: target.player, square: target.square };
+            oddityDialog = false;
+            mode = 'oddityPlace';
+          }}>{target.name}</button>
+        {/each}
+      </div>
+      <button onpointerup={() => (oddityDialog = false)}>{t.cancel}</button>
+    </div>
+  </div>
+{/if}
+
+{#if warehouseSquare !== null && p.board[warehouseSquare]?.building}
+  {@const wh = p.board[warehouseSquare].building!}
+  {@const whEffects = catalog[wh.card].effects ?? []}
+  {@const whCap = whEffects.includes('warehouse') ? 3 : 2}
+  <div class="scrim">
+    <div class="pick" style="transform: rotate({rotation}deg)">
+      <h3>{catalog[wh.card].name.de}</h3>
+      {#if whEffects.includes('museum') && wh.stored?.length && !p.museumSoldThisRound}
+        <span class="pickText">{t.museumSell}</span>
+        <div class="btnRow">
+          {#each wh.stored as r, i}
+            <button class="chip" style="background: {RESOURCE_CSS[r]}" onpointerup={() => {
+              showError(game.dispatch({ t: 'museumSell', player, square: warehouseSquare!, storedIndex: i }));
+              warehouseSquare = null;
+            }}>{t.resourceNames[r]}</button>
+          {/each}
+        </div>
+      {/if}
+      {#if p.pending != null && (wh.stored?.length ?? 0) < whCap}
         <button class="primary" onpointerup={() => {
           showError(game.dispatch({ t: 'warehouseStore', player, square: warehouseSquare! }));
           warehouseSquare = null;
         }}>▦ {t.warehouseStore}</button>
       {/if}
-      {#if wh.stored?.length}
+      {#if whEffects.includes('warehouse') && wh.stored?.length && p.pending != null}
         <span class="pickText">{t.warehouseSwapHint}</span>
         <div class="btnRow">
           {#each wh.stored as r, i}
@@ -492,6 +707,28 @@
   .pname.mb { color: var(--accent); }
   .status { font-size: 12px; color: var(--text-dim); }
   .status.done { color: var(--ok); font-weight: 700; }
+  .chest { display: flex; gap: 2px; }
+  .chest .slot {
+    width: 18px;
+    height: 18px;
+    border-radius: 4px;
+    border: 1px solid rgba(255, 255, 255, 0.25);
+    background: rgba(0, 0, 0, 0.25);
+    display: grid;
+    place-items: center;
+    font-size: 11px;
+    line-height: 1;
+  }
+  .chest .slot.filled { border-color: var(--accent); }
+  .prismToggle {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 12px;
+    color: var(--text-dim);
+    cursor: pointer;
+  }
+  .prismToggle input { width: 16px; height: 16px; }
 
   .row { display: flex; gap: 10px; flex: 1; min-height: 0; }
   .boardWrap {

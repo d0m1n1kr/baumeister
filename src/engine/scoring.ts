@@ -89,20 +89,28 @@ function combinations<T>(arr: T[], k: number): T[][] {
   return out;
 }
 
+interface FeedCandidate {
+  fed: Set<number>;
+  coinsSpent: number;
+}
+
 /**
- * Alle sinnvollen Fütterungs-Kandidaten (Mengen gefütterter Hütten-Felder).
- * Deterministische Fütterer (Kornspeicher/Obstgarten) stehen fest; pro
- * Gewächshaus wird eine zusammenhängende Gruppe gewählt; Bauernhöfe füttern
- * beliebige Hütten bis zur Kapazität.
+ * Alle sinnvollen Fütterungs-Kandidaten (Mengen gefütterter Hütten-Felder,
+ * ggf. mit ausgegebenen Münzen — Fortune). Deterministische Fütterer
+ * (Kornspeicher/Obstgarten/Zehntscheune-Nachbarn) stehen fest; pro Gewächshaus
+ * wird eine zusammenhängende Gruppe gewählt; Bauernhöfe füttern beliebige
+ * Hütten bis zur Kapazität; Root Cellar/Tithe Barn füttern gegen Münzen.
  */
-function feedingCandidates(p: PlayerState, catalog: Catalog): Set<number>[] {
+function feedingCandidates(p: PlayerState, catalog: Catalog): FeedCandidate[] {
   const buildings = placedBuildings(p, catalog);
   const cottages = buildings.filter((b) => isCottage(b.def)).map((b) => b.square);
-  if (cottages.length === 0) return [new Set()];
+  if (cottages.length === 0) return [{ fed: new Set(), coinsSpent: 0 }];
 
   const fixed = new Set<number>();
   let anywhereCapacity = 0;
   let greenhouses = 0;
+  let hasRowColPerCoin = false;
+  let hasPerCoinPer2 = false;
 
   for (const b of buildings) {
     const feeding = b.def.feeding;
@@ -121,6 +129,14 @@ function feedingCandidates(p: PlayerState, catalog: Catalog): Set<number>[] {
         break;
       case 'contiguousGroup':
         greenhouses++;
+        break;
+      case 'rowOrColumnPerCoin':
+        hasRowColPerCoin = true;
+        break;
+      case 'adjacentPlusPerCoinPer2':
+        hasPerCoinPer2 = true;
+        // Nachbarn füttert die Zehntscheune gratis
+        for (const n of neighbors4(b.square)) if (cottages.includes(n)) fixed.add(n);
         break;
     }
   }
@@ -143,22 +159,22 @@ function feedingCandidates(p: PlayerState, catalog: Catalog): Set<number>[] {
   }
 
   // Bauernhof-Kapazität auf die restlichen Hütten verteilen
-  const results: Set<number>[] = [];
+  let results: FeedCandidate[] = [];
   for (const base of bases) {
     const remaining = cottages.filter((c) => !base.has(c));
     if (anywhereCapacity >= remaining.length) {
       const s = new Set(base);
       for (const c of remaining) s.add(c);
-      results.push(s);
+      results.push({ fed: s, coinsSpent: 0 });
     } else if (anywhereCapacity === 0) {
-      results.push(base);
+      results.push({ fed: base, coinsSpent: 0 });
     } else {
       const combos = combinations(remaining, anywhereCapacity);
       if (combos.length <= 2000) {
         for (const combo of combos) {
           const s = new Set(base);
           for (const c of combo) s.add(c);
-          results.push(s);
+          results.push({ fed: s, coinsSpent: 0 });
         }
       } else {
         // Fallback: Hütten neben Tempeln bevorzugen
@@ -171,11 +187,54 @@ function feedingCandidates(p: PlayerState, catalog: Catalog): Set<number>[] {
         const sorted = [...remaining].sort((a, b) => Number(templeAdj.has(b)) - Number(templeAdj.has(a)));
         const s = new Set(base);
         for (const c of sorted.slice(0, anywhereCapacity)) s.add(c);
-        results.push(s);
+        results.push({ fed: s, coinsSpent: 0 });
       }
     }
   }
-  return dedupeSets(results);
+  results = dedupeCandidates(results);
+
+  // Root Cellar: je 1 Münze füttert alle Hütten einer Zeile/Spalte
+  if (hasRowColPerCoin && p.coins > 0) {
+    const lines: number[][] = [];
+    for (let i = 0; i < 4; i++) {
+      lines.push(cottages.filter((c) => rowOf(c) === i));
+      lines.push(cottages.filter((c) => colOf(c) === i));
+    }
+    const usefulLines = lines.filter((l) => l.length > 0);
+    const expanded: FeedCandidate[] = [...results];
+    for (const cand of results) {
+      for (let k = 1; k <= Math.min(p.coins - cand.coinsSpent, usefulLines.length); k++) {
+        for (const combo of combinations(usefulLines, k)) {
+          const s = new Set(cand.fed);
+          for (const line of combo) for (const c of line) s.add(c);
+          expanded.push({ fed: s, coinsSpent: cand.coinsSpent + k });
+        }
+      }
+    }
+    results = dedupeCandidates(expanded);
+  }
+
+  // Tithe Barn: 1 Münze je 2 weitere Hütten (beliebig)
+  if (hasPerCoinPer2 && p.coins > 0) {
+    const expanded: FeedCandidate[] = [...results];
+    for (const cand of results) {
+      const remaining = cottages.filter((c) => !cand.fed.has(c));
+      const budget = p.coins - cand.coinsSpent;
+      const maxFeed = Math.min(remaining.length, budget * 2);
+      for (let n = 1; n <= maxFeed; n++) {
+        const cost = Math.ceil(n / 2);
+        if (cost > budget) break;
+        for (const combo of combinations(remaining, n).slice(0, 500)) {
+          const s = new Set(cand.fed);
+          for (const c of combo) s.add(c);
+          expanded.push({ fed: s, coinsSpent: cand.coinsSpent + cost });
+        }
+      }
+    }
+    results = dedupeCandidates(expanded);
+  }
+
+  return results;
 }
 
 function dedupeSets(sets: Set<number>[]): Set<number>[] {
@@ -191,6 +250,17 @@ function dedupeSets(sets: Set<number>[]): Set<number>[] {
   return out;
 }
 
+/** Dedupe: je Fütterungs-Menge nur die günstigste Münz-Ausgabe behalten. */
+function dedupeCandidates(cands: FeedCandidate[]): FeedCandidate[] {
+  const best = new Map<string, FeedCandidate>();
+  for (const c of cands) {
+    const k = [...c.fed].sort((a, b) => a - b).join(',');
+    const prev = best.get(k);
+    if (!prev || c.coinsSpent < prev.coinsSpent) best.set(k, c);
+  }
+  return [...best.values()];
+}
+
 // ---------- Wertung ----------
 
 export function scoreGame(state: GameState, catalog: Catalog): PlayerScore[] {
@@ -200,8 +270,8 @@ export function scoreGame(state: GameState, catalog: Catalog): PlayerScore[] {
 export function scorePlayer(state: GameState, playerIndex: number, catalog: Catalog): PlayerScore {
   const p = state.players[playerIndex];
   let best: PlayerScore | null = null;
-  for (const fed of feedingCandidates(p, catalog)) {
-    const s = scoreWithFeeding(state, playerIndex, fed, catalog);
+  for (const cand of feedingCandidates(p, catalog)) {
+    const s = scoreWithFeeding(state, playerIndex, cand, catalog);
     if (!best || s.total > best.total) best = s;
   }
   return best!;
@@ -210,9 +280,10 @@ export function scorePlayer(state: GameState, playerIndex: number, catalog: Cata
 function scoreWithFeeding(
   state: GameState,
   playerIndex: number,
-  fed: Set<number>,
+  candidate: FeedCandidate,
   catalog: Catalog
 ): PlayerScore {
+  const fed = candidate.fed;
   const p = state.players[playerIndex];
   const buildings = placedBuildings(p, catalog);
   const hasEffect = (e: string) => buildings.some((b) => (b.def.effects ?? []).includes(e as never));
@@ -365,7 +436,7 @@ function scoreWithFeeding(
         break;
       }
       case 'handler': {
-        addPoints(b.card, scoreHandler(spec.handler, spec.vp ?? 0, state, playerIndex, b, buildings, catalog));
+        addPoints(b.card, scoreHandler(spec.handler, spec.vp ?? 0, state, playerIndex, b, buildings, catalog, fed));
         break;
       }
     }
@@ -373,15 +444,36 @@ function scoreWithFeeding(
 
   // Leere Felder: kein Gebäude (Restmaterial zählt als leer; Bondmaker-Material liegt AUF Gebäuden)
   const emptySquares = p.board.filter((sq) => !sq.building).length;
-  const emptyPenalty = hasEffect('cathedral') ? 0 : -emptySquares;
+
+  // Tiny Trees: Samen als EINZIGES unbebautes Feld → Baum (2 SP, Feld zählt nicht als leer)
+  let treePoints: number | undefined;
+  let penaltySquares = emptySquares;
+  if (state.config.systems.trees) {
+    const seed = p.seedSquare;
+    const isTree =
+      seed != null && seed >= 0 && !p.board[seed].building && emptySquares === 1;
+    treePoints = isTree ? 2 : 0;
+    if (isTree) penaltySquares -= 1;
+  }
+  const emptyPenalty = hasEffect('cathedral') || penaltySquares === 0 ? 0 : -penaltySquares;
+
+  // Fortune: übrige Münzen (nach Fütterungs-Ausgaben)
+  let coins: PlayerScore['coins'];
+  if (state.config.systems.coins) {
+    const remaining = Math.max(0, p.coins - candidate.coinsSpent);
+    const value = hasEffect('coinValue2') ? 2 : 1;
+    coins = { count: remaining, spent: candidate.coinsSpent, points: remaining * value };
+  }
 
   const allLines = [...lines.values()];
-  const total = allLines.reduce((s, l) => s + l.points, 0) + emptyPenalty;
+  const total =
+    allLines.reduce((s, l) => s + l.points, 0) +
+    emptyPenalty + (coins?.points ?? 0) + (treePoints ?? 0);
 
   let fedCottages = 0;
   for (const b of buildings) if (isCottage(b.def) && fed.has(b.square)) fedCottages += cottageWeight(b.def);
 
-  return { lines: allLines, emptySquares, emptyPenalty, total, fedCottages };
+  return { lines: allLines, emptySquares, emptyPenalty, total, fedCottages, coins, treePoints };
 }
 
 function scoreHandler(
@@ -391,7 +483,8 @@ function scoreHandler(
   playerIndex: number,
   self: Placed,
   buildings: Placed[],
-  catalog: Catalog
+  catalog: Catalog,
+  fed: Set<number>
 ): number {
   const p = state.players[playerIndex];
   switch (handler) {
@@ -448,6 +541,29 @@ function scoreHandler(
       ).length;
       const byRank = [6, 3, 2];
       return baseVp + (rank <= 3 ? byRank[rank - 1] : 0);
+    }
+    case 'schoolhouse': {
+      // Fortune: 2 SP bei gefütterter Nachbar-Hütte; +2 SP bei Münzen ≥ rechter Nachbar
+      const fedAdjacent = neighbors4(self.square).some((n) => {
+        const nb = p.board[n].building;
+        return !!nb && isCottage(catalog[nb.card]) && fed.has(n);
+      });
+      if (!fedAdjacent) return 0;
+      const n = state.players.length;
+      const right = state.players[(playerIndex + n - 1) % n];
+      const bonus = right === p || p.coins >= right.coins ? 2 : 0;
+      return 2 + bonus;
+    }
+    case 'eraflage': {
+      // Fortune (unverifiziert): Basis − 2 SP je anderem Gebäudetyp in Zeile ∪ Spalte
+      const types = new Set<string>();
+      for (const o of buildings) {
+        if (o.square === self.square || o.card === self.card) continue;
+        if (rowOf(o.square) === rowOf(self.square) || colOf(o.square) === colOf(self.square)) {
+          types.add(o.card);
+        }
+      }
+      return baseVp - types.size * 2;
     }
     default:
       return baseVp;

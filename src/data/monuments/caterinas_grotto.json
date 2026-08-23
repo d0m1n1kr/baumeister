@@ -1,0 +1,42 @@
+{
+  "id": "caterinas_grotto",
+  "set": "fortune",
+  "kind": "monument",
+  "category": "monument",
+  "color": "pink",
+  "name": {
+    "de": "Caterinas Grotte",
+    "en": "Caterina's Grotto"
+  },
+  "text": {
+    "de": "Beim Bau: Lege je 1 Münze auf jedes freie Mittelfeld. Wer auf einem Münzfeld baut, erhält die Münze. Münzen auf dem Brett zählen am Ende nicht.",
+    "en": "On construct: place a coin on each empty center square. Constructing on a coin square gains the coin."
+  },
+  "pattern": [
+    [
+      null,
+      "glass"
+    ],
+    [
+      "brick",
+      "stone"
+    ],
+    [
+      "wood",
+      null
+    ]
+  ],
+  "features": [
+    "coins",
+    "center",
+    "on-construct"
+  ],
+  "scoring": {
+    "type": "none"
+  },
+  "effects": [
+    "grottoCoins"
+  ],
+  "art": "caterinas_grotto.svg",
+  "unverified": true
+}

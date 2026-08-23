@@ -1,0 +1,39 @@
+{
+  "id": "petal_promenade",
+  "set": "fortune",
+  "kind": "monument",
+  "category": "monument",
+  "color": "pink",
+  "name": {
+    "de": "Die Blütenpromenade",
+    "en": "The Petal Promenade"
+  },
+  "text": {
+    "de": "Beim Bau: Lege Münzen auf bis zu 3 freie Felder. Wer dort bei fremder Ansage Material platziert, erhält die Münze.",
+    "en": "On construct: place coins on up to 3 empty squares; placing a foreign-named resource there gains the coin."
+  },
+  "pattern": [
+    [
+      "glass",
+      "wheat",
+      "glass"
+    ],
+    [
+      null,
+      "wood",
+      null
+    ]
+  ],
+  "features": [
+    "coins",
+    "on-construct"
+  ],
+  "scoring": {
+    "type": "none"
+  },
+  "effects": [
+    "promenadeCoins"
+  ],
+  "art": "petal_promenade.svg",
+  "unverified": true
+}

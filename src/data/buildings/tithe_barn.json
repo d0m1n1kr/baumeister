@@ -1,0 +1,38 @@
+{
+  "id": "tithe_barn",
+  "set": "fortune",
+  "kind": "building",
+  "category": "food",
+  "color": "red",
+  "name": {
+    "de": "Zehntscheune",
+    "en": "Tithe Barn"
+  },
+  "text": {
+    "de": "Füttert alle angrenzenden Hütten. Zusätzlich füttert sie beliebige Hütten für 1 Münze je 2 Hütten.",
+    "en": "Feeds all adjacent cottages. Additionally feeds any cottages for 1 coin per 2 cottages."
+  },
+  "pattern": [
+    [
+      "wheat",
+      "stone"
+    ],
+    [
+      "stone",
+      "wood"
+    ]
+  ],
+  "features": [
+    "feeds",
+    "adjacency",
+    "coins"
+  ],
+  "feeding": {
+    "mode": "adjacentPlusPerCoinPer2"
+  },
+  "scoring": {
+    "type": "none"
+  },
+  "effects": [],
+  "art": "tithe_barn.svg"
+}
