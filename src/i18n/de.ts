@@ -110,6 +110,7 @@ export const t = {
   yourName: 'Dein Name',
   joinButton: 'Beitreten',
   connecting: 'Verbinde …',
+  relayStatus: (open: number, total: number) => `Vermittlung: ${open}/${total} Relays erreichbar`,
   waitingForHost: 'Warte auf den Start durch den Host …',
   connected: 'verbunden',
   disconnected: 'getrennt',

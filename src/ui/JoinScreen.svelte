@@ -1,6 +1,6 @@
 <script lang="ts">
   import { session } from '../net/session.svelte';
-  import { selectedTransport, joinCodeFromUrl, clearJoinHash } from '../net';
+  import { selectedTransport, joinCodeFromUrl, clearJoinHash, signalingStatus } from '../net';
   import { isValidRoomCode, normalizeRoomCode } from '../net/protocol';
   import { t } from '../i18n/de';
   import HelpDialog from './HelpDialog.svelte';
@@ -18,6 +18,17 @@
   let name = $state(initialName ?? '');
   let busy = $state(false);
   let showHelp = $state(false);
+
+  // Diagnose beim Verbinden: Sind die Vermittlungs-Relays überhaupt erreichbar?
+  let relays = $state<{ open: number; total: number } | null>(null);
+  $effect(() => {
+    if (session.status !== 'connecting') {
+      relays = null;
+      return;
+    }
+    const timer = setInterval(() => (relays = signalingStatus()), 1000);
+    return () => clearInterval(timer);
+  });
 
   const ready = $derived(isValidRoomCode(normalizeRoomCode(code)) && name.trim().length > 0);
   const seats = $derived(session.lobbySeats);
@@ -50,6 +61,11 @@
     <section class="status">
       {#if session.status === 'connecting'}
         <p>{t.connecting}</p>
+        {#if relays}
+          <p class="relays" class:bad={relays.open === 0}>
+            {t.relayStatus(relays.open, relays.total)}
+          </p>
+        {/if}
       {:else}
         <p>{t.waitingForHost}</p>
         <ul class="seats">
@@ -140,6 +156,8 @@
   .dot { width: 9px; height: 9px; border-radius: 50%; background: var(--text-dim); }
   .dot.on { background: var(--ok); }
   .status p { margin: 0; color: var(--text-dim); text-align: center; }
+  .relays { font-size: 11px; }
+  .relays.bad { color: var(--danger); }
   .actions { display: flex; justify-content: flex-end; gap: 10px; }
   .error { background: var(--danger); color: #fff; font-size: 13px; padding: 8px 10px; border-radius: 8px; }
 </style>
