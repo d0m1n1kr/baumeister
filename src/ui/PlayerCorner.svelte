@@ -431,6 +431,11 @@
             {#if coinsActive && !isMB && !p.pendingLocked && p.pending === namedResource && p.coins >= 1}
               <button onpointerup={() => (coinDialog = true)}>🪙 {t.coinSwap}</button>
             {/if}
+            {#if st.config.systems.cavern && !isMB && (p.cavernUsed ?? 0) < 2}
+              <button onpointerup={() => showError(game.dispatch({ t: 'cavern', player }))}>
+                🕳 {t.cavernButton} ({2 - (p.cavernUsed ?? 0)})
+              </button>
+            {/if}
           </div>
         {/if}
 

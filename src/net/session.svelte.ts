@@ -72,8 +72,12 @@ export class Session {
   mySeat = $state<number | null>(null);
   roomCode = $state('');
   netError = $state('');
-  /** Vom Host beim Raumöffnen gewählte Partie-Optionen (Erweiterungen, Monumente). */
-  setup = $state<{ sets: string[]; useMonuments: boolean }>({ sets: ['base'], useMonuments: true });
+  /** Vom Host beim Raumöffnen gewählte Partie-Optionen (Erweiterungen, Monumente, Höhle). */
+  setup = $state<{ sets: string[]; useMonuments: boolean; cavern?: boolean }>({
+    sets: ['base'],
+    useMonuments: true,
+    cavern: false
+  });
 
   private transport: Transport | null = null;
   private hostPeer: PeerId | null = null;

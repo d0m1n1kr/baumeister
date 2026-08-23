@@ -187,6 +187,8 @@ export interface PlayerState {
   seedSquare?: number;
   /** Fortune: zusätzliches Material (Southern Semaphore); rückt nach dem Platzieren in pending nach. */
   pendingExtra?: Resource | null;
+  /** Höhlen-Regel: bereits beiseitegelegte Materialien (max. 2 pro Partie). */
+  cavernUsed?: number;
   /** Fortune: pending stammt aus Southern Semaphore → kein Tausch (Fabrik/Münze) erlaubt. */
   pendingLocked?: boolean;
   /** Fortune: Museum-Verkauf bereits in dieser Runde genutzt. */
@@ -224,7 +226,7 @@ export interface GameConfig {
   /** Aktive Karten-Sets (enthält immer 'base'). */
   sets: string[];
   /** Aktive Zusatzsysteme (aus den gewählten Sets abgeleitet). */
-  systems: { coins: boolean; trees: boolean };
+  systems: { coins: boolean; trees: boolean; cavern?: boolean };
 }
 
 /** Maximale Münzen in der Truhe (Fortune). */
@@ -248,6 +250,7 @@ export type Action =
   | { t: 'factorySwap'; player: number; take: Resource }
   | { t: 'coinSwap'; player: number; take: Resource }
   | { t: 'placeResource'; player: number; square: number }
+  | { t: 'cavern'; player: number }
   | { t: 'moveResource'; player: number; square: number }
   | { t: 'warehouseStore'; player: number; square: number }
   | { t: 'warehouseSwap'; player: number; square: number; storedIndex: number }

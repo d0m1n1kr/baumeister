@@ -345,3 +345,49 @@ describe('Baumeister-Folge und Bank-Sperre', () => {
     expect(s.players[0].choices.length).toBe(0);
   });
 });
+
+describe('Höhlen-Regel', () => {
+  function cavernGame() {
+    return inRound(freshGame(2, ACTIVE_DEFAULT, false, undefined, { cavern: true }));
+  }
+
+  it('legt fremd angesagtes Material beiseite — höchstens 2-mal pro Partie', () => {
+    let s = cavernGame(); // Baumeister ist Spieler 0
+    s = a(s, { t: 'cavern', player: 1 });
+    expect(s.players[1].pending).toBeNull();
+    expect(s.players[1].cavernUsed).toBe(1);
+    expect(s.players[1].board.every((sq) => !sq.resource)).toBe(true);
+
+    s.players[1].pending = 'wood';
+    s = a(s, { t: 'cavern', player: 1 });
+    expect(s.players[1].cavernUsed).toBe(2);
+
+    s.players[1].pending = 'wood';
+    expect(() => a(s, { t: 'cavern', player: 1 })).toThrow(/Höhle ist voll/);
+  });
+
+  it('die eigene Ansage muss platziert werden', () => {
+    const s = cavernGame();
+    expect(() => a(s, { t: 'cavern', player: 0 })).toThrow(/eigene Ansage/);
+  });
+
+  it('ohne aktivierte Regel nicht erlaubt (Standard: aus)', () => {
+    const s = inRound(freshGame(2));
+    expect(s.config.systems.cavern).toBe(false);
+    expect(() => a(s, { t: 'cavern', player: 1 })).toThrow(/nicht aktiv/);
+  });
+
+  it('ohne Material in der Hand nicht erlaubt', () => {
+    let s = cavernGame();
+    s = a(s, { t: 'placeResource', player: 1, square: 5 });
+    expect(() => a(s, { t: 'cavern', player: 1 })).toThrow(/Kein Material/);
+  });
+
+  it('Zusatz-Material (Semaphor) rückt nach dem Beiseitelegen nach', () => {
+    let s = cavernGame();
+    s.players[1].pendingExtra = 'glass';
+    s = a(s, { t: 'cavern', player: 1 });
+    expect(s.players[1].pending).toBe('glass'); // nur das erste Material ist weg
+    expect(s.players[1].cavernUsed).toBe(1);
+  });
+});

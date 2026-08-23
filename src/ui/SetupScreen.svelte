@@ -22,6 +22,7 @@
   let names = $state(['Spieler 1', 'Spieler 2', 'Spieler 3', 'Spieler 4']);
   let corners = $state([...DEFAULT_CORNERS[4]]);
   let useMonuments = $state(true);
+  let cavernRule = $state(false);
   let chosenSets = $state<string[]>([]);
   let multiDevice = $state(false);
   let remote = $state([false, true, true, true]);
@@ -59,7 +60,7 @@
 
   function start() {
     try {
-      game.start(buildGameConfig(currentPlayers(), activeSets(), useMonuments));
+      game.start(buildGameConfig(currentPlayers(), activeSets(), useMonuments, cavernRule));
     } catch (e) {
       error = e instanceof Error ? e.message : String(e);
     }
@@ -87,7 +88,7 @@
     busy = true;
     error = '';
     try {
-      session.setup = { sets: activeSets(), useMonuments };
+      session.setup = { sets: activeSets(), useMonuments, cavern: cavernRule };
       await session.openRoom(makeRoomCode(), seats, selectedTransport());
     } catch (e) {
       error = e instanceof Error ? e.message : String(e);
@@ -154,6 +155,12 @@
     <label class="field toggle">
       <input type="checkbox" bind:checked={useMonuments} />
       <span>{t.useMonuments}</span>
+    </label>
+
+    <label class="field toggle">
+      <input type="checkbox" bind:checked={cavernRule} />
+      <span>{t.cavernRule}</span>
+      <span class="expDesc">{t.cavernRuleHint}</span>
     </label>
 
     <div class="expansions">

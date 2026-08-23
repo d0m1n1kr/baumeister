@@ -18,6 +18,8 @@ an den vier Ecken des Geräts, die 7 Gebäudekarten der Partie liegen in der Mit
     umgesetzt und mit ⚠ markiert (Liste in `schema.md`).
   - *Tiny Trees* — Samen-Marker: Überbauen bringt ein Gratis-Material, als letztes
     unbebautes Feld wird der Samen ein Baum (2 Punkte).
+- **Höhlen-Regel (im Setup wählbar, Standard aus):** bis zu 2 fremd angesagte
+  Materialien pro Partie beiseitelegen — sie zählen am Ende weder Punkte noch Strafen.
 - **Multi-Touch:** Mehrere Spieler können gleichzeitig Materialien per Drag & Drop
   auf ihre Bretter ziehen; jede Ecke ist zum jeweiligen Spieler rotiert.
 - **Monument-Geheimhaltung:** 2 ziehen / 1 geheim wählen, Aufdecken nur nach
