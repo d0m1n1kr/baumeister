@@ -95,6 +95,22 @@ describe('gameStore: Routing und Persistenz', () => {
     expect(game.hasSave()).toBe(false); // gespiegelt wird nie gespeichert
   });
 
+  it('resume repariert einen festgefahrenen Spielstand (Deadlock älterer Versionen)', () => {
+    game.start(config(2));
+    const st = game.state!;
+    st.phase = { t: 'round', resource: 'wood' };
+    for (const p of st.players) {
+      p.pending = null;
+      p.roundDone = true;
+    }
+    // so speichern, wie ihn eine ältere Version hinterlassen hat
+    data.set('tinytowns.save.v1', JSON.stringify(st));
+    game.reset({ keepSave: true });
+
+    expect(game.resume()).toBe(true);
+    expect(game.state!.phase.t).toBe('nameResource'); // „Weiterspielen" läuft wieder
+  });
+
   it('resume stellt den gespeicherten Stand wieder her — und sonst nichts', () => {
     game.start(config(2));
     game.reset({ keepSave: true });
