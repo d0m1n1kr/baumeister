@@ -1,7 +1,7 @@
 // Bindeglied zwischen Engine und UI: reaktiver Zustand + Autosave.
 
 import { catalog } from '../data';
-import { apply, newGame, RuleError } from '../engine/game';
+import { apply, newGame, repairRound, RuleError } from '../engine/game';
 import type { Action, GameConfig, GameState } from '../engine/types';
 import { saveGame, loadGame, clearSave } from './persist';
 
@@ -57,7 +57,9 @@ export const game = {
   resume(): boolean {
     const saved = loadGame();
     if (!saved) return false;
-    state = saved;
+    // Von älteren Versionen festgefahrene Runden beim Laden abschließen
+    state = repairRound(saved, catalog);
+    saveGame(state);
     return true;
   },
 

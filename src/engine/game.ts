@@ -59,6 +59,24 @@ export function apply(state: GameState, action: Action, catalog: Catalog): GameS
   // JSON-Klon statt structuredClone: funktioniert auch mit Sveltes $state-Proxys,
   // und der Spielzustand ist reines JSON (wird ohnehin so persistiert).
   const s: GameState = JSON.parse(JSON.stringify(state));
+  const next = dispatchAction(s, action, catalog);
+  // Rundenabschluss zentral prüfen: Auch die letzte AUFGELÖSTE Entscheidung
+  // eines bereits „fertigen" Spielers (Fabrik-Markierung nach altem Stand,
+  // Opaleye-Anspruch eines Nachbarn, …) muss die Runde beenden können —
+  // sonst warten alle für immer aufeinander.
+  return next.phase.t === 'round' ? maybeAdvance(next, catalog) : next;
+}
+
+/**
+ * Repariert einen festgefahrenen Spielstand (ältere Versionen konnten eine
+ * Runde hinterlassen, in der alle fertig sind, der Abschluss aber nie lief).
+ * Beim Laden eines Spielstands aufrufen; ein gesunder Stand bleibt unberührt.
+ */
+export function repairRound(state: GameState, catalog: Catalog): GameState {
+  return state.phase.t === 'round' ? maybeAdvance(state, catalog) : state;
+}
+
+function dispatchAction(s: GameState, action: Action, catalog: Catalog): GameState {
   switch (action.t) {
     case 'chooseMonument': return chooseMonument(s, action.player, action.card);
     case 'placeSeed': return placeSeed(s, action.player, action.square);

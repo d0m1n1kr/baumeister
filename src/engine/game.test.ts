@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { apply, newGame, RuleError } from './game';
+import { apply, newGame, repairRound, RuleError } from './game';
 import { catalog, config, freshGame, inRound, put, res, ACTIVE_DEFAULT } from './test-helpers';
 import { idx } from './types';
 import type { GameState } from './types';
@@ -411,5 +411,44 @@ describe('„Fertig" ist verbindlich', () => {
     res(s2, 1, 1, 'stone');
     s2 = a(s2, { t: 'build', player: 1, squares: [0, 1], card: 'well', target: 0 });
     expect(s2.players[1].board[0].building?.card).toBe('well');
+  });
+});
+
+describe('Rundenabschluss durch die letzte Entscheidung (Deadlock-Fix)', () => {
+  /** So hinterließ es eine ältere Version: beide „fertig", aber eine
+   *  Fabrik-Markierung (nach dem „Fertig" gebaut) noch offen. */
+  function stuckWithChoice(): GameState {
+    const s = inRound(freshGame(2));
+    for (const p of s.players) {
+      p.pending = null;
+      p.roundDone = true;
+    }
+    put(s, 1, 15, 'factory');
+    s.players[1].choices = [{ t: 'markResource', square: 15, card: 'factory' }];
+    return s;
+  }
+
+  it('die letzte aufgelöste Entscheidung schließt die Runde ab', () => {
+    let s = stuckWithChoice();
+    s = a(s, { t: 'resolveMark', player: 1, resource: 'wood' });
+    expect(s.players[1].board[15].building?.marked).toBe('wood');
+    expect(s.phase.t).toBe('nameResource'); // kein „Warte auf die anderen"-Deadlock
+    expect(s.masterBuilder).toBe(1);
+  });
+
+  it('repairRound macht einen bereits festgefahrenen Spielstand wieder spielbar', () => {
+    // Deadlock-Endzustand: alle fertig, keine Entscheidungen, Runde nie beendet
+    const stuck = inRound(freshGame(2));
+    for (const p of stuck.players) {
+      p.pending = null;
+      p.roundDone = true;
+    }
+    expect(repairRound(stuck, catalog).phase.t).toBe('nameResource');
+
+    // gesunde Stände bleiben unberührt
+    const running = inRound(freshGame(2));
+    expect(repairRound(running, catalog).phase.t).toBe('round');
+    const withChoice = stuckWithChoice();
+    expect(repairRound(withChoice, catalog).phase.t).toBe('round'); // Entscheidung offen
   });
 });
