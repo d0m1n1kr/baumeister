@@ -25,7 +25,11 @@ an den vier Ecken des Geräts, die 7 Gebäudekarten der Partie liegen in der Mit
 - **Karten-Zoom:** Tippen vergrößert jede Karte, zum antippenden Spieler gedreht;
   Mini-Karten zeigen Baumuster, Feature-Symbole und schematisches Artwork.
 - **Persistenz:** Autosave im `localStorage` nach jeder Aktion, „Weiterspielen“ nach Reload.
-- **PWA:** offline-fähig, am iPad über „Zum Home-Bildschirm“ installierbar.
+- **PWA:** vollständig offline-fähig (alle Assets werden beim ersten Besuch
+  precacht; Spiel-Logik und Spielstand liegen komplett im Client) — am iPad/Handy
+  über „Zum Home-Bildschirm“ installierbar. Die App prüft beim Start, beim
+  Zurückkehren in die App und alle 15 Minuten auf neue Versionen und bietet
+  ein Update per Banner an; der laufende Spielstand übersteht das Update.
 
 ## Entwicklung
 

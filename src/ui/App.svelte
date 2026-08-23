@@ -4,9 +4,12 @@
   import SetupScreen from './SetupScreen.svelte';
   import GameTable from './GameTable.svelte';
   import ScoreScreen from './ScoreScreen.svelte';
+  import UpdateBanner from './UpdateBanner.svelte';
 
   let showResume = $state(game.hasSave());
 </script>
+
+<UpdateBanner />
 
 {#if game.state}
   {#if game.state.phase.t === 'gameOver'}
