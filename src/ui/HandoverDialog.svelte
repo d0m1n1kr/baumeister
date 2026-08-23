@@ -3,11 +3,19 @@
   // Damit lassen sich Spieler jederzeit (wieder) auf eigene Geräte bringen —
   // ein freigegebener Platz geht an das nächste Gerät, das dem Raum beitritt.
   import { session } from '../net/session.svelte';
-  import { joinUrlFor } from '../net';
+  import { joinUrlFor, signalingStatus } from '../net';
   import { t } from '../i18n/de';
   import QrCode from './QrCode.svelte';
 
   let { onclose }: { onclose: () => void } = $props();
+
+  // Vermittlungs-Anzeige: zeigt dem Host sofort, ob ER das Problem ist.
+  let relays = $state<{ open: number; total: number } | null>(null);
+  $effect(() => {
+    relays = signalingStatus();
+    const timer = setInterval(() => (relays = signalingStatus()), 2000);
+    return () => clearInterval(timer);
+  });
 </script>
 
 <div class="scrim" role="button" tabindex="-1" onpointerup={onclose}>
@@ -22,6 +30,9 @@
       </div>
     </div>
     <p class="hint">{t.handoverHint}</p>
+  {#if relays}
+    <p class="relayLine" class:bad={relays.open === 0}>{t.relayStatus(relays.open, relays.total)}</p>
+  {/if}
 
     <ul class="seats">
       {#each session.seats as seat}
@@ -86,4 +97,6 @@
   .seats button { font-size: 11px; padding: 4px 8px; }
   .dot { width: 9px; height: 9px; border-radius: 50%; background: var(--text-dim); flex-shrink: 0; }
   .dot.on { background: var(--ok); }
+  .relayLine { margin: 0; font-size: 11px; color: var(--text-dim); text-align: center; }
+  .relayLine.bad { color: var(--danger); font-weight: 700; }
 </style>

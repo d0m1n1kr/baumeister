@@ -81,7 +81,10 @@ für Tests und eine In-Memory-Variante für Unit-Tests. Ein Wechsel des Vermittl
 berührt die Spiellogik nicht. Die Vermittlung läuft über eine **handverlesene Liste von
 8 großen Nostr-Relays** (`trysteroTransport.ts`) statt der Trystero-Auslosung — die Liste
 ist der Treffpunkt aller Geräte, Änderungen daran immer zusammen mit `PROTOCOL_VERSION`.
-Beim Verbinden zeigt die App an, wie viele Relays erreichbar sind.
+Beim Verbinden zeigt die App an, wie viele Relays erreichbar sind (auch in Host-Lobby
+und Raum-Code-Dialog). Nach längerem Hintergrund baut die App den Raum komplett neu
+auf — Nostr-Relays vergessen ihre Abos beim Socket-Abriss, und Trystero 0.25 erneuert
+sie nach einem Reconnect nicht (das Gerät würde sonst senden, aber nichts mehr hören).
 
 **iOS-Eigenheit:** Wird die App in den Hintergrund geschickt oder das Display gesperrt,
 beendet iOS jede Verbindung — dagegen hilft keine Technik. Die App hält deshalb während

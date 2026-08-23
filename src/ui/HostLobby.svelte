@@ -1,6 +1,6 @@
 <script lang="ts">
   import { session } from '../net/session.svelte';
-  import { joinUrlFor } from '../net';
+  import { joinUrlFor, signalingStatus } from '../net';
   import { t } from '../i18n/de';
   import QrCode from './QrCode.svelte';
 
@@ -9,6 +9,14 @@
   const seats = $derived(session.seats);
   const remoteSeats = $derived(seats.filter((s) => s.kind === 'remote'));
   const allConnected = $derived(remoteSeats.every((s) => s.connected));
+
+  // Vermittlungs-Anzeige: zeigt dem Host sofort, ob ER das Problem ist.
+  let relays = $state<{ open: number; total: number } | null>(null);
+  $effect(() => {
+    relays = signalingStatus();
+    const timer = setInterval(() => (relays = signalingStatus()), 2000);
+    return () => clearInterval(timer);
+  });
 </script>
 
 <main>
@@ -41,6 +49,9 @@
   </ul>
 
   <p class="note">{t.hostStaysAwake}</p>
+  {#if relays}
+    <p class="relayLine" class:bad={relays.open === 0}>{t.relayStatus(relays.open, relays.total)}</p>
+  {/if}
 
   <div class="actions">
     <button onpointerup={oncancel}>{t.leaveRoom}</button>
@@ -108,4 +119,6 @@
   .note { margin: 0; font-size: 12px; color: var(--text-dim); text-align: center; }
   .actions { display: flex; gap: 10px; }
   .actions button { font-size: 16px; padding: 10px 18px; }
+  .relayLine { margin: 0; font-size: 11px; color: var(--text-dim); text-align: center; }
+  .relayLine.bad { color: var(--danger); font-weight: 700; }
 </style>
