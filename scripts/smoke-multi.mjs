@@ -143,6 +143,17 @@ try {
     .waitFor({ timeout: 10000 });
   console.log('✓ QR-Handover: neues Gerät übernimmt einen freigegebenen Platz im Spiel');
 
+  // QR-Scan bei BEREITS offener Seite: iOS feuert dann nur ein hashchange,
+  // keinen Reload — die App muss trotzdem sofort zum Beitritt springen
+  const idle = await context.newPage();
+  await idle.goto(BASE_URL); // ohne Beitritts-Code: landet auf Weiterspielen/Setup
+  await idle.locator('button', { hasText: /Weiterspielen|Los geht/ }).first().waitFor({ timeout: 10000 });
+  await idle.evaluate((c) => (location.hash = `#join=${c}`), code);
+  await idle.locator('.codeInput').waitFor({ timeout: 5000 });
+  const prefilled = await idle.locator('.codeInput').inputValue();
+  if (prefilled !== code) fail(`Code nicht übernommen: „${prefilled}" statt „${code}"`);
+  console.log('✓ QR-Scan im offenen Tab: hashchange führt direkt zum Beitritt');
+
   console.log('Mehrgeräte-Smoke-Test bestanden.');
 } finally {
   await browser?.close();
