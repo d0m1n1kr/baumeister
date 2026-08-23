@@ -300,3 +300,86 @@ describe('Fortune-Wertungen', () => {
     expect(score.coins?.spent).toBe(1);
   });
 });
+
+describe('Fortune-Effekte: Teehaus, Promenade, Grotte', () => {
+  /** Baut die Karte über ihr echtes Muster oben links aufs Brett. */
+  function buildOn(s: GameState, player: number, card: string): GameState {
+    const cells: number[] = [];
+    catalog[card].pattern.forEach((row, r) =>
+      row.forEach((c, cIdx) => {
+        if (c) {
+          const sq = r * 4 + cIdx;
+          res(s, player, sq, c);
+          cells.push(sq);
+        }
+      })
+    );
+    return a(s, { t: 'build', player, squares: cells, card, target: cells[0] });
+  }
+
+  it('Teehaus: +1 Münze je Gebäudetyp in Zeile ODER Spalte (bessere Achse, max 3)', () => {
+    let s = inRound(coinGame(2, ['cottage', 'farm', 'teahouse', 'chapel', 'theater', 'tavern', 'factory']));
+    s.players[0].pending = null;
+    // Zeile des Zielfelds (1): drei verschiedene Typen; Spalte: nur einer
+    put(s, 0, 0, 'cottage');
+    put(s, 0, 2, 'chapel');
+    put(s, 0, 3, 'tavern');
+    put(s, 0, 9, 'farm');
+    s = buildOn(s, 0, 'teahouse'); // Ziel = Feld 1
+    expect(s.players[0].coins).toBe(3);
+  });
+
+  it('Blütenpromenade: Münzen auf freie Felder, Einsammeln bei fremder Ansage', () => {
+    let s = inRound(coinGame());
+    s.players[0].pending = null;
+    s.players[0].monument = { card: 'petal_promenade', built: false };
+    s = buildOn(s, 0, 'petal_promenade'); // Ziel = Feld 0
+    expect(s.players[0].choices[0]?.t).toBe('promenadeCoins');
+
+    // belegtes Feld geht nicht
+    expect(() => a(s, { t: 'resolvePromenade', player: 0, square: 0 })).toThrow(RuleError);
+
+    s = a(s, { t: 'resolvePromenade', player: 0, square: 15 });
+    expect(s.players[0].board[15].coin).toBe(true);
+    // vorzeitig aufhören: Entscheidung ist erledigt
+    s = a(s, { t: 'resolvePromenade', player: 0, square: null });
+    expect(s.players[0].choices.length).toBe(0);
+
+    // Fremde Ansage (Baumeister ist ein anderer): Material aufs Münzfeld → Münze
+    s.masterBuilder = 1;
+    s.players[0].pending = 'wood';
+    s = a(s, { t: 'placeResource', player: 0, square: 15 });
+    expect(s.players[0].coins).toBe(1);
+    expect(s.players[0].board[15].coin).toBeUndefined();
+  });
+
+  it('Blütenpromenade: eigene Ansage sammelt die Münze nicht ein', () => {
+    let s = inRound(coinGame());
+    s.players[0].pending = null;
+    s.players[0].monument = { card: 'petal_promenade', built: false };
+    s = buildOn(s, 0, 'petal_promenade');
+    s = a(s, { t: 'resolvePromenade', player: 0, square: 15 });
+    s = a(s, { t: 'resolvePromenade', player: 0, square: null });
+
+    s.masterBuilder = 0; // eigene Ansage
+    s.players[0].pending = 'wood';
+    s = a(s, { t: 'placeResource', player: 0, square: 15 });
+    expect(s.players[0].coins).toBe(0);
+    expect(s.players[0].board[15].coin).toBe(true); // Münze bleibt liegen
+  });
+
+  it('Caterinas Grotte: Münzen auf freie Mittelfelder, Bauen sammelt ein', () => {
+    let s = inRound(coinGame(2, ['cottage', 'farm', 'well', 'chapel', 'theater', 'tavern', 'factory']));
+    s.players[0].pending = null;
+    s.players[0].monument = { card: 'caterinas_grotto', built: false };
+    s = buildOn(s, 0, 'caterinas_grotto'); // Ziel = Feld 1, Mittelfelder danach frei
+    for (const c of [5, 6, 9, 10]) expect(s.players[0].board[c].coin).toBe(true);
+
+    // Bau auf einem Münzfeld nimmt die Münze
+    res(s, 0, 6, 'wood');
+    res(s, 0, 7, 'stone');
+    s = a(s, { t: 'build', player: 0, squares: [6, 7], card: 'well', target: 6 });
+    expect(s.players[0].coins).toBe(1);
+    expect(s.players[0].board[6].coin).toBeUndefined();
+  });
+});

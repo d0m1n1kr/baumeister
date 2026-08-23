@@ -300,6 +300,71 @@ describe('Sitzung: Host und Gäste', () => {
     expect(received.filter((m) => m.t === 'state').length).toBeGreaterThan(0);
   });
 
+  it('weist Aktionen ohne Platz oder vor Spielstart mit klarer Meldung ab', async () => {
+    const net2 = new LoopbackNetwork();
+    const h = device();
+    await h.session.openRoom('XYZ234', seats(), async (_c, hd) => net2.connect('host', hd));
+
+    const received: Array<{ t: string; message?: string }> = [];
+    const stray = net2.connect('stray', {
+      onMessage: (m) => received.push(m as { t: string; message?: string }),
+      onPeerJoin: () => {},
+      onPeerLeave: () => {}
+    });
+
+    // ohne hello (kein Platz) …
+    stray.send({ t: 'action', action: { t: 'nameResource', resource: 'wood' } });
+    expect(received.at(-1)).toMatchObject({ t: 'error', message: expect.stringMatching(/Kein Platz/) });
+
+    // … und mit Platz, aber vor dem Spielstart
+    stray.send({ t: 'hello', clientId: 'cs', name: 'S', protocolVersion: PROTOCOL_VERSION });
+    stray.send({ t: 'action', action: { t: 'nameResource', resource: 'wood' } });
+    expect(received.at(-1)).toMatchObject({ t: 'error', message: expect.stringMatching(/läuft noch nicht/) });
+  });
+
+  it('findet den Host nach dessen Ausfall wieder (hello-Fallback per clientId)', () => {
+    host.session.startGame(gameConfig());
+
+    // Host fällt weg (App im Hintergrund / Gerät gesperrt)
+    net.goOffline('host');
+    expect(g1.session.status).toBe('connecting');
+
+    // Nachfragen ohne bekannten Host läuft ins Leere, crasht aber nicht
+    g1.session.onResume();
+
+    // Während der Abwesenheit passiert etwas — der Gast verpasst es
+    net.goOnline('host');
+    // Rückkehr löst onPeerJoin aus → Gast meldet sich per hello, der Host
+    // erkennt ihn an der clientId und gibt Platz + Zustand zurück
+    expect(g1.session.status).toBe('playing');
+    expect(g1.session.mySeat).toBe(1);
+
+    host.game.dispatch({ t: 'chooseMonument', player: 0, card: 'the_starloom' });
+    expect(g1.game.state!.players[0].monument?.card).toBe(HIDDEN_MONUMENT);
+  });
+
+  it('Heartbeat fragt nur als Gast nach und lässt sich stoppen', () => {
+    vi.useFakeTimers();
+    try {
+      host.session.startGame(gameConfig());
+      const guestAsks = vi.spyOn(g1.session, 'requestResync');
+      const hostAsks = vi.spyOn(host.session, 'requestResync');
+      const stopGuest = g1.session.startHeartbeat(1000);
+      const stopHost = host.session.startHeartbeat(1000);
+
+      vi.advanceTimersByTime(3500);
+      expect(guestAsks).toHaveBeenCalledTimes(3);
+      expect(hostAsks).not.toHaveBeenCalled(); // der Host fragt niemanden
+
+      stopGuest();
+      stopHost();
+      vi.advanceTimersByTime(5000);
+      expect(guestAsks).toHaveBeenCalledTimes(3); // gestoppt heißt gestoppt
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
   it('schickt bei unverändertem Stand keinen Zustand erneut (Heartbeat bleibt still)', () => {
     host.session.startGame(gameConfig());
     let applied = 0;
