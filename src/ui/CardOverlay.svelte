@@ -1,0 +1,75 @@
+<script lang="ts">
+  import type { CardDef } from '../engine/types';
+  import { artFor } from '../data';
+  import { CATEGORY_CSS, FEATURE_ICONS } from './helpers';
+  import PatternGrid from './PatternGrid.svelte';
+  import { t } from '../i18n/de';
+
+  let {
+    card,
+    rotation = 0,
+    onclose
+  }: { card: CardDef; rotation?: number; onclose: () => void } = $props();
+</script>
+
+<div class="scrim" role="button" tabindex="-1" onpointerup={onclose}>
+  <div
+    class="big"
+    style="transform: rotate({rotation}deg); --cat: {CATEGORY_CSS[card.color]}"
+    role="dialog"
+    onpointerup={(e) => e.stopPropagation()}
+  >
+    <div class="bar"></div>
+    <h2>{card.name.de}</h2>
+    <div class="row">
+      <span class="art">{@html artFor(card) ?? ''}</span>
+      <PatternGrid pattern={card.pattern} cell={22} />
+    </div>
+    <p>{card.text.de}</p>
+    <div class="feats">
+      {#each card.features as f}
+        <span>{FEATURE_ICONS[f]?.icon} {FEATURE_ICONS[f]?.title}</span>
+      {/each}
+    </div>
+    <button class="primary" onpointerup={onclose}>{t.close}</button>
+  </div>
+</div>
+
+<style>
+  .scrim {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.6);
+    display: grid;
+    place-items: center;
+    z-index: 100;
+  }
+  .big {
+    position: relative;
+    background: var(--bg-card);
+    color: var(--paper-ink);
+    border-radius: 16px;
+    padding: 22px 26px 18px;
+    width: min(420px, 80vw);
+    max-height: 85vh;
+    overflow: auto;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+    box-shadow: 0 8px 40px rgba(0, 0, 0, 0.6);
+  }
+  .bar {
+    position: absolute;
+    inset: 0 0 auto 0;
+    height: 12px;
+    border-radius: 16px 16px 0 0;
+    background: var(--cat);
+  }
+  h2 { margin: 6px 0 0; font-size: 24px; }
+  .row { display: flex; align-items: center; gap: 22px; }
+  .art { width: 84px; height: 84px; }
+  .art :global(svg) { width: 100%; height: 100%; }
+  p { margin: 0; font-size: 16px; line-height: 1.45; text-align: center; }
+  .feats { display: flex; flex-wrap: wrap; gap: 6px 14px; font-size: 12px; opacity: 0.85; justify-content: center; }
+</style>

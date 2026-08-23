@@ -1,11 +1,43 @@
 <script lang="ts">
-  // Platzhalter — wird im UI-Meilenstein ersetzt.
+  import { game } from '../store/gameStore.svelte';
+  import { t } from '../i18n/de';
+  import SetupScreen from './SetupScreen.svelte';
+  import GameTable from './GameTable.svelte';
+  import ScoreScreen from './ScoreScreen.svelte';
+
+  let showResume = $state(game.hasSave());
 </script>
 
-<main>
-  <h1>Tiny Towns</h1>
-</main>
+{#if game.state}
+  {#if game.state.phase.t === 'gameOver'}
+    <ScoreScreen />
+  {:else}
+    <GameTable />
+  {/if}
+{:else if showResume}
+  <main class="resume">
+    <h1>🏘 {t.appTitle}</h1>
+    <div class="buttons">
+      <button class="primary big" onpointerup={() => { if (!game.resume()) showResume = false; }}>
+        {t.resumeGame}
+      </button>
+      <button class="big" onpointerup={() => { game.reset(); showResume = false; }}>{t.newGame}</button>
+    </div>
+  </main>
+{:else}
+  <SetupScreen />
+{/if}
 
 <style>
-  main { display: grid; place-items: center; height: 100%; }
+  .resume {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 26px;
+  }
+  h1 { margin: 0; font-size: 34px; }
+  .buttons { display: flex; flex-direction: column; gap: 12px; width: 240px; }
+  .big { font-size: 17px; padding: 12px; }
 </style>

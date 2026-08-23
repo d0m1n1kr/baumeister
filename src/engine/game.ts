@@ -38,7 +38,9 @@ export function newGame(config: GameConfig): GameState {
 }
 
 export function apply(state: GameState, action: Action, catalog: Catalog): GameState {
-  const s: GameState = structuredClone(state);
+  // JSON-Klon statt structuredClone: funktioniert auch mit Sveltes $state-Proxys,
+  // und der Spielzustand ist reines JSON (wird ohnehin so persistiert).
+  const s: GameState = JSON.parse(JSON.stringify(state));
   switch (action.t) {
     case 'chooseMonument': return chooseMonument(s, action.player, action.card);
     case 'nameResource': return nameResource(s, action.resource, catalog);
