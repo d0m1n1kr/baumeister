@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { untrack } from 'svelte';
   import { game } from '../store/gameStore.svelte';
   import { drags } from '../store/dragStore.svelte';
   import { catalog } from '../data';
@@ -83,6 +84,14 @@
   // Wenn eine neue Entscheidung ansteht, Bau-Modus verlassen
   $effect(() => {
     if (choice && (mode === 'select' || mode === 'target')) resetMode();
+  });
+
+  // Rundenwechsel oder „Fertig" beendet einen offenen Bau-Modus — sonst hinge
+  // die Auswahl über die nächste Ansage hinweg fest (z. B. wenn die anderen
+  // die Runde beenden, während hier noch markiert wird).
+  $effect(() => {
+    const stale = !inRound || p.roundDone || p.done;
+    if (stale && untrack(() => mode) !== 'idle') resetMode();
   });
 
   // Regelverstöße meldet im Mehrgerätemodus der Host — hier anzeigen wie lokale Fehler.
@@ -441,7 +450,9 @@
 
         {#if !choice}
           {#if mode === 'idle'}
-            <button onpointerup={() => (mode = 'select')}>🔨 {t.buildMode}</button>
+            {#if !p.roundDone}
+              <button onpointerup={() => (mode = 'select')}>🔨 {t.buildMode}</button>
+            {/if}
           {:else}
             <button onpointerup={resetMode}>{t.cancel}</button>
           {/if}
