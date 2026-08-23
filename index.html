@@ -11,6 +11,103 @@
     <title>Tiny Towns</title>
   </head>
   <body>
+    <!-- Lade-Splash: erscheint sofort (vor dem JS), die Stadt baut sich auf.
+         main.ts blendet ihn nach dem App-Start weich aus. -->
+    <div id="splash" aria-hidden="true">
+      <div class="board">
+        <i></i><i><b class="c1"></b></i><i></i><i><b class="c2"></b></i>
+        <i><b class="c3"></b></i><i></i><i><b class="c4"></b></i><i></i>
+        <i></i><i><b class="c5"></b></i><i></i><i><b class="c6"></b></i>
+        <i><b class="c2"></b></i><i></i><i><b class="c1"></b></i><i></i>
+      </div>
+      <div class="title">🏘 Tiny Towns</div>
+      <div class="credit">v__APP_VERSION__ · Dominik Rössler &amp; Claude</div>
+    </div>
+    <style>
+      #splash {
+        position: fixed;
+        inset: 0;
+        z-index: 999;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 20px;
+        background: #1e2a38;
+        color: #e8edf2;
+        font-family: system-ui, sans-serif;
+        pointer-events: none;
+        transition: opacity 0.4s ease;
+      }
+      #splash.done { opacity: 0; }
+      #splash .board {
+        display: grid;
+        grid-template-columns: repeat(4, 44px);
+        grid-auto-rows: 44px;
+        gap: 6px;
+      }
+      #splash .board i {
+        background: #e4d7bd;
+        border-radius: 8px;
+        position: relative;
+        opacity: 0;
+        transform: scale(0.4);
+        animation: tile 0.45s ease forwards;
+      }
+      /* Felder poppen versetzt ein … */
+      #splash .board i:nth-child(1)  { animation-delay: 0.05s; }
+      #splash .board i:nth-child(2)  { animation-delay: 0.5s; }
+      #splash .board i:nth-child(3)  { animation-delay: 0.2s; }
+      #splash .board i:nth-child(4)  { animation-delay: 0.65s; }
+      #splash .board i:nth-child(5)  { animation-delay: 0.35s; }
+      #splash .board i:nth-child(6)  { animation-delay: 0.1s; }
+      #splash .board i:nth-child(7)  { animation-delay: 0.75s; }
+      #splash .board i:nth-child(8)  { animation-delay: 0.25s; }
+      #splash .board i:nth-child(9)  { animation-delay: 0.15s; }
+      #splash .board i:nth-child(10) { animation-delay: 0.6s; }
+      #splash .board i:nth-child(11) { animation-delay: 0.3s; }
+      #splash .board i:nth-child(12) { animation-delay: 0.85s; }
+      #splash .board i:nth-child(13) { animation-delay: 0.45s; }
+      #splash .board i:nth-child(14) { animation-delay: 0.02s; }
+      #splash .board i:nth-child(15) { animation-delay: 0.7s; }
+      #splash .board i:nth-child(16) { animation-delay: 0.4s; }
+      /* … dann wachsen kleine Gebäude in den Kategoriefarben */
+      #splash .board b {
+        position: absolute;
+        inset: 8px 9px 7px;
+        clip-path: polygon(50% 0, 100% 42%, 88% 42%, 88% 100%, 12% 100%, 12% 42%, 0 42%);
+        opacity: 0;
+        transform: translateY(6px);
+        animation: bld 0.4s ease forwards;
+      }
+      #splash .c1 { background: #5d9cd6; animation-delay: 1.05s !important; }
+      #splash .c2 { background: #c8574e; animation-delay: 1.2s !important; }
+      #splash .c3 { background: #d9a441; animation-delay: 1.1s !important; }
+      #splash .c4 { background: #7fae62; animation-delay: 1.3s !important; }
+      #splash .c5 { background: #8a8f98; animation-delay: 1.15s !important; }
+      #splash .c6 { background: #cd6f9c; animation-delay: 1.4s !important; }
+      #splash .title {
+        font-size: 26px;
+        font-weight: 800;
+        opacity: 0;
+        animation: bld 0.6s ease 0.9s forwards;
+      }
+      #splash .credit {
+        font-size: 11px;
+        color: #9aa7b4;
+        opacity: 0;
+        animation: bld 0.6s ease 1.3s forwards;
+      }
+      @keyframes tile { to { opacity: 1; transform: scale(1); } }
+      @keyframes bld { to { opacity: 1; transform: translateY(0); } }
+      @media (prefers-reduced-motion: reduce) {
+        #splash .board i, #splash .board b, #splash .title, #splash .credit {
+          animation: none;
+          opacity: 1;
+          transform: none;
+        }
+      }
+    </style>
     <div id="app"></div>
     <script type="module" src="/src/main.ts"></script>
   </body>

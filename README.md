@@ -4,6 +4,8 @@ Digitale Umsetzung des Brettspiels *Tiny Towns* (Basisspiel) als rein clientseit
 Web-App (PWA) für **2–4 Spieler an einem iPad im Querformat**: Alle spielen gleichzeitig
 an den vier Ecken des Geräts, die 7 Gebäudekarten der Partie liegen in der Mitte.
 
+**▶ Spielen: [d0m1n1kr.github.io/tiny-towns](https://d0m1n1kr.github.io/tiny-towns/)**
+
 ## Features
 
 - **Vollautomatische Regeln:** Muster-Validierung (Rotation + Spiegelung), alle
