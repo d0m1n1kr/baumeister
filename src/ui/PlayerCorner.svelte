@@ -819,6 +819,14 @@
     .corner.wide .boardWrap { width: min(26vh, 60vw); align-self: center; }
     .corner.wide .panel { align-items: center; width: 100%; flex: 1; }
     .corner.wide header { justify-content: center; }
+  }
+  @media (max-width: 700px) and (orientation: portrait) {
+    /* 3–4 Spieler am Handy: Die Eckzellen sind zu schmal für Brett + Knöpfe
+       nebeneinander — die Knöpfe ragten aus dem Bild. Panel unters Brett. */
+    .corner:not(.wide) .row { flex-direction: column; align-items: center; gap: 4px; }
+    .corner:not(.wide) .boardWrap { width: min(24vh, 38vw); align-self: center; }
+    .corner:not(.wide) .panel { align-items: center; width: 100%; flex: 1; min-height: 0; overflow-y: auto; }
+    .corner:not(.wide) header { justify-content: center; }
     .boardWrap { width: min(26vh, 40vw); }
     .panel button { font-size: 12px; padding: 6px 9px; }
     .chip { width: 46px; height: 46px; }

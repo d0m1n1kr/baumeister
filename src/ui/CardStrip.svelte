@@ -197,6 +197,17 @@
     .strip.soloStrip.horizontal .cardWrap { width: calc(25% - 5px); }
   }
 
+  /* Tablet-Hochformat (2 Spieler / Einzelansicht): genug Höhe — Karten
+     umbrechen lassen statt horizontal zu scrollen */
+  @media (orientation: portrait) and (min-height: 900px) {
+    .strip.horizontal .cards:not(.alice) {
+      flex-wrap: wrap;
+      justify-content: center;
+      row-gap: 6px;
+      overflow: visible;
+    }
+  }
+
   /* Alice-Modus: Karten samt Beschreibung dauerhaft offen (Einzelansicht) */
   .aliceBtn {
     font-size: 11px;
