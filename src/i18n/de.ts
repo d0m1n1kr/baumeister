@@ -128,6 +128,41 @@ export const t = {
   myBoard: 'Mein Brett',
   tableView: 'Spieltisch',
 
+  helpButton: 'Kurzanleitung',
+  help: {
+    roundTitle: 'So läuft eine Runde',
+    roundSteps: [
+      'Der Baumeister (👑) sagt ein Material an — alle Spieler erhalten es.',
+      'Jeder legt es per Tipp oder Ziehen auf ein freies Feld (bis „Fertig" noch verschiebbar).',
+      'Passt ein Baumuster: „🔨 Bauen" → Felder markieren → Karte wählen → Bauplatz antippen. Beliebig oft pro Runde.',
+      '„✓ Fertig" beendet deine Runde — sind alle fertig, wandert die Krone weiter.',
+      'Ist deine Stadt voll und nichts mehr baubar, erklärst du sie für fertig. Am Ende wertet die App automatisch.'
+    ],
+    cavernNote: 'Höhlen-Regel (falls im Setup aktiviert): 2× pro Partie darfst du ein fremd angesagtes Material in die Höhle legen statt es zu platzieren.',
+    singleTitle: 'An einem Gerät',
+    singleSteps: [
+      'Spieler, Namen und Ecken wählen — jede Ecke ist zum jeweiligen Spieler gedreht, alle spielen gleichzeitig.',
+      'Karten antippen vergrößert sie, gedreht zum Antipper (⟳ dreht zum Gegenüber).',
+      'Monumente bleiben geheim: Vor dem Aufdecken bestätigen, dass die anderen wegschauen.',
+      'Die Partie speichert sich selbst — nach einem Neustart einfach „Weiterspielen".'
+    ],
+    hostTitle: 'Mit eigenen Geräten (Host)',
+    hostSteps: [
+      '„Raum öffnen" — Mitspieler scannen den QR-Code oder tippen den 6-stelligen Code ein.',
+      'Plätze lassen sich mischen: einige spielen hier am Gerät, andere auf ihrem eigenen.',
+      'Dieses Gerät führt die Partie: entsperrt und im Vordergrund lassen.',
+      'Im Spiel zeigt „⌗ Raum-Code" jederzeit QR und Plätze — dort Plätze an Geräte übergeben oder hierher übernehmen.',
+      'Nach einem Neustart stellt „Weiterspielen" Partie und Raum wieder her; die Gäste verbinden sich von selbst.'
+    ],
+    guestTitle: 'Beitreten mit eigenem Gerät',
+    guestSteps: [
+      'QR-Code scannen oder Raum-Code eintippen, Namen wählen — dein Platz kommt automatisch.',
+      'Du siehst dein Brett groß, die Gegner klein; dein Monument liegt für dich offen.',
+      '„📖 Alice-Modus" zeigt alle Karten dauerhaft mit Beschreibung.',
+      'Kurz weg oder neu geladen? Die App tritt automatisch wieder bei. Klappt es nicht: Host-Gerät wecken oder dort den Platz neu vergeben lassen.'
+    ]
+  },
+
   updateAvailable: 'Neue Version verfügbar',
   updateNow: 'Aktualisieren',
   updateLater: 'Später',

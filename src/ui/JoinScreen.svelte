@@ -3,6 +3,7 @@
   import { selectedTransport, joinCodeFromUrl, clearJoinHash } from '../net';
   import { isValidRoomCode, normalizeRoomCode } from '../net/protocol';
   import { t } from '../i18n/de';
+  import HelpDialog from './HelpDialog.svelte';
 
   let {
     onback,
@@ -16,6 +17,7 @@
   // svelte-ignore state_referenced_locally
   let name = $state(initialName ?? '');
   let busy = $state(false);
+  let showHelp = $state(false);
 
   const ready = $derived(isValidRoomCode(normalizeRoomCode(code)) && name.trim().length > 0);
   const seats = $derived(session.lobbySeats);
@@ -88,9 +90,14 @@
           {busy ? t.connecting : t.joinButton}
         </button>
       </div>
+      <button class="link" onpointerup={() => (showHelp = true)}>📖 {t.helpButton}</button>
     </section>
   {/if}
 </main>
+
+{#if showHelp}
+  <HelpDialog mode="guest" onclose={() => (showHelp = false)} />
+{/if}
 
 <style>
   main {
