@@ -848,11 +848,15 @@
     gap: 12px;
     align-items: center;
     width: min(560px, 88vw);
+    max-height: 90vh;
+    overflow-y: auto;
+    touch-action: pan-y;
   }
   .pick h3 { margin: 0; }
   .pickRow { display: flex; gap: 14px; width: 100%; }
   .pickCard {
     flex: 1;
+    min-width: 0; /* Flex-Karten dürfen nicht aus dem Dialog wachsen */
     display: flex;
     flex-direction: column;
     gap: 8px;
@@ -860,6 +864,10 @@
     background: rgba(255, 255, 255, 0.05);
     border-radius: 10px;
     padding: 10px;
+  }
+  @media (max-width: 700px) {
+    /* Handy: Monumente untereinander statt nebeneinander */
+    .pickRow { flex-direction: column; }
   }
   .pickText { font-size: 12px; color: var(--text-dim); margin: 0; text-align: center; }
 </style>
