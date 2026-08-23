@@ -1,5 +1,6 @@
 <script lang="ts">
   import { game } from '../store/gameStore.svelte';
+  import { session } from '../net/session.svelte';
   import { catalog } from '../data';
   import { scoreGame } from '../engine/scoring';
   import { t } from '../i18n/de';
@@ -84,7 +85,7 @@
       </tbody>
     </table>
   </div>
-  <button class="primary big" onpointerup={() => game.reset()}>{t.playAgain}</button>
+  <button class="primary big" onpointerup={() => game.reset({ keepSave: session.role === 'guest' })}>{t.playAgain}</button>
 </main>
 
 <style>

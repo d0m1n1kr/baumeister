@@ -65,8 +65,10 @@ export const game = {
     return loadGame() !== null;
   },
 
-  reset(): void {
+  /** Gast im Mehrgerätemodus: `keepSave` verschont einen evtl. vorhandenen
+   *  eigenen Ein-Gerät-Spielstand — gespiegelt wurde ohnehin nie gespeichert. */
+  reset(opts: { keepSave?: boolean } = {}): void {
     state = null;
-    clearSave();
+    if (!opts.keepSave) clearSave();
   }
 };

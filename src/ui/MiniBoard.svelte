@@ -11,6 +11,11 @@
   const isMB = $derived(st.masterBuilder === player);
   const seat = $derived(session.lobbySeats.find((s) => s.index === player));
   const offline = $derived(seat ? !seat.connected : false);
+  const canTakeOver = $derived(
+    session.role === 'host' &&
+    session.seats[player]?.kind === 'remote' &&
+    !session.seats[player]?.connected
+  );
 </script>
 
 <div class="mini" class:offline>
@@ -27,6 +32,11 @@
     {:else if p.roundDone}✓
     {:else}&nbsp;{/if}
   </footer>
+  {#if canTakeOver}
+    <button class="takeover" onpointerup={() => session.takeOverSeat(player)}>
+      {t.takeOverSeat}
+    </button>
+  {/if}
 </div>
 
 <style>
@@ -39,6 +49,11 @@
     pointer-events: none; /* fremde Bretter sind reine Anzeige */
   }
   .mini.offline { opacity: 0.5; }
+  .takeover {
+    pointer-events: auto; /* Ausnahme vom nicht-interaktiven Brett */
+    font-size: 10px;
+    padding: 4px 6px;
+  }
   header { display: flex; align-items: center; gap: 5px; font-size: 11px; min-width: 0; }
   .dot { width: 7px; height: 7px; border-radius: 50%; background: var(--ok); flex-shrink: 0; }
   .dot.off { background: var(--text-dim); }

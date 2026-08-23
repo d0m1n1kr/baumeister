@@ -1,8 +1,8 @@
 <script lang="ts">
   import { game } from '../store/gameStore.svelte';
-  import { catalog } from '../data';
-  import { SETS, systemActive } from '../data/sets';
-  import { mulberry32, randomSeed, randomSetup, sortPlayersClockwise } from '../engine/registry';
+  import { buildGameConfig } from '../store/newGameConfig';
+  import { SETS } from '../data/sets';
+  import { sortPlayersClockwise } from '../engine/registry';
   import { session } from '../net/session.svelte';
   import { selectedTransport } from '../net';
   import { makeRoomCode } from '../net/protocol';
@@ -52,21 +52,13 @@
     }));
   }
 
-  function activeSets() {
-    const sets = ['base', ...chosenSets];
-    return {
-      sets,
-      systems: { coins: systemActive(sets, 'coins'), trees: systemActive(sets, 'trees') }
-    };
+  function activeSets(): string[] {
+    return ['base', ...chosenSets];
   }
 
   function start() {
-    const players = currentPlayers();
-    const { sets, systems } = activeSets();
     try {
-      game.start(
-        randomSetup(catalog, players, useMonuments, mulberry32(randomSeed()), sets, systems)
-      );
+      game.start(buildGameConfig(currentPlayers(), activeSets(), useMonuments));
     } catch (e) {
       error = e instanceof Error ? e.message : String(e);
     }
@@ -94,7 +86,7 @@
     busy = true;
     error = '';
     try {
-      session.setup = { sets: activeSets().sets, useMonuments };
+      session.setup = { sets: activeSets(), useMonuments };
       await session.openRoom(makeRoomCode(), seats, selectedTransport());
     } catch (e) {
       error = e instanceof Error ? e.message : String(e);

@@ -22,6 +22,13 @@
 
   /** Im Mehrgerätemodus darf jedes Gerät nur seine eigenen Plätze bedienen. */
   const canControl = $derived(session.controls(player));
+  // Host-Tischansicht: Ein getrennter Remote-Platz lässt sich auch mitten im
+  // Spiel ans Host-Gerät holen (z. B. wenn dem Mitspieler der Akku ausging).
+  const canTakeOver = $derived(
+    session.role === 'host' &&
+    session.seats[player]?.kind === 'remote' &&
+    !session.seats[player]?.connected
+  );
 
   const st = $derived(game.state!);
   const p = $derived(st.players[player]);
@@ -373,11 +380,15 @@
       {#if !canControl}
         <!-- Fremder Platz (Host-Tischansicht): nur Status, keine Bedienung -->
         <span class="status">
-          {#if p.done}{t.townComplete}
+          {#if canTakeOver}{t.disconnected}
+          {:else if p.done}{t.townComplete}
           {:else if p.pending != null}{t.placeHint}
           {:else if p.roundDone}{t.waitingForOthers}
           {:else}—{/if}
         </span>
+        {#if canTakeOver}
+          <button onpointerup={() => session.takeOverSeat(player)}>{t.takeOverSeat}</button>
+        {/if}
       {:else}
       {#if st.phase.t === 'monumentDraft'}
         {#if !p.monument}

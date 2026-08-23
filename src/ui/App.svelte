@@ -1,9 +1,7 @@
 <script lang="ts">
   import { game } from '../store/gameStore.svelte';
+  import { buildGameConfig } from '../store/newGameConfig';
   import { session } from '../net/session.svelte';
-  import { catalog } from '../data';
-  import { mulberry32, randomSeed, randomSetup } from '../engine/registry';
-  import { systemActive } from '../data/sets';
   import { joinCodeFromUrl } from '../net';
   import { t } from '../i18n/de';
   import SetupScreen from './SetupScreen.svelte';
@@ -22,12 +20,7 @@
     const players = session.seats.map((s) => ({ name: s.name, corner: s.corner }));
     const { sets, useMonuments } = session.setup;
     try {
-      session.startGame(
-        randomSetup(catalog, players, useMonuments, mulberry32(randomSeed()), sets, {
-          coins: systemActive(sets, 'coins'),
-          trees: systemActive(sets, 'trees')
-        })
-      );
+      session.startGame(buildGameConfig(players, sets, useMonuments));
     } catch (e) {
       setupError = e instanceof Error ? e.message : String(e);
     }
