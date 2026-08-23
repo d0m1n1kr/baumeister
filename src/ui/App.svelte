@@ -12,6 +12,8 @@
   import ScoreScreen from './ScoreScreen.svelte';
   import UpdateBanner from './UpdateBanner.svelte';
   import CreditsFooter from './CreditsFooter.svelte';
+  import { sfx } from './sound';
+  import type { GameState } from '../engine/types';
 
   let showResume = $state(game.hasSave());
   let urlJoin = $state(joinCodeFromUrl());
@@ -63,6 +65,50 @@
       window.removeEventListener('hashchange', onHash);
       window.removeEventListener('pageshow', onHash);
     };
+  });
+
+  // Soundeffekte zentral aus Zustandsänderungen ableiten — funktioniert damit
+  // identisch am Einzelgerät, beim Host und bei Gästen (Zustand vom Netz).
+  let prevState: GameState | null = null;
+  $effect(() => {
+    const st = game.state;
+    const prev = prevState;
+    prevState = st;
+    if (!st || !prev || st === prev) return;
+
+    if (st.phase.t === 'round' && prev.phase.t !== 'round') {
+      sfx.play('named');
+    } else if (st.phase.t === 'nameResource' && prev.phase.t === 'round') {
+      // Neue Runde: Hinweiston, wenn der neue Baumeister an diesem Gerät sitzt
+      if (session.controls(st.masterBuilder)) sfx.play('myTurn');
+    } else if (st.phase.t === 'gameOver' && prev.phase.t !== 'gameOver') {
+      sfx.play('gameOver');
+    }
+
+    let built = false;
+    let monument = false;
+    let placed = false;
+    let coined = false;
+    let seeded = false;
+    for (const [i, pl] of st.players.entries()) {
+      const old = prev.players[i];
+      if (!old) continue;
+      const buildings = pl.board.filter((sq) => sq.building).length;
+      const oldBuildings = old.board.filter((sq) => sq.building).length;
+      if (buildings > oldBuildings) {
+        built = true;
+        if (pl.monument?.built && !old.monument?.built) monument = true;
+      }
+      const res = pl.board.filter((sq) => sq.resource).length;
+      if (res > old.board.filter((sq) => sq.resource).length) placed = true;
+      if (pl.coins > old.coins) coined = true;
+      if (pl.seedSquare === -1 && (old.seedSquare ?? -1) >= 0) seeded = true;
+    }
+    if (monument) sfx.play('monument');
+    else if (built) sfx.play('build');
+    else if (placed) sfx.play('place', st.phase.t === 'round' ? st.phase.resource : undefined);
+    if (coined && !monument) sfx.play('coin');
+    if (seeded) sfx.play('tree');
   });
 
   // Nach längerem Hintergrund (iOS-Schlaf) den Raum komplett neu aufbauen:

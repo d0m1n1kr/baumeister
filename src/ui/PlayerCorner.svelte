@@ -6,6 +6,7 @@
   import { matchingCards } from '../engine/patterns';
   import type { CardDef, Resource } from '../engine/types';
   import { cornerRotation, RESOURCE_CSS } from './helpers';
+  import { sfx } from './sound';
   import { t } from '../i18n/de';
   import BoardGrid from './BoardGrid.svelte';
   import CardMini from './CardMini.svelte';
@@ -64,6 +65,7 @@
 
   function showError(msg: string | null) {
     if (!msg) return;
+    sfx.play('error');
     error = msg;
     clearTimeout(errorTimer);
     errorTimer = setTimeout(() => (error = ''), 2600);
