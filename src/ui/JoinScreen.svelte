@@ -1,9 +1,10 @@
 <script lang="ts">
   import { session } from '../net/session.svelte';
-  import { selectedTransport, joinCodeFromUrl, clearJoinHash, signalingStatus } from '../net';
+  import { codeFromScan, selectedTransport, joinCodeFromUrl, clearJoinHash, signalingStatus } from '../net';
   import { isValidRoomCode, normalizeRoomCode } from '../net/protocol';
   import { t } from '../i18n/de';
   import HelpDialog from './HelpDialog.svelte';
+  import QrScanner from './QrScanner.svelte';
 
   let {
     onback,
@@ -18,6 +19,22 @@
   let name = $state(initialName ?? '');
   let busy = $state(false);
   let showHelp = $state(false);
+  let scanning = $state(false);
+  let scanError = $state('');
+  const canScan = typeof navigator !== 'undefined' && !!navigator.mediaDevices?.getUserMedia;
+
+  function scanned(text: string): boolean {
+    const found = codeFromScan(text);
+    if (!found) {
+      scanError = t.scanInvalid;
+      return false; // weiterscannen — vielleicht war ein fremder QR im Bild
+    }
+    scanning = false;
+    scanError = '';
+    code = found;
+    if (name.trim()) void join(); // Name schon da: direkt beitreten
+    return true;
+  }
 
   // Diagnose beim Verbinden: Sind die Vermittlungs-Relays überhaupt erreichbar?
   let relays = $state<{ open: number; total: number } | null>(null);
@@ -83,21 +100,29 @@
     <section class="form">
       <label>
         <span>{t.joinCode}</span>
-        <input
-          class="codeInput"
-          type="text"
-          autocapitalize="characters"
-          autocomplete="off"
-          maxlength="7"
-          bind:value={code}
-          placeholder="ABC234"
-        />
+        <div class="codeRow">
+          <input
+            class="codeInput"
+            type="text"
+            autocapitalize="characters"
+            autocomplete="off"
+            maxlength="7"
+            bind:value={code}
+            placeholder="ABC234"
+          />
+          {#if canScan}
+            <button class="scanBtn" title={t.scanButton} onpointerup={() => { scanError = ''; scanning = true; }}>
+              📷
+            </button>
+          {/if}
+        </div>
       </label>
       <label>
         <span>{t.yourName}</span>
         <input type="text" maxlength="14" bind:value={name} placeholder="Name" />
       </label>
 
+      {#if scanError && !scanning}<div class="error">{scanError}</div>{/if}
       {#if session.netError}<div class="error">{session.netError}</div>{/if}
 
       <div class="actions">
@@ -113,6 +138,10 @@
 
 {#if showHelp}
   <HelpDialog mode="guest" onclose={() => (showHelp = false)} />
+{/if}
+
+{#if scanning}
+  <QrScanner onresult={scanned} onclose={() => (scanning = false)} />
 {/if}
 
 <style>
@@ -144,12 +173,16 @@
     border-radius: 8px;
     padding: 10px;
   }
+  .codeRow { display: flex; gap: 8px; align-items: stretch; }
   .codeInput {
+    flex: 1;
+    min-width: 0;
     text-transform: uppercase;
     letter-spacing: 6px;
     font-size: 22px;
     text-align: center;
   }
+  .scanBtn { font-size: 20px; padding: 0 14px; }
   .seats { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 6px; }
   .seats li { display: flex; align-items: center; gap: 8px; font-size: 14px; }
   .seats li.me { color: var(--accent); font-weight: 700; }
