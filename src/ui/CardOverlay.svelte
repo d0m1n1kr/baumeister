@@ -10,16 +10,20 @@
     rotation = 0,
     onclose
   }: { card: CardDef; rotation?: number; onclose: () => void } = $props();
+
+  // Zusätzliche Drehung per Flip-Knopf, damit auch das Gegenüber lesen kann
+  let flip = $state(0);
 </script>
 
 <div class="scrim" role="button" tabindex="-1" onpointerup={onclose}>
   <div
     class="big"
-    style="transform: rotate({rotation}deg); --cat: {CATEGORY_CSS[card.color]}"
+    style="transform: rotate({rotation + flip}deg); --cat: {CATEGORY_CSS[card.color]}"
     role="dialog"
     onpointerup={(e) => e.stopPropagation()}
   >
     <div class="bar"></div>
+    <button class="flip" title="Zum Gegenüber drehen" onpointerup={() => (flip += 180)}>⟳</button>
     <h2>{card.name.de}</h2>
     <div class="row">
       <span class="art">{@html artFor(card) ?? ''}</span>
@@ -65,6 +69,20 @@
     height: 12px;
     border-radius: 16px 16px 0 0;
     background: var(--cat);
+  }
+  .big { transition: transform 0.25s ease; }
+  .flip {
+    position: absolute;
+    top: 18px;
+    right: 14px;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    padding: 0;
+    font-size: 19px;
+    background: rgba(0, 0, 0, 0.08);
+    color: var(--paper-ink);
+    border: 1px solid rgba(0, 0, 0, 0.2);
   }
   h2 { margin: 6px 0 0; font-size: 24px; }
   .row { display: flex; align-items: center; gap: 22px; }
