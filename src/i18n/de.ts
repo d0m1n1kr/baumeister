@@ -85,5 +85,10 @@ export const t = {
   playAgain: 'Neue Partie',
 
   confirmAbort: 'Laufende Partie verwerfen?',
-  abortGame: 'Partie beenden'
+  abortGame: 'Partie beenden',
+
+  updateAvailable: 'Neue Version verfügbar',
+  updateNow: 'Aktualisieren',
+  updateLater: 'Später',
+  offlineReady: 'Bereit für Offline-Spiel'
 };
