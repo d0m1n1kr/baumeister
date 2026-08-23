@@ -42,7 +42,7 @@
   .banner {
     position: fixed;
     left: 50%;
-    bottom: 14px;
+    bottom: calc(14px + env(safe-area-inset-bottom, 0px));
     transform: translateX(-50%);
     display: flex;
     align-items: center;
