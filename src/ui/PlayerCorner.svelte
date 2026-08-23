@@ -357,7 +357,7 @@
   const buildableSelection = $derived(mode === 'select' && selected.length > 0);
 </script>
 
-<div class="corner" class:wide style="transform: rotate({rotation}deg)">
+<div class="corner" class:wide class:soloCorner={solo} style="transform: rotate({rotation}deg)">
   <header>
     <span class="pname" class:mb={isMB}>{isMB ? '👑 ' : ''}{p.name}</span>
     {#if coinsActive}
@@ -835,6 +835,8 @@
     .corner.wide .boardWrap { width: min(26vh, 60vw); align-self: center; }
     .corner.wide .panel { align-items: center; width: 100%; flex: 1; }
     .corner.wide header { justify-content: center; }
+    /* Solo: das einzige Brett darf den Platz nutzen */
+    .corner.soloCorner .boardWrap { width: min(36vh, 86vw); }
   }
   @media (max-width: 700px) and (orientation: portrait) {
     /* 3–4 Spieler am Handy: Die Eckzellen sind zu schmal für Brett + Knöpfe
