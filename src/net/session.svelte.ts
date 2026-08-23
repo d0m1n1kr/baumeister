@@ -25,6 +25,12 @@ class ConnectAborted extends Error {
   }
 }
 
+interface SessionHandlers {
+  onMessage(msg: unknown, from: PeerId): void;
+  onPeerJoin(peer: PeerId): void;
+  onPeerLeave(peer: PeerId): void;
+}
+
 export type Role = 'off' | 'host' | 'guest';
 export type Status = 'idle' | 'connecting' | 'lobby' | 'playing' | 'error';
 
@@ -114,11 +120,13 @@ export class Session {
     this.transport?.send(JSON.parse(JSON.stringify(msg)), target);
   }
 
-  private async connect(code: string, factory: TransportFactory, handlers: {
-    onMessage(msg: unknown, from: PeerId): void;
-    onPeerJoin(peer: PeerId): void;
-    onPeerLeave(peer: PeerId): void;
-  }): Promise<void> {
+  /** Zuletzt benutzte Fabrik/Handler — für den Raum-Neuaufbau nach iOS-Schlaf. */
+  private lastFactory: TransportFactory | null = null;
+  private lastHandlers: SessionHandlers | null = null;
+
+  private async connect(code: string, factory: TransportFactory, handlers: SessionHandlers): Promise<void> {
+    this.lastFactory = factory;
+    this.lastHandlers = handlers;
     const myEpoch = ++this.epoch;
     this.ready = false;
     this.queued = [];
@@ -314,6 +322,36 @@ export class Session {
   }
 
   /**
+   * Raum komplett neu aufbauen (frischer Transport). Nötig nach längerem
+   * iOS-Schlaf: Die Vermittlungs-Relays vergessen ihre Abos beim Socket-Abriss,
+   * und Trystero erneuert sie nach einem Reconnect nicht — der Client kann dann
+   * noch senden, hört aber nichts mehr. Neue Sockets = neue Abos.
+   */
+  async reconnectTransport(): Promise<void> {
+    if (this.role === 'off' || !this.lastFactory || !this.lastHandlers) return;
+    this.transport?.close();
+    this.transport = null;
+    if (this.role === 'guest') {
+      this.hostPeer = null;
+      if (this.status === 'playing' || this.status === 'lobby') this.status = 'connecting';
+    } else {
+      for (const seat of this.seats) {
+        if (seat.kind === 'remote') {
+          seat.connected = false;
+          seat.peerId = undefined;
+        }
+      }
+    }
+    try {
+      await this.connect(this.roomCode, this.lastFactory, this.lastHandlers);
+    } catch {
+      return; // nächster Versuch beim nächsten Aufwachen
+    }
+    if (this.role === 'guest') this.requestResync();
+    else this.sendLobby();
+  }
+
+  /**
    * Nach Rückkehr in den Vordergrund aufrufen. Unter iOS wird die App im
    * Hintergrund angehalten und die Verbindung fällt weg — statt das zu
    * verhindern (was nicht geht), wird der Zustand einfach neu geholt.
@@ -373,6 +411,8 @@ export class Session {
     this.version = 0;
     this.bridge.sendAction = null;
     this.bridge.onLocalApplied = null;
+    this.lastFactory = null;
+    this.lastHandlers = null;
   }
 
   private clearJoinTimers(): void {

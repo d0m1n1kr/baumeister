@@ -16,12 +16,14 @@ export class LoopbackNetwork {
 
   connect(id: PeerId, handlers: TransportHandlers): Transport {
     const member: Member = { id, handlers };
-    // Bestehende Teilnehmer über den Neuzugang informieren (und umgekehrt)
+    // Erst registrieren, dann informieren — wie im echten Netz: Wer auf ein
+    // onPeerJoin sofort antwortet, muss den Neuzugang schon erreichen können.
+    this.members.push(member);
     for (const other of this.members) {
+      if (other.id === id) continue;
       other.handlers.onPeerJoin(id);
       handlers.onPeerJoin(other.id);
     }
-    this.members.push(member);
 
     return {
       selfId: id,

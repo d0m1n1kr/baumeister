@@ -227,6 +227,33 @@ describe('Sitzung: Host und Gäste', () => {
     expect(host.session.controls(2)).toBe(false);
   });
 
+  it('reconnectTransport: Raum-Neuaufbau, Gäste finden automatisch zurück', async () => {
+    host.session.startGame(gameConfig());
+
+    // Host baut den Transport neu auf (z. B. nach iOS-Schlaf: Relays taub)
+    await host.session.reconnectTransport();
+
+    // Die Gäste haben den alten Host-Peer verloren und sich per hello neu
+    // gemeldet — alle Plätze sind wieder verbunden, der Zustand ist da.
+    expect(host.session.seats[1].connected).toBe(true);
+    expect(host.session.seats[2].connected).toBe(true);
+    expect(g1.session.status).toBe('playing');
+
+    // Und die Partie läuft normal weiter
+    host.game.dispatch({ t: 'chooseMonument', player: 0, card: 'the_starloom' });
+    expect(g1.game.state!.players[0].monument?.card).toBe(HIDDEN_MONUMENT);
+  });
+
+  it('reconnectTransport als Gast: meldet sich neu an und holt den Zustand', async () => {
+    host.session.startGame(gameConfig());
+    host.game.dispatch({ t: 'chooseMonument', player: 0, card: 'the_starloom' });
+
+    await g1.session.reconnectTransport();
+    expect(g1.session.status).toBe('playing');
+    expect(g1.session.mySeat).toBe(1);
+    expect(g1.game.state!.players[0].monument?.card).toBe(HIDDEN_MONUMENT);
+  });
+
   it('gibt einen Platz frei — ein neues Gerät bekommt ihn mitten im Spiel (QR-Handover)', async () => {
     host.session.startGame(gameConfig());
     // Anna verliert ihr Gerät — der Host gibt den Platz für ein neues frei

@@ -65,6 +65,23 @@
     };
   });
 
+  // Nach längerem Hintergrund (iOS-Schlaf) den Raum komplett neu aufbauen:
+  // Die Vermittlungs-Relays vergessen ihre Abos beim Socket-Abriss, und ohne
+  // Neuaufbau würde das Gerät zwar weiter senden, aber nichts mehr hören.
+  $effect(() => {
+    let hiddenAt = 0;
+    const onVisibility = () => {
+      if (document.visibilityState === 'hidden') {
+        hiddenAt = Date.now();
+      } else if (hiddenAt && Date.now() - hiddenAt > 10000) {
+        hiddenAt = 0;
+        void session.reconnectTransport();
+      }
+    };
+    document.addEventListener('visibilitychange', onVisibility);
+    return () => document.removeEventListener('visibilitychange', onVisibility);
+  });
+
   // Nach gelungenem (Auto-)Beitritt den Code aus der Adresszeile räumen.
   $effect(() => {
     if (session.role === 'guest' && session.status !== 'connecting') clearJoinHash();
