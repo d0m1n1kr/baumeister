@@ -12,7 +12,7 @@
   import ConfirmDialog from './ConfirmDialog.svelte';
   import ResourcePicker from './ResourcePicker.svelte';
 
-  let { player }: { player: number } = $props();
+  let { player, wide = false }: { player: number; wide?: boolean } = $props();
 
   const st = $derived(game.state!);
   const p = $derived(st.players[player]);
@@ -321,7 +321,7 @@
   const buildableSelection = $derived(mode === 'select' && selected.length > 0);
 </script>
 
-<div class="corner" style="transform: rotate({rotation}deg)">
+<div class="corner" class:wide style="transform: rotate({rotation}deg)">
   <header>
     <span class="pname" class:mb={isMB}>{isMB ? '👑 ' : ''}{p.name}</span>
     {#if coinsActive}
@@ -737,6 +737,22 @@
     flex-shrink: 0;
     align-self: flex-start;
   }
+  .corner.wide .boardWrap { width: min(32vh, 44vw); }
+  .corner.wide .row { justify-content: center; }
+  /* Panel nicht auf volle Restbreite strecken, damit die Gruppe mittig sitzt */
+  .corner.wide .panel { flex: 0 1 360px; }
+  .corner.wide header { justify-content: center; }
+  @media (max-width: 700px) {
+    .corner { padding: 4px; gap: 4px; }
+    /* 2 Spieler am Handy: Brett mittig, Panel darunter */
+    .corner.wide .row { flex-direction: column; align-items: center; gap: 4px; }
+    .corner.wide .boardWrap { width: min(26vh, 60vw); }
+    .corner.wide .panel { align-items: center; width: 100%; flex: 1; }
+    .corner.wide header { justify-content: center; }
+    .boardWrap { width: min(26vh, 40vw); }
+    .panel button { font-size: 12px; padding: 6px 9px; }
+    .chip { width: 46px; height: 46px; }
+  }
   .hint {
     position: absolute;
     left: 0;
@@ -754,6 +770,7 @@
     min-width: 0;
     align-items: flex-start;
     overflow-y: auto;
+    touch-action: pan-y;
   }
   .panel button { font-size: 13px; padding: 7px 12px; }
 

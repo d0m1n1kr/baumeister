@@ -7,7 +7,7 @@
   import CardMini from './CardMini.svelte';
   import CardOverlay from './CardOverlay.svelte';
 
-  let { onabort }: { onabort?: () => void } = $props();
+  let { onabort, horizontal = false }: { onabort?: () => void; horizontal?: boolean } = $props();
 
   const st = $derived(game.state!);
   const named = $derived(st.phase.t === 'round' ? st.phase.resource : null);
@@ -20,7 +20,7 @@
   }
 </script>
 
-<div class="strip">
+<div class="strip" class:horizontal>
   <div class="info">
     <span class="round">
       {t.round} {Math.max(1, st.round)}
@@ -36,7 +36,9 @@
   </div>
   <div class="cards">
     {#each st.config.activeCards as id}
-      <CardMini card={catalog[id]} onclick={(e) => open(catalog[id], e)} />
+      <div class="cardWrap">
+        <CardMini card={catalog[id]} onclick={(e) => open(catalog[id], e)} />
+      </div>
     {/each}
   </div>
 </div>
@@ -84,8 +86,39 @@
     flex: 1;
     display: flex;
     flex-direction: column;
-    justify-content: space-evenly;
-    gap: 4px;
+    gap: 6px;
     min-height: 0;
+    overflow-y: auto;
+    touch-action: pan-y; /* Scrollen trotz globalem touch-action: none */
+    scrollbar-width: thin;
   }
+  .cardWrap { flex-shrink: 0; }
+
+  /* horizontale Leiste (2-Spieler-Modus / Hochformat) */
+  .strip.horizontal {
+    flex-direction: row;
+    align-items: center;
+    border-left: none;
+    border-right: none;
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    padding: 4px 8px;
+    gap: 10px;
+  }
+  .strip.horizontal .info {
+    border-bottom: none;
+    border-right: 1px solid rgba(255, 255, 255, 0.1);
+    padding-right: 10px;
+    padding-bottom: 0;
+    flex-shrink: 0;
+  }
+  .strip.horizontal .cards {
+    flex-direction: row;
+    overflow-y: hidden;
+    overflow-x: auto;
+    touch-action: pan-x;
+    align-items: stretch;
+    min-width: 0; /* Scroll-Container darf die Grid-Spalte nicht aufweiten */
+  }
+  .strip.horizontal .cardWrap { width: clamp(96px, 13vw, 130px); }
 </style>

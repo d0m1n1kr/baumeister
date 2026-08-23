@@ -16,7 +16,7 @@ export default defineConfig({
         description: 'Tiny Towns für das iPad — 2 bis 4 Spieler an einem Gerät',
         lang: 'de',
         display: 'standalone',
-        orientation: 'landscape',
+        orientation: 'any',
         background_color: '#1e2a38',
         theme_color: '#1e2a38',
         icons: [
