@@ -427,11 +427,11 @@
           <div class="picker offer">
             {#each st.soloOffer as r, i}
               <button
-                class="chip offerChip"
+                class="offerChip"
                 style="background: {RESOURCE_CSS[r]}"
                 title={t.resourceNames[r]}
                 onpointerup={() => showError(game.dispatch({ t: 'soloPick', index: i }))}
-              >{t.resourceNames[r]}</button>
+              ><span>{t.resourceNames[r]}</span></button>
             {/each}
           </div>
           <span class="deckCount">{t.soloDeckCount(st.soloDeck?.length ?? 0)}</span>
@@ -966,16 +966,22 @@
     .pickRow { flex-direction: column; }
   }
   .pickText { font-size: 12px; color: var(--text-dim); margin: 0; text-align: center; }
-  .offer { display: flex; gap: 10px; }
+  .offer { display: flex; gap: 10px; justify-content: center; }
   .offerChip {
     width: 56px;
     height: 56px;
     border-radius: 50%;
-    border: 3px solid rgba(255, 255, 255, 0.75);
-    color: #1c2430;
-    font-size: 11px;
-    font-weight: 700;
+    border: 2px solid rgba(0, 0, 0, 0.35);
+    display: grid;
+    place-items: center;
     padding: 0;
+    line-height: 1;
+  }
+  .offerChip span {
+    font-size: 10px;
+    font-weight: 700;
+    color: rgba(0, 0, 0, 0.75);
+    text-shadow: 0 1px 1px rgba(255, 255, 255, 0.3);
   }
   .deckCount { font-size: 11px; color: var(--text-dim); }
 </style>
