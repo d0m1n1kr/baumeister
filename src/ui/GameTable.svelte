@@ -72,7 +72,9 @@
       'bottom';
   }
   @media (max-width: 700px) {
-    .table:not(.two) {
+    /* 3–4 Spieler: schmalere Mittelspalte. Gilt NICHT für das
+       Ein-Spalten-Layout des Solo-Modus. */
+    .table:not(.two):not(.single) {
       grid-template-columns: 1fr clamp(92px, 24vw, 120px) 1fr;
     }
   }

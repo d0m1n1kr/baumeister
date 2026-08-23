@@ -357,7 +357,7 @@
   const buildableSelection = $derived(mode === 'select' && selected.length > 0);
 </script>
 
-<div class="corner" class:wide style="transform: rotate({rotation}deg)">
+<div class="corner" class:wide class:soloCorner={solo} style="transform: rotate({rotation}deg)">
   <header>
     <span class="pname" class:mb={isMB}>{isMB ? '👑 ' : ''}{p.name}</span>
     {#if coinsActive}
@@ -427,11 +427,11 @@
           <div class="picker offer">
             {#each st.soloOffer as r, i}
               <button
-                class="chip offerChip"
+                class="offerChip"
                 style="background: {RESOURCE_CSS[r]}"
                 title={t.resourceNames[r]}
                 onpointerup={() => showError(game.dispatch({ t: 'soloPick', index: i }))}
-              >{t.resourceNames[r]}</button>
+              ><span>{t.resourceNames[r]}</span></button>
             {/each}
           </div>
           <span class="deckCount">{t.soloDeckCount(st.soloDeck?.length ?? 0)}</span>
@@ -835,6 +835,8 @@
     .corner.wide .boardWrap { width: min(26vh, 60vw); align-self: center; }
     .corner.wide .panel { align-items: center; width: 100%; flex: 1; }
     .corner.wide header { justify-content: center; }
+    /* Solo: das einzige Brett darf den Platz nutzen */
+    .corner.soloCorner .boardWrap { width: min(36vh, 86vw); }
   }
   @media (max-width: 700px) and (orientation: portrait) {
     /* 3–4 Spieler am Handy: Die Eckzellen sind zu schmal für Brett + Knöpfe
@@ -964,16 +966,22 @@
     .pickRow { flex-direction: column; }
   }
   .pickText { font-size: 12px; color: var(--text-dim); margin: 0; text-align: center; }
-  .offer { display: flex; gap: 10px; }
+  .offer { display: flex; gap: 10px; justify-content: center; }
   .offerChip {
     width: 56px;
     height: 56px;
     border-radius: 50%;
-    border: 3px solid rgba(255, 255, 255, 0.75);
-    color: #1c2430;
-    font-size: 11px;
-    font-weight: 700;
+    border: 2px solid rgba(0, 0, 0, 0.35);
+    display: grid;
+    place-items: center;
     padding: 0;
+    line-height: 1;
+  }
+  .offerChip span {
+    font-size: 10px;
+    font-weight: 700;
+    color: rgba(0, 0, 0, 0.75);
+    text-shadow: 0 1px 1px rgba(255, 255, 255, 0.3);
   }
   .deckCount { font-size: 11px; color: var(--text-dim); }
 </style>
