@@ -1,22 +1,62 @@
 <script lang="ts">
   import { game } from '../store/gameStore.svelte';
+  import { session } from '../net/session.svelte';
+  import { catalog } from '../data';
+  import { mulberry32, randomSeed, randomSetup } from '../engine/registry';
+  import { systemActive } from '../data/sets';
+  import { joinCodeFromUrl } from '../net';
   import { t } from '../i18n/de';
   import SetupScreen from './SetupScreen.svelte';
-  import GameTable from './GameTable.svelte';
+  import JoinScreen from './JoinScreen.svelte';
+  import HostLobby from './HostLobby.svelte';
+  import GameView from './GameView.svelte';
   import ScoreScreen from './ScoreScreen.svelte';
   import UpdateBanner from './UpdateBanner.svelte';
 
   let showResume = $state(game.hasSave());
+  let joining = $state(joinCodeFromUrl() !== null);
+  let setupError = $state('');
+
+  /** Host startet aus der Lobby: Konfiguration aus den aktuellen Sitzplätzen bauen. */
+  function startFromLobby() {
+    const players = session.seats.map((s) => ({ name: s.name, corner: s.corner }));
+    const { sets, useMonuments } = session.setup;
+    try {
+      session.startGame(
+        randomSetup(catalog, players, useMonuments, mulberry32(randomSeed()), sets, {
+          coins: systemActive(sets, 'coins'),
+          trees: systemActive(sets, 'trees')
+        })
+      );
+    } catch (e) {
+      setupError = e instanceof Error ? e.message : String(e);
+    }
+  }
 </script>
 
 <UpdateBanner />
 
-{#if game.state}
+{#if session.role === 'guest'}
+  {#if session.status === 'playing' && game.state}
+    {#if game.state.phase.t === 'gameOver'}
+      <ScoreScreen />
+    {:else}
+      <GameView />
+    {/if}
+  {:else}
+    <JoinScreen onback={() => (joining = false)} />
+  {/if}
+{:else if session.role === 'host' && !game.state}
+  <HostLobby onstart={startFromLobby} oncancel={() => session.leave()} />
+  {#if setupError}<div class="fatal">{setupError}</div>{/if}
+{:else if game.state}
   {#if game.state.phase.t === 'gameOver'}
     <ScoreScreen />
   {:else}
-    <GameTable />
+    <GameView />
   {/if}
+{:else if joining}
+  <JoinScreen onback={() => (joining = false)} />
 {:else if showResume}
   <main class="resume">
     <h1>🏘 {t.appTitle}</h1>
@@ -28,7 +68,7 @@
     </div>
   </main>
 {:else}
-  <SetupScreen />
+  <SetupScreen onjoin={() => (joining = true)} />
 {/if}
 
 <style>
@@ -43,4 +83,14 @@
   h1 { margin: 0; font-size: 34px; }
   .buttons { display: flex; flex-direction: column; gap: 12px; width: 240px; }
   .big { font-size: 17px; padding: 12px; }
+  .fatal {
+    position: fixed;
+    bottom: 12px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: var(--danger);
+    padding: 8px 14px;
+    border-radius: 8px;
+    font-size: 13px;
+  }
 </style>

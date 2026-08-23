@@ -12,11 +12,20 @@
   import ConfirmDialog from './ConfirmDialog.svelte';
   import ResourcePicker from './ResourcePicker.svelte';
 
-  let { player, wide = false }: { player: number; wide?: boolean } = $props();
+  import { session } from '../net/session.svelte';
+
+  let {
+    player,
+    wide = false,
+    solo = false
+  }: { player: number; wide?: boolean; solo?: boolean } = $props();
+
+  /** Im Mehrgerätemodus darf jedes Gerät nur seine eigenen Plätze bedienen. */
+  const canControl = $derived(session.controls(player));
 
   const st = $derived(game.state!);
   const p = $derived(st.players[player]);
-  const rotation = $derived(cornerRotation(p.corner));
+  const rotation = $derived(solo ? 0 : cornerRotation(p.corner));
   const isMB = $derived(st.masterBuilder === player);
   const inRound = $derived(st.phase.t === 'round');
   const namedResource = $derived(st.phase.t === 'round' ? st.phase.resource : null);
@@ -67,6 +76,15 @@
   // Wenn eine neue Entscheidung ansteht, Bau-Modus verlassen
   $effect(() => {
     if (choice && (mode === 'select' || mode === 'target')) resetMode();
+  });
+
+  // Regelverstöße meldet im Mehrgerätemodus der Host — hier anzeigen wie lokale Fehler.
+  $effect(() => {
+    const remote = session.netError;
+    if (remote && canControl && session.role === 'guest') {
+      showError(remote);
+      session.clearError();
+    }
   });
 
   // ---------- Bauen ----------
@@ -142,7 +160,7 @@
   );
 
   function oncell(square: number) {
-    if (p.done) return;
+    if (p.done || !canControl) return;
     const sq = p.board[square];
     // Tiny Trees: Samen setzen
     if (st.phase.t === 'seedPlacement') {
@@ -258,7 +276,7 @@
 
   // ---------- Drag & Drop (Multi-Touch-fähig) ----------
   function chipDown(e: PointerEvent) {
-    if (!inRound || p.pending == null || drags[player]) return;
+    if (!inRound || p.pending == null || drags[player] || !canControl) return;
     (e.currentTarget as HTMLElement).setPointerCapture(e.pointerId);
     drags[player] = { resource: p.pending, x: e.clientX, y: e.clientY, pointerId: e.pointerId };
   }
@@ -352,6 +370,15 @@
     </div>
 
     <div class="panel">
+      {#if !canControl}
+        <!-- Fremder Platz (Host-Tischansicht): nur Status, keine Bedienung -->
+        <span class="status">
+          {#if p.done}{t.townComplete}
+          {:else if p.pending != null}{t.placeHint}
+          {:else if p.roundDone}{t.waitingForOthers}
+          {:else}—{/if}
+        </span>
+      {:else}
       {#if st.phase.t === 'monumentDraft'}
         {#if !p.monument}
           <button class="primary" onpointerup={() => (confirming = 'draft')}>{t.monumentDraftButton}</button>
@@ -555,6 +582,7 @@
       {/if}
 
       {#if error}<div class="error">{error}</div>{/if}
+      {/if}
     </div>
   </div>
 </div>
