@@ -81,7 +81,10 @@ berührt die Spiellogik nicht.
 **iOS-Eigenheit:** Wird die App in den Hintergrund geschickt oder das Display gesperrt,
 beendet iOS jede Verbindung — dagegen hilft keine Technik. Die App hält deshalb während
 der Partie den Bildschirm wach (Wake Lock) und gleicht bei jeder Rückkehr in den
-Vordergrund den vollen Zustand ab; getrennte Plätze bleiben reserviert.
+Vordergrund den vollen Zustand ab; getrennte Plätze bleiben reserviert. Wird der Tab
+komplett neu geladen (auch das macht iOS gern), tritt ein Gast automatisch wieder bei
+(Sitzung liegt im `localStorage`), und der Host stellt mit „Weiterspielen" Partie
+**und** Raum wieder her — die Gäste verbinden sich dann von selbst neu.
 
 **Neue Karten** brauchen nur eine JSON-Datei (+ optional SVG) in `src/data/buildings/`
 bzw. `src/data/monuments/` — solange sie vorhandene Wertungs-/Effekt-Bausteine nutzen,

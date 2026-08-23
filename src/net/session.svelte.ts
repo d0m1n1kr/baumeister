@@ -14,6 +14,7 @@ import {
   type ClientMessage, type HostMessage, type SeatInfo
 } from './protocol';
 import { redactFor } from './redact';
+import { clearSession, saveSession } from './sessionPersist';
 import { actionAllowed, seatOfClient, seatOfPeer, toSeatInfo, type Seat } from './seats';
 import type { PeerId, Transport, TransportFactory } from './transport';
 
@@ -318,6 +319,7 @@ export class Session {
   leave(): void {
     this.epoch++; // ein evtl. noch laufender Verbindungsaufbau gehört ab jetzt niemandem
     this.clearJoinTimer();
+    clearSession();
     this.transport?.close();
     this.transport = null;
     this.hostPeer = null;
@@ -346,6 +348,23 @@ export class Session {
     const info = toSeatInfo(this.seats);
     this.lobbySeats = info;
     this.post({ t: 'lobby', seats: info });
+    this.persistSession();
+  }
+
+  /** Sitzung ablegen, damit ein Reload (iOS wirft Tabs gern raus) zurückführt. */
+  private persistSession(): void {
+    if (this.role === 'host') {
+      saveSession({
+        role: 'host',
+        code: this.roomCode,
+        seats: this.seats.map(({ index, name, corner, kind, clientId }) => ({
+          index, name, corner, kind, clientId
+        })),
+        setup: { ...this.setup }
+      });
+    } else if (this.role === 'guest') {
+      saveSession({ role: 'guest', code: this.roomCode, name: this.myName });
+    }
   }
 
   private sendHello(peer: PeerId): void {
@@ -461,8 +480,12 @@ export class Session {
         this.clearJoinTimer();
         this.hostPeer = from;
         this.mySeat = raw.seat;
+        // Ein welcome heißt: (neue) Host-Instanz — deren Versionszähler beginnt
+        // wieder bei null, unsere alte Höchstmarke würde alles Neue verwerfen.
+        this.lastSeenVersion = -1;
         this.status = this.game.state ? 'playing' : 'lobby';
         this.netError = '';
+        this.persistSession();
         return;
       case 'reject':
         if (this.hostPeer !== null && !fromHost) return;

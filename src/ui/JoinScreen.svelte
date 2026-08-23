@@ -4,10 +4,17 @@
   import { isValidRoomCode, normalizeRoomCode } from '../net/protocol';
   import { t } from '../i18n/de';
 
-  let { onback }: { onback: () => void } = $props();
+  let {
+    onback,
+    initialCode,
+    initialName
+  }: { onback: () => void; initialCode?: string; initialName?: string } = $props();
 
-  let code = $state(joinCodeFromUrl() ?? '');
-  let name = $state('');
+  // Bewusst nur der Anfangswert: eine Vorbelegung, die der Nutzer frei editiert.
+  // svelte-ignore state_referenced_locally
+  let code = $state(joinCodeFromUrl() ?? initialCode ?? '');
+  // svelte-ignore state_referenced_locally
+  let name = $state(initialName ?? '');
   let busy = $state(false);
 
   const ready = $derived(isValidRoomCode(normalizeRoomCode(code)) && name.trim().length > 0);
