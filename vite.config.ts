@@ -1,11 +1,17 @@
 import { defineConfig } from 'vite';
 import { svelte } from '@sveltejs/vite-plugin-svelte';
 import { VitePWA } from 'vite-plugin-pwa';
+import { version } from './package.json';
 
 // GitHub Pages serves the app under /<repo>/ — the deploy workflow sets BASE_PATH.
 export default defineConfig({
   base: process.env.BASE_PATH ?? '/',
   plugins: [
+    // Versionsnummer in die statische index.html (Lade-Splash) einsetzen
+    {
+      name: 'html-version',
+      transformIndexHtml: (html: string) => html.replace(/__APP_VERSION__/g, version)
+    },
     svelte(),
     VitePWA({
       registerType: 'prompt',
