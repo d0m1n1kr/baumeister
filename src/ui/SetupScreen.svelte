@@ -8,6 +8,7 @@
   import { makeRoomCode } from '../net/protocol';
   import type { Seat } from '../net/seats';
   import { t } from '../i18n/de';
+  import CreditsFooter from './CreditsFooter.svelte';
 
   let { onjoin }: { onjoin: () => void } = $props();
 
@@ -179,6 +180,7 @@
   </section>
 
   <button class="link" onpointerup={onjoin}>{t.joinTitle} →</button>
+  <CreditsFooter />
 </main>
 
 <style>

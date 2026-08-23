@@ -10,6 +10,7 @@
   import GameView from './GameView.svelte';
   import ScoreScreen from './ScoreScreen.svelte';
   import UpdateBanner from './UpdateBanner.svelte';
+  import CreditsFooter from './CreditsFooter.svelte';
 
   let showResume = $state(game.hasSave());
   let joining = $state(joinCodeFromUrl() !== null);
@@ -59,6 +60,7 @@
       </button>
       <button class="big" onpointerup={() => { game.reset(); showResume = false; }}>{t.newGame}</button>
     </div>
+    <CreditsFooter />
   </main>
 {:else}
   <SetupScreen onjoin={() => (joining = true)} />
