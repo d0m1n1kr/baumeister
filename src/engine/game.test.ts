@@ -391,3 +391,25 @@ describe('Höhlen-Regel', () => {
     expect(s.players[1].cavernUsed).toBe(1);
   });
 });
+
+describe('„Fertig" ist verbindlich', () => {
+  it('nach roundDone ist kein Bau mehr möglich', () => {
+    let s = inRound(freshGame(2));
+    s.players[1].pending = null;
+    s = a(s, { t: 'roundDone', player: 1 });
+
+    res(s, 1, 0, 'wood');
+    res(s, 1, 1, 'stone');
+    expect(() =>
+      a(s, { t: 'build', player: 1, squares: [0, 1], card: 'well', target: 0 })
+    ).toThrow(/bereits beendet/);
+
+    // vor dem „Fertig" geht derselbe Bau selbstverständlich
+    let s2 = inRound(freshGame(2));
+    s2.players[1].pending = null;
+    res(s2, 1, 0, 'wood');
+    res(s2, 1, 1, 'stone');
+    s2 = a(s2, { t: 'build', player: 1, squares: [0, 1], card: 'well', target: 0 });
+    expect(s2.players[1].board[0].building?.card).toBe('well');
+  });
+});

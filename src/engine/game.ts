@@ -370,6 +370,9 @@ function build(
 ): GameState {
   requireRound(s);
   const p = activePlayer(s, player);
+  // „Fertig" ist verbindlich: Danach wartet der Spieler nur noch — sonst könnte
+  // ein Bau mit dem Rundenwechsel der anderen kollidieren.
+  if (p.roundDone) fail('Runde ist bereits beendet');
   const def = catalog[card] ?? fail('Unbekannte Karte');
   const effects = def.effects ?? [];
 

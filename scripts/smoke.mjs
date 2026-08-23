@@ -100,9 +100,12 @@ try {
   await dragChip(1);
   const done2 = page.locator('button', { hasText: '✓ Fertig' });
   await done2.first().click();
+  // Regression: Nach „Fertig" darf der eigene Bauen-Knopf nicht mehr da sein
+  const bauen = await page.locator('button', { hasText: '🔨' }).count();
+  if (bauen !== 1) fail(`Nach „Fertig" erwartet 1 Bauen-Knopf, gefunden: ${bauen}`);
   await done2.first().click();
   await page.locator('.picker').waitFor({ timeout: 5000 });
-  console.log('✓ Platzieren per Tipp + Verschieben');
+  console.log('✓ Platzieren per Tipp + Verschieben, „Fertig" sperrt das Bauen');
 
   await playRound('Glas', 5, false);
   console.log('✓ 3 Runden Platzierung (Drag & Tipp)');
