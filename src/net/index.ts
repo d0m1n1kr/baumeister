@@ -3,7 +3,7 @@
 // aber zwischen zwei Tabs desselben Geräts (für Entwicklung und E2E-Tests).
 
 import { createChannelTransport } from './channelTransport';
-import { createTrysteroTransport } from './trysteroTransport';
+import { createTrysteroTransport, relayStatus } from './trysteroTransport';
 import type { TransportFactory } from './transport';
 
 export function selectedTransport(): TransportFactory {
@@ -15,6 +15,11 @@ export function selectedTransport(): TransportFactory {
     // location nicht verfügbar (Tests) — Standard verwenden
   }
   return createTrysteroTransport;
+}
+
+/** Erreichbarkeit der Vermittlungs-Relays (nur beim echten P2P-Transport). */
+export function signalingStatus(): { open: number; total: number } | null {
+  return selectedTransport() === createTrysteroTransport ? relayStatus() : null;
 }
 
 /** Beitritts-Code aus der Adresszeile (`#join=ABC234`), z. B. nach QR-Scan. */

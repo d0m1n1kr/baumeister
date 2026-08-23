@@ -78,7 +78,10 @@ Ohne aktive Sitzung läuft exakt der bisherige Ein-Gerät-Pfad.
 Der Transport steckt hinter einem schmalen Interface (`src/net/transport.ts`) — es gibt
 eine P2P-Variante (Trystero, wird nur bei Bedarf nachgeladen), eine BroadcastChannel-Variante
 für Tests und eine In-Memory-Variante für Unit-Tests. Ein Wechsel des Vermittlungsdienstes
-berührt die Spiellogik nicht.
+berührt die Spiellogik nicht. Die Vermittlung läuft über eine **handverlesene Liste von
+8 großen Nostr-Relays** (`trysteroTransport.ts`) statt der Trystero-Auslosung — die Liste
+ist der Treffpunkt aller Geräte, Änderungen daran immer zusammen mit `PROTOCOL_VERSION`.
+Beim Verbinden zeigt die App an, wie viele Relays erreichbar sind.
 
 **iOS-Eigenheit:** Wird die App in den Hintergrund geschickt oder das Display gesperrt,
 beendet iOS jede Verbindung — dagegen hilft keine Technik. Die App hält deshalb während
