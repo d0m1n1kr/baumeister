@@ -79,8 +79,11 @@
   <div class="cards" class:alice={aliceOn}>
     {#each [...st.config.activeCards, ...extraCards] as id}
       <div class="cardWrap">
-        <CardMini card={catalog[id]} onclick={(e) => open(catalog[id], e)} />
-        {#if aliceOn}<p class="desc">{catalog[id].text.de}</p>{/if}
+        <CardMini
+          card={catalog[id]}
+          description={aliceOn ? catalog[id].text.de : ''}
+          onclick={(e) => open(catalog[id], e)}
+        />
       </div>
     {/each}
   </div>
@@ -209,14 +212,16 @@
     max-height: 46vh;
   }
   .strip.horizontal .cards.alice .cardWrap { width: clamp(150px, 23vw, 210px); }
-  .desc {
-    margin: 3px 2px 0;
-    font-size: 10.5px;
-    line-height: 1.35;
-    color: var(--text-dim);
-  }
   @media (max-width: 720px) and (orientation: portrait) {
-    /* Am Handy: zwei Spalten mit Text, bei Bedarf scrollbar */
+    /* Am Handy: zwei Spalten, Leiste fest gedeckelt und in sich scrollbar —
+       das Spielbrett darunter muss immer erreichbar bleiben */
+    .strip.soloStrip.horizontal .cards.alice {
+      max-height: 30vh;
+      overflow-y: auto;
+      overflow-x: hidden;
+      touch-action: pan-y;
+      align-content: flex-start;
+    }
     .strip.soloStrip.horizontal .cards.alice .cardWrap { width: calc(50% - 5px); }
   }
 </style>

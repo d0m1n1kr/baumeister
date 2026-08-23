@@ -8,9 +8,16 @@
     card,
     onclick,
     badge = '',
-    compact = false
-  }: { card: CardDef; onclick?: (e: PointerEvent) => void; badge?: string; compact?: boolean } =
-    $props();
+    compact = false,
+    description = ''
+  }: {
+    card: CardDef;
+    onclick?: (e: PointerEvent) => void;
+    badge?: string;
+    compact?: boolean;
+    /** Alice-Modus: Kartentext direkt auf der Karte anzeigen. */
+    description?: string;
+  } = $props();
 </script>
 
 <button
@@ -33,6 +40,7 @@
       <span title="Kartendetails nicht verifiziert — Korrekturen siehe src/data/schema.md">⚠</span>
     {/if}
   </span>
+  {#if description}<span class="desc">{description}</span>{/if}
   {#if badge}<span class="badge">{badge}</span>{/if}
 </button>
 
@@ -74,6 +82,14 @@
   .compact .art { width: 24px; height: 24px; }
   .art :global(svg) { width: 100%; height: 100%; display: block; }
   .feats { display: flex; gap: 4px; font-size: 10px; line-height: 1; min-height: 11px; }
+  .desc {
+    font-size: 10px;
+    line-height: 1.3;
+    text-align: left;
+    color: var(--paper-ink);
+    opacity: 0.85;
+    padding: 1px 1px 2px;
+  }
   .badge {
     position: absolute;
     top: -6px;
