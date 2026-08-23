@@ -44,6 +44,35 @@ describe('Rundenablauf', () => {
     expect(s.masterBuilder).toBe(1);
   });
 
+  it('unbestätigtes Material kann bis zum „Fertig" verschoben werden', () => {
+    let s = freshGame(2);
+    s = a(s, { t: 'nameResource', resource: 'wood' });
+    s = a(s, { t: 'placeResource', player: 0, square: 0 });
+    expect(s.players[0].placedSquare).toBe(0);
+
+    s = a(s, { t: 'moveResource', player: 0, square: 7 });
+    expect(s.players[0].board[0].resource).toBeUndefined();
+    expect(s.players[0].board[7].resource).toBe('wood');
+    expect(s.players[0].placedSquare).toBe(7);
+
+    // belegtes Ziel wird abgelehnt
+    put(s, 0, 3, 'well');
+    expect(() => a(s, { t: 'moveResource', player: 0, square: 3 })).toThrow(RuleError);
+
+    // nach „Fertig" ist nichts mehr verschiebbar
+    s = a(s, { t: 'roundDone', player: 0 });
+    expect(() => a(s, { t: 'moveResource', player: 0, square: 8 })).toThrow(RuleError);
+  });
+
+  it('verbautes Material ist nicht mehr verschiebbar', () => {
+    let s = freshGame(2);
+    s = a(s, { t: 'nameResource', resource: 'wood' });
+    res(s, 0, 1, 'stone');
+    s = a(s, { t: 'placeResource', player: 0, square: 0 });
+    s = a(s, { t: 'build', player: 0, squares: [0, 1], card: 'well', target: 0 });
+    expect(() => a(s, { t: 'moveResource', player: 0, square: 8 })).toThrow(RuleError);
+  });
+
   it('belegte Felder und fehlendes Material werden abgelehnt', () => {
     let s = freshGame(2);
     s = a(s, { t: 'nameResource', resource: 'wood' });

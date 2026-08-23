@@ -50,6 +50,20 @@ describe('randomSetup', () => {
     expect(cfg.firstMasterBuilder).toBeLessThan(4);
   });
 
+  it('ordnet Spieler im Uhrzeigersinn (unten links → oben links → oben rechts → unten rechts)', () => {
+    const cfg = randomSetup(catalog, players, false, mulberry32(1));
+    expect(cfg.players.map((p) => p.corner)).toEqual([0, 3, 2, 1]);
+    expect(cfg.players.map((p) => p.name)).toEqual(['A', 'D', 'C', 'B']);
+
+    const two = randomSetup(
+      catalog,
+      [{ name: 'X', corner: 2 }, { name: 'Y', corner: 0 }],
+      false,
+      mulberry32(1)
+    );
+    expect(two.players.map((p) => p.name)).toEqual(['Y', 'X']);
+  });
+
   it('ist mit gleichem Seed reproduzierbar', () => {
     const a = randomSetup(catalog, players, true, mulberry32(7));
     const b = randomSetup(catalog, players, true, mulberry32(7));

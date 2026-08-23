@@ -138,6 +138,9 @@ export interface PlayerState {
   monument?: { card: string; built: boolean };
   /** Ausstehendes Material dieser Runde (null = bereits platziert). */
   pending?: Resource | null;
+  /** Feld des in dieser Runde platzierten, noch unbestätigten Materials —
+   *  bis zum „Fertig" darf es noch verschoben werden. */
+  placedSquare?: number | null;
   /** Runde beendet (nach Platzieren + optionalem Bauen). */
   roundDone: boolean;
   /** Stadt fertig — nimmt nicht mehr teil. */
@@ -188,6 +191,7 @@ export type Action =
   | { t: 'nameResource'; resource: Resource }
   | { t: 'factorySwap'; player: number; take: Resource }
   | { t: 'placeResource'; player: number; square: number }
+  | { t: 'moveResource'; player: number; square: number }
   | { t: 'warehouseStore'; player: number; square: number }
   | { t: 'warehouseSwap'; player: number; square: number; storedIndex: number }
   | { t: 'build'; player: number; squares: number[]; card: string; target: number }

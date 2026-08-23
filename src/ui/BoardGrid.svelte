@@ -8,12 +8,15 @@
     board,
     selected = [],
     highlights = [],
+    tentative = null,
     oncell
   }: {
     player: number;
     board: Square[];
     selected?: number[];
     highlights?: number[];
+    /** Unbestätigt platziertes Material (noch verschiebbar). */
+    tentative?: number | null;
     oncell?: (square: number) => void;
   } = $props();
 
@@ -29,6 +32,7 @@
       class="cell"
       class:selected={selected.includes(i)}
       class:highlight={highlights.includes(i)}
+      class:tentative={tentative === i}
       data-player={player}
       data-square={i}
       role="button"
@@ -85,6 +89,7 @@
     overflow: visible;
   }
   .cell.selected { outline: 3px solid var(--accent); outline-offset: -1px; z-index: 1; }
+  .cell.tentative { outline: 3px dashed var(--accent); outline-offset: -1px; z-index: 1; }
   .cell.highlight {
     outline: 3px dashed var(--ok);
     outline-offset: -1px;
