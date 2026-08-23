@@ -1,5 +1,6 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { clientId, Session, type GameBridge, type NetBridgeLike } from './session.svelte';
+import { loadSession, saveSession } from './sessionPersist';
 import { LoopbackNetwork } from './loopback';
 import { HIDDEN_MONUMENT } from './redact';
 import type { Seat } from './seats';
@@ -224,6 +225,78 @@ describe('Sitzung: Host und Gäste', () => {
     expect(host.session.seats[1].kind).toBe('local');
     expect(host.session.controls(1)).toBe(true);
     expect(host.session.controls(2)).toBe(false);
+  });
+
+  it('gibt einen Platz frei — ein neues Gerät bekommt ihn mitten im Spiel (QR-Handover)', async () => {
+    host.session.startGame(gameConfig());
+    // Anna verliert ihr Gerät — der Host gibt den Platz für ein neues frei
+    net.goOffline('g1');
+    host.session.releaseSeat(1);
+    expect(host.session.seats[1]).toMatchObject({ kind: 'remote', connected: false });
+    expect(host.session.seats[1].clientId).toBeUndefined();
+
+    const fresh = device();
+    await fresh.session.join('ABC234', 'Anna neu', factory('gNeu'), 'client-NEU');
+    expect(fresh.session.mySeat).toBe(1);
+    expect(fresh.session.status).toBe('playing'); // Spielstand kommt sofort mit
+    expect(fresh.game.state!.players[0].monumentOptions).toEqual([
+      HIDDEN_MONUMENT,
+      HIDDEN_MONUMENT
+    ]); // Geheimhaltung gilt auch für das neue Gerät
+  });
+
+  it('Freigabe des lokalen Platzes: mySeat folgt dem ersten lokalen Platz', () => {
+    expect(host.session.mySeat).toBe(0);
+    host.session.releaseSeat(0);
+    expect(host.session.mySeat).toBeNull();
+    expect(host.session.controls(0)).toBe(false);
+    host.session.takeOverSeat(0);
+    expect(host.session.mySeat).toBe(0);
+  });
+
+  it('Beitritts-Timeout behält die Sitzungs-Ablage — erst Verlassen räumt auf', async () => {
+    const data = new Map<string, string>();
+    vi.stubGlobal('location', { search: '' });
+    vi.stubGlobal('localStorage', {
+      getItem: (k: string) => data.get(k) ?? null,
+      setItem: (k: string, v: string) => void data.set(k, v),
+      removeItem: (k: string) => void data.delete(k)
+    });
+    try {
+      saveSession({ role: 'guest', code: 'QQQ234', name: 'X' }); // frühere Sitzung
+      const net2 = new LoopbackNetwork();
+      const d = device();
+      await d.session.join('QQQ234', 'X', async (_c, hd) => net2.connect('solo', hd), 'cx', 20);
+      await new Promise((r) => setTimeout(r, 60));
+      expect(d.session.role).toBe('off');
+      expect(loadSession()).toMatchObject({ code: 'QQQ234' }); // Reload kann es erneut versuchen
+      d.session.leave();
+      expect(loadSession()).toBeNull(); // bewusstes Verlassen räumt auf
+    } finally {
+      vi.unstubAllGlobals();
+    }
+  });
+
+  it('ruft während des Verbindens wiederholt hello (gegen verpasste Peer-Ereignisse)', async () => {
+    const net2 = new LoopbackNetwork();
+    const heard: Array<{ t: string }> = [];
+    net2.connect('witness', {
+      onMessage: (m) => heard.push(m as { t: string }),
+      onPeerJoin: () => {},
+      onPeerLeave: () => {}
+    });
+    const d = device();
+    vi.useFakeTimers();
+    try {
+      await d.session.join('QQQ234', 'X', async (_c, hd) => net2.connect('late', hd), 'cx', 60000);
+      const initial = heard.filter((m) => m.t === 'hello').length;
+      expect(initial).toBe(1); // einmal direkt über onPeerJoin
+      vi.advanceTimersByTime(9500);
+      expect(heard.filter((m) => m.t === 'hello').length).toBe(initial + 3); // alle 3 s erneut
+    } finally {
+      vi.useRealTimers();
+      d.session.leave();
+    }
   });
 
   it('übernimmt einen getrennten Platz mitten im Spiel — der alte Gast bleibt draußen', () => {

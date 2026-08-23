@@ -93,6 +93,8 @@ export class Session {
   /** Frist für den Beitritt: Ein Raum lässt sich auch ohne Host „betreten"
    *  (z. B. bei einem Tippfehler im Code) — dann darf es kein ewiges Warten geben. */
   private joinTimer: ReturnType<typeof setTimeout> | null = null;
+  /** Wiederholtes hello während des Verbindens (gegen verpasste Peer-Ereignisse). */
+  private helloTimer: ReturnType<typeof setInterval> | null = null;
   /** Transporte melden Peers teils schon, bevor die Fabrik zurückgekehrt ist —
    *  solche Ereignisse werden bis zur Einsatzbereitschaft zurückgestellt. */
   private ready = false;
@@ -218,7 +220,29 @@ export class Session {
     seat.peerId = undefined;
     seat.clientId = undefined;
     seat.connected = true;
+    this.refreshMySeat();
     this.sendLobby();
+  }
+
+  /**
+   * Host gibt einen Platz zur Übergabe per QR-Code frei: Er wird wieder zum
+   * Remote-Platz ohne Gerätebindung — das nächste Gerät, das dem Raum beitritt,
+   * bekommt ihn (auch mitten im Spiel, samt Spielstand).
+   */
+  releaseSeat(index: number): void {
+    if (this.role !== 'host') return;
+    const seat = this.seats[index];
+    if (!seat) return;
+    seat.kind = 'remote';
+    seat.peerId = undefined;
+    seat.clientId = undefined;
+    seat.connected = false;
+    this.refreshMySeat();
+    this.sendLobby();
+  }
+
+  private refreshMySeat(): void {
+    this.mySeat = this.seats.find((s) => s.kind === 'local')?.index ?? null;
   }
 
   // ---------------- Gast ----------------
@@ -228,7 +252,9 @@ export class Session {
     name: string,
     factory: TransportFactory,
     id: string = clientId(),
-    timeoutMs = 15000
+    // Echtes P2P braucht Signaling über Relays + ICE-Handshake — 15 s waren
+    // auf realen Geräten zu knapp und ließen den Wiederbeitritt scheitern.
+    timeoutMs = 30000
   ): Promise<void> {
     this.role = 'guest';
     this.status = 'connecting';
@@ -253,20 +279,32 @@ export class Session {
     } catch (e) {
       if (e instanceof ConnectAborted) return; // leave() kam zuvor — nichts zu melden
       // Aufbau gescheitert (Vermittlung nicht erreichbar o. Ä.): sauber zurück;
-      // die Meldung nach leave() setzen, weil leave() sie räumt.
-      this.leave();
+      // die Meldung nach leave() setzen, weil leave() sie räumt. Die Ablage
+      // bleibt bestehen, damit der nächste Versuch/Reload es erneut probiert.
+      this.leave({ keepStored: true });
       this.netError = e instanceof Error && e.message ? e.message : 'Verbindung fehlgeschlagen.';
       return;
     }
-    // Meldet sich binnen Frist kein Host (falscher Code, Host offline),
-    // wird der Beitritt abgebrochen statt ewig zu „verbinden".
-    this.clearJoinTimer();
+    this.clearJoinTimers();
     if (this.status !== 'connecting') return; // Host hat sich schon gemeldet
+    // Solange wir verbinden, regelmäßig hello rufen: Ein einzelnes, verpasstes
+    // Peer-Ereignis darf den Wiederbeitritt nicht stumm scheitern lassen.
+    this.helloTimer = setInterval(() => {
+      if (this.role === 'guest' && this.status === 'connecting') this.post({
+        t: 'hello',
+        clientId: this.myClientId,
+        name: this.myName,
+        protocolVersion: PROTOCOL_VERSION
+      });
+    }, 3000);
+    // Meldet sich binnen Frist kein Host (falscher Code, Host offline), wird
+    // abgebrochen statt ewig zu „verbinden" — die Ablage bleibt aber erhalten,
+    // damit ein erneuter Versuch (oder Reload) direkt wieder ansetzen kann.
     this.joinTimer = setTimeout(() => {
       this.joinTimer = null;
       if (this.role !== 'guest' || this.status !== 'connecting') return;
-      this.leave();
-      this.netError = 'Kein Host unter diesem Code erreichbar — Code prüfen und erneut versuchen.';
+      this.leave({ keepStored: true });
+      this.netError = 'Kein Host unter diesem Code erreichbar — Host-Gerät wecken und erneut versuchen.';
     }, timeoutMs);
   }
 
@@ -316,10 +354,12 @@ export class Session {
 
   // ---------------- gemeinsam ----------------
 
-  leave(): void {
+  leave(opts: { keepStored?: boolean } = {}): void {
     this.epoch++; // ein evtl. noch laufender Verbindungsaufbau gehört ab jetzt niemandem
-    this.clearJoinTimer();
-    clearSession();
+    this.clearJoinTimers();
+    // Ablage nur räumen, wenn der Nutzer wirklich geht — nach einem Timeout
+    // bleibt sie liegen, damit Reload/erneuter Versuch direkt weitermachen.
+    if (!opts.keepStored) clearSession();
     this.transport?.close();
     this.transport = null;
     this.hostPeer = null;
@@ -335,10 +375,14 @@ export class Session {
     this.bridge.onLocalApplied = null;
   }
 
-  private clearJoinTimer(): void {
+  private clearJoinTimers(): void {
     if (this.joinTimer !== null) {
       clearTimeout(this.joinTimer);
       this.joinTimer = null;
+    }
+    if (this.helloTimer !== null) {
+      clearInterval(this.helloTimer);
+      this.helloTimer = null;
     }
   }
 
@@ -477,7 +521,7 @@ export class Session {
     switch (raw.t) {
       case 'welcome':
         if (this.hostPeer !== null && !fromHost) return; // zweiter „Host" — ignorieren
-        this.clearJoinTimer();
+        this.clearJoinTimers();
         this.hostPeer = from;
         this.mySeat = raw.seat;
         // Ein welcome heißt: (neue) Host-Instanz — deren Versionszähler beginnt
@@ -489,7 +533,7 @@ export class Session {
         return;
       case 'reject':
         if (this.hostPeer !== null && !fromHost) return;
-        this.clearJoinTimer();
+        this.clearJoinTimers();
         this.hostPeer = null;
         this.status = 'error';
         this.netError = raw.reason;

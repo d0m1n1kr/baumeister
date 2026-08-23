@@ -124,6 +124,25 @@ try {
   await guest.locator('.banner').waitFor({ state: 'hidden', timeout: 20000 });
   console.log('✓ Host-Reload: Raum wiederhergestellt, Gast automatisch neu verbunden');
 
+  // QR-Handover: Host gibt seinen lokalen Platz frei — ein NEUES Gerät
+  // (frischer Tab = frische Kennung) bekommt ihn mitten im Spiel
+  await host.locator('.qrToggle').click();
+  await host.locator('.dialog button', { hasText: 'Per QR übergeben' }).click();
+  await host.locator('.dialog .state', { hasText: 'frei' }).waitFor({ timeout: 5000 });
+  await host.locator('.dialog button', { hasText: 'Schließen' }).click();
+
+  const fresh = await context.newPage();
+  fresh.on('pageerror', (e) => fail(`Neues-Gerät-Seitenfehler: ${e.message}`));
+  await fresh.goto(`${BASE_URL}#join=${code}`);
+  await fresh.locator('input[placeholder="Name"]').fill('Ben');
+  await fresh.locator('button', { hasText: 'Beitreten' }).click();
+  await fresh.locator('.solo').waitFor({ timeout: 15000 });
+  // Das neue Gerät sieht den laufenden Spielstand (Zug des ersten Gastes)
+  await fresh
+    .locator(`[data-player="${guestSeat}"][data-square="5"] .res`)
+    .waitFor({ timeout: 10000 });
+  console.log('✓ QR-Handover: neues Gerät übernimmt einen freigegebenen Platz im Spiel');
+
   console.log('Mehrgeräte-Smoke-Test bestanden.');
 } finally {
   await browser?.close();

@@ -120,6 +120,11 @@ export const t = {
   leaveRoom: 'Raum verlassen',
   hostStaysAwake: 'Dieses Gerät bitte entsperrt lassen — es führt die Partie.',
   reconnecting: 'Verbindung unterbrochen — versuche erneut …',
+  handoverTitle: 'Geräte & Plätze',
+  handoverHint: 'Code scannen und beitreten — ein freier Platz wird automatisch zugeteilt, auch mitten im Spiel.',
+  releaseSeat: 'Per QR übergeben',
+  releaseForNewDevice: 'Für neues Gerät freigeben',
+  seatFree: 'frei — wartet auf Gerät',
   myBoard: 'Mein Brett',
   tableView: 'Spieltisch',
 
