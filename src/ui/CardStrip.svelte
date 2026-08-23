@@ -6,6 +6,7 @@
   import { t } from '../i18n/de';
   import CardMini from './CardMini.svelte';
   import CardOverlay from './CardOverlay.svelte';
+  import { sfx } from './sound';
 
   let {
     onabort,
@@ -49,6 +50,7 @@
   const aliceOn = $derived(solo && alice);
 
   let overlay = $state<{ card: CardDef; rotation: number } | null>(null);
+  let soundOn = $state(sfx.enabled);
 
   function open(card: CardDef, e: PointerEvent) {
     // Am Spieltisch zum antippenden Spieler drehen (obere Hälfte = 180°);
@@ -61,6 +63,11 @@
   <div class="info">
     <span class="round">
       {t.round} {Math.max(1, st.round)}
+      <button
+        class="abort"
+        onpointerup={() => (soundOn = sfx.toggle())}
+        title={soundOn ? t.soundOff : t.soundOn}
+      >{soundOn ? '🔊' : '🔇'}</button>
       <button class="abort" onpointerup={() => onabort?.()} title={t.abortGame}>✕</button>
     </span>
     <span class="mb">👑 {st.players[st.masterBuilder].name}</span>

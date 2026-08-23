@@ -34,6 +34,11 @@ an den vier Ecken des Geräts, die 7 Gebäudekarten der Partie liegen in der Mit
     oder 6-stelligem Code bei — **ohne Server**, direkt von Gerät zu Gerät (WebRTC).
     Sitzplätze lassen sich mischen: einige Spieler am Host-Gerät, andere mit eigenem
     Handy. Monumente sind dabei erstmals wirklich geheim.
+- **Soundeffekte (abschaltbar):** warme Marimba-, Holz- und Glockenklänge —
+  komplett per Web Audio synthetisiert (keine Asset-Dateien, keine Lizenzfragen,
+  offline). Ansage, Platzieren (Tonhöhe je Material), Bauen, Monument-Glocke,
+  Münze, Baum, Fehlerton, „du bist dran" und Schluss-Fanfare; 🔊-Schalter in
+  der Kartenleiste, Wahl wird je Gerät gemerkt.
 - **Persistenz:** Autosave im `localStorage` nach jeder Aktion, „Weiterspielen“ nach Reload.
 - **PWA:** vollständig offline-fähig (alle Assets werden beim ersten Besuch
   precacht; Spiel-Logik und Spielstand liegen komplett im Client) — am iPad/Handy

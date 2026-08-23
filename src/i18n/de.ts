@@ -129,6 +129,9 @@ export const t = {
   myBoard: 'Mein Brett',
   tableView: 'Spieltisch',
 
+  soundOn: 'Ton einschalten',
+  soundOff: 'Ton ausschalten',
+
   helpButton: 'Kurzanleitung',
   help: {
     roundTitle: 'So läuft eine Runde',
