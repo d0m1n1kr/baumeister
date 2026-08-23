@@ -25,7 +25,7 @@
   }
 </script>
 
-<div class="strip" class:horizontal>
+<div class="strip" class:horizontal class:soloStrip={solo}>
   <div class="info">
     <span class="round">
       {t.round} {Math.max(1, st.round)}
@@ -126,4 +126,26 @@
     min-width: 0; /* Scroll-Container darf die Grid-Spalte nicht aufweiten */
   }
   .strip.horizontal .cardWrap { width: clamp(96px, 13vw, 130px); }
+
+  /* Solo-Ansicht am Handy (Hochformat): alle Karten auf einen Blick, kein Scrollen */
+  @media (max-width: 720px) and (orientation: portrait) {
+    .strip.soloStrip.horizontal { flex-direction: column; gap: 4px; padding: 4px 6px; }
+    .strip.soloStrip.horizontal .info {
+      flex-direction: row;
+      justify-content: center;
+      gap: 12px;
+      width: 100%;
+      border-right: none;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      padding: 0 0 3px;
+    }
+    .strip.soloStrip.horizontal .cards {
+      flex-wrap: wrap;
+      justify-content: center;
+      row-gap: 5px;
+      overflow: visible;
+      touch-action: auto;
+    }
+    .strip.soloStrip.horizontal .cardWrap { width: calc(25% - 5px); }
+  }
 </style>

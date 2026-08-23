@@ -2,7 +2,8 @@
   import { game } from '../store/gameStore.svelte';
   import { buildGameConfig } from '../store/newGameConfig';
   import { session } from '../net/session.svelte';
-  import { joinCodeFromUrl } from '../net';
+  import { joinCodeFromUrl, selectedTransport } from '../net';
+  import { clearSession, loadSession, restoreSeats } from '../net/sessionPersist';
   import { t } from '../i18n/de';
   import SetupScreen from './SetupScreen.svelte';
   import JoinScreen from './JoinScreen.svelte';
@@ -15,6 +16,39 @@
   let showResume = $state(game.hasSave());
   let joining = $state(joinCodeFromUrl() !== null);
   let setupError = $state('');
+
+  // Unterbrochene Mehrgeräte-Sitzung (Reload, iOS-Tab-Rauswurf) wieder aufnehmen.
+  const stored = loadSession();
+  if (stored?.role === 'guest' && stored.name) {
+    // Gast: nahtlos zurück in die Partie — der Host erkennt uns an der clientId.
+    joining = true;
+    void session.join(stored.code, stored.name, selectedTransport());
+  } else if (stored?.role === 'host' && !game.hasSave()) {
+    // Host-Reload noch in der Lobby: Raum mit denselben Plätzen wieder öffnen.
+    if (stored.setup) session.setup = stored.setup;
+    void session.openRoom(stored.code, restoreSeats(stored.seats ?? []), selectedTransport())
+      .catch((e) => (setupError = e instanceof Error ? e.message : String(e)));
+  }
+
+  /** „Weiterspielen": Spielstand laden und — falls Host einer Sitzung — den Raum
+   *  wieder öffnen; die Gäste verbinden sich dann von selbst neu. */
+  async function resumeGame() {
+    if (!game.resume()) {
+      showResume = false;
+      return;
+    }
+    if (stored?.role === 'host') {
+      if (stored.setup) session.setup = stored.setup;
+      try {
+        await session.openRoom(stored.code, restoreSeats(stored.seats ?? []), selectedTransport());
+        session.status = 'playing';
+        session.broadcastState();
+      } catch (e) {
+        // Ohne Netz läuft die Partie lokal weiter (alle Plätze bedienbar).
+        setupError = e instanceof Error ? e.message : String(e);
+      }
+    }
+  }
 
   /** Host startet aus der Lobby: Konfiguration aus den aktuellen Sitzplätzen bauen. */
   function startFromLobby() {
@@ -38,7 +72,7 @@
       <GameView />
     {/if}
   {:else}
-    <JoinScreen onback={() => (joining = false)} />
+    <JoinScreen initialCode={stored?.code} initialName={stored?.name} onback={() => (joining = false)} />
   {/if}
 {:else if session.role === 'host' && !game.state}
   <HostLobby onstart={startFromLobby} oncancel={() => session.leave()} />
@@ -50,15 +84,15 @@
     <GameView />
   {/if}
 {:else if joining}
-  <JoinScreen onback={() => (joining = false)} />
+  <JoinScreen initialCode={stored?.code} initialName={stored?.name} onback={() => (joining = false)} />
 {:else if showResume}
   <main class="resume">
     <h1>🏘 {t.appTitle}</h1>
     <div class="buttons">
-      <button class="primary big" onpointerup={() => { if (!game.resume()) showResume = false; }}>
+      <button class="primary big" onpointerup={resumeGame}>
         {t.resumeGame}
       </button>
-      <button class="big" onpointerup={() => { game.reset(); showResume = false; }}>{t.newGame}</button>
+      <button class="big" onpointerup={() => { game.reset(); clearSession(); showResume = false; }}>{t.newGame}</button>
     </div>
     <CreditsFooter />
   </main>

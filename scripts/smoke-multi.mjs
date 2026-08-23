@@ -104,6 +104,26 @@ try {
   if (after !== before) fail('Gast konnte ein fremdes Brett verändern');
   console.log('✓ Fremde Bretter sind für den Gast gesperrt');
 
+  // Gast lädt neu (iOS wirft Tabs im Hintergrund gern raus):
+  // automatischer Wiederbeitritt ohne Code-Eingabe, Zustand kommt zurück
+  await guest.reload();
+  await guest.locator('.solo').waitFor({ timeout: 15000 });
+  await guest
+    .locator(`[data-player="${guestSeat}"][data-square="5"] .res`)
+    .waitFor({ timeout: 10000 });
+  console.log('✓ Gast-Reload: automatisch zurück in der Partie');
+
+  // Host lädt neu: „Weiterspielen" stellt Partie UND Raum wieder her
+  await host.reload();
+  await host.locator('button', { hasText: 'Weiterspielen' }).click();
+  await host.locator('.table').waitFor({ timeout: 15000 });
+  await host
+    .locator(`[data-player="${guestSeat}"][data-square="5"] .res`)
+    .waitFor({ timeout: 10000 });
+  // Der Gast verbindet sich von selbst neu (Banner verschwindet wieder)
+  await guest.locator('.banner').waitFor({ state: 'hidden', timeout: 20000 });
+  console.log('✓ Host-Reload: Raum wiederhergestellt, Gast automatisch neu verbunden');
+
   console.log('Mehrgeräte-Smoke-Test bestanden.');
 } finally {
   await browser?.close();
