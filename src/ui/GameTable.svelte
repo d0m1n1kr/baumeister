@@ -10,17 +10,18 @@
 
   const st = $derived(game.state!);
   const twoPlayer = $derived(st.players.length === 2);
+  const single = $derived(st.players.length === 1);
   let confirmAbort = $state(false);
 </script>
 
-<div class="table" class:two={twoPlayer}>
+<div class="table" class:two={twoPlayer} class:single>
   {#each st.players as p, i}
-    <div class="slot" style="grid-area: {twoPlayer ? (p.corner >= 2 ? 'top' : 'bottom') : cornerArea(p.corner)}">
-      <PlayerCorner player={i} wide={twoPlayer} />
+    <div class="slot" style="grid-area: {single ? 'bottom' : twoPlayer ? (p.corner >= 2 ? 'top' : 'bottom') : cornerArea(p.corner)}">
+      <PlayerCorner player={i} wide={twoPlayer || single} solo={single} />
     </div>
   {/each}
   <div class="center">
-    <CardStrip horizontal={twoPlayer} onabort={() => (confirmAbort = true)} />
+    <CardStrip horizontal={twoPlayer || single} solo={single} onabort={() => (confirmAbort = true)} />
   </div>
 
   <!-- Geist-Chips für laufende Drags (unrotierte Tisch-Ebene) -->
@@ -59,6 +60,14 @@
     grid-template-rows: 1fr auto 1fr;
     grid-template-areas:
       'top'
+      'strip'
+      'bottom';
+  }
+  /* Solo: Kartenleiste oben, das eigene Brett darunter */
+  .table.single {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: auto 1fr;
+    grid-template-areas:
       'strip'
       'bottom';
   }

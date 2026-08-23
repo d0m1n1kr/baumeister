@@ -30,9 +30,13 @@ export function newGame(config: GameConfig): GameState {
     coins: 0,
     buildsThisRound: 0
   }));
+  // Solo: 3 Karten offen auslegen, der Rest ist der Nachziehstapel
+  const deck = config.solo && config.soloDeck ? [...config.soloDeck] : undefined;
   return {
     config,
     players,
+    soloOffer: deck ? deck.splice(0, 3) : undefined,
+    soloDeck: deck,
     phase: config.useMonuments
       ? { t: 'monumentDraft' }
       : config.systems.trees
@@ -81,6 +85,7 @@ function dispatchAction(s: GameState, action: Action, catalog: Catalog): GameSta
     case 'chooseMonument': return chooseMonument(s, action.player, action.card);
     case 'placeSeed': return placeSeed(s, action.player, action.square);
     case 'nameResource': return nameResource(s, action.resource, catalog);
+    case 'soloPick': return soloPick(s, action.index, catalog);
     case 'factorySwap': return factorySwap(s, action.player, action.take, catalog);
     case 'coinSwap': return coinSwap(s, action.player, action.take);
     case 'oddityStore': return oddityStore(s, action.player, action.square, catalog);
@@ -133,6 +138,23 @@ function placeSeed(s: GameState, player: number, square: number): GameState {
 }
 
 // ---------- Rundenablauf ----------
+
+/**
+ * Solo-Modus (offizielle Variante): Eines der 3 ausliegenden Materialien wählen.
+ * Die gewählte Karte wandert verdeckt unter den Stapel, von oben wird nachgezogen.
+ */
+function soloPick(s: GameState, index: number, catalog: Catalog): GameState {
+  if (!s.config.solo || !s.soloOffer || !s.soloDeck) fail('Kein Solo-Spiel');
+  const offer = s.soloOffer!;
+  const deck = s.soloDeck!;
+  const resource = offer[index] ?? fail('Ungültige Auswahl');
+  const next = nameResource(s, resource, catalog);
+  deck.push(resource); // gewählte Karte verdeckt nach unten …
+  const drawn = deck.shift(); // … und von oben nachziehen
+  if (drawn) offer[index] = drawn;
+  else offer.splice(index, 1);
+  return next;
+}
 
 function nameResource(s: GameState, resource: Resource, catalog: Catalog): GameState {
   if (s.phase.t !== 'nameResource') fail('Jetzt wird kein Material angesagt');
@@ -196,7 +218,8 @@ function factorySwap(s: GameState, player: number, take: Resource, catalog: Cata
   const named = requireRound(s);
   const p = activePlayer(s, player);
   if (p.pending !== named || p.pendingLocked) fail('Tausch nur vor dem Platzieren des angesagten Materials');
-  if (s.masterBuilder === player) fail('Die Fabrik wirkt nur bei fremder Ansage');
+  // Offizielle Solo-Regel: Fabrik & Co. gelten für die Wahl aus dem Deck
+  if (!s.config.solo && s.masterBuilder === player) fail('Die Fabrik wirkt nur bei fremder Ansage');
   const hasMatch = p.board.some(
     (sq) => sq.building?.marked === named && catalog[sq.building.card]?.effects?.includes('factory')
   );
@@ -211,7 +234,7 @@ function coinSwap(s: GameState, player: number, take: Resource): GameState {
   if (!s.config.systems.coins) fail('Münzen sind nicht im Spiel');
   const p = activePlayer(s, player);
   if (p.pending !== named || p.pendingLocked) fail('Tausch nur vor dem Platzieren des angesagten Materials');
-  if (s.masterBuilder === player) fail('Der Baumeister muss sein angesagtes Material nehmen');
+  if (!s.config.solo && s.masterBuilder === player) fail('Der Baumeister muss sein angesagtes Material nehmen');
   if (take === named) fail('Bitte ein anderes Material wählen');
   if (p.coins < 1) fail('Keine Münze in der Truhe');
   p.coins--;

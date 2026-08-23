@@ -3,6 +3,8 @@
   import { session } from '../net/session.svelte';
   import { catalog } from '../data';
   import { scoreGame } from '../engine/scoring';
+  import { soloRank } from '../engine/registry';
+  import { addHighscore, highscores, type HighscoreEntry } from '../store/highscore';
   import { t } from '../i18n/de';
 
   const st = $derived(game.state!);
@@ -29,11 +31,44 @@
   function lineFor(pi: number, card: string) {
     return scores[pi].lines.find((l) => l.card === card);
   }
+
+  // Solo: Rang bestimmen und Ergebnis genau EINMAL in die Bestenliste schreiben
+  const solo = $derived(!!st.config.solo);
+  const soloScore = $derived(scores[0]?.total ?? 0);
+  const rank = $derived(soloRank(soloScore));
+  let place = $state<number | null>(null);
+  let list = $state<HighscoreEntry[]>([]);
+  $effect(() => {
+    if (!solo) return;
+    const id = st.config.gameId ?? 'unbekannt';
+    try {
+      if (localStorage.getItem('tinytowns.hsRecorded') !== id) {
+        place = addHighscore({
+          score: soloScore,
+          rank,
+          date: new Date().toISOString().slice(0, 10),
+          dailyId: st.config.dailyId
+        });
+        localStorage.setItem('tinytowns.hsRecorded', id);
+      }
+    } catch {
+      // privater Modus — dann ohne Bestenliste
+    }
+    list = highscores();
+  });
 </script>
 
 <main>
   <h1>{t.scoreTitle}</h1>
-  <p class="winner">🏆 {t.winner}: <strong>{st.players[winnerIdx].name}</strong> ({scores[winnerIdx].total} Punkte)</p>
+  {#if solo}
+    <p class="winner">
+      🏆 {t.soloRankTitle}: <strong>{rank}</strong> ({soloScore} Punkte)
+      {#if st.config.dailyId}<span class="daily">📅 {t.soloDaily} {st.config.dailyId}</span>{/if}
+    </p>
+    {#if place}<p class="best">⭐ {t.soloNewBest.replace('{n}', String(place))}</p>{/if}
+  {:else}
+    <p class="winner">🏆 {t.winner}: <strong>{st.players[winnerIdx].name}</strong> ({scores[winnerIdx].total} Punkte)</p>
+  {/if}
   <div class="tableWrap">
     <table>
       <thead>
@@ -85,6 +120,20 @@
       </tbody>
     </table>
   </div>
+  {#if solo && list.length > 0}
+    <div class="hs">
+      <h2>{t.soloHighscores}</h2>
+      <ol>
+        {#each list.slice(0, 5) as e, i}
+          <li class:hit={place === i + 1}>
+            <strong>{e.score}</strong> — {e.rank}
+            <span class="hsMeta">{e.date}{e.dailyId ? ' · 📅' : ''}</span>
+          </li>
+        {/each}
+      </ol>
+    </div>
+  {/if}
+
   <button class="primary big" onpointerup={() => game.reset({ keepSave: session.role === 'guest' })}>{t.playAgain}</button>
 </main>
 
@@ -114,4 +163,11 @@
   .totals td { border-top: 2px solid rgba(255, 255, 255, 0.25); font-weight: 700; font-size: 16px; }
   .win { color: var(--accent); }
   .big { font-size: 16px; padding: 12px 22px; }
+  .daily { margin-left: 10px; font-size: 13px; color: var(--text-dim); }
+  .best { margin: 0; color: var(--ok); font-weight: 700; }
+  .hs { background: var(--bg-panel); border-radius: 12px; padding: 12px 18px; }
+  .hs h2 { margin: 0 0 6px; font-size: 14px; }
+  .hs ol { margin: 0; padding-left: 20px; display: flex; flex-direction: column; gap: 3px; font-size: 13px; }
+  .hs li.hit { color: var(--accent); }
+  .hsMeta { color: var(--text-dim); font-size: 11px; margin-left: 6px; }
 </style>

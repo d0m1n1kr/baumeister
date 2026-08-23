@@ -42,7 +42,7 @@ export function seatOfClient(seats: Seat[], clientId: string): Seat | undefined 
  * selbst; `nameResource` gilt implizit für den Baumeister.
  */
 export function actionAllowed(action: Action, seat: number, state: GameState): string | null {
-  if (action.t === 'nameResource') {
+  if (action.t === 'nameResource' || action.t === 'soloPick') {
     return state.masterBuilder === seat ? null : 'Nur der Baumeister sagt das Material an';
   }
   return action.player === seat ? null : 'Diese Aktion gehört zu einem anderen Spielplatz';

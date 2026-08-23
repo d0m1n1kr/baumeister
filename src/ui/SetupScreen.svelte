@@ -1,6 +1,6 @@
 <script lang="ts">
   import { game } from '../store/gameStore.svelte';
-  import { buildGameConfig } from '../store/newGameConfig';
+  import { buildGameConfig, todayId } from '../store/newGameConfig';
   import { SETS } from '../data/sets';
   import { sortPlayersClockwise } from '../engine/registry';
   import { session } from '../net/session.svelte';
@@ -14,6 +14,7 @@
   let { onjoin }: { onjoin: () => void } = $props();
 
   const DEFAULT_CORNERS: Record<number, number[]> = {
+    1: [0],
     2: [0, 2],
     3: [0, 1, 3],
     4: [0, 1, 2, 3]
@@ -26,6 +27,8 @@
   let cavernRule = $state(false);
   let chosenSets = $state<string[]>([]);
   let multiDevice = $state(false);
+  let daily = $state(false);
+  const solo = $derived(count === 1);
   let remote = $state([false, true, true, true]);
   let error = $state('');
   let busy = $state(false);
@@ -62,7 +65,12 @@
 
   function start() {
     try {
-      game.start(buildGameConfig(currentPlayers(), activeSets(), useMonuments, cavernRule));
+      game.start(
+        buildGameConfig(currentPlayers(), activeSets(), useMonuments, !solo && cavernRule, {
+          solo,
+          dailyId: solo && daily ? todayId() : undefined
+        })
+      );
     } catch (e) {
       error = e instanceof Error ? e.message : String(e);
     }
@@ -106,12 +114,28 @@
     <div class="field">
       <span class="label">{t.players}</span>
       <div class="seg">
-        {#each [2, 3, 4] as n}
+        {#each [1, 2, 3, 4] as n}
           <button class:primary={count === n} onpointerup={() => setCount(n)}>{n}</button>
         {/each}
       </div>
     </div>
 
+    {#if solo}
+      <!-- Offizielle Solo-Variante: Material aus dem Kartendeck -->
+      <div class="field modeRow">
+        <span class="label">{t.soloMode}</span>
+        <div class="seg">
+          <button class:primary={!daily} onpointerup={() => (daily = false)}>{t.soloFree}</button>
+          <button class:primary={daily} onpointerup={() => (daily = true)}>📅 {t.soloDaily}</button>
+        </div>
+      </div>
+      <p class="modeHint">
+        {#if daily}{t.soloDailyHint}{/if}
+        <button class="link helpLink" onpointerup={() => (showHelp = true)}>📖 {t.helpButton}</button>
+      </p>
+    {/if}
+
+    {#if !solo}
     <div class="field modeRow">
       <span class="label">{t.deviceMode}</span>
       <div class="seg">
@@ -127,6 +151,7 @@
       {multiDevice ? t.ownDevicesHint : t.oneDeviceHint}
       <button class="link helpLink" onpointerup={() => (showHelp = true)}>📖 {t.helpButton}</button>
     </p>
+    {/if}
 
     {#each Array.from({ length: count }) as _, i}
       <div class="field playerRow">
@@ -137,6 +162,7 @@
           maxlength="14"
           disabled={multiDevice && remote[i]}
         />
+        {#if !solo}
         <select
           value={corners[i]}
           onchange={(e) => setCorner(i, Number((e.currentTarget as HTMLSelectElement).value))}
@@ -145,6 +171,7 @@
             <option value={c}>{t.cornerNames[c]}</option>
           {/each}
         </select>
+        {/if}
         {#if multiDevice}
           <button
             class="deviceToggle"
@@ -162,11 +189,13 @@
       <span>{t.useMonuments}</span>
     </label>
 
-    <label class="field toggle">
-      <input type="checkbox" bind:checked={cavernRule} />
-      <span>{t.cavernRule}</span>
-      <span class="expDesc">{t.cavernRuleHint}</span>
-    </label>
+    {#if !solo}
+      <label class="field toggle">
+        <input type="checkbox" bind:checked={cavernRule} />
+        <span>{t.cavernRule}</span>
+        <span class="expDesc">{t.cavernRuleHint}</span>
+      </label>
+    {/if}
 
     <div class="expansions">
       <span class="expTitle">{t.expansions}</span>
@@ -196,7 +225,10 @@
 </main>
 
 {#if showHelp}
-  <HelpDialog mode={multiDevice ? 'host' : 'single'} onclose={() => (showHelp = false)} />
+  <HelpDialog
+    mode={solo ? 'solo' : multiDevice ? 'host' : 'single'}
+    onclose={() => (showHelp = false)}
+  />
 {/if}
 
 <style>

@@ -134,6 +134,16 @@ export const t = {
   myBoard: 'Mein Brett',
   tableView: 'Spieltisch',
 
+  soloMode: 'Solo',
+  soloOfferTitle: 'Wähle 1 der 3 ausliegenden Materialien',
+  soloDeckCount: (n: number) => `Nachziehstapel: ${n} Karten`,
+  soloDaily: 'Tages-Challenge',
+  soloDailyHint: 'Fester Zufall des Tages — weltweit dieselben Karten und Materialien. Vergleiche deine Punkte!',
+  soloFree: 'Freies Solo',
+  soloRankTitle: 'Dein Rang',
+  soloHighscores: 'Bestenliste (dieses Gerät)',
+  soloNewBest: 'Neuer Platz {n} in der Bestenliste!',
+
   soundOn: 'Ton einschalten',
   soundOff: 'Ton ausschalten',
 
@@ -160,6 +170,14 @@ export const t = {
       'Jeder Spieler legt zu Beginn einen Samen auf ein freies Feld seines Bretts.',
       'Wird der Samen überbaut, wählst du ein Gratis-Material und platzierst es sofort.',
       'Bleibt der Samen bis zum Schluss als letztes unbebautes Feld liegen, wächst er zum Baum: 2 Punkte.'
+    ],
+    soloTitle: 'Solo (offizielle Variante)',
+    soloSteps: [
+      '15 Material-Karten (3 je Sorte) sind gemischt, 3 liegen offen aus.',
+      'Jede Runde wählst du EINE der drei — die gewählte Karte wandert verdeckt unter den Stapel, von oben wird nachgezogen. Mitzählen lohnt sich!',
+      'Gasthaus, Bank, Fort Eisenkraut und Opaleyes Wacht sind aus dem Spiel; Fabrik & Co. wirken auf deine Deck-Wahl.',
+      'Am Ende zeigt die Wertung deinen Rang (bis „Meister-Architekt" ab 38 Punkten) und die Bestenliste dieses Geräts.',
+      'Tages-Challenge: fester Zufall des Tages — weltweit dieselben Karten. Vergleicht eure Punkte!'
     ],
     singleTitle: 'An einem Gerät',
     singleSteps: [
