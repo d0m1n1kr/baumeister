@@ -19,9 +19,9 @@
   /** Host startet aus der Lobby: Konfiguration aus den aktuellen Sitzplätzen bauen. */
   function startFromLobby() {
     const players = session.seats.map((s) => ({ name: s.name, corner: s.corner }));
-    const { sets, useMonuments } = session.setup;
+    const { sets, useMonuments, cavern } = session.setup;
     try {
-      session.startGame(buildGameConfig(players, sets, useMonuments));
+      session.startGame(buildGameConfig(players, sets, useMonuments, cavern));
     } catch (e) {
       setupError = e instanceof Error ? e.message : String(e);
     }

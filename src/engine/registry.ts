@@ -81,7 +81,7 @@ export function randomSetup(
   useMonuments: boolean,
   rng: Rng,
   sets: string[] = ['base'],
-  systems: { coins?: boolean; trees?: boolean } = {}
+  systems: { coins?: boolean; trees?: boolean; cavern?: boolean } = {}
 ): GameConfig {
   // Spielerreihenfolge = Sitzreihenfolge im Uhrzeigersinn, damit der
   // Baumeister im Uhrzeigersinn weiterwandert.
@@ -116,6 +116,10 @@ export function randomSetup(
     firstMasterBuilder: Math.floor(rng() * players.length),
     useMonuments,
     sets,
-    systems: { coins: systems.coins ?? false, trees: systems.trees ?? false }
+    systems: {
+      coins: systems.coins ?? false,
+      trees: systems.trees ?? false,
+      cavern: systems.cavern ?? false
+    }
   };
 }

@@ -10,10 +10,12 @@ import type { GameConfig } from '../engine/types';
 export function buildGameConfig(
   players: { name: string; corner: number }[],
   sets: string[],
-  useMonuments: boolean
+  useMonuments: boolean,
+  cavern = false
 ): GameConfig {
   return randomSetup(catalog, players, useMonuments, mulberry32(randomSeed()), sets, {
     coins: systemActive(sets, 'coins'),
-    trees: systemActive(sets, 'trees')
+    trees: systemActive(sets, 'trees'),
+    cavern
   });
 }

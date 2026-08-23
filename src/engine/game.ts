@@ -72,6 +72,7 @@ export function apply(state: GameState, action: Action, catalog: Catalog): GameS
     case 'resolvePromenade': return resolvePromenade(s, action.player, action.square);
     case 'resolveSeedBonus': return resolveSeedBonus(s, action.player, action.resource, action.square);
     case 'placeResource': return placeResource(s, action.player, action.square, catalog);
+    case 'cavern': return cavern(s, action.player);
     case 'moveResource': return moveResource(s, action.player, action.square, catalog);
     case 'warehouseStore': return warehouseStore(s, action.player, action.square, catalog);
     case 'warehouseSwap': return warehouseSwap(s, action.player, action.square, action.storedIndex, catalog);
@@ -232,6 +233,24 @@ function placeResource(s: GameState, player: number, square: number, catalog: Ca
     delete sq.coin;
     gainCoins(p, 1);
   }
+  return s;
+}
+
+/**
+ * Höhlen-Regel (offizielle Variante): Statt zu platzieren darf ein fremd
+ * angesagtes Material beiseitegelegt werden — höchstens 2-mal pro Partie.
+ * Es zählt am Ende weder Punkte noch Strafen; es ist schlicht weg.
+ */
+function cavern(s: GameState, player: number): GameState {
+  requireRound(s);
+  const p = activePlayer(s, player);
+  if (!s.config.systems.cavern) fail('Die Höhlen-Regel ist in dieser Partie nicht aktiv');
+  if (p.pending == null) fail('Kein Material zum Beiseitelegen');
+  if (s.masterBuilder === player) fail('Die eigene Ansage muss platziert werden');
+  if ((p.cavernUsed ?? 0) >= 2) fail('Die Höhle ist voll (höchstens 2 pro Partie)');
+  p.cavernUsed = (p.cavernUsed ?? 0) + 1;
+  consumePending(p); // ein evtl. Zusatz-Material (Semaphor) rückt regulär nach
+  p.placedSquare = null;
   return s;
 }
 

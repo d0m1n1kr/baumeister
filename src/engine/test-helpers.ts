@@ -15,7 +15,7 @@ export function config(
   activeCards: string[] = ACTIVE_DEFAULT,
   useMonuments = false,
   monumentDeals?: string[][],
-  systems: { coins?: boolean; trees?: boolean } = {}
+  systems: { coins?: boolean; trees?: boolean; cavern?: boolean } = {}
 ): GameConfig {
   return {
     players: Array.from({ length: n }, (_, i) => ({ name: `P${i + 1}`, corner: i })),
@@ -24,7 +24,11 @@ export function config(
     firstMasterBuilder: 0,
     useMonuments,
     sets: ['base'],
-    systems: { coins: systems.coins ?? false, trees: systems.trees ?? false }
+    systems: {
+      coins: systems.coins ?? false,
+      trees: systems.trees ?? false,
+      cavern: systems.cavern ?? false
+    }
   };
 }
 
@@ -33,7 +37,7 @@ export function freshGame(
   activeCards: string[] = ACTIVE_DEFAULT,
   useMonuments = false,
   monumentDeals?: string[][],
-  systems: { coins?: boolean; trees?: boolean } = {}
+  systems: { coins?: boolean; trees?: boolean; cavern?: boolean } = {}
 ): GameState {
   return newGame(config(n, activeCards, useMonuments, monumentDeals, systems));
 }

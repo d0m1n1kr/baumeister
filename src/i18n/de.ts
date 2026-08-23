@@ -84,6 +84,10 @@ export const t = {
   winner: 'Gewinner',
   playAgain: 'Neue Partie',
 
+  cavernRule: 'Höhlen-Regel',
+  cavernRuleHint: 'Bis zu 2 fremd angesagte Materialien pro Partie beiseitelegen (zählen am Ende nicht).',
+  cavernButton: 'In die Höhle',
+
   confirmAbort: 'Laufende Partie verwerfen?',
   abortGame: 'Partie beenden',
 
