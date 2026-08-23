@@ -27,6 +27,17 @@
     <ol>
       {#each t.help.roundSteps as step}<li>{step}</li>{/each}
     </ol>
+
+    <h4>{t.help.fortuneTitle}</h4>
+    <ol>
+      {#each t.help.fortuneSteps as step}<li>{step}</li>{/each}
+    </ol>
+
+    <h4>{t.help.treesTitle}</h4>
+    <ol>
+      {#each t.help.treesSteps as step}<li>{step}</li>{/each}
+    </ol>
+
     <p class="note">{t.help.cavernNote}</p>
 
     <button class="primary" onpointerup={onclose}>{t.close}</button>

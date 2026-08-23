@@ -139,6 +139,19 @@ export const t = {
       'Ist deine Stadt voll und nichts mehr baubar, erklärst du sie für fertig. Am Ende wertet die App automatisch.'
     ],
     cavernNote: 'Höhlen-Regel (falls im Setup aktiviert): 2× pro Partie darfst du ein fremd angesagtes Material in die Höhle legen statt es zu platzieren.',
+    fortuneTitle: 'Erweiterung: Fortune (Münzen)',
+    fortuneSteps: [
+      'Baust du in einer Runde 2 oder mehr Gebäude (mit Materialentfernen), erhältst du 1 Münze — die Truhe fasst höchstens 4.',
+      'Bei fremder Ansage kannst du 1 Münze zahlen und stattdessen ein beliebiges anderes Material nehmen (🪙-Knopf am Material-Chip).',
+      'Am Spielende ist jede Münze in der Truhe 1 Punkt wert.',
+      'Dazu kommen eigene Fortune-Gebäude und -Monumente mit Münz-Effekten; mit ⚠ markierte Karten sind nach bestem Wissen umgesetzt.'
+    ],
+    treesTitle: 'Erweiterung: Tiny Trees (Samen)',
+    treesSteps: [
+      'Jeder Spieler legt zu Beginn einen Samen auf ein freies Feld seines Bretts.',
+      'Wird der Samen überbaut, wählst du ein Gratis-Material und platzierst es sofort.',
+      'Bleibt der Samen bis zum Schluss als letztes unbebautes Feld liegen, wächst er zum Baum: 2 Punkte.'
+    ],
     singleTitle: 'An einem Gerät',
     singleSteps: [
       'Spieler, Namen und Ecken wählen — jede Ecke ist zum jeweiligen Spieler gedreht, alle spielen gleichzeitig.',
