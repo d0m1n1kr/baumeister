@@ -13,7 +13,9 @@ function fail(msg) {
   throw new Error(msg);
 }
 
-const server = spawn('npx', ['vite', 'preview', '--port', String(PORT), '--strictPort'], {
+// Direkt die Binärdatei starten (nicht über npx): sonst überlebt der
+// eigentliche Vite-Prozess das Beenden der Hülle und blockiert den Port.
+const server = spawn('node_modules/.bin/vite', ['preview', '--port', String(PORT), '--strictPort'], {
   cwd: new URL('..', import.meta.url).pathname,
   stdio: 'ignore'
 });

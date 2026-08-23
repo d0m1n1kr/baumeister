@@ -65,6 +65,16 @@ function shuffled<T>(arr: T[], rng: Rng): T[] {
 /** Ecken im Uhrzeigersinn (von oben betrachtet): unten links → oben links → oben rechts → unten rechts. */
 const CLOCKWISE_CORNERS = [0, 3, 2, 1];
 
+/**
+ * Spieler in Sitzreihenfolge (im Uhrzeigersinn) bringen. Die Reihenfolge legt die
+ * Spielerindizes fest — im Mehrgerätemodus müssen Sitzplätze dieselbe Ordnung nutzen.
+ */
+export function sortPlayersClockwise<T extends { corner: number }>(players: T[]): T[] {
+  return [...players].sort(
+    (a, b) => CLOCKWISE_CORNERS.indexOf(a.corner) - CLOCKWISE_CORNERS.indexOf(b.corner)
+  );
+}
+
 export function randomSetup(
   catalog: Catalog,
   playersInput: { name: string; corner: number }[],
@@ -75,9 +85,7 @@ export function randomSetup(
 ): GameConfig {
   // Spielerreihenfolge = Sitzreihenfolge im Uhrzeigersinn, damit der
   // Baumeister im Uhrzeigersinn weiterwandert.
-  const players = [...playersInput].sort(
-    (a, b) => CLOCKWISE_CORNERS.indexOf(a.corner) - CLOCKWISE_CORNERS.indexOf(b.corner)
-  );
+  const players = sortPlayersClockwise(playersInput);
   if (!sets.includes('base')) sets = ['base', ...sets];
   // Erweiterungskarten werden laut Anleitung einfach in die Stapel gemischt.
   const defs = Object.values(catalog).filter((d) => sets.includes(d.set));

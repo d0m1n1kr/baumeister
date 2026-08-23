@@ -2,8 +2,14 @@
   import { game } from '../store/gameStore.svelte';
   import { catalog } from '../data';
   import { SETS, systemActive } from '../data/sets';
-  import { mulberry32, randomSeed, randomSetup } from '../engine/registry';
+  import { mulberry32, randomSeed, randomSetup, sortPlayersClockwise } from '../engine/registry';
+  import { session } from '../net/session.svelte';
+  import { selectedTransport } from '../net';
+  import { makeRoomCode } from '../net/protocol';
+  import type { Seat } from '../net/seats';
   import { t } from '../i18n/de';
+
+  let { onjoin }: { onjoin: () => void } = $props();
 
   const DEFAULT_CORNERS: Record<number, number[]> = {
     2: [0, 2],
@@ -16,7 +22,10 @@
   let corners = $state([...DEFAULT_CORNERS[4]]);
   let useMonuments = $state(true);
   let chosenSets = $state<string[]>([]);
+  let multiDevice = $state(false);
+  let remote = $state([false, true, true, true]);
   let error = $state('');
+  let busy = $state(false);
 
   function toggleSet(id: string) {
     chosenSets = chosenSets.includes(id)
@@ -35,20 +44,62 @@
     corners[i] = corner;
   }
 
-  function start() {
-    const players = Array.from({ length: count }, (_, i) => ({
+  function currentPlayers() {
+    return Array.from({ length: count }, (_, i) => ({
       name: names[i].trim() || `Spieler ${i + 1}`,
-      corner: corners[i]
+      corner: corners[i],
+      remote: multiDevice && remote[i]
     }));
+  }
+
+  function activeSets() {
     const sets = ['base', ...chosenSets];
-    const systems = {
-      coins: systemActive(sets, 'coins'),
-      trees: systemActive(sets, 'trees')
+    return {
+      sets,
+      systems: { coins: systemActive(sets, 'coins'), trees: systemActive(sets, 'trees') }
     };
+  }
+
+  function start() {
+    const players = currentPlayers();
+    const { sets, systems } = activeSets();
     try {
-      game.start(randomSetup(catalog, players, useMonuments, mulberry32(randomSeed()), sets, systems));
+      game.start(
+        randomSetup(catalog, players, useMonuments, mulberry32(randomSeed()), sets, systems)
+      );
     } catch (e) {
       error = e instanceof Error ? e.message : String(e);
+    }
+  }
+
+  /**
+   * Mehrgerätemodus: Raum öffnen und auf Mitspieler warten. Die Sitzplätze werden
+   * schon hier in Uhrzeiger-Reihenfolge angelegt, damit ihre Indizes später exakt
+   * den Spielerindizes der Partie entsprechen.
+   */
+  async function openRoom() {
+    if (busy) return;
+    const seated = sortPlayersClockwise(currentPlayers());
+    if (!seated.some((p) => !p.remote)) {
+      error = 'Mindestens ein Platz muss an diesem Gerät bleiben.';
+      return;
+    }
+    const seats: Seat[] = seated.map((p, index) => ({
+      index,
+      name: p.remote ? '—' : p.name,
+      corner: p.corner,
+      kind: p.remote ? 'remote' : 'local',
+      connected: !p.remote
+    }));
+    busy = true;
+    error = '';
+    try {
+      session.setup = { sets: activeSets().sets, useMonuments };
+      await session.openRoom(makeRoomCode(), seats, selectedTransport());
+    } catch (e) {
+      error = e instanceof Error ? e.message : String(e);
+    } finally {
+      busy = false;
     }
   }
 </script>
@@ -65,9 +116,28 @@
       </div>
     </div>
 
+    <div class="field modeRow">
+      <span class="label">{t.deviceMode}</span>
+      <div class="seg">
+        <button class:primary={!multiDevice} onpointerup={() => (multiDevice = false)}>
+          {t.oneDevice}
+        </button>
+        <button class:primary={multiDevice} onpointerup={() => (multiDevice = true)}>
+          {t.ownDevices}
+        </button>
+      </div>
+    </div>
+    <p class="modeHint">{multiDevice ? t.ownDevicesHint : t.oneDeviceHint}</p>
+
     {#each Array.from({ length: count }) as _, i}
       <div class="field playerRow">
-        <input type="text" bind:value={names[i]} placeholder={`${t.playerName} ${i + 1}`} maxlength="14" />
+        <input
+          type="text"
+          bind:value={names[i]}
+          placeholder={`${t.playerName} ${i + 1}`}
+          maxlength="14"
+          disabled={multiDevice && remote[i]}
+        />
         <select
           value={corners[i]}
           onchange={(e) => setCorner(i, Number((e.currentTarget as HTMLSelectElement).value))}
@@ -76,6 +146,15 @@
             <option value={c}>{t.cornerNames[c]}</option>
           {/each}
         </select>
+        {#if multiDevice}
+          <button
+            class="deviceToggle"
+            class:remote={remote[i]}
+            onpointerup={() => (remote[i] = !remote[i])}
+          >
+            {remote[i] ? `📱 ${t.seatOwnDevice}` : `🏠 ${t.seatHere}`}
+          </button>
+        {/if}
       </div>
     {/each}
 
@@ -100,8 +179,14 @@
     </div>
 
     {#if error}<div class="error">{error}</div>{/if}
-    <button class="primary big" onpointerup={start}>{t.startGame}</button>
+    {#if multiDevice}
+      <button class="primary big" disabled={busy} onpointerup={openRoom}>{t.openRoom}</button>
+    {:else}
+      <button class="primary big" onpointerup={start}>{t.startGame}</button>
+    {/if}
   </section>
+
+  <button class="link" onpointerup={onjoin}>{t.joinTitle} →</button>
 </main>
 
 <style>
@@ -161,4 +246,17 @@
   .expDesc { font-size: 11px; color: var(--text-dim); line-height: 1.35; }
   .big { font-size: 17px; padding: 12px; margin-top: 6px; }
   .error { color: var(--danger); font-size: 13px; }
+  .modeRow { flex-wrap: wrap; }
+  .modeRow .seg button { width: auto; font-size: 13px; }
+  .modeHint { margin: -6px 0 0; font-size: 11px; color: var(--text-dim); line-height: 1.4; }
+  .deviceToggle { font-size: 11px; padding: 6px 8px; white-space: nowrap; }
+  .deviceToggle.remote { border-color: var(--accent); color: var(--accent); }
+  .playerRow input:disabled { opacity: 0.45; }
+  .link {
+    background: none;
+    border: none;
+    color: var(--text-dim);
+    font-size: 14px;
+    text-decoration: underline;
+  }
 </style>

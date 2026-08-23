@@ -58,6 +58,8 @@ export class Session {
   mySeat = $state<number | null>(null);
   roomCode = $state('');
   netError = $state('');
+  /** Vom Host beim Raumöffnen gewählte Partie-Optionen (Erweiterungen, Monumente). */
+  setup = $state<{ sets: string[]; useMonuments: boolean }>({ sets: ['base'], useMonuments: true });
 
   private transport: Transport | null = null;
   private hostPeer: PeerId | null = null;
@@ -73,6 +75,14 @@ export class Session {
   private later(fn: () => void): void {
     if (this.ready) fn();
     else this.queued.push(fn);
+  }
+
+  /**
+   * Alles wird als schlichtes JSON verschickt: Reaktive Zustände sind Proxys,
+   * die weder strukturiert geklont noch von Serialisierern verarbeitet werden können.
+   */
+  private post(msg: ClientMessage | HostMessage, target?: PeerId): void {
+    this.transport?.send(JSON.parse(JSON.stringify(msg)), target);
   }
 
   private async connect(code: string, factory: TransportFactory, handlers: {
@@ -149,12 +159,7 @@ export class Session {
     this.version++;
     for (const seat of this.seats) {
       if (seat.kind !== 'remote' || !seat.peerId) continue;
-      const msg: HostMessage = {
-        t: 'state',
-        state: redactFor(state, seat.index),
-        version: this.version
-      };
-      this.transport.send(msg, seat.peerId);
+      this.post({ t: 'state', state: redactFor(state, seat.index), version: this.version }, seat.peerId);
     }
   }
 
@@ -201,26 +206,38 @@ export class Session {
 
   sendAction(action: Action): void {
     if (!this.transport) return;
-    const msg: ClientMessage = { t: 'action', action };
-    this.transport.send(msg, this.hostPeer ?? undefined);
+    this.post({ t: 'action', action }, this.hostPeer ?? undefined);
+  }
+
+  /**
+   * Nach Rückkehr in den Vordergrund aufrufen. Unter iOS wird die App im
+   * Hintergrund angehalten und die Verbindung fällt weg — statt das zu
+   * verhindern (was nicht geht), wird der Zustand einfach neu geholt.
+   */
+  onResume(): void {
+    if (this.role === 'guest') this.requestResync();
+    else if (this.role === 'host') this.sendLobby();
+  }
+
+  /** Regelmäßiger Abgleich, falls ein Verbindungsverlust unbemerkt bleibt. */
+  startHeartbeat(intervalMs = 20000): () => void {
+    const timer = setInterval(() => this.onResume(), intervalMs);
+    return () => clearInterval(timer);
   }
 
   /** Nach Rückkehr aus dem Hintergrund den vollen Zustand nachladen. */
   requestResync(): void {
     if (this.role !== 'guest' || !this.transport) return;
     if (this.hostPeer) {
-      this.transport.send(
-        { t: 'resync', clientId: this.myClientId } satisfies ClientMessage,
-        this.hostPeer
-      );
+      this.post({ t: 'resync', clientId: this.myClientId }, this.hostPeer);
     } else {
       // Verbindung war weg: neu anmelden, der Host erkennt uns an der clientId
-      this.transport.send({
+      this.post({
         t: 'hello',
         clientId: this.myClientId,
         name: this.myName,
         protocolVersion: PROTOCOL_VERSION
-      } satisfies ClientMessage);
+      });
     }
   }
 
@@ -245,18 +262,19 @@ export class Session {
   // ---------------- Nachrichtenbehandlung ----------------
 
   private sendLobby(): void {
-    this.lobbySeats = toSeatInfo(this.seats);
-    this.transport?.send({ t: 'lobby', seats: this.lobbySeats } satisfies HostMessage);
+    const info = toSeatInfo(this.seats);
+    this.lobbySeats = info;
+    this.post({ t: 'lobby', seats: info });
   }
 
   private sendHello(peer: PeerId): void {
-    this.transport?.send(
+    this.post(
       {
         t: 'hello',
         clientId: this.myClientId,
         name: this.myName,
         protocolVersion: PROTOCOL_VERSION
-      } satisfies ClientMessage,
+      },
       peer
     );
   }
@@ -264,7 +282,7 @@ export class Session {
   private onClientMessage(raw: unknown, from: PeerId): void {
     const transport = this.transport;
     if (!transport || !isClientMessage(raw)) return;
-    const reply = (msg: HostMessage) => transport.send(msg, from);
+    const reply = (msg: HostMessage) => this.post(msg, from);
 
     switch (raw.t) {
       case 'hello': {

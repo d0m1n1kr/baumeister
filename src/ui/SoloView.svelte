@@ -1,0 +1,99 @@
+<script lang="ts">
+  import { game } from '../store/gameStore.svelte';
+  import { session } from '../net/session.svelte';
+  import { drags } from '../store/dragStore.svelte';
+  import { RESOURCE_CSS } from './helpers';
+  import { t } from '../i18n/de';
+  import PlayerCorner from './PlayerCorner.svelte';
+  import MiniBoard from './MiniBoard.svelte';
+  import CardStrip from './CardStrip.svelte';
+  import ConfirmDialog from './ConfirmDialog.svelte';
+
+  const st = $derived(game.state!);
+  /** Eigener Platz: beim Gast der zugewiesene, beim Host sein erster lokaler. */
+  const me = $derived(
+    session.mySeat ?? st.players.findIndex((_, i) => session.controls(i))
+  );
+  const others = $derived(st.players.map((_, i) => i).filter((i) => i !== me));
+
+  let confirmLeave = $state(false);
+</script>
+
+<div class="solo">
+  <div class="opponents">
+    {#each others as i}
+      <div class="slot"><MiniBoard player={i} /></div>
+    {/each}
+  </div>
+
+  <div class="strip">
+    <CardStrip horizontal onabort={() => (confirmLeave = true)} />
+  </div>
+
+  <div class="own">
+    <PlayerCorner player={me} wide solo />
+  </div>
+
+  {#if session.status === 'connecting'}
+    <div class="banner">{t.reconnecting}</div>
+  {/if}
+
+  {#each Object.values(drags) as d}
+    {#if d}
+      <div class="ghost" style="left: {d.x}px; top: {d.y}px; background: {RESOURCE_CSS[d.resource]}"></div>
+    {/if}
+  {/each}
+</div>
+
+{#if confirmLeave}
+  <ConfirmDialog
+    title={t.confirmAbort}
+    confirmLabel={t.leaveRoom}
+    danger
+    onconfirm={() => { confirmLeave = false; session.leave(); game.reset(); }}
+    oncancel={() => (confirmLeave = false)}
+  />
+{/if}
+
+<style>
+  .solo {
+    height: 100%;
+    display: grid;
+    grid-template-rows: auto auto 1fr;
+    overflow: hidden;
+    position: relative;
+  }
+  .opponents {
+    display: flex;
+    gap: 10px;
+    padding: 8px 10px 4px;
+    overflow-x: auto;
+    touch-action: pan-x;
+    min-width: 0;
+  }
+  .slot { width: clamp(84px, 22vw, 130px); flex-shrink: 0; }
+  .strip { min-width: 0; min-height: 0; }
+  .own { min-height: 0; overflow: hidden; }
+  .banner {
+    position: absolute;
+    top: 6px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: var(--danger);
+    font-size: 12px;
+    padding: 5px 12px;
+    border-radius: 999px;
+    z-index: 50;
+  }
+  .ghost {
+    position: fixed;
+    width: 52px;
+    height: 52px;
+    border-radius: 50%;
+    border: 3px solid #fff;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.6);
+    transform: translate(-50%, -50%);
+    pointer-events: none;
+    z-index: 90;
+  }
+</style>
