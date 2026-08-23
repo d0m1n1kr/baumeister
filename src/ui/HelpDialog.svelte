@@ -3,14 +3,16 @@
   // des gewählten Modus (ein Gerät / Host / Gast).
   import { t } from '../i18n/de';
 
-  let { mode, onclose }: { mode: 'single' | 'host' | 'guest'; onclose: () => void } = $props();
+  let { mode, onclose }: { mode: 'single' | 'host' | 'guest' | 'solo'; onclose: () => void } = $props();
 
   const section = $derived(
-    mode === 'single'
-      ? { title: t.help.singleTitle, steps: t.help.singleSteps }
-      : mode === 'host'
-        ? { title: t.help.hostTitle, steps: t.help.hostSteps }
-        : { title: t.help.guestTitle, steps: t.help.guestSteps }
+    mode === 'solo'
+      ? { title: t.help.soloTitle, steps: t.help.soloSteps }
+      : mode === 'single'
+        ? { title: t.help.singleTitle, steps: t.help.singleSteps }
+        : mode === 'host'
+          ? { title: t.help.hostTitle, steps: t.help.hostSteps }
+          : { title: t.help.guestTitle, steps: t.help.guestSteps }
   );
 </script>
 

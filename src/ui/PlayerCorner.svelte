@@ -332,7 +332,7 @@
 
   // ---------- Fabrik ----------
   const factoryAvailable = $derived(
-    inRound && !isMB && p.pending != null && p.pending === namedResource &&
+    inRound && (!isMB || st.config.solo) && p.pending != null && p.pending === namedResource &&
     p.board.some(
       (sq) => sq.building?.marked === namedResource &&
         (catalog[sq.building.card].effects ?? []).includes('factory')
@@ -421,7 +421,23 @@
         {#if oddityTargets.length > 0 && mode !== 'oddityPlace'}
           <button onpointerup={() => (oddityDialog = true)}>🛍 {t.oddityTakeTitle}</button>
         {/if}
-        <ResourcePicker disabled={bankBlocked} onpick={(r) => showError(game.dispatch({ t: 'nameResource', resource: r }))} />
+        {#if st.config.solo && st.soloOffer}
+          <!-- Solo: eines der 3 offen ausliegenden Materialien wählen -->
+          <span class="choiceTitle">{t.soloOfferTitle}</span>
+          <div class="picker offer">
+            {#each st.soloOffer as r, i}
+              <button
+                class="chip offerChip"
+                style="background: {RESOURCE_CSS[r]}"
+                title={t.resourceNames[r]}
+                onpointerup={() => showError(game.dispatch({ t: 'soloPick', index: i }))}
+              >{t.resourceNames[r]}</button>
+            {/each}
+          </div>
+          <span class="deckCount">{t.soloDeckCount(st.soloDeck?.length ?? 0)}</span>
+        {:else}
+          <ResourcePicker disabled={bankBlocked} onpick={(r) => showError(game.dispatch({ t: 'nameResource', resource: r }))} />
+        {/if}
       {/if}
 
       {#if inRound && !p.done}
@@ -443,7 +459,7 @@
             {#if factoryAvailable}
               <button onpointerup={() => (factoryDialog = true)}>⚙ {t.factorySwap}</button>
             {/if}
-            {#if coinsActive && !isMB && !p.pendingLocked && p.pending === namedResource && p.coins >= 1}
+            {#if coinsActive && (!isMB || st.config.solo) && !p.pendingLocked && p.pending === namedResource && p.coins >= 1}
               <button onpointerup={() => (coinDialog = true)}>🪙 {t.coinSwap}</button>
             {/if}
             {#if st.config.systems.cavern && !isMB && (p.cavernUsed ?? 0) < 2}
@@ -948,4 +964,16 @@
     .pickRow { flex-direction: column; }
   }
   .pickText { font-size: 12px; color: var(--text-dim); margin: 0; text-align: center; }
+  .offer { display: flex; gap: 10px; }
+  .offerChip {
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    border: 3px solid rgba(255, 255, 255, 0.75);
+    color: #1c2430;
+    font-size: 11px;
+    font-weight: 700;
+    padding: 0;
+  }
+  .deckCount { font-size: 11px; color: var(--text-dim); }
 </style>

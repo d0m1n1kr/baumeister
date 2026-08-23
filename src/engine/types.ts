@@ -223,6 +223,14 @@ export interface GameConfig {
   monumentDeals: string[][];
   firstMasterBuilder: number;
   useMonuments: boolean;
+  /** Solo-Modus (offizielle Variante): Material kommt aus einem Kartendeck. */
+  solo?: boolean;
+  /** Solo: gemischtes Material-Deck (15 Karten, 3 je Material), Index 0 = oben. */
+  soloDeck?: Resource[];
+  /** Tages-Challenge: Datum des festen Seeds (z. B. „2026-08-23"). */
+  dailyId?: string;
+  /** Eindeutige Partie-Kennung (Bestenliste: jede Partie zählt nur einmal). */
+  gameId?: string;
   /** Aktive Karten-Sets (enthält immer 'base'). */
   sets: string[];
   /** Aktive Zusatzsysteme (aus den gewählten Sets abgeleitet). */
@@ -233,6 +241,10 @@ export interface GameConfig {
 export const COIN_CAP = 4;
 
 export interface GameState {
+  /** Solo: verdeckter Nachziehstapel (Index 0 = oben). */
+  soloDeck?: Resource[];
+  /** Solo: die 3 offen ausliegenden Material-Karten. */
+  soloOffer?: Resource[];
   config: GameConfig;
   players: PlayerState[];
   phase: Phase;
@@ -247,6 +259,7 @@ export interface GameState {
 export type Action =
   | { t: 'chooseMonument'; player: number; card: string }
   | { t: 'nameResource'; resource: Resource }
+  | { t: 'soloPick'; index: number }
   | { t: 'factorySwap'; player: number; take: Resource }
   | { t: 'coinSwap'; player: number; take: Resource }
   | { t: 'placeResource'; player: number; square: number }

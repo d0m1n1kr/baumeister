@@ -1,6 +1,6 @@
 // Kartenkatalog: Validierung der JSON-Assets + zufälliges Partie-Setup.
 
-import type { CardDef, Catalog, Category, GameConfig } from './types';
+import type { CardDef, Catalog, Category, GameConfig, Resource } from './types';
 
 export const CATEGORY_ORDER: Category[] = [
   'cottage', 'food', 'well', 'chapel', 'theater', 'tavern', 'factory'
@@ -75,20 +75,28 @@ export function sortPlayersClockwise<T extends { corner: number }>(players: T[])
   );
 }
 
+/** Offizielle Solo-Regel: Karten, die sich auf Mitspieler beziehen, fliegen raus. */
+export const SOLO_EXCLUDED = ['inn', 'bank', 'fort_ironweed', 'opaleyes_watch'];
+
+const RESOURCES: Resource[] = ['wood', 'brick', 'stone', 'wheat', 'glass'];
+
 export function randomSetup(
   catalog: Catalog,
   playersInput: { name: string; corner: number }[],
   useMonuments: boolean,
   rng: Rng,
   sets: string[] = ['base'],
-  systems: { coins?: boolean; trees?: boolean; cavern?: boolean } = {}
+  systems: { coins?: boolean; trees?: boolean; cavern?: boolean } = {},
+  solo = false
 ): GameConfig {
   // Spielerreihenfolge = Sitzreihenfolge im Uhrzeigersinn, damit der
   // Baumeister im Uhrzeigersinn weiterwandert.
   const players = sortPlayersClockwise(playersInput);
   if (!sets.includes('base')) sets = ['base', ...sets];
   // Erweiterungskarten werden laut Anleitung einfach in die Stapel gemischt.
-  const defs = Object.values(catalog).filter((d) => sets.includes(d.set));
+  const defs = Object.values(catalog).filter(
+    (d) => sets.includes(d.set) && !(solo && SOLO_EXCLUDED.includes(d.id))
+  );
   const activeCards: string[] = [];
   for (const cat of CATEGORY_ORDER) {
     const pool = defs.filter((d) => d.kind !== 'monument' && d.category === cat);
@@ -115,6 +123,12 @@ export function randomSetup(
     monumentDeals,
     firstMasterBuilder: Math.floor(rng() * players.length),
     useMonuments,
+    solo,
+    // Solo: 15 Material-Karten (3 je Material) mischen — seedbar, also auch
+    // als Tages-Challenge für alle gleich.
+    soloDeck: solo
+      ? shuffled(RESOURCES.flatMap((r) => [r, r, r]), rng)
+      : undefined,
     sets,
     systems: {
       coins: systems.coins ?? false,
@@ -122,4 +136,25 @@ export function randomSetup(
       cavern: systems.cavern ?? false
     }
   };
+}
+
+/** Offizielle Solo-Rangtabelle (Anleitung). */
+export function soloRank(score: number): string {
+  if (score >= 38) return 'Meister-Architekt';
+  if (score >= 32) return 'Stadtplaner';
+  if (score >= 25) return 'Ingenieur';
+  if (score >= 18) return 'Zimmermann';
+  if (score >= 10) return 'Baulehrling';
+  return 'Angehender Architekt';
+}
+
+/** Deterministischer Seed für die Tages-Challenge: gleiches Datum = gleiche
+ *  Karten und gleiches Deck, weltweit. */
+export function dailySeed(dailyId: string): number {
+  let h = 2166136261;
+  for (const c of `tiny-towns-${dailyId}`) {
+    h ^= c.charCodeAt(0);
+    h = Math.imul(h, 16777619);
+  }
+  return h >>> 0;
 }
