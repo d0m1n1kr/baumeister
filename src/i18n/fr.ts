@@ -98,6 +98,7 @@ export const fr: Translation = {
 
   aliceMode: 'Mode Alice',
   aliceModeHint: 'Afficher toutes les cartes avec leur texte en permanence',
+  flipCards: 'Tourner les cartes pour le côté opposé',
 
   townHallMode: 'Mode Hôtel de ville',
   townHallModeHint: 'Sans maître bâtisseur : un paquet de ressources mène les manches ; chaque 3ᵉ manche, chacun choisit librement.',

@@ -98,6 +98,7 @@ export const de = {
 
   aliceMode: 'Alice-Modus',
   aliceModeHint: 'Alle Karten dauerhaft mit Beschreibung zeigen',
+  flipCards: 'Kartenauslage für die Gegenseite drehen',
 
   townHallMode: 'Rathaus-Modus',
   townHallModeHint: 'Ohne Baumeister: Ein Materialdeck bestimmt die Runden, jede 3. Runde wählt jeder frei.',

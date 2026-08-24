@@ -98,6 +98,7 @@ export const en: Translation = {
 
   aliceMode: 'Alice mode',
   aliceModeHint: 'Show all cards with their text permanently',
+  flipCards: 'Rotate the card display for the far side',
 
   townHallMode: 'Town Hall mode',
   townHallModeHint: 'No Master Builder: a resource deck drives the rounds; every 3rd round everyone chooses freely.',

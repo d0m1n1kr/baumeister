@@ -98,6 +98,7 @@ export const es: Translation = {
 
   aliceMode: 'Modo Alice',
   aliceModeHint: 'Mostrar todas las cartas con su texto permanentemente',
+  flipCards: 'Girar las cartas hacia el lado opuesto',
 
   townHallMode: 'Modo Ayuntamiento',
   townHallModeHint: 'Sin maestro constructor: un mazo de recursos dirige las rondas; cada 3.ª ronda todos eligen libremente.',

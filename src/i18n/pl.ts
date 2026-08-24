@@ -98,6 +98,7 @@ export const pl: Translation = {
 
   aliceMode: 'Tryb Alice',
   aliceModeHint: 'Pokazuj stale wszystkie karty z opisem',
+  flipCards: 'Obróć karty w stronę przeciwną',
 
   townHallMode: 'Tryb Ratusza',
   townHallModeHint: 'Bez mistrza budowniczego: talia surowców prowadzi rundy; co 3. rundę każdy wybiera dowolnie.',
