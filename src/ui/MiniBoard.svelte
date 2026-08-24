@@ -24,7 +24,7 @@
     <span class="name">{isMB ? (st.config.townHall ? '🏛 ' : '👑 ') : ''}{p.name}</span>
     {#if st.config.systems.coins}<span class="coins">🪙 {p.coins}</span>{/if}
   </header>
-  <BoardGrid player={player} board={p.board} rail={!!st.train} />
+  <BoardGrid player={player} board={p.board} />
   <footer>
     {#if p.done}{t.townComplete}
     {:else if offline}{t.disconnected}

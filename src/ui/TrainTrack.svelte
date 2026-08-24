@@ -1,51 +1,97 @@
 <script lang="ts">
-  // Eisenbahn: permanente Gleise am unteren (und oberen) Spielfeldrand mit
-  // Tunnelportalen an den Enden. Der Zug ist samt Beladung immer sichtbar —
-  // er parkt an der Stadt, bei der er gerade hält, und fährt beim Rundenwechsel
-  // sichtbar zur nächsten (durch die Tunnel, wenn er die Seite wechselt).
-  // Waggons hängen HINTER der Lok. Rein aus Zustands-Diffs abgeleitet.
+  // Eisenbahn: EINE durchgehende Strecke je Brettreihe, exakt auf Höhe der
+  // Brett-Unterkanten (aus dem echten Layout gemessen), vom linken bis zum
+  // rechten Bildschirmrand — mit Tunnelportalen an den Enden. Steht die
+  // vertikale Kartenleiste im Weg, fährt der Zug hinter ihr durch einen Tunnel.
+  // Der Zug (3 Waggons HINTER der Lok) ist samt Beladung immer sichtbar und
+  // parkt unter der Stadt, bei der er gerade hält. Rein aus Zustands-Diffs
+  // abgeleitet — identisch am Einzelgerät, beim Host und bei Gästen.
   import { game } from '../store/gameStore.svelte';
   import { catalog } from '../data';
   import { trainStopPlayer } from '../engine/game';
   import { RESOURCE_CSS } from './helpers';
   import { sfx } from './sound';
 
-  let {
-    /** Einzelansicht (Gast/Handy): nur die eigene Stadt liegt an der Strecke. */
-    focus = null
-  }: { focus?: number | null } = $props();
-
   const st = $derived(game.state);
 
-  type Spot = { edge: 'bottom' | 'top'; x: number };
-
-  const topUsed = $derived(
-    focus == null && (st?.players.some((p) => p.corner >= 2) ?? false)
-  );
-
-  /** Parkposition einer Rundkurs-Position in Bildschirmkoordinaten. */
-  function slotFor(pos: number): Spot | null {
-    if (!st || pos >= st.players.length) return null; // Tunnel-Segment
-    if (focus != null) return pos === focus ? { edge: 'bottom', x: 50 } : null;
-    const c = st.players[pos].corner;
-    return (
-      [
-        { edge: 'bottom', x: 28 }, { edge: 'bottom', x: 72 },
-        { edge: 'top', x: 72 }, { edge: 'top', x: 28 }
-      ] as Spot[]
-    )[c] ?? { edge: 'bottom', x: 50 };
+  type Edge = 'bottom' | 'top';
+  type Spot = { edge: Edge; x: number };
+  interface Layout {
+    /** y-Position (px) der Strecke je Brettreihe (nur vorhandene Reihen). */
+    tracks: Partial<Record<Edge, number>>;
+    /** Parkposition je Spieler: unter der Mitte seines Bretts. */
+    slots: Record<number, Spot>;
+    /** Vertikale Kartenleiste: x-Bereich (%) — dort fährt der Zug durch den Tunnel. */
+    strip: { l: number; r: number } | null;
   }
 
+  // ---------- Layout aus dem DOM messen ----------
+  // Bretter markieren sich per data-track={player} (nur die großen Bretter der
+  // Spielerecken, keine Mini-Bretter). Gemessen wird beim Start, bei Resize,
+  // vor jeder Fahrt und periodisch (Ansichtswechsel Host ↔ Einzelansicht).
+  let layout = $state<Layout | null>(null);
+
+  function measure(): void {
+    if (typeof document === 'undefined') return;
+    const els = document.querySelectorAll<HTMLElement>('[data-track]');
+    if (els.length === 0) {
+      layout = null;
+      return;
+    }
+    const vw = window.innerWidth;
+    const vh = window.innerHeight;
+    const rows: Record<Edge, number[]> = { bottom: [], top: [] };
+    const slots: Record<number, Spot> = {};
+    for (const el of els) {
+      const r = el.getBoundingClientRect();
+      if (r.width === 0) continue;
+      // Obere Bretter sind zur Gegenseite gedreht — ihre „Unterkante" liegt
+      // in Bildschirmkoordinaten oben.
+      const edge: Edge = r.top + r.height / 2 < vh / 2 ? 'top' : 'bottom';
+      rows[edge].push(edge === 'top' ? r.top : r.bottom);
+      slots[Number(el.dataset.track)] = { edge, x: ((r.left + r.width / 2) / vw) * 100 };
+    }
+    const tracks: Partial<Record<Edge, number>> = {};
+    for (const edge of ['bottom', 'top'] as Edge[]) {
+      if (rows[edge].length) {
+        tracks[edge] = rows[edge].reduce((a, b) => a + b, 0) / rows[edge].length;
+      }
+    }
+    // Vertikale Kartenleiste als Hindernis (die horizontale liegt nie im Weg)
+    let strip: Layout['strip'] = null;
+    const stripEl = document.querySelector('.strip:not(.horizontal)');
+    if (stripEl) {
+      const r = stripEl.getBoundingClientRect();
+      if (r.height > r.width) strip = { l: (r.left / vw) * 100, r: (r.right / vw) * 100 };
+    }
+    layout = { tracks, slots, strip };
+  }
+
+  $effect(() => {
+    measure();
+    window.addEventListener('resize', measure);
+    // Ansichtswechsel (Tisch ↔ Einzelansicht) ändern das Layout ohne Resize
+    const timer = setInterval(measure, 2000);
+    return () => {
+      window.removeEventListener('resize', measure);
+      clearInterval(timer);
+    };
+  });
+
+  function slotFor(pos: number): Spot | null {
+    if (!st || pos >= st.players.length) return null; // Tunnel-Segment
+    return layout?.slots[pos] ?? null; // ungemessene Stadt (z. B. Einzelansicht)
+  }
+
+  // ---------- Fahrt ----------
   const reduceMotion =
     typeof matchMedia !== 'undefined' && matchMedia('(prefers-reduced-motion: reduce)').matches;
 
   // Fahrtrichtung ist immer „vorwärts": unten links → rechts, oben rechts → links.
-  const EXIT_X = { bottom: 112, top: -12 } as const;
-  const ENTRY_X = { bottom: -12, top: 112 } as const;
+  const EXIT_X = { bottom: 106, top: -6 } as const;
+  const ENTRY_X = { bottom: -6, top: 106 } as const;
 
-  let anim = $state<{ edge: 'bottom' | 'top'; x: number; dur: number; shown: boolean }>({
-    edge: 'bottom', x: 50, dur: 0, shown: false
-  });
+  let driving = $state<{ edge: Edge; x: number; dur: number; shown: boolean } | null>(null);
   let runId = 0;
   const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
   const legDur = (from: number, to: number) => Math.max(400, Math.abs(to - from) * 22);
@@ -54,40 +100,44 @@
     const my = ++runId;
     sfx.play('trainMove');
     if (reduceMotion) {
-      anim = to
-        ? { edge: to.edge, x: to.x, dur: 0, shown: true }
-        : { ...anim, shown: false };
       if (horn) sfx.play('trainHorn');
-      return;
+      return; // geparkte Position folgt direkt aus dem Zustand
     }
-    // 1) Direktfahrt, wenn Ziel in Fahrtrichtung auf derselben Strecke liegt
     if (from && to && from.edge === to.edge &&
         (from.edge === 'bottom' ? to.x > from.x : to.x < from.x)) {
-      anim = { edge: to.edge, x: to.x, dur: legDur(from.x, to.x), shown: true };
-      await sleep(anim.dur);
+      // Direktfahrt auf derselben Strecke
+      driving = { edge: from.edge, x: from.x, dur: 0, shown: true };
+      await sleep(30);
+      if (my !== runId) return;
+      driving = { edge: to.edge, x: to.x, dur: legDur(from.x, to.x), shown: true };
+      await sleep(driving.dur);
     } else {
-      // 2) In den vorderen Tunnel ausfahren …
+      // In den vorderen Tunnel ausfahren …
       if (from) {
         const exit = EXIT_X[from.edge];
-        anim = { edge: from.edge, x: exit, dur: legDur(from.x, exit), shown: true };
-        await sleep(anim.dur);
+        driving = { edge: from.edge, x: from.x, dur: 0, shown: true };
+        await sleep(30);
         if (my !== runId) return;
-        anim = { ...anim, shown: false };
+        driving = { edge: from.edge, x: exit, dur: legDur(from.x, exit), shown: true };
+        await sleep(driving.dur);
+        if (my !== runId) return;
+        driving = { ...driving, shown: false };
         await sleep(350);
       }
       if (my !== runId) return;
-      // 3) … und aus dem Einfahrtstunnel der Zielstrecke wieder herein
+      // … und aus dem Einfahrtstunnel der Zielstrecke wieder herein
       if (to) {
         const entry = ENTRY_X[to.edge];
-        anim = { edge: to.edge, x: entry, dur: 0, shown: false };
-        await sleep(30); // Teleport rendern lassen, dann sichtbar losfahren
+        driving = { edge: to.edge, x: entry, dur: 0, shown: false };
+        await sleep(30);
         if (my !== runId) return;
-        anim = { edge: to.edge, x: to.x, dur: legDur(entry, to.x), shown: true };
-        await sleep(anim.dur);
+        driving = { edge: to.edge, x: to.x, dur: legDur(entry, to.x), shown: true };
+        await sleep(driving.dur);
       }
     }
     if (my !== runId) return;
     if (horn && to) sfx.play('trainHorn');
+    driving = null; // ab jetzt wieder an der Parkposition aus dem Zustand
   }
 
   let prevPos: number | null = null;
@@ -95,30 +145,70 @@
     const pos = st?.train?.pos ?? null;
     const prev = prevPos;
     prevPos = pos;
-    if (st == null || pos == null) return;
-    if (prev == null) {
-      // Mount/Reload: ohne Fahrt an die aktuelle Position stellen
-      const spot = slotFor(pos);
-      anim = spot
-        ? { edge: spot.edge, x: spot.x, dur: 0, shown: true }
-        : { ...anim, shown: false };
+    if (st == null || pos == null || prev == null || pos === prev) return;
+    measure(); // frische Koordinaten für Start und Ziel
+    void drive(slotFor(prev), slotFor(pos), trainStopPlayer(st, catalog) != null);
+  });
+
+  // Anzeigeposition: während der Fahrt animiert, sonst geparkt an der Stadt
+  const spot = $derived.by(() => {
+    if (driving) return driving;
+    const s = st?.train ? slotFor(st.train.pos) : null;
+    return s ? { ...s, dur: 0, shown: true } : null;
+  });
+  const trackY = $derived(spot ? layout?.tracks[spot.edge] : undefined);
+
+  const trackList = $derived(
+    (['bottom', 'top'] as Edge[]).flatMap((e) => {
+      const y = layout?.tracks[e];
+      return y != null ? [{ edge: e, y }] : [];
+    })
+  );
+
+  // Hinter der Kartenleiste (Tunnel): Zug während der Fahrt ausblenden,
+  // solange er den Leisten-Bereich kreuzt — per rAF an der echten Position.
+  let trainEl = $state<HTMLElement | null>(null);
+  let inStrip = $state(false);
+  $effect(() => {
+    if (!driving) {
+      inStrip = false;
       return;
     }
-    if (pos === prev) return;
-    void drive(slotFor(prev), slotFor(pos), trainStopPlayer(st, catalog) != null);
+    let raf = 0;
+    const step = () => {
+      const s = layout?.strip;
+      if (s && trainEl) {
+        const r = trainEl.getBoundingClientRect();
+        const cx = (((r.left + r.right) / 2) / window.innerWidth) * 100;
+        inStrip = cx > s.l - 1.5 && cx < s.r + 1.5;
+      }
+      raf = requestAnimationFrame(step);
+    };
+    raf = requestAnimationFrame(step);
+    return () => cancelAnimationFrame(raf);
   });
 </script>
 
 <div class="layer" aria-hidden="true">
-  <div class="track bottom"></div>
-  {#if topUsed}<div class="track top"></div>{/if}
+  {#each trackList as tr (tr.edge)}
+    <div class="track" style="top: {tr.y - 5}px"></div>
+    <div class="tunnel left" class:up={tr.edge === 'top'} style="top: {tr.y - 20}px"></div>
+    <div class="tunnel right" class:up={tr.edge === 'top'} style="top: {tr.y - 20}px"></div>
+    {#if layout?.strip}
+      {@const strip = layout.strip}
+      <!-- Tunnelportale an der Kartenleiste: der Zug fährt hinter ihr durch -->
+      <div class="portal" style="left: calc({strip.l}% - 7px); top: {tr.y - 17}px"></div>
+      <div class="portal" style="left: calc({strip.r}% - 7px); top: {tr.y - 17}px"></div>
+    {/if}
+  {/each}
 
-  {#if st?.train}
+  {#if st?.train && spot && trackY != null}
     <div
       class="train"
-      class:onTop={anim.edge === 'top'}
-      class:hiddenTrain={!anim.shown}
-      style="left: {anim.x}%; transition-duration: {anim.dur}ms"
+      class:onTop={spot.edge === 'top'}
+      class:hiddenTrain={!spot.shown || inStrip}
+      style="left: {spot.x}%; top: {trackY}px; transition-duration: {spot.dur}ms"
+      bind:this={trainEl}
     >
       <!-- Waggons hängen hinter der Lok (Fahrtrichtung: Lok vorn rechts) -->
       {#each [...st.train.wagons].reverse() as w}
@@ -129,13 +219,6 @@
       <span class="loco">🚂</span>
     </div>
   {/if}
-
-  <div class="tunnel bottom left"></div>
-  <div class="tunnel bottom right"></div>
-  {#if topUsed}
-    <div class="tunnel top left"></div>
-    <div class="tunnel top right"></div>
-  {/if}
 </div>
 
 <style>
@@ -145,7 +228,7 @@
     pointer-events: none;
     z-index: 60;
   }
-  /* Gleisbett: zwei Schienen + Schwellen */
+  /* Gleisbett: zwei Schienen + Schwellen, exakt an der Brett-Unterkante */
   .track {
     position: absolute;
     left: 0;
@@ -154,22 +237,22 @@
     background:
       repeating-linear-gradient(90deg, #55483a 0 4px, transparent 4px 14px) center / 100% 10px,
       linear-gradient(#0000 0 2px, #8d8478 2px 3.5px, #0000 3.5px 6.5px, #8d8478 6.5px 8px, #0000 8px);
-    opacity: 0.85;
+    opacity: 0.8;
   }
-  .track.bottom { bottom: 2px; }
-  .track.top { top: 2px; }
 
   .train {
     position: absolute;
     display: flex;
     align-items: flex-end;
     gap: 3px;
-    translate: -50% 0;
+    /* Ankerpunkt: Räder auf der Gleislinie (inline top = Brettkante) */
+    translate: -50% calc(-100% + 9px);
     transition: left 0ms linear;
     z-index: 1;
   }
-  .train { bottom: 9px; }
-  .train.onTop { bottom: auto; top: 9px; rotate: 180deg; }
+  /* Obere Bretter: Zug um 180° gedreht (für die Gegenseite aufrecht) — die
+     Räder liegen nach der Drehung an der Box-Oberkante, also Box an die Linie */
+  .train.onTop { rotate: 180deg; translate: -50% -9px; }
   .hiddenTrain { visibility: hidden; }
   .loco { font-size: 30px; line-height: 1; transform: scaleX(-1); }
   .car {
@@ -189,17 +272,28 @@
     border: 1.5px solid rgba(0, 0, 0, 0.4);
   }
 
-  /* Tunnelportale: der Zug verschwindet in ihnen (liegen über dem Zug) */
+  /* Tunnelportale an den Bildschirmrändern (liegen über dem Zug) */
   .tunnel {
     position: absolute;
-    width: 42px;
-    height: 46px;
+    width: 40px;
+    height: 40px;
     background: #2c3a4d;
     border: 3px solid #46586f;
+    border-radius: 22px 22px 6px 6px;
     z-index: 2;
   }
-  .tunnel.bottom { bottom: 0; border-bottom: none; border-radius: 24px 24px 0 0; }
-  .tunnel.top { top: 0; border-top: none; border-radius: 0 0 24px 24px; }
-  .tunnel.left { left: -6px; }
-  .tunnel.right { right: -6px; }
+  .tunnel.up { border-radius: 6px 6px 22px 22px; }
+  .tunnel.left { left: -8px; }
+  .tunnel.right { right: -8px; }
+
+  /* Tunnelportale an der Kartenleiste (schmale Torbögen) */
+  .portal {
+    position: absolute;
+    width: 14px;
+    height: 34px;
+    background: #2c3a4d;
+    border: 3px solid #46586f;
+    border-radius: 10px 10px 4px 4px;
+    z-index: 2;
+  }
 </style>

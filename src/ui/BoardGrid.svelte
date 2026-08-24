@@ -24,7 +24,8 @@
     tentative?: number | null;
     /** Tiny Trees: Feld mit Samen. */
     seed?: number | null;
-    /** Eisenbahn: Gleis-Markierung an der Unterkante (dort darf der Bahnhof hin). */
+    /** Eisenbahn: dieses Brett liegt an der Strecke — TrainTrack misst seine
+     *  Unterkante als Gleishöhe (nur die großen Bretter, keine Mini-Bretter). */
     rail?: boolean;
     oncell?: (square: number) => void;
   } = $props();
@@ -91,7 +92,7 @@
   });
 </script>
 
-<div class="board">
+<div class="board" data-track={rail ? player : undefined}>
   {#each board as sq, i}
     {@const def = cardOf(sq)}
     <div
@@ -137,7 +138,6 @@
       {#if seed === i && !sq.building}<span class="seedMark">🌱</span>{/if}
     </div>
   {/each}
-  {#if rail}<div class="railEdge"></div>{/if}
   {#each ghosts as g (g.id)}
     <span
       class="ghost"
@@ -224,20 +224,6 @@
   @keyframes ghostFly {
     to { translate: var(--dx) var(--dy); scale: 0.3; opacity: 0.1; }
   }
-  /* Eisenbahn: Gleis an der Unterkante — an dieser Reihe liegt die Strecke */
-  .railEdge {
-    position: absolute;
-    left: 8%;
-    right: 8%;
-    bottom: -1px;
-    height: 7px;
-    pointer-events: none;
-    background:
-      repeating-linear-gradient(90deg, #55483a 0 3px, transparent 3px 11px) center / 100% 7px,
-      linear-gradient(#0000 0 1px, #8d8478 1px 2.5px, #0000 2.5px 4.5px, #8d8478 4.5px 6px, #0000 6px);
-    opacity: 0.9;
-  }
-
   @media (prefers-reduced-motion: reduce) {
     .ghost { display: none; }
     .building.justBuilt, .building.justBuilt.gold { animation: none; }
