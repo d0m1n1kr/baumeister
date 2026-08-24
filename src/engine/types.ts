@@ -60,7 +60,8 @@ export type ScoreHandlerId =
   | 'shrine'         // Tabelle nach Gebäudezahl zum Bauzeitpunkt
   | 'starloom'       // Punkte nach Fertigstellungs-Reihenfolge
   | 'schoolhouse'    // Fortune: 2 SP bei gefütterter Nachbar-Hütte, +2 bei Münzen ≥ rechter Nachbar
-  | 'eraflage';      // Fortune (unverifiziert): Basis −2 SP je Gebäudetyp in Zeile ∪ Spalte
+  | 'eraflage'       // Fortune: 9 SP wenn gefüttert, −2 SP je Gebäudetyp in Zeile ∪ Spalte
+  | 'hollowHill';    // Fortune: 7 SP, −2 je Münztausch nach dem Bau
 
 /** Spiellogik-Effekte, implementiert in effects.ts / game.ts. */
 export type EffectId =
@@ -80,7 +81,6 @@ export type EffectId =
   | 'barrettCastle'      // zählt als 2 (gefütterte) Hütten für alle Wertungen
   // ---------- Fortune ----------
   | 'coinOnConstruct'    // Bau: +1 Münze (Mine, Root Cellar)
-  | 'coinOnConstruct2'   // Bau: +2 Münzen (Treasury, best effort)
   | 'statueCoins'        // Bau: +1 Münze je Gebäudetyp mit 3+ Exemplaren
   | 'gamblersDen'        // Bau: +2 Münzen bei genau 1 Münze
   | 'teahouseCoins'      // Bau: +1 Münze je Typ in Zeile ODER Spalte (max 3)
@@ -89,13 +89,18 @@ export type EffectId =
   | 'constructCost2'     // Bau kostet 2 Münzen (Pflicht)
   | 'coinValue2'         // Endwertung: Münzen 2 statt 1 SP (Estival Festival)
   | 'masonsGuild'        // Bau: je 1 Münze → 1 weiteres (einzigartiges) Gebäude
-  | 'oddityShop'         // hält 1 fremd angesagtes Material; MB-Zugriff gegen Münze
-  | 'museum'             // lagert Material; 1×/Runde 1 zurückgeben → +1 Münze
-  | 'cathedralTransform' // Bau: 3 Münzen zahlen, sonst wird es eine Hütte
-  | 'grottoCoins'        // Bau: Münzen auf freie Mittelfelder legen
-  | 'promenadeCoins'     // Bau: Münzen auf bis zu 3 freie Felder legen
-  | 'prismForge'         // 1×/Runde: Bauen ohne Materialentfernen (Doppelnutzung)
-  | 'southernSemaphore'; // jede Runde 1 zusätzliches angesagtes Material
+  | 'oddityShop'         // hält 1 fremd angesagtes Material; nehmender Baumeister erhält 1 Münze
+  | 'museum'             // Bau: 2 Materialien darauf legen; passende Ansage → zurückgeben statt platzieren, +1 Münze
+  | 'cathedralTransform' // Bau: 3 Münzen zahlen ODER stattdessen das graue Gebäude der Partie bauen
+  | 'grottoCoins'        // Bau: Münze auf jedes der 4 Mittelfelder (bebaute sofort kassieren)
+  | 'promenadeCoins'     // Bau: Münzen auf 3 freie Felder; die nächsten 3 fremden Ansagen MÜSSEN dorthin
+  | 'prismForge'         // 2 einzigartige Gebäude mit überlappenden Mustern in derselben Runde
+  | 'southernSemaphore'  // fremde Ansage: 1 Zusatz-Material desselben Typs, dafür +1 Münze
+  | 'windseedCoins'      // Bau: +1 Münze je Gebäude des häufigsten eigenen Gebäudetyps
+  | 'okaverCottage'      // Truhe auf 4 Münzen gefüllt → Hütte auf ein beliebiges freies Feld
+  | 'hollowHill'         // Marker: nach dem Bau kostet jeder Münztausch −2 SP
+  | 'fedMonument'        // Monument will wie eine Hütte gefüttert werden (Eraflage)
+  | 'coinSlot';          // gebautes Monument: +1 Truhenplatz (Truhe fasst 5)
 
 export interface FeedingSpec {
   mode:
@@ -196,6 +201,14 @@ export interface PlayerState {
   /** Fortune: Prisma-Schmiede in dieser Runde genutzt (+ Karte der Erstnutzung). */
   prismUsedThisRound?: boolean;
   prismCard?: string;
+  /** Fortune, Prisma: Materialfelder des Prisma-Baus — Reste werden nach dem 2. Bau entfernt. */
+  prismSquares?: number[];
+  /** Fortune, Hollow Hill: Münztausche nach dem Bau (je −2 SP). */
+  hollowHillSwaps?: number;
+  /** Fortune, Juwelier: Münzen, die erst am Rundenende gutgeschrieben werden. */
+  pendingCoins?: number;
+  /** Fortune, Promenade: das platzierte Material hat eine Münze kassiert (nicht mehr verschiebbar). */
+  placedCoin?: boolean;
 }
 
 export type PendingChoice =
@@ -206,6 +219,9 @@ export type PendingChoice =
   | { t: 'opaleyeClaim'; square: number; card: string }               // Nachbar baute Vorratstyp
   | { t: 'masonsGuild'; square: number; picked: string[] }            // Fortune: Münzen → Gebäude
   | { t: 'promenadeCoins'; remaining: number }                        // Fortune: Münzen auf Felder
+  | { t: 'museumStock'; square: number; remaining: number }           // Fortune: 2 Materialien aufs Museum
+  | { t: 'cathedralChoice'; square: number }                          // Fortune: 3 Münzen zahlen oder umwandeln
+  | { t: 'okaverCottage' }                                            // Fortune: Truhe voll → Gratis-Hütte
   | { t: 'seedBonus' };                                               // Tiny Trees: Gratis-Material
 
 export type Phase =
@@ -270,9 +286,12 @@ export type Action =
   | { t: 'build'; player: number; squares: number[]; card: string; target: number; prism?: boolean }
   | { t: 'oddityStore'; player: number; square: number }
   | { t: 'oddityTake'; player: number; fromPlayer: number; fromSquare: number; targetSquare: number }
-  | { t: 'museumSell'; player: number; square: number; storedIndex: number }
+  | { t: 'museumSell'; player: number; square: number }
   | { t: 'resolveMasons'; player: number; card: string | null; square?: number }
   | { t: 'resolvePromenade'; player: number; square: number | null }
+  | { t: 'resolveMuseumStock'; player: number; resource: Resource }
+  | { t: 'resolveCathedral'; player: number; pay: boolean; square?: number }
+  | { t: 'resolveOkaver'; player: number; square: number | null }
   | { t: 'resolveSeedBonus'; player: number; resource: Resource | null; square?: number }
   | { t: 'placeSeed'; player: number; square: number }
   | { t: 'resolveMark'; player: number; resource: Resource }

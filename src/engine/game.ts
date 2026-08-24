@@ -48,8 +48,23 @@ export function newGame(config: GameConfig): GameState {
   };
 }
 
-function gainCoins(p: PlayerState, n: number): void {
-  p.coins = Math.min(COIN_CAP, p.coins + n);
+/** Truhenkapazität: 4, +1 mit gebautem Münz-Slot-Monument (Fortune). */
+function coinCap(p: PlayerState, catalog: Catalog): number {
+  const slot = p.monument?.built && (catalog[p.monument.card]?.effects ?? []).includes('coinSlot');
+  return COIN_CAP + (slot ? 1 : 0);
+}
+
+function gainCoins(p: PlayerState, n: number, catalog: Catalog): void {
+  const before = p.coins;
+  p.coins = Math.min(coinCap(p, catalog), p.coins + n);
+  // Okavers Schatzkammer: Truhe auf 4 Münzen gefüllt → Gratis-Hütte anbieten
+  if (
+    before < COIN_CAP && p.coins >= COIN_CAP && !p.done &&
+    hasBuiltEffect(p, 'okaverCottage', catalog) &&
+    !p.choices.some((c) => c.t === 'okaverCottage')
+  ) {
+    p.choices.push({ t: 'okaverCottage' });
+  }
 }
 
 /** Hat der Spieler ein gebautes Gebäude mit diesem Effekt? */
@@ -87,12 +102,15 @@ function dispatchAction(s: GameState, action: Action, catalog: Catalog): GameSta
     case 'nameResource': return nameResource(s, action.resource, catalog);
     case 'soloPick': return soloPick(s, action.index, catalog);
     case 'factorySwap': return factorySwap(s, action.player, action.take, catalog);
-    case 'coinSwap': return coinSwap(s, action.player, action.take);
+    case 'coinSwap': return coinSwap(s, action.player, action.take, catalog);
     case 'oddityStore': return oddityStore(s, action.player, action.square, catalog);
     case 'oddityTake': return oddityTake(s, action.player, action.fromPlayer, action.fromSquare, action.targetSquare, catalog);
-    case 'museumSell': return museumSell(s, action.player, action.square, action.storedIndex, catalog);
+    case 'museumSell': return museumSell(s, action.player, action.square, catalog);
     case 'resolveMasons': return resolveMasons(s, action.player, action.card, action.square, catalog);
     case 'resolvePromenade': return resolvePromenade(s, action.player, action.square);
+    case 'resolveMuseumStock': return resolveMuseumStock(s, action.player, action.resource);
+    case 'resolveCathedral': return resolveCathedral(s, action.player, action.pay, action.square, catalog);
+    case 'resolveOkaver': return resolveOkaver(s, action.player, action.square, catalog);
     case 'resolveSeedBonus': return resolveSeedBonus(s, action.player, action.resource, action.square);
     case 'placeResource': return placeResource(s, action.player, action.square, catalog);
     case 'cavern': return cavern(s, action.player);
@@ -104,7 +122,7 @@ function dispatchAction(s: GameState, action: Action, catalog: Catalog): GameSta
     case 'resolveGrove': return resolveGrove(s, action.player, action.card, action.square, catalog);
     case 'resolveGuild': return resolveGuild(s, action.player, action.square, action.newCard, catalog);
     case 'resolveOpaleyeSetup': return resolveOpaleyeSetup(s, action.player, action.card, catalog);
-    case 'resolveOpaleyeClaim': return resolveOpaleyeClaim(s, action.player, action.accept, action.square);
+    case 'resolveOpaleyeClaim': return resolveOpaleyeClaim(s, action.player, action.accept, action.square, catalog);
     case 'roundDone': return roundDone(s, action.player, catalog);
     case 'declareComplete': return declareComplete(s, action.player, catalog);
   }
@@ -171,24 +189,28 @@ function nameResource(s: GameState, resource: Resource, catalog: Catalog): GameS
   s.round++;
   mb.masterBuilderTurns++;
   s.oddityTaken = false;
-  for (const p of s.players) {
+  s.players.forEach((p, pi) => {
     p.placedSquare = null;
     p.buildsThisRound = 0;
     p.museumSoldThisRound = false;
     p.prismUsedThisRound = false;
     p.prismCard = undefined;
+    p.prismSquares = undefined;
     p.pendingLocked = false;
     p.pendingExtra = null;
+    p.placedCoin = false;
     if (p.done) {
       p.pending = null;
       p.roundDone = true;
     } else {
       p.pending = resource;
       p.roundDone = false;
-      // Southern Semaphore: 1 zusätzliches Material des angesagten Typs
-      if (hasBuiltEffect(p, 'southernSemaphore', catalog)) p.pendingExtra = resource;
+      // Southern Semaphore: 1 Zusatz-Material — nur bei FREMDER Ansage
+      if (pi !== s.masterBuilder && hasBuiltEffect(p, 'southernSemaphore', catalog)) {
+        p.pendingExtra = resource;
+      }
     }
-  }
+  });
   s.phase = { t: 'round', resource };
   return s;
 }
@@ -196,6 +218,7 @@ function nameResource(s: GameState, resource: Resource, catalog: Catalog): GameS
 /** pending verbraucht: ggf. Zusatz-Material (Southern Semaphore) nachrücken. */
 function consumePending(p: PlayerState): void {
   p.pending = null;
+  p.pendingLocked = false;
   if (p.pendingExtra) {
     p.pending = p.pendingExtra;
     p.pendingExtra = null;
@@ -229,7 +252,7 @@ function factorySwap(s: GameState, player: number, take: Resource, catalog: Cata
 }
 
 /** Fortune: 1 Münze zahlen, um ein beliebiges anderes Material zu nehmen. */
-function coinSwap(s: GameState, player: number, take: Resource): GameState {
+function coinSwap(s: GameState, player: number, take: Resource, catalog: Catalog): GameState {
   const named = requireRound(s);
   if (!s.config.systems.coins) fail('Münzen sind nicht im Spiel');
   const p = activePlayer(s, player);
@@ -239,6 +262,13 @@ function coinSwap(s: GameState, player: number, take: Resource): GameState {
   if (p.coins < 1) fail('Keine Münze in der Truhe');
   p.coins--;
   p.pending = take;
+  // Southern Semaphore: Münzen dürfen keines der beiden Materialien tauschen —
+  // wer tauscht, verzichtet auf das Zusatz-Material (und dessen Münze).
+  p.pendingExtra = null;
+  // Hollow Hill: jeder Münztausch nach dem Bau kostet 2 Punkte
+  if (hasBuiltEffect(p, 'hollowHill', catalog)) {
+    p.hollowHillSwaps = (p.hollowHillSwaps ?? 0) + 1;
+  }
   return s;
 }
 
@@ -265,15 +295,36 @@ function placeResource(s: GameState, player: number, square: number, catalog: Ca
   requireRound(s);
   const p = activePlayer(s, player);
   if (p.pending == null) fail('Kein Material zum Platzieren');
-  const sq = checkPlacementTarget(s, p, player, square, catalog);
+  const sq = p.board[square] ?? fail('Ungültiges Feld');
+  const wasExtra = p.pendingLocked === true;
+
+  // Blütenpromenade: solange eigene Münzfelder existieren, MÜSSEN fremd
+  // angesagte Materialien dorthin; eigene Ansagen dürfen NICHT auf Münzfelder
+  // (außer es gibt kein münzfreies leeres Feld mehr).
+  if (hasBuiltEffect(p, 'promenadeCoins', catalog)) {
+    const coinSquares = p.board.some((c) => c.coin);
+    const freeWithoutCoin = p.board.some((c) => !c.building && !c.resource && !c.coin);
+    if (s.masterBuilder !== player) {
+      if (coinSquares && !sq.coin) fail('Das Material muss auf ein Münzfeld der Promenade');
+    } else if (sq.coin && freeWithoutCoin) {
+      fail('Eigene Ansagen dürfen nicht auf Münzfelder der Promenade');
+    }
+  }
+
+  checkPlacementTarget(s, p, player, square, catalog);
   sq.resource = p.pending;
   consumePending(p);
   p.placedSquare = square;
-  // Münze auf dem Feld (Promenade): bei fremder Ansage einsammeln
-  if (sq.coin && s.masterBuilder !== player) {
+  // Münze der Promenade: beim Platzieren einsammeln. Grotto-Münzen bleiben
+  // liegen — sie teilen sich das Feld mit dem Material und gehören erst dem
+  // Gebäude, das dort entsteht.
+  if (sq.coin && hasBuiltEffect(p, 'promenadeCoins', catalog)) {
     delete sq.coin;
-    gainCoins(p, 1);
+    gainCoins(p, 1, catalog);
+    p.placedCoin = true;
   }
+  // Southern Semaphore: das platzierte Zusatz-Material bringt 1 Münze
+  if (wasExtra) gainCoins(p, 1, catalog);
   return s;
 }
 
@@ -301,27 +352,32 @@ function moveResource(s: GameState, player: number, square: number, catalog: Cat
   const p = activePlayer(s, player);
   if (p.roundDone) fail('Runde bereits beendet');
   if (p.pending != null) fail('Erst das Material platzieren');
+  if (p.placedCoin) fail('Das Material hat eine Promenaden-Münze kassiert und bleibt liegen');
   const src = p.placedSquare;
   if (src == null) fail('Kein verschiebbares Material');
   if (src === square) return s;
   const srcSq = p.board[src];
   if (!srcSq?.resource) fail('Material wurde bereits verbaut');
-  const sq = checkPlacementTarget(s, p, player, square, catalog);
+  const sq = p.board[square] ?? fail('Ungültiges Feld');
+  if (sq.coin && hasBuiltEffect(p, 'promenadeCoins', catalog)) {
+    fail('Auf Münzfelder der Promenade nur direkt beim Platzieren');
+  }
+  checkPlacementTarget(s, p, player, square, catalog);
   sq.resource = srcSq.resource;
   delete srcSq.resource;
   p.placedSquare = square;
   return s;
 }
 
-/** Lager-Gebäude (Lagerhaus max 3, Museum max 2) auf dem Feld finden. */
+/** Lagerhaus (max 3) auf dem Feld finden. */
 function findStorage(p: PlayerState, square: number, catalog: Catalog) {
   const b = p.board[square]?.building;
   const effects = b ? (catalog[b.card]?.effects ?? []) : [];
-  if (!b || (!effects.includes('warehouse') && !effects.includes('museum'))) {
+  if (!b || !effects.includes('warehouse')) {
     fail('Kein Lager-Gebäude auf diesem Feld');
   }
   b.stored ??= [];
-  return { b, cap: effects.includes('warehouse') ? 3 : 2 };
+  return { b, cap: 3 };
 }
 
 function warehouseStore(s: GameState, player: number, square: number, catalog: Catalog): GameState {
@@ -382,24 +438,42 @@ function oddityTake(
   const sq = p.board[targetSquare] ?? fail('Ungültiges Feld');
   if (sq.building || sq.resource) fail('Feld ist belegt');
   sq.resource = b.stored.pop()!;
-  gainCoins(owner, 1);
+  gainCoins(p, 1, catalog); // die Münze erhält der nehmende Baumeister (offizielle Regel)
   s.oddityTaken = true;
   return s;
 }
 
-/** Fortune, Museum: 1×/Runde 1 eingelagertes Material zurückgeben → +1 Münze. */
-function museumSell(
-  s: GameState, player: number, square: number, storedIndex: number, catalog: Catalog
-): GameState {
-  requireRound(s);
+/**
+ * Fortune, Museum: Liegt das fremd angesagte Material auf dem Museum, darf es
+ * statt platziert zu werden in den Vorrat zurückgehen → +1 Münze (1×/Runde).
+ */
+function museumSell(s: GameState, player: number, square: number, catalog: Catalog): GameState {
+  const named = requireRound(s);
   const p = activePlayer(s, player);
   if (p.museumSoldThisRound) fail('Museum bereits in dieser Runde genutzt');
+  if (s.masterBuilder === player) fail('Nur bei fremder Ansage möglich');
+  if (p.pending !== named || p.pendingLocked) fail('Nur statt des angesagten Materials möglich');
   const b = p.board[square]?.building;
   if (!b || !catalog[b.card]?.effects?.includes('museum')) fail('Kein Museum hier');
-  if (!b.stored?.[storedIndex]) fail('Kein Material an dieser Position');
-  b.stored.splice(storedIndex, 1);
-  gainCoins(p, 1);
+  const i = b.stored?.indexOf(named) ?? -1;
+  if (i < 0) fail('Dieses Material liegt nicht auf dem Museum');
+  b.stored!.splice(i, 1);
+  consumePending(p); // statt zu platzieren; ein Zusatz-Material (Semaphor) rückt nach
+  p.placedSquare = null;
+  gainCoins(p, 1, catalog);
   p.museumSoldThisRound = true;
+  return s;
+}
+
+/** Fortune, Museum: nach dem Bau 2 Materialien aus dem Vorrat auflegen. */
+function resolveMuseumStock(s: GameState, player: number, resource: Resource): GameState {
+  const p = s.players[player] ?? fail('Unbekannter Spieler');
+  const choice = takeChoice(p, 'museumStock');
+  const b = p.board[choice.square]?.building ?? fail('Museum nicht gefunden');
+  b.stored ??= [];
+  b.stored.push(resource);
+  choice.remaining--;
+  if (choice.remaining <= 0) removeChoice(p, choice);
   return s;
 }
 
@@ -417,13 +491,21 @@ function build(
   const def = catalog[card] ?? fail('Unbekannte Karte');
   const effects = def.effects ?? [];
 
-  // Prisma-Schmiede: 1×/Runde bauen, ohne die Materialien zu entfernen
+  // Prisma-Schmiede: Materialien liegen lassen, damit ein ZWEITES,
+  // andersartiges Gebäude sie in derselben Runde mitbenutzen kann
   if (prism) {
     if (!hasBuiltEffect(p, 'prismForge', catalog)) fail('Keine Prisma-Schmiede gebaut');
     if (p.prismUsedThisRound) fail('Prisma-Schmiede bereits in dieser Runde genutzt');
   }
+  if (p.prismUsedThisRound && card === p.prismCard) {
+    fail('Prisma-Schmiede: Die beiden Gebäude müssen unterschiedlich sein');
+  }
   // Estival Festival: Baukosten 2 Münzen (Pflicht)
   if (effects.includes('constructCost2') && p.coins < 2) fail('Der Bau kostet 2 Münzen');
+  // Solo-Regel: Der Juwelier braucht die 1 Münze zwingend
+  if (s.config.solo && effects.includes('jewelerToll') && p.coins < 1) {
+    fail('Solo: Der Juwelier kann nur mit 1 Münze gebaut werden');
+  }
 
   const isMonument = def.kind === 'monument';
   if (isMonument) {
@@ -451,20 +533,28 @@ function build(
     fail('Bauplatz muss eines der Materialfelder sein');
   }
 
-  // Materialien entfernen (Handelsposten bleiben stehen; Prisma: Materialien bleiben liegen)
+  // Materialien entfernen (Handelsposten bleiben stehen; Prisma: Materialien
+  // bleiben für den zweiten Bau liegen und werden danach entfernt)
   if (!prism) {
     for (const i of resourceSquares) delete p.board[i].resource;
-    p.buildsThisRound++; // Fortune: 2+ Bauten durch Materialentfernen → 1 Münze am Rundenende
+    if (p.prismSquares?.length) {
+      for (const i of p.prismSquares) delete p.board[i].resource;
+      p.prismSquares = undefined;
+    }
   } else {
     p.prismUsedThisRound = true;
     p.prismCard = card;
+    p.prismSquares = resourceSquares;
   }
+  // Beide Prisma-Gebäude entstehen durch Materialentfernen → beide zählen
+  // für die Rundenmünze (2+ Bauten).
+  p.buildsThisRound++;
   const targetCell = p.board[target];
   targetCell.building = { card };
-  // Münze auf dem Bauplatz (Grotto) einsammeln
+  // Münze auf dem Bauplatz (Grotto/Promenade) einsammeln
   if (targetCell.coin) {
     delete targetCell.coin;
-    gainCoins(p, 1);
+    gainCoins(p, 1, catalog);
   }
 
   if (isMonument) p.monument!.built = true;
@@ -479,6 +569,24 @@ function build(
     p.seedSquare = -1;
     p.choices.push({ t: 'seedBonus' });
   }
+
+  onBuildingPlaced(s, player, card, target, catalog);
+
+  return s;
+}
+
+/**
+ * Gemeinsame Folgen, wenn ein Gebäude entsteht — beim regulären Bau UND wenn
+ * ein Karteneffekt es platziert (Grove, Architektengilde, Opaleye, Steinmetz-
+ * gilde, Okaver, Kathedralen-Umbau). Offizielle „Special Note": Auch solche
+ * Gebäude bringen ihre Bau-Vorteile.
+ */
+function onBuildingPlaced(
+  s: GameState, player: number, card: string, target: number, catalog: Catalog
+): void {
+  const p = s.players[player];
+  const def = catalog[card] ?? fail('Unbekannte Karte');
+  const effects = def.effects ?? [];
 
   applyCoinEffects(s, p, def, target, catalog);
 
@@ -501,9 +609,12 @@ function build(
   if (effects.includes('promenadeCoins')) {
     p.choices.push({ t: 'promenadeCoins', remaining: 3 });
   }
+  if (effects.includes('museum')) {
+    p.choices.push({ t: 'museumStock', square: target, remaining: 2 });
+  }
 
   // Opaleyes Wacht der Sitznachbarn: bevorrateten Typ erhalten
-  if (!isMonument) {
+  if (def.kind !== 'monument') {
     const n = s.players.length;
     const neighborIdxs = n <= 2 ? [ (player + 1) % n ] : [ (player + 1) % n, (player + n - 1) % n ];
     for (const ni of new Set(neighborIdxs)) {
@@ -522,8 +633,20 @@ function build(
       }
     }
   }
+}
 
-  return s;
+/** Karteneffekt platziert ein Gebäude: Feld belegen, Münze kassieren, Bau-Folgen. */
+function placeBuildingByEffect(
+  s: GameState, player: number, card: string, target: number, catalog: Catalog
+): void {
+  const p = s.players[player];
+  const cell = p.board[target];
+  cell.building = { card };
+  if (cell.coin) {
+    delete cell.coin;
+    gainCoins(p, 1, catalog);
+  }
+  onBuildingPlaced(s, player, card, target, catalog);
 }
 
 /** Fortune: Münz-Effekte beim Bau (Reihenfolge: Kosten → Gewinne → Prüfungen). */
@@ -534,9 +657,8 @@ function applyCoinEffects(
   const effects = def.effects ?? [];
 
   if (effects.includes('constructCost2')) p.coins -= 2; // Deckung vorab geprüft
-  if (effects.includes('coinOnConstruct')) gainCoins(p, 1);
-  if (effects.includes('coinOnConstruct2')) gainCoins(p, 2);
-  if (effects.includes('gamblersDen') && p.coins === 1) gainCoins(p, 2);
+  if (effects.includes('coinOnConstruct')) gainCoins(p, 1, catalog);
+  if (effects.includes('gamblersDen') && p.coins === 1) gainCoins(p, 2, catalog);
 
   if (effects.includes('statueCoins')) {
     const counts = new Map<string, number>();
@@ -545,7 +667,16 @@ function applyCoinEffects(
     }
     let n = 0;
     for (const c of counts.values()) if (c >= 3) n++;
-    gainCoins(p, n);
+    gainCoins(p, n, catalog);
+  }
+
+  if (effects.includes('windseedCoins')) {
+    // +1 Münze je Gebäude des häufigsten eigenen Gebäudetyps
+    const counts = new Map<string, number>();
+    for (const sq of p.board) {
+      if (sq.building) counts.set(sq.building.card, (counts.get(sq.building.card) ?? 0) + 1);
+    }
+    gainCoins(p, Math.max(0, ...counts.values()), catalog);
   }
 
   if (effects.includes('teahouseCoins')) {
@@ -557,12 +688,13 @@ function applyCoinEffects(
       if (rowOf(i) === row) rowTypes.add(sq.building.card);
       if (colOf(i) === col) colTypes.add(sq.building.card);
     });
-    gainCoins(p, Math.min(3, Math.max(rowTypes.size, colTypes.size)));
+    gainCoins(p, Math.min(3, Math.max(rowTypes.size, colTypes.size)), catalog);
   }
 
   if (effects.includes('jewelerToll')) {
     if (p.coins >= 1) p.coins--;
-    else for (const o of s.players) if (o !== p) gainCoins(o, 1);
+    // Sonst erhalten alle anderen 1 Münze — erst AM RUNDENENDE (auch fertige Städte)
+    else for (const o of s.players) if (o !== p) o.pendingCoins = (o.pendingCoins ?? 0) + 1;
   }
 
   if (effects.includes('parsonageCheck')) {
@@ -575,16 +707,64 @@ function applyCoinEffects(
   }
 
   if (effects.includes('cathedralTransform')) {
-    if (p.coins >= 3) p.coins -= 3;
-    else p.board[target].building = { card: 'cottage' }; // wird stattdessen eine Hütte
+    // 3 Münzen zahlen ist freiwillig — sonst entsteht das graue Gebäude der Partie
+    p.choices.push({ t: 'cathedralChoice', square: target });
   }
 
   if (effects.includes('grottoCoins')) {
     for (const c of CENTER_SQUARES) {
       const sq = p.board[c];
-      if (!sq.building && !sq.coin) sq.coin = true;
+      if (sq.building) gainCoins(p, 1, catalog); // bebaut (inkl. Grotto selbst) → sofort
+      else if (!sq.coin) sq.coin = true;         // Münze teilt sich das Feld ggf. mit Material
     }
   }
+}
+
+/** Kathedrale (Fortune): 3 Münzen zahlen ODER das graue Gebäude der Partie bauen. */
+function resolveCathedral(
+  s: GameState, player: number, pay: boolean, square: number | undefined, catalog: Catalog
+): GameState {
+  const p = s.players[player] ?? fail('Unbekannter Spieler');
+  const choice = takeChoice(p, 'cathedralChoice');
+  if (pay) {
+    if (p.coins < 3) fail('Nicht genug Münzen');
+    p.coins -= 3;
+    removeChoice(p, choice);
+    return s;
+  }
+  const grayCard = s.config.activeCards.find((c) => catalog[c]?.category === 'well');
+  removeChoice(p, choice);
+  if (!grayCard) return s; // kein graues Gebäude in dieser Partie → Kathedrale bleibt
+  const grayDef = catalog[grayCard];
+  let target = choice.square;
+  // Schuppen & Co.: darf auf ein beliebiges freies Feld ziehen
+  if (square != null && square !== choice.square) {
+    if (!(grayDef.effects ?? []).includes('buildAnywhereSelf')) fail('Dieses Gebäude bleibt auf dem Feld');
+    const sq = p.board[square] ?? fail('Ungültiges Feld');
+    if (sq.building || sq.resource) fail('Feld ist belegt');
+    target = square;
+  }
+  delete p.board[choice.square].building;
+  // Bau-Folgen des grauen Gebäudes (z. B. Münze der Mine/Statue)
+  placeBuildingByEffect(s, player, grayCard, target, catalog);
+  return s;
+}
+
+/** Okavers Schatzkammer: Truhe auf 4 gefüllt → Gratis-Hütte auf ein freies Feld. */
+function resolveOkaver(
+  s: GameState, player: number, square: number | null, catalog: Catalog
+): GameState {
+  const p = s.players[player] ?? fail('Unbekannter Spieler');
+  const choice = takeChoice(p, 'okaverCottage');
+  if (square == null) {
+    removeChoice(p, choice);
+    return s;
+  }
+  const sq = p.board[square] ?? fail('Ungültiges Feld');
+  if (sq.building || sq.resource) fail('Feld ist belegt');
+  removeChoice(p, choice);
+  placeBuildingByEffect(s, player, 'cottage', square, catalog);
+  return s;
 }
 
 // ---------- Entscheidungen ----------
@@ -630,7 +810,9 @@ function resolveGrove(
     if (catalog[card]?.kind === 'monument') fail('Monumente nicht erlaubt');
     const sq = p.board[square ?? -1] ?? fail('Ungültiges Feld');
     if (sq.building || sq.resource) fail('Feld ist belegt');
-    sq.building = { card };
+    removeChoice(p, choice);
+    placeBuildingByEffect(s, player, card, square!, catalog);
+    return s;
   }
   removeChoice(p, choice);
   return s;
@@ -677,16 +859,18 @@ function resolveOpaleyeSetup(
 }
 
 function resolveOpaleyeClaim(
-  s: GameState, player: number, accept: boolean, square: number | undefined
+  s: GameState, player: number, accept: boolean, square: number | undefined, catalog: Catalog
 ): GameState {
   const p = s.players[player] ?? fail('Unbekannter Spieler');
   const choice = takeChoice(p, 'opaleyeClaim');
   if (accept) {
     const sq = p.board[square ?? -1] ?? fail('Ungültiges Feld');
     if (sq.building || sq.resource) fail('Feld ist belegt');
-    sq.building = { card: choice.card };
     const stock = p.board[choice.square].building?.stock;
     if (stock) stock.splice(stock.indexOf(choice.card), 1);
+    removeChoice(p, choice);
+    placeBuildingByEffect(s, player, choice.card, square!, catalog);
+    return s;
   }
   removeChoice(p, choice);
   return s;
@@ -709,17 +893,20 @@ function resolveMasons(
   const sq = p.board[square ?? -1] ?? fail('Ungültiges Feld');
   if (sq.building || sq.resource) fail('Feld ist belegt');
   p.coins--;
-  sq.building = { card };
   choice.picked.push(card);
   if (p.coins === 0) removeChoice(p, choice);
+  placeBuildingByEffect(s, player, card, square!, catalog);
   return s;
 }
 
-/** Petal Promenade (best effort): Münzen auf bis zu 3 freie Felder legen. */
+/** Petal Promenade: Münzen auf 3 leere Felder legen (Pflicht, solange Felder frei sind). */
 function resolvePromenade(s: GameState, player: number, square: number | null): GameState {
   const p = s.players[player] ?? fail('Unbekannter Spieler');
   const choice = takeChoice(p, 'promenadeCoins');
+  const hasFree = p.board.some((sq) => !sq.building && !sq.resource && !sq.coin);
   if (square == null) {
+    // Abbrechen nur, wenn kein geeignetes Feld mehr existiert
+    if (hasFree) fail('Es müssen 3 Münzen auf leere Felder gelegt werden');
     removeChoice(p, choice);
     return s;
   }
@@ -751,17 +938,32 @@ function resolveSeedBonus(
 function roundDone(s: GameState, player: number, catalog: Catalog): GameState {
   requireRound(s);
   const p = activePlayer(s, player);
+  // Southern Semaphore: das Zusatz-Material ist freiwillig — „Fertig" verzichtet darauf
+  if (p.pending != null && p.pendingLocked) {
+    p.pending = null;
+    p.pendingLocked = false;
+  }
   if (p.pending != null) fail('Erst das Material platzieren');
   if (p.choices.length > 0) fail('Erst offene Entscheidungen klären');
+  cleanupPrismLeftovers(p);
   p.roundDone = true;
   p.placedSquare = null;
   return maybeAdvance(s, catalog);
+}
+
+/** Prisma-Schmiede: blieb der zweite Bau aus, werden die liegen gelassenen
+ *  Materialien am Rundenende doch entfernt (sie sind verbaut). */
+function cleanupPrismLeftovers(p: PlayerState): void {
+  if (!p.prismSquares?.length) return;
+  for (const i of p.prismSquares) delete p.board[i].resource;
+  p.prismSquares = undefined;
 }
 
 function declareComplete(s: GameState, player: number, catalog: Catalog): GameState {
   requireRound(s);
   const p = activePlayer(s, player);
   if (p.board.some((sq) => !sq.building && !sq.resource)) fail('Es gibt noch freie Felder');
+  cleanupPrismLeftovers(p);
   p.done = true;
   p.finishRound = s.round;
   p.pending = null;
@@ -771,26 +973,30 @@ function declareComplete(s: GameState, player: number, catalog: Catalog): GameSt
   return maybeAdvance(s, catalog);
 }
 
-/** Fortune: am Rundenende 1 Münze für 2+ Bauten durch Materialentfernen. */
-function awardRoundCoins(s: GameState): void {
+/** Fortune: am Rundenende 1 Münze für 2+ Bauten sowie aufgeschobene Münzen (Juwelier). */
+function awardRoundCoins(s: GameState, catalog: Catalog): void {
   if (!s.config.systems.coins) return;
   for (const p of s.players) {
-    if (p.buildsThisRound >= 2) gainCoins(p, 1);
+    if (p.buildsThisRound >= 2) gainCoins(p, 1, catalog);
     p.buildsThisRound = 0;
+    if (p.pendingCoins) {
+      gainCoins(p, p.pendingCoins, catalog);
+      p.pendingCoins = 0;
+    }
   }
 }
 
 function maybeAdvance(s: GameState, catalog: Catalog): GameState {
   const active = s.players.filter((p) => !p.done);
   if (active.length === 0) {
-    awardRoundCoins(s);
+    awardRoundCoins(s, catalog);
     s.phase = { t: 'gameOver' };
     return s;
   }
   const allDone = s.players.every((p) => p.roundDone && p.choices.length === 0);
   if (!allDone) return s;
 
-  awardRoundCoins(s);
+  awardRoundCoins(s, catalog);
   s.masterBuilder = nextMasterBuilder(s, catalog);
   s.oddityTaken = false;
   s.phase = { t: 'nameResource' };

@@ -9,8 +9,8 @@
     "en": "Oddity Shop"
   },
   "text": {
-    "de": "2 Punkte. Sagt ein anderer Spieler ein Material an, darfst du es hier ablegen (max. 1). Ein neuer Baumeister darf vor seiner Ansage 1 Material aus einem fremden Kuriositätenladen auf sein Brett nehmen — der Besitzer erhält 1 Münze.",
-    "en": "2 points. Holds 1 resource named by another player. A new Master Builder may first take 1 resource from another player’s Oddity Shop; the owner gains 1 coin."
+    "de": "2 Punkte. Sagt ein anderer Spieler ein Material an, darfst du es hier ablegen (max. 1). Ein neuer Baumeister darf vor seiner Ansage 1 Material aus einem fremden Kuriositätenladen auf sein Brett nehmen und erhält dafür 1 Münze.",
+    "en": "2 points. Each Oddity Shop can store 1 resource named by another player. At the start of their turn as Master Builder, other players may take this resource, place it on their board, and gain 1 coin."
   },
   "pattern": [
     [

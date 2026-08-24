@@ -9,19 +9,15 @@
     "en": "The Petal Promenade"
   },
   "text": {
-    "de": "Beim Bau: Lege Münzen auf bis zu 3 freie Felder. Wer dort bei fremder Ansage Material platziert, erhält die Münze.",
-    "en": "On construct: place coins on up to 3 empty squares; placing a foreign-named resource there gains the coin."
+    "de": "3 Punkte. Beim Bau: Lege 1 Münze auf 3 leere Felder. Die nächsten 3 fremd angesagten Materialien MÜSSEN auf diese Felder — jede Platzierung bringt die Münze. Eigene Ansagen dürfen nicht auf Münzfelder.",
+    "en": "3 points. On construct: place 1 coin on 3 empty squares. The next 3 resources named by other players must be placed on those squares; gain each coin when you place a resource there. You may not place resources you name on coin squares."
   },
   "pattern": [
     [
-      "glass",
       "wheat",
-      "glass"
-    ],
-    [
-      null,
+      "brick",
       "wood",
-      null
+      "wheat"
     ]
   ],
   "features": [
@@ -29,11 +25,12 @@
     "on-construct"
   ],
   "scoring": {
-    "type": "none"
+    "type": "flat",
+    "vp": 3
   },
   "effects": [
-    "promenadeCoins"
+    "promenadeCoins",
+    "coinSlot"
   ],
-  "art": "petal_promenade.svg",
-  "unverified": true
+  "art": "petal_promenade.svg"
 }

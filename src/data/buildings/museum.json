@@ -9,21 +9,19 @@
     "en": "Museum"
   },
   "text": {
-    "de": "Statt zu platzieren darfst du das angesagte Material einlagern (max. 2). Einmal pro Runde: 1 eingelagertes Material zurückgeben → +1 Münze.",
-    "en": "Instead of placing, you may store the named resource (max 2). Once per round: return 1 stored resource for 1 coin."
+    "de": "Beim Bau: Lege 2 Materialien auf das Museum. Sagt ein anderer Spieler ein Material an, das auf dem Museum liegt, darfst du es statt zu platzieren in den Vorrat zurückgeben → +1 Münze (1×/Runde).",
+    "en": "When constructed, place 2 resources on the Museum. When another player names a resource on the Museum, instead of placing that resource you may return it to the supply and gain 1 coin (once per round)."
   },
   "pattern": [
     [
-      null,
-      null,
-      "glass",
-      null
+      "stone",
+      "wheat",
+      "wood"
     ],
     [
       "brick",
-      "stone",
-      "stone",
-      "wood"
+      null,
+      "brick"
     ]
   ],
   "features": [
@@ -37,6 +35,5 @@
   "effects": [
     "museum"
   ],
-  "art": "museum.svg",
-  "unverified": true
+  "art": "museum.svg"
 }

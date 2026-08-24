@@ -33,7 +33,8 @@
   },
   "effects": [
     "constructCost2",
-    "coinValue2"
+    "coinValue2",
+    "coinSlot"
   ],
   "art": "estival_festival.svg"
 }

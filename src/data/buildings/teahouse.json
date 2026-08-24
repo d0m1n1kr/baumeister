@@ -9,13 +9,13 @@
     "en": "Teahouse"
   },
   "text": {
-    "de": "Beim Bau: +1 Münze je Gebäudetyp in seiner Zeile ODER Spalte (bessere Achse, max. 3).",
-    "en": "On construct: gain 1 coin per building type in its row OR column (max 3)."
+    "de": "1 Punkt. Beim Bau: +1 Münze je einzigartigem Gebäudetyp in seiner Zeile ODER Spalte (nicht beide, max. 3).",
+    "en": "1 point. On construct: gain 1 coin for each unique building type in the same row or column (not both, max 3)."
   },
   "pattern": [
     [
       null,
-      "brick",
+      "wheat",
       null
     ],
     [
@@ -30,11 +30,11 @@
     "on-construct"
   ],
   "scoring": {
-    "type": "none"
+    "type": "flat",
+    "vp": 1
   },
   "effects": [
     "teahouseCoins"
   ],
-  "art": "teahouse.svg",
-  "unverified": true
+  "art": "teahouse.svg"
 }

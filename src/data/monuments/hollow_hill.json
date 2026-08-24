@@ -9,27 +9,32 @@
     "en": "Hollow Hill"
   },
   "text": {
-    "de": "5 Punkte. (Vereinfachte Umsetzung — Originaleffekt nicht verifizierbar.)",
-    "en": "5 points. (Simplified — original effect unverified.)"
+    "de": "7 Punkte. −2 Punkte für jede Münze, die du nach dem Bau ausgibst, um Materialien zu tauschen.",
+    "en": "7 points. −2 points for each coin you spend to change resources after constructing Hollow Hill."
   },
   "pattern": [
     [
-      null,
       "wheat",
+      "wood",
       null
     ],
     [
-      "wood",
+      "brick",
       "stone",
-      "wood"
+      "wheat"
     ]
   ],
-  "features": [],
+  "features": [
+    "negative-vp",
+    "coins"
+  ],
   "scoring": {
-    "type": "flat",
-    "vp": 5
+    "type": "handler",
+    "handler": "hollowHill",
+    "vp": 7
   },
-  "effects": [],
-  "art": "hollow_hill.svg",
-  "unverified": true
+  "effects": [
+    "hollowHill"
+  ],
+  "art": "hollow_hill.svg"
 }

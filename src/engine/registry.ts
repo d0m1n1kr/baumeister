@@ -76,7 +76,11 @@ export function sortPlayersClockwise<T extends { corner: number }>(players: T[])
 }
 
 /** Offizielle Solo-Regel: Karten, die sich auf Mitspieler beziehen, fliegen raus. */
-export const SOLO_EXCLUDED = ['inn', 'bank', 'fort_ironweed', 'opaleyes_watch'];
+export const SOLO_EXCLUDED = [
+  'inn', 'bank', 'fort_ironweed', 'opaleyes_watch',
+  // Fortune (offizielle Solo-Regel): interaktive Karten bleiben draußen
+  'oddity_shop', 'schoolhouse', 'southern_semaphore'
+];
 
 const RESOURCES: Resource[] = ['wood', 'brick', 'stone', 'wheat', 'glass'];
 

@@ -43,7 +43,8 @@
   // ---------- lokaler UI-Zustand ----------
   type Mode =
     | 'idle' | 'select' | 'target' | 'grovePlace' | 'claimPlace' | 'guildPick'
-    | 'masonsPlace' | 'promenadePlace' | 'seedBonusPlace' | 'oddityPlace';
+    | 'masonsPlace' | 'promenadePlace' | 'seedBonusPlace' | 'oddityPlace'
+    | 'okaverPlace' | 'cathedralPlace';
   let mode = $state<Mode>('idle');
   let selected = $state<number[]>([]);
   let buildCard = $state<string | null>(null);
@@ -171,7 +172,8 @@
   const highlights = $derived(
     mode === 'target' ? targetSquares
     : mode === 'grovePlace' || mode === 'claimPlace' || mode === 'masonsPlace' ||
-      mode === 'promenadePlace' || mode === 'seedBonusPlace' || mode === 'oddityPlace' ? emptySquares
+      mode === 'promenadePlace' || mode === 'seedBonusPlace' || mode === 'oddityPlace' ||
+      mode === 'okaverPlace' || mode === 'cathedralPlace' ? emptySquares
     : mode === 'guildPick' ? p.board.map((sq, i) => (sq.building && catalog[sq.building.card].kind !== 'monument' ? i : -1)).filter((i) => i >= 0)
     : st.phase.t === 'seedPlacement' && p.seedSquare == null ? emptySquares
     : []
@@ -199,6 +201,18 @@
         if (!emptySquares.includes(square)) return;
         showError(game.dispatch({ t: 'resolvePromenade', player, square }));
         if (!p.choices.some((c) => c.t === 'promenadeCoins')) mode = 'idle';
+        break;
+      }
+      case 'okaverPlace': {
+        if (!emptySquares.includes(square)) return;
+        showError(game.dispatch({ t: 'resolveOkaver', player, square }));
+        resetMode();
+        break;
+      }
+      case 'cathedralPlace': {
+        if (!emptySquares.includes(square)) return;
+        showError(game.dispatch({ t: 'resolveCathedral', player, pay: false, square }));
+        resetMode();
         break;
       }
       case 'seedBonusPlace': {
@@ -250,19 +264,12 @@
       }
       case 'idle': {
         if (!inRound) break;
-        // Lagerhaus/Museum antippen, solange Material aussteht → einlagern/tauschen/verkaufen
+        // Lagerhaus antippen, solange Material aussteht → einlagern/tauschen;
+        // Museum antippen → Inhalt ansehen / passendes Material zurückgeben
         if (
-          p.pending != null && sq.building &&
-          ((catalog[sq.building.card].effects ?? []).includes('warehouse') ||
+          sq.building &&
+          ((p.pending != null && (catalog[sq.building.card].effects ?? []).includes('warehouse')) ||
             (catalog[sq.building.card].effects ?? []).includes('museum'))
-        ) {
-          warehouseSquare = square;
-          break;
-        }
-        // Museum ohne pending: Verkauf möglich
-        if (
-          p.pending == null && sq.building && sq.building.stored?.length &&
-          (catalog[sq.building.card].effects ?? []).includes('museum') && !p.museumSoldThisRound
         ) {
           warehouseSquare = square;
           break;
@@ -314,13 +321,17 @@
     const square = Number(cell.getAttribute('data-square'));
     const sq = p.board[square];
     const cellEffects = sq.building ? (catalog[sq.building.card].effects ?? []) : [];
-    if (cellEffects.includes('warehouse') || cellEffects.includes('museum')) {
-      const cap = cellEffects.includes('warehouse') ? 3 : 2;
-      if ((sq.building!.stored?.length ?? 0) < cap) {
+    if (cellEffects.includes('warehouse')) {
+      if ((sq.building!.stored?.length ?? 0) < 3) {
         showError(game.dispatch({ t: 'warehouseStore', player, square }));
       } else {
         warehouseSquare = square;
       }
+      return;
+    }
+    if (cellEffects.includes('museum')) {
+      // Aufs Museum ziehen = passendes Material zurückgeben (+1 Münze)
+      showError(game.dispatch({ t: 'museumSell', player, square }));
       return;
     }
     if (cellEffects.includes('oddityShop') && !isMB) {
@@ -361,8 +372,9 @@
   <header>
     <span class="pname" class:mb={isMB}>{isMB ? '👑 ' : ''}{p.name}</span>
     {#if coinsActive}
+      {@const chestCap = 4 + (p.monument?.built && (catalog[p.monument.card].effects ?? []).includes('coinSlot') ? 1 : 0)}
       <span class="chest" title={t.coins}>
-        {#each Array.from({ length: 4 }) as _, i}
+        {#each Array.from({ length: chestCap }) as _, i}
           <span class="slot" class:filled={i < p.coins}>{i < p.coins ? '🪙' : ''}</span>
         {/each}
       </span>
@@ -495,9 +507,12 @@
               <span>✨ {t.prismToggle}</span>
             </label>
           {/if}
-          {#if mode === 'idle' && p.pending == null && !p.roundDone}
+          {#if mode === 'idle' && (p.pending == null || p.pendingLocked) && !p.roundDone}
             {#if tentative != null}
               <span class="moveHint">{t.moveHint}</span>
+            {/if}
+            {#if p.pending != null && p.pendingLocked}
+              <span class="moveHint">{t.semaphoreSkipHint}</span>
             {/if}
             <button class="primary" onpointerup={() => showError(game.dispatch({ t: 'roundDone', player }))}>
               ✓ {t.roundDone}
@@ -586,7 +601,57 @@
           {#if mode !== 'promenadePlace'}
             <button class="primary" onpointerup={() => (mode = 'promenadePlace')}>{t.choosePlacement}</button>
           {/if}
-          <button onpointerup={() => { showError(game.dispatch({ t: 'resolvePromenade', player, square: null })); resetMode(); }}>
+          {#if !p.board.some((sq) => !sq.building && !sq.resource && !sq.coin)}
+            <button onpointerup={() => { showError(game.dispatch({ t: 'resolvePromenade', player, square: null })); resetMode(); }}>
+              {t.skip}
+            </button>
+          {/if}
+        </div>
+      {:else if choice?.t === 'museumStock'}
+        <div class="choice">
+          <ResourcePicker
+            label={`${t.museumStockTitle} (${choice.remaining})`}
+            onpick={(r) => showError(game.dispatch({ t: 'resolveMuseumStock', player, resource: r }))}
+          />
+        </div>
+      {:else if choice?.t === 'cathedralChoice'}
+        {@const grayCard = st.config.activeCards.find((c) => catalog[c]?.category === 'well')}
+        <div class="choice">
+          <span class="choiceTitle">{t.cathedralTitle}</span>
+          <div class="btnRow">
+            {#if p.coins >= 3}
+              <button class="primary" onpointerup={() => showError(game.dispatch({ t: 'resolveCathedral', player, pay: true }))}>
+                🪙 {t.cathedralPay}
+              </button>
+            {/if}
+            {#if grayCard}
+              {#if (catalog[grayCard].effects ?? []).includes('buildAnywhereSelf')}
+                <button onpointerup={() => (mode = 'cathedralPlace')}>
+                  {t.cathedralTransform(catalog[grayCard].name.de)}
+                </button>
+              {/if}
+              <button onpointerup={() => showError(game.dispatch({ t: 'resolveCathedral', player, pay: false }))}>
+                {t.cathedralTransformHere(catalog[grayCard].name.de)}
+              </button>
+            {:else}
+              <button onpointerup={() => showError(game.dispatch({ t: 'resolveCathedral', player, pay: false }))}>
+                {t.skip}
+              </button>
+            {/if}
+          </div>
+          {#if mode === 'cathedralPlace'}
+            <span class="choiceTitle">{t.choosePlacement}</span>
+          {/if}
+        </div>
+      {:else if choice?.t === 'okaverCottage'}
+        <div class="choice">
+          <span class="choiceTitle">{t.okaverTitle}</span>
+          {#if mode !== 'okaverPlace'}
+            <button class="primary" disabled={emptySquares.length === 0} onpointerup={() => (mode = 'okaverPlace')}>
+              {t.choosePlacement}
+            </button>
+          {/if}
+          <button onpointerup={() => { showError(game.dispatch({ t: 'resolveOkaver', player, square: null })); resetMode(); }}>
             {t.skip}
           </button>
         </div>
@@ -717,22 +782,28 @@
 {#if warehouseSquare !== null && p.board[warehouseSquare]?.building}
   {@const wh = p.board[warehouseSquare].building!}
   {@const whEffects = catalog[wh.card].effects ?? []}
-  {@const whCap = whEffects.includes('warehouse') ? 3 : 2}
+  {@const museumSellable =
+    whEffects.includes('museum') && !p.museumSoldThisRound && !isMB &&
+    p.pending != null && p.pending === namedResource && !p.pendingLocked &&
+    (wh.stored ?? []).includes(namedResource!)}
   <div class="scrim">
     <div class="pick" style="transform: rotate({rotation}deg)">
       <h3>{catalog[wh.card].name.de}</h3>
-      {#if whEffects.includes('museum') && wh.stored?.length && !p.museumSoldThisRound}
-        <span class="pickText">{t.museumSell}</span>
+      {#if whEffects.includes('museum') && wh.stored?.length}
+        <span class="pickText">{t.museumContents}</span>
         <div class="btnRow">
-          {#each wh.stored as r, i}
-            <button class="chip" style="background: {RESOURCE_CSS[r]}" onpointerup={() => {
-              showError(game.dispatch({ t: 'museumSell', player, square: warehouseSquare!, storedIndex: i }));
-              warehouseSquare = null;
-            }}>{t.resourceNames[r]}</button>
+          {#each wh.stored as r}
+            <span class="chip" style="background: {RESOURCE_CSS[r]}">{t.resourceNames[r]}</span>
           {/each}
         </div>
       {/if}
-      {#if p.pending != null && (wh.stored?.length ?? 0) < whCap}
+      {#if museumSellable}
+        <button class="primary" onpointerup={() => {
+          showError(game.dispatch({ t: 'museumSell', player, square: warehouseSquare! }));
+          warehouseSquare = null;
+        }}>🪙 {t.museumSell}</button>
+      {/if}
+      {#if whEffects.includes('warehouse') && p.pending != null && (wh.stored?.length ?? 0) < 3}
         <button class="primary" onpointerup={() => {
           showError(game.dispatch({ t: 'warehouseStore', player, square: warehouseSquare! }));
           warehouseSquare = null;

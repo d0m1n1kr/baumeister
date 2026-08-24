@@ -85,22 +85,46 @@ Rulebook + gängigen Klarstellungen (UltraBoardGames/BGG):
 - **Sternenwebstuhl:** 1.→6, 2.→3, 3.→2, ab 4.→0; gleiche Runde = gleicher Rang.
 - **Opaleyes Wacht:** Basispunkte 0.
 
-## Unverifizierte Karten (Fortune) — `unverified: true`
+## Fortune-Karten — verifiziert
 
-Diese Karten sind aus öffentlichen Quellen (Rulebook-PDF, UltraBoardGames, BGG-Fotos)
-nicht vollständig belegbar und nach bester Quellenlage bzw. mit gekennzeichneten
-Annahmen umgesetzt. **Korrektur = JSON-Edit** in `buildings/`/`monuments/`:
+Alle 12 Fortune-Gebäude und 10 Fortune-Monumente sind gegen Primärquellen
+abgeglichen (Stand: alle `unverified`-Marker entfernt):
 
-| Karte | Annahme |
-|---|---|
-| `cathedral_fortune` | Muster erfunden; 2 SP ohne Kathedralen-Nachbar; Bau: 3 Münzen oder → Hütte (Effekt aus Klarstellungen) |
-| `teahouse` | Muster erfunden; Münzen je Typ in Zeile ODER Spalte, max 3 (aus Klarstellungen) |
-| `museum` | Muster erfunden; Kapazität 2 angenommen; 1×/Runde Verkauf +1 Münze (aus Klarstellungen) |
-| `caterinas_grotto` | Muster erfunden; Münzen auf freie Mittelfelder, Einsammeln beim Bau |
-| `eraflage_vineyard` | Muster erfunden; Basis 8 SP ANGENOMMEN, −2 je Typ in Zeile ∪ Spalte |
-| `hollow_hill` | komplett vereinfacht: flat 5 SP (Original nicht rekonstruierbar) |
-| `petal_promenade` | Muster erfunden; Münzen auf bis zu 3 freie Felder, Einsammeln bei fremder Ansage |
-| `prism_forge` | Muster erfunden; vereinfacht: 1×/Runde Bau ohne Materialentfernen |
-| `southern_semaphore` | Muster erfunden; 1 Zusatz-Material je Runde, nicht tauschbar |
-| `treasury_at_okaver` | Effekt ERFUNDEN: 3 SP + 2 Münzen beim Bau (keine Quelle) |
-| `shrine_of_the_windseed` | Effekt ERFUNDEN: 1 SP, +3 in einer Ecke (keine Quelle) |
+- Offizielles AEG-Rulebook-PDF (alderac.com, 2020 + 2025) — die Karten-Miniaturen
+  neben den „Building/Monument Clarifications" enthalten die vollständigen
+  Kartentexte und Baumuster und wurden Karte für Karte ausgelesen.
+- UltraBoardGames Fortune-Klarstellungen (deckungsgleich mit dem Rulebook;
+  dort heißt die Zehntscheune „Little Barn" — AEG-Druck: „Tithe Barn").
+- BGG-Fotos für die zwei Karten ohne Klarstellung: „The Treasury at Okaver"
+  (Solo-Challenge-Fotos) und „Shrine of the Windseed" (Partie-Foto, Okt. 2022).
+
+Wichtige Regel-Details aus den Klarstellungen, die im Code stecken:
+
+- **Kathedrale:** 3 Münzen zahlen ist FREIWILLIG; sonst entsteht das graue
+  Gebäude der Partie auf dem Feld — mit dessen Bau-Effekt (Schuppen darf ziehen).
+- **Museum:** beim Bau 2 Materialien auflegen; passende fremde Ansage darf
+  statt platziert zurückgegeben werden (+1 Münze, 1×/Runde egal wie viele Museen).
+- **Kuriositätenladen:** die Münze erhält der NEHMENDE Baumeister.
+- **Juwelier:** Strafmünzen erst am Rundenende, auch an fertige Städte;
+  Solo: ohne Münze nicht baubar.
+- **Statue/Windschrein:** das gebaute Gebäude zählt sich selbst mit.
+- **Promenade:** 3 Münzen Pflicht; die nächsten 3 fremden Ansagen MÜSSEN auf
+  die Münzfelder, eigene Ansagen dürfen nicht (außer kein anderes Feld frei).
+- **Grotte:** Münzen auf ALLE 4 Mittelfelder, bebaute sofort kassieren; Münze
+  teilt sich das Feld mit Materialien; Reste verfallen am Spielende.
+- **Semaphor:** nur bei fremder Ansage, Zusatz-Material freiwillig, Platzieren
+  bringt 1 Münze; Münztausch des Erst-Materials verwirkt das Zusatz-Material.
+- **Prisma-Schmiede:** 2 UNTERSCHIEDLICHE Gebäude, überlappende Materialien
+  zählen doppelt, danach werden alle Reste entfernt; beide Bauten zählen für
+  die Rundenmünze.
+- **Hollow Hill:** −2 SP je Münztausch nach dem Bau.
+- **Okaver:** „Truhe auf 4 gefüllt" → Gratis-Hütte (jedes Mal).
+- **Eraflage:** wird wie eine Hütte GEFÜTTERT (9 SP nur gefüttert), zählt aber
+  für keine Hütten-Wertung anderer Karten.
+- **Münz-Slot:** Grotte, Estival, Promenade und Windschrein erweitern die
+  Truhe auf 5 (`coinSlot`), sobald gebaut.
+- **Special Note:** Auch per Karteneffekt platzierte Gebäude (Grove,
+  Architektengilde, Opaleye, Steinmetzgilde, Okaver, Kathedralen-Umbau)
+  bringen ihre Bau-Effekte.
+
+Solo ausgeschlossen (Fortune): `oddity_shop`, `schoolhouse`, `southern_semaphore`.

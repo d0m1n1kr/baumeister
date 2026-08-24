@@ -27,6 +27,13 @@ function isCottage(def: CardDef): boolean {
   return def.category === 'cottage' || (def.effects ?? []).includes('barrettCastle');
 }
 
+/** Fütterbar: Hütten-artig oder Monument mit Futter-Symbol (Eraflage Vineyard).
+ *  Solche Monumente werden wie Hütten gefüttert, zählen aber für keine
+ *  Hütten-Wertung (Brunnen, Pfarrhaus, …). */
+function isFeedable(def: CardDef): boolean {
+  return isCottage(def) || (def.effects ?? []).includes('fedMonument');
+}
+
 /** Barrett Castle zählt für alle Wertungen als 2 Hütten. */
 function cottageWeight(def: CardDef): number {
   return (def.effects ?? []).includes('barrettCastle') ? 2 : 1;
@@ -48,9 +55,9 @@ function selectorWeight(sel: Selector, target: CardDef): number {
 
 // ---------- Fütterung ----------
 
-/** Zusammenhängende Gruppen von Hütten-Gebäuden (orthogonal). */
+/** Zusammenhängende Gruppen fütterbarer Gebäude (orthogonal). */
 function cottageGroups(buildings: Placed[]): number[][] {
-  const cottageSquares = new Set(buildings.filter((b) => isCottage(b.def)).map((b) => b.square));
+  const cottageSquares = new Set(buildings.filter((b) => isFeedable(b.def)).map((b) => b.square));
   const seen = new Set<number>();
   const groups: number[][] = [];
   for (const s of cottageSquares) {
@@ -103,7 +110,7 @@ interface FeedCandidate {
  */
 function feedingCandidates(p: PlayerState, catalog: Catalog): FeedCandidate[] {
   const buildings = placedBuildings(p, catalog);
-  const cottages = buildings.filter((b) => isCottage(b.def)).map((b) => b.square);
+  const cottages = buildings.filter((b) => isFeedable(b.def)).map((b) => b.square);
   if (cottages.length === 0) return [{ fed: new Set(), coinsSpent: 0 }];
 
   const fixed = new Set<number>();
@@ -555,15 +562,19 @@ function scoreHandler(
       return 2 + bonus;
     }
     case 'eraflage': {
-      // Fortune (unverifiziert): Basis − 2 SP je anderem Gebäudetyp in Zeile ∪ Spalte
+      // Fortune: 9 SP nur gefüttert; −2 SP je einzigartigem Gebäudetyp in Zeile ∪ Spalte
       const types = new Set<string>();
       for (const o of buildings) {
-        if (o.square === self.square || o.card === self.card) continue;
+        if (o.square === self.square) continue;
         if (rowOf(o.square) === rowOf(self.square) || colOf(o.square) === colOf(self.square)) {
           types.add(o.card);
         }
       }
-      return baseVp - types.size * 2;
+      return (fed.has(self.square) ? baseVp : 0) - types.size * 2;
+    }
+    case 'hollowHill': {
+      // Fortune: −2 SP je Münztausch nach dem Bau
+      return baseVp - 2 * (p.hollowHillSwaps ?? 0);
     }
     default:
       return baseVp;

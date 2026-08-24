@@ -65,9 +65,17 @@ export const t = {
   coinSwap: 'Münze: anderes Material',
   coinSwapHint: 'Zahle 1 Münze und nimm ein beliebiges anderes Material',
   masonsTitle: 'Steinmetzgilde: je 1 Münze → 1 Gebäude',
-  promenadeTitle: 'Blütenpromenade: Münzen auf freie Felder legen',
-  museumSell: 'Museum: Material zurückgeben (+1 Münze)',
-  oddityTakeTitle: 'Kuriositätenladen: Material nehmen (Besitzer erhält 1 Münze)',
+  promenadeTitle: 'Blütenpromenade: Münzen auf leere Felder legen',
+  museumSell: 'Angesagtes Material zurückgeben (+1 Münze)',
+  museumContents: 'Auf dem Museum liegt:',
+  museumStockTitle: 'Museum: Material auflegen',
+  cathedralTitle: 'Kathedrale: 3 Münzen zahlen?',
+  cathedralPay: '3 Münzen zahlen',
+  cathedralTransform: (name: string) => `In ${name} umwandeln (Feld wählen)`,
+  cathedralTransformHere: (name: string) => `In ${name} umwandeln`,
+  okaverTitle: 'Schatzkammer: Truhe voll → Gratis-Hütte?',
+  semaphoreSkipHint: 'Zusatz-Material (Semaphor) verfällt mit „Fertig"',
+  oddityTakeTitle: 'Kuriositätenladen: Material nehmen (+1 Münze für dich)',
   oddityStoreHint: 'Auf den Kuriositätenladen gelegt',
   seedPlaceHint: 'Tippe ein Feld für deinen Samen',
   seedBonusTitle: 'Samen überbaut: Gratis-Material wählen',
@@ -160,10 +168,10 @@ export const t = {
     cavernNote: 'Höhlen-Regel (falls im Setup aktiviert): 2× pro Partie darfst du ein fremd angesagtes Material in die Höhle legen statt es zu platzieren.',
     fortuneTitle: 'Erweiterung: Fortune (Münzen)',
     fortuneSteps: [
-      'Baust du in einer Runde 2 oder mehr Gebäude (mit Materialentfernen), erhältst du 1 Münze — die Truhe fasst höchstens 4.',
+      'Baust du in einer Runde 2 oder mehr Gebäude (mit Materialentfernen), erhältst du 1 Münze — die Truhe fasst höchstens 4 (manche Monumente geben 1 Extra-Platz).',
       'Bei fremder Ansage kannst du 1 Münze zahlen und stattdessen ein beliebiges anderes Material nehmen (🪙-Knopf am Material-Chip).',
       'Am Spielende ist jede Münze in der Truhe 1 Punkt wert.',
-      'Dazu kommen eigene Fortune-Gebäude und -Monumente mit Münz-Effekten; mit ⚠ markierte Karten sind nach bestem Wissen umgesetzt.'
+      'Dazu kommen 12 Fortune-Gebäude und 10 Monumente mit Münz-Effekten — alle nach den offiziellen Kartentexten umgesetzt.'
     ],
     treesTitle: 'Erweiterung: Tiny Trees (Samen)',
     treesSteps: [

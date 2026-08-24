@@ -6,7 +6,7 @@ import type { Action, GameState } from '../engine/types';
 
 /** Bei Änderungen erhöhen — verhindert, dass Geräte mit unterschiedlichen App-Ständen
  *  in einer Partie landen und sich gegenseitig kaputte Zustände schicken. */
-export const PROTOCOL_VERSION = 3;
+export const PROTOCOL_VERSION = 4;
 
 export interface SeatInfo {
   index: number;
