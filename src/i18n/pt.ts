@@ -102,6 +102,14 @@ export const pt: Translation = {
 
   townHallMode: 'Modo Câmara Municipal',
   townHallModeHint: 'Sem mestre construtor: um baralho de recursos conduz as rondas; a cada 3.ª ronda todos escolhem livremente.',
+  trainMode: 'Modo ferrovia',
+  trainModeHint: 'Um trem com 3 vagões percorre a mesa rodada após rodada — com uma estação construída podes carregar ou trocar recursos.',
+  trainStopTitle: 'O trem para na tua estação!',
+  trainLoad: 'Carregar no trem',
+  trainSwapHint: 'Trocar pelo conteúdo do vagão',
+  trainAt: (name) => `O trem para em ${name}`,
+  trainPassing: (name) => `O trem passa por ${name}`,
+  trainTunnel: 'O trem está no túnel',
   thDraw: 'Comprar a próxima carta',
   thStartFree: 'Iniciar ronda: escolha livre',
   thDeckCount: (n: number) => `Baralho: ${n} cartas`,
@@ -187,6 +195,13 @@ export const pt: Translation = {
       'Fábrica, Armazém, troca de moeda etc. aplicam-se às cartas compradas; o Banco bloqueia a escolha livre, o Forte descansa nessas rondas.',
       'Com Fortune, a Loja de Curiosidades fica fora do jogo.'
     ],
+    trainTitle: 'Modo ferrovia (se ativado)',
+    trainSteps: [
+      'Um trem com 3 vagões avança uma cidade no fim de cada rodada (em sentido horário; no solo ele sai do túnel a cada 3 rodadas).',
+      'A estação fica exposta como 8ª carta para todos (pedra–madeira–pedra, 2 pontos, no máximo uma por cidade).',
+      'Quando o trem para na tua estação, em vez de colocar podes: carregar o recurso recebido num vagão livre — ou trocá-lo pelo conteúdo de um vagão (o recurso trocado é colocado normalmente).',
+      'Os vagões são públicos: o que deixas, outro pode levar pelo caminho.'
+    ],
     fortuneTitle: 'Expansão: Fortune (moedas)',
     fortuneSteps: [
       'Constrói 2 ou mais edifícios numa ronda (removendo recursos) para ganhar 1 moeda — o baú guarda no máximo 4 (alguns monumentos dão 1 espaço extra).',
@@ -255,6 +270,16 @@ export const pt: Translation = {
   ],
 
   errors: {
+    // Eisenbahn
+    'Die Eisenbahn ist nicht im Spiel': 'A ferrovia não está nesta partida',
+    'Der Zug hält nicht an deinem Bahnhof': 'O trem não para na tua estação',
+    'Der Zug wurde in dieser Runde bereits genutzt': 'O trem já foi usado nesta rodada',
+    'Kein Material zum Verladen': 'Nenhum recurso para carregar',
+    'Alle Waggons sind voll': 'Todos os vagões estão cheios',
+    'Das Zusatz-Material kann nicht getauscht werden': 'O recurso extra não pode ser trocado',
+    'Ungültiger Waggon': 'Vagão inválido',
+    'Dieser Waggon ist leer': 'Este vagão está vazio',
+    'Nur ein Bahnhof pro Stadt': 'Apenas uma estação por cidade',
     'Auf Münzfelder der Promenade nur direkt beim Platzieren': 'As casas com moeda do Passeio só se usam ao colocar diretamente',
     'Auswahl entspricht nicht dem Baumuster': 'A seleção não corresponde ao padrão de construção',
     'Bauplatz ist nicht frei': 'A casa de construção não está livre',

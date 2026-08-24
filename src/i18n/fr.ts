@@ -102,6 +102,14 @@ export const fr: Translation = {
 
   townHallMode: 'Mode Hôtel de ville',
   townHallModeHint: 'Sans maître bâtisseur : un paquet de ressources mène les manches ; chaque 3ᵉ manche, chacun choisit librement.',
+  trainMode: 'Mode chemin de fer',
+  trainModeHint: 'Un train de 3 wagons fait le tour de la table manche après manche — avec une gare construite, tu peux charger ou échanger des ressources.',
+  trainStopTitle: 'Le train s\'arrête à ta gare !',
+  trainLoad: 'Charger dans le train',
+  trainSwapHint: 'Échanger contre le contenu du wagon',
+  trainAt: (name) => `Le train s'arrête chez ${name}`,
+  trainPassing: (name) => `Le train passe devant ${name}`,
+  trainTunnel: 'Le train est dans le tunnel',
   thDraw: 'Piocher la carte suivante',
   thStartFree: 'Lancer la manche : choix libre',
   thDeckCount: (n: number) => `Pioche : ${n} cartes`,
@@ -187,6 +195,13 @@ export const fr: Translation = {
       'Fabrique, Entrepôt, échange de pièce & co s’appliquent aux cartes piochées ; la Banque bloque le choix libre, Fort Verveine passe les manches de choix.',
       'Avec Fortune, le Bazar des Curiosités est retiré du jeu.'
     ],
+    trainTitle: 'Mode chemin de fer (si activé au départ)',
+    trainSteps: [
+      'Un train de 3 wagons avance d\'une ville à la fin de chaque manche (dans le sens horaire ; en solo il sort du tunnel toutes les 3 manches).',
+      'La gare est exposée comme 8e carte pour tous (pierre–bois–pierre, 2 points, au plus une par ville).',
+      'Quand le train s\'arrête à ta gare, au lieu de placer tu peux : charger la ressource reçue dans un wagon vide — ou l\'échanger contre le contenu d\'un wagon (tu places ensuite la ressource échangée normalement).',
+      'Les wagons sont publics : ce que tu déposes, un autre peut le prendre en route.'
+    ],
     fortuneTitle: 'Extension : Fortune (pièces)',
     fortuneSteps: [
       'Construis 2 bâtiments ou plus en une manche (en retirant des ressources) pour gagner 1 pièce — le coffre en contient 4 au plus (certains monuments ajoutent 1 emplacement).',
@@ -255,6 +270,16 @@ export const fr: Translation = {
   ],
 
   errors: {
+    // Eisenbahn
+    'Die Eisenbahn ist nicht im Spiel': "Le chemin de fer n'est pas dans cette partie",
+    'Der Zug hält nicht an deinem Bahnhof': "Le train ne s'arrête pas à ta gare",
+    'Der Zug wurde in dieser Runde bereits genutzt': 'Le train a déjà été utilisé ce tour-ci',
+    'Kein Material zum Verladen': 'Aucune ressource à charger',
+    'Alle Waggons sind voll': 'Tous les wagons sont pleins',
+    'Das Zusatz-Material kann nicht getauscht werden': 'La ressource bonus ne peut pas être échangée',
+    'Ungültiger Waggon': 'Wagon invalide',
+    'Dieser Waggon ist leer': 'Ce wagon est vide',
+    'Nur ein Bahnhof pro Stadt': 'Une seule gare par ville',
     'Auf Münzfelder der Promenade nur direkt beim Platzieren': 'Les cases à pièce de la Promenade ne s’utilisent qu’au placement direct',
     'Auswahl entspricht nicht dem Baumuster': 'La sélection ne correspond pas au motif de construction',
     'Bauplatz ist nicht frei': 'La case de construction n’est pas libre',

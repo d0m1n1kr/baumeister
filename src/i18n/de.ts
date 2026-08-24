@@ -102,6 +102,14 @@ export const de = {
 
   townHallMode: 'Rathaus-Modus',
   townHallModeHint: 'Ohne Baumeister: Ein Materialdeck bestimmt die Runden, jede 3. Runde wählt jeder frei.',
+  trainMode: 'Eisenbahn-Modus',
+  trainModeHint: 'Ein Zug mit 3 Waggons fährt Runde für Runde um den Tisch — mit gebautem Bahnhof darfst du Material verladen oder tauschen.',
+  trainStopTitle: 'Der Zug hält an deinem Bahnhof!',
+  trainLoad: 'In den Zug verladen',
+  trainSwapHint: 'Gegen den Waggon-Inhalt tauschen',
+  trainAt: (name: string) => `Der Zug hält bei ${name}`,
+  trainPassing: (name: string) => `Der Zug fährt an ${name} vorbei`,
+  trainTunnel: 'Der Zug ist im Tunnel',
   thDraw: 'Nächste Karte ziehen',
   thStartFree: 'Runde starten: freie Wahl',
   thDeckCount: (n: number) => `Nachziehstapel: ${n} Karten`,
@@ -186,6 +194,13 @@ export const de = {
       'Ist der Stapel leer, wird der Abwurf neu gemischt und wieder 5 Karten verdeckt abgeworfen. Mitzählen lohnt sich!',
       'Fabrik, Lagerhaus, Münztausch & Co. wirken auf gezogene Karten; die Bank sperrt die freie Wahl, Fort Eisenkraut setzt in Wahlrunden aus.',
       'Mit Fortune ist der Kuriositätenladen aus dem Spiel.'
+    ],
+    trainTitle: 'Eisenbahn-Modus (falls im Setup aktiviert)',
+    trainSteps: [
+      'Ein Zug mit 3 Waggons fährt am Ende jeder Runde eine Stadt weiter (im Uhrzeigersinn; solo taucht er alle 3 Runden aus dem Tunnel auf).',
+      'Der Bahnhof liegt als 8. Karte für alle aus (Stein–Holz–Stein, 2 Punkte, höchstens einer pro Stadt).',
+      'Hält der Zug an deinem Bahnhof, darfst du statt zu platzieren: das erhaltene Material in einen freien Waggon verladen — oder gegen den Inhalt eines Waggons tauschen (das getauschte platzierst du dann normal).',
+      'Die Waggons sind öffentlich: Was du abgibst, kann unterwegs jemand anderes wegschnappen.'
     ],
     fortuneTitle: 'Erweiterung: Fortune (Münzen)',
     fortuneSteps: [

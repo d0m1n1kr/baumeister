@@ -11,6 +11,7 @@
   import GameView from './GameView.svelte';
   import ScoreScreen from './ScoreScreen.svelte';
   import UpdateBanner from './UpdateBanner.svelte';
+  import TrainRide from './TrainRide.svelte';
   import CreditsFooter from './CreditsFooter.svelte';
   import { sfx } from './sound';
   import type { GameState } from '../engine/types';
@@ -156,9 +157,9 @@
   /** Host startet aus der Lobby: Konfiguration aus den aktuellen Sitzplätzen bauen. */
   function startFromLobby() {
     const players = session.seats.map((s) => ({ name: s.name, corner: s.corner }));
-    const { sets, useMonuments, cavern, townHall } = session.setup;
+    const { sets, useMonuments, cavern, townHall, train } = session.setup;
     try {
-      session.startGame(buildGameConfig(players, sets, useMonuments, cavern, { townHall }));
+      session.startGame(buildGameConfig(players, sets, useMonuments, cavern, { townHall, train }));
     } catch (e) {
       setupError = e instanceof Error ? e.message : String(e);
     }
@@ -166,6 +167,7 @@
 </script>
 
 <UpdateBanner />
+{#if game.state?.train}<TrainRide />{/if}
 
 {#if session.role === 'guest'}
   {#if session.status === 'playing' && game.state}

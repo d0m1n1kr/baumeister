@@ -4,7 +4,7 @@
   import { drags } from '../store/dragStore.svelte';
   import { catalog } from '../data';
   import { matchingCards } from '../engine/patterns';
-  import { hasFortIronweed } from '../engine/game';
+  import { hasFortIronweed, trainStopPlayer } from '../engine/game';
   import type { CardDef, Resource } from '../engine/types';
   import { cornerRotation, RESOURCE_CSS } from './helpers';
   import { sfx } from './sound';
@@ -351,6 +351,12 @@
     )
   );
 
+  // ---------- Eisenbahn ----------
+  // Der Zug hält an diesem Bahnhof und die Zug-Aktion ist noch offen
+  const trainHere = $derived(
+    inRound && p.pending != null && !p.trainUsed && trainStopPlayer(st, catalog) === player
+  );
+
   // ---------- Monument ----------
   const monumentDef = $derived(p.monument ? catalog[p.monument.card] : null);
 
@@ -511,6 +517,29 @@
               <button onpointerup={() => showError(game.dispatch({ t: 'cavern', player }))}>
                 🕳 {t.cavernButton} ({2 - (p.cavernUsed ?? 0)})
               </button>
+            {/if}
+            {#if trainHere}
+              <div class="trainStop">
+                <span class="trainLabel">🚂 {t.trainStopTitle}</span>
+                <div class="trainActions">
+                  {#if st.train!.wagons.some((w) => w === null)}
+                    <button onpointerup={() => showError(game.dispatch({ t: 'trainDrop', player }))}>
+                      📦 {t.trainLoad}
+                    </button>
+                  {/if}
+                  {#each st.train!.wagons as w, wi}
+                    {#if w}
+                      <button
+                        class="wagonBtn"
+                        title={t.trainSwapHint}
+                        onpointerup={() => showError(game.dispatch({ t: 'trainSwap', player, wagon: wi }))}
+                      >
+                        🔁 <span class="dotBig" style="background: {RESOURCE_CSS[w]}"></span>
+                      </button>
+                    {/if}
+                  {/each}
+                </div>
+              </div>
             {/if}
           </div>
         {/if}
@@ -976,6 +1005,26 @@
   .panel button { font-size: 13px; padding: 7px 12px; }
 
   .pendingWrap { display: flex; flex-direction: column; gap: 6px; align-items: flex-start; }
+
+  /* Eisenbahn: Halt am Bahnhof */
+  .trainStop {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    padding: 6px 8px;
+    border: 1px dashed var(--accent);
+    border-radius: 10px;
+  }
+  .trainLabel { font-size: 12px; font-weight: 700; color: var(--accent); }
+  .trainActions { display: flex; flex-wrap: wrap; gap: 6px; }
+  .wagonBtn { display: inline-flex; align-items: center; gap: 4px; }
+  .dotBig {
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    border: 1.5px solid rgba(0, 0, 0, 0.4);
+    display: inline-block;
+  }
   .pendingLabel { font-size: 11px; color: var(--text-dim); }
   .moveHint { font-size: 11px; color: var(--text-dim); }
   .chip {

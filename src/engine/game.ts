@@ -50,8 +50,34 @@ export function newGame(config: GameConfig): GameState {
         : { t: 'nameResource' },
     masterBuilder: config.firstMasterBuilder,
     round: 0,
+    train: config.systems.train
+      ? { pos: config.trainStart ?? 0, wagons: [null, null, null] }
+      : undefined,
     v: SAVE_VERSION
   };
+}
+
+// ---------- Eisenbahn (eigener Modus) ----------
+
+/** Länge des Rundkurses: eine Position je Stadt, solo mit 2 Tunnel-Segmenten
+ *  (der Zug hält dann alle 3 Runden). */
+export function trainCycle(s: GameState): number {
+  return Math.max(s.players.length, 3);
+}
+
+/** Spieler, an dessen Bahnhof der Zug in dieser Runde hält — sonst null. */
+export function trainStopPlayer(s: GameState, catalog: Catalog): number | null {
+  const train = s.train;
+  if (!train || train.pos >= s.players.length) return null;
+  const p = s.players[train.pos];
+  if (p.done) return null;
+  return hasStation(p, catalog) ? train.pos : null;
+}
+
+function hasStation(p: PlayerState, catalog: Catalog): boolean {
+  return p.board.some(
+    (sq) => sq.building && (catalog[sq.building.card]?.effects ?? []).includes('trainStation')
+  );
 }
 
 /** Truhenkapazität: 4, +1 mit gebautem Münz-Slot-Monument (Fortune). */
@@ -131,6 +157,8 @@ function dispatchAction(s: GameState, action: Action, catalog: Catalog): GameSta
     case 'resolveGuild': return resolveGuild(s, action.player, action.square, action.newCard, catalog);
     case 'resolveOpaleyeSetup': return resolveOpaleyeSetup(s, action.player, action.card, catalog);
     case 'resolveOpaleyeClaim': return resolveOpaleyeClaim(s, action.player, action.accept, action.square, catalog);
+    case 'trainDrop': return trainDrop(s, action.player, catalog);
+    case 'trainSwap': return trainSwap(s, action.player, action.wagon, catalog);
     case 'roundDone': return roundDone(s, action.player, catalog);
     case 'declareComplete': return declareComplete(s, action.player, catalog);
   }
@@ -219,6 +247,7 @@ function startRound(s: GameState, resource: Resource | null, catalog: Catalog): 
     p.pendingLocked = false;
     p.pendingExtra = null;
     p.placedCoin = false;
+    p.trainUsed = false;
     if (p.done) {
       p.pending = null;
       p.roundDone = true;
@@ -422,6 +451,44 @@ function cavern(s: GameState, player: number): GameState {
   return s;
 }
 
+/** Eisenbahn: Guards, die Verladen und Tauschen gemeinsam haben. */
+function trainAccess(s: GameState, player: number, catalog: Catalog) {
+  requireRound(s);
+  const p = activePlayer(s, player);
+  const train = s.train ?? fail('Die Eisenbahn ist nicht im Spiel');
+  if (trainStopPlayer(s, catalog) !== player) fail('Der Zug hält nicht an deinem Bahnhof');
+  if (p.trainUsed) fail('Der Zug wurde in dieser Runde bereits genutzt');
+  if (p.pending == null) fail('Kein Material zum Verladen');
+  return { p, train };
+}
+
+/** Eisenbahn: das erhaltene Material in einen freien Waggon legen —
+ *  statt es zu platzieren. */
+function trainDrop(s: GameState, player: number, catalog: Catalog): GameState {
+  const { p, train } = trainAccess(s, player, catalog);
+  const w = train.wagons.indexOf(null);
+  if (w < 0) fail('Alle Waggons sind voll');
+  train.wagons[w] = p.pending!;
+  p.trainUsed = true;
+  consumePending(p); // ein evtl. Zusatz-Material (Semaphor) rückt regulär nach
+  p.placedSquare = null;
+  return s;
+}
+
+/** Eisenbahn: das erhaltene Material gegen den Inhalt eines Waggons tauschen —
+ *  das getauschte Material wird danach normal platziert. */
+function trainSwap(s: GameState, player: number, wagon: number, catalog: Catalog): GameState {
+  const { p, train } = trainAccess(s, player, catalog);
+  if (p.pendingLocked) fail('Das Zusatz-Material kann nicht getauscht werden');
+  if (wagon < 0 || wagon >= train.wagons.length) fail('Ungültiger Waggon');
+  const held = train.wagons[wagon];
+  if (held == null) fail('Dieser Waggon ist leer');
+  train.wagons[wagon] = p.pending!;
+  p.pending = held;
+  p.trainUsed = true;
+  return s;
+}
+
 /** Unbestätigtes Material dieser Runde verschieben (bis zum „Fertig"). */
 function moveResource(s: GameState, player: number, square: number, catalog: Catalog): GameState {
   requireRound(s);
@@ -595,6 +662,11 @@ function build(
     fail('Karte ist in dieser Partie nicht im Spiel');
   }
 
+  // Eisenbahn: höchstens ein Bahnhof pro Stadt
+  if (effects.includes('trainStation') && hasStation(p, catalog)) {
+    fail('Nur ein Bahnhof pro Stadt');
+  }
+
   if (!matchesPattern(card, { board: p.board, squares, catalog })) {
     fail('Auswahl entspricht nicht dem Baumuster');
   }
@@ -721,6 +793,10 @@ function placeBuildingByEffect(
   s: GameState, player: number, card: string, target: number, catalog: Catalog
 ): void {
   const p = s.players[player];
+  // Eisenbahn: auch per Effekt darf kein zweiter Bahnhof entstehen
+  if ((catalog[card]?.effects ?? []).includes('trainStation') && hasStation(p, catalog)) {
+    fail('Nur ein Bahnhof pro Stadt');
+  }
   const cell = p.board[target];
   cell.building = { card };
   if (cell.coin) {
@@ -1087,6 +1163,9 @@ function maybeAdvance(s: GameState, catalog: Catalog): GameState {
   if (!allDone) return s;
 
   awardRoundCoins(s, catalog);
+  // Eisenbahn: der Zug fährt eine Position weiter (Städte im Uhrzeigersinn,
+  // solo mit Tunnel-Segmenten)
+  if (s.train) s.train.pos = (s.train.pos + 1) % trainCycle(s);
   // Rathaus: der Bürgermeister bleibt derselbe — es gibt keinen Baumeister
   if (!s.config.townHall) s.masterBuilder = nextMasterBuilder(s, catalog);
   s.oddityTaken = false;

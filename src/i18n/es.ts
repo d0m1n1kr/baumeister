@@ -102,6 +102,14 @@ export const es: Translation = {
 
   townHallMode: 'Modo Ayuntamiento',
   townHallModeHint: 'Sin maestro constructor: un mazo de recursos dirige las rondas; cada 3.ª ronda todos eligen libremente.',
+  trainMode: 'Modo ferrocarril',
+  trainModeHint: 'Un tren con 3 vagones recorre la mesa ronda a ronda: con una estación construida puedes cargar o intercambiar recursos.',
+  trainStopTitle: '¡El tren para en tu estación!',
+  trainLoad: 'Cargar en el tren',
+  trainSwapHint: 'Intercambiar por el contenido del vagón',
+  trainAt: (name) => `El tren para en ${name}`,
+  trainPassing: (name) => `El tren pasa por ${name}`,
+  trainTunnel: 'El tren está en el túnel',
   thDraw: 'Robar la siguiente carta',
   thStartFree: 'Iniciar ronda: elección libre',
   thDeckCount: (n: number) => `Mazo: ${n} cartas`,
@@ -187,6 +195,13 @@ export const es: Translation = {
       'Fábrica, Almacén, cambio de moneda, etc. se aplican a las cartas robadas; el Banco bloquea la elección libre y el Fuerte descansa en esas rondas.',
       'Con Fortune, la Tienda de Rarezas queda fuera del juego.'
     ],
+    trainTitle: 'Modo ferrocarril (si está activado)',
+    trainSteps: [
+      'Un tren con 3 vagones avanza una ciudad al final de cada ronda (en sentido horario; en solitario sale del túnel cada 3 rondas).',
+      'La estación está expuesta como 8.ª carta para todos (piedra–madera–piedra, 2 puntos, máximo una por ciudad).',
+      'Cuando el tren para en tu estación, en vez de colocar puedes: cargar el recurso recibido en un vagón libre — o intercambiarlo por el contenido de un vagón (el recurso intercambiado se coloca normalmente).',
+      'Los vagones son públicos: lo que dejas, otro puede llevárselo por el camino.'
+    ],
     fortuneTitle: 'Expansión: Fortune (monedas)',
     fortuneSteps: [
       'Construye 2 o más edificios en una ronda (retirando recursos) para ganar 1 moneda — el cofre guarda como máximo 4 (algunos monumentos añaden 1 hueco).',
@@ -255,6 +270,16 @@ export const es: Translation = {
   ],
 
   errors: {
+    // Eisenbahn
+    'Die Eisenbahn ist nicht im Spiel': 'El ferrocarril no está en esta partida',
+    'Der Zug hält nicht an deinem Bahnhof': 'El tren no para en tu estación',
+    'Der Zug wurde in dieser Runde bereits genutzt': 'El tren ya se usó en esta ronda',
+    'Kein Material zum Verladen': 'No hay recurso para cargar',
+    'Alle Waggons sind voll': 'Todos los vagones están llenos',
+    'Das Zusatz-Material kann nicht getauscht werden': 'El recurso extra no se puede intercambiar',
+    'Ungültiger Waggon': 'Vagón no válido',
+    'Dieser Waggon ist leer': 'Este vagón está vacío',
+    'Nur ein Bahnhof pro Stadt': 'Solo una estación por ciudad',
     'Auf Münzfelder der Promenade nur direkt beim Platzieren': 'Las casillas con moneda del Paseo solo se usan al colocar directamente',
     'Auswahl entspricht nicht dem Baumuster': 'La selección no coincide con el patrón de construcción',
     'Bauplatz ist nicht frei': 'La casilla de construcción no está libre',

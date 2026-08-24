@@ -95,7 +95,8 @@ export function randomSetup(
   sets: string[] = ['base'],
   systems: { coins?: boolean; trees?: boolean; cavern?: boolean } = {},
   solo = false,
-  townHall = false
+  townHall = false,
+  train = false
 ): GameConfig {
   // Spielerreihenfolge = Sitzreihenfolge im Uhrzeigersinn, damit der
   // Baumeister im Uhrzeigersinn weiterwandert.
@@ -113,6 +114,9 @@ export function randomSetup(
     if (pool.length === 0) throw new AssetError(`Keine Karten in Kategorie "${cat}"`);
     activeCards.push(pool[Math.floor(rng() * pool.length)].id);
   }
+  // Eisenbahn: der Bahnhof liegt als 8. Karte für alle aus (set 'internal',
+  // taucht daher nie in den Kategorie-Pools auf)
+  if (train) activeCards.push('train_station');
 
   const monumentDeals: string[][] = [];
   if (useMonuments) {
@@ -144,11 +148,16 @@ export function randomSetup(
       ? shuffled(RESOURCES.flatMap((r) => [r, r, r]), rng)
       : undefined,
     thSeed: townHall ? Math.floor(rng() * 0xffffffff) : undefined,
+    // Eisenbahn: zufällige Startposition auf dem Rundkurs (solo: 3 Segmente)
+    trainStart: train
+      ? Math.floor(rng() * Math.max(players.length, 3))
+      : undefined,
     sets,
     systems: {
       coins: systems.coins ?? false,
       trees: systems.trees ?? false,
-      cavern: systems.cavern ?? false
+      cavern: systems.cavern ?? false,
+      train
     }
   };
 }

@@ -1,0 +1,33 @@
+{
+  "id": "train_station",
+  "set": "internal",
+  "kind": "building",
+  "category": "well",
+  "color": "grey",
+  "name": {
+    "de": "Bahnhof",
+    "en": "Train Station"
+  },
+  "text": {
+    "de": "2 Punkte. Hält der Zug in deiner Stadt, darfst du das erhaltene Material statt zu platzieren in einen freien Waggon verladen — oder gegen den Inhalt eines Waggons tauschen.",
+    "en": "2 points. When the train stops in your town, you may load the received resource into an empty wagon instead of placing it — or swap it for a wagon's contents."
+  },
+  "pattern": [
+    [
+      "stone",
+      "wood",
+      "stone"
+    ]
+  ],
+  "features": [
+    "interactive"
+  ],
+  "scoring": {
+    "type": "flat",
+    "vp": 2
+  },
+  "effects": [
+    "trainStation"
+  ],
+  "art": "train_station.svg"
+}

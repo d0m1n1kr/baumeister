@@ -100,7 +100,9 @@ export type EffectId =
   | 'okaverCottage'      // Truhe auf 4 Münzen gefüllt → Hütte auf ein beliebiges freies Feld
   | 'hollowHill'         // Marker: nach dem Bau kostet jeder Münztausch −2 SP
   | 'fedMonument'        // Monument will wie eine Hütte gefüttert werden (Eraflage)
-  | 'coinSlot';          // gebautes Monument: +1 Truhenplatz (Truhe fasst 5)
+  | 'coinSlot'           // gebautes Monument: +1 Truhenplatz (Truhe fasst 5)
+  // ---------- Eisenbahn (eigener Modus) ----------
+  | 'trainStation';      // Bahnhof: der Zug hält hier (max. 1 pro Stadt)
 
 export interface FeedingSpec {
   mode:
@@ -209,6 +211,8 @@ export interface PlayerState {
   pendingCoins?: number;
   /** Fortune, Promenade: das platzierte Material hat eine Münze kassiert (nicht mehr verschiebbar). */
   placedCoin?: boolean;
+  /** Eisenbahn: Zug-Aktion (Verladen/Tauschen) in dieser Runde bereits genutzt. */
+  trainUsed?: boolean;
 }
 
 export type PendingChoice =
@@ -257,7 +261,9 @@ export interface GameConfig {
   /** Aktive Karten-Sets (enthält immer 'base'). */
   sets: string[];
   /** Aktive Zusatzsysteme (aus den gewählten Sets abgeleitet). */
-  systems: { coins: boolean; trees: boolean; cavern?: boolean };
+  systems: { coins: boolean; trees: boolean; cavern?: boolean; train?: boolean };
+  /** Eisenbahn: zufällige Startposition des Zugs (seedbar). */
+  trainStart?: number;
 }
 
 /** Maximale Münzen in der Truhe (Fortune). */
@@ -281,6 +287,9 @@ export interface GameState {
   round: number;
   /** Fortune: Oddity-Shop-Zugriff des aktuellen Baumeisters bereits genutzt. */
   oddityTaken?: boolean;
+  /** Eisenbahn: Position auf dem Rundkurs (pos < Spielerzahl: hält bei dieser
+   *  Stadt, sonst Tunnel) und die 3 Waggons (null = leer). */
+  train?: { pos: number; wagons: (Resource | null)[] };
   /** Version des Save-Formats. */
   v: number;
 }
@@ -314,6 +323,8 @@ export type Action =
   | { t: 'resolveGuild'; player: number; square: number | null; newCard?: string }
   | { t: 'resolveOpaleyeSetup'; player: number; card: string | null }
   | { t: 'resolveOpaleyeClaim'; player: number; accept: boolean; square?: number }
+  | { t: 'trainDrop'; player: number }
+  | { t: 'trainSwap'; player: number; wagon: number }
   | { t: 'roundDone'; player: number }
   | { t: 'declareComplete'; player: number };
 
