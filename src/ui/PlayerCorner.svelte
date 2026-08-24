@@ -735,7 +735,8 @@
         </button>
       {/if}
 
-      {#if error}<div class="error">{error}</div>{/if}
+      <!-- key: neue Meldung startet das Schütteln auch, wenn schon eine steht -->
+      {#if error}{#key error}<div class="error">{error}</div>{/key}{/if}
       {/if}
     </div>
   </div>

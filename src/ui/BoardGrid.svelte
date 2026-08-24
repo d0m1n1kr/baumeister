@@ -3,6 +3,9 @@
   import { catalog, artFor } from '../data';
   import { CATEGORY_CSS, RESOURCE_CSS } from './helpers';
 
+  /** Fliegendes Material beim Bauen (rein dekorativ). */
+  type Ghost = { id: number; col: number; row: number; dx: number; dy: number; color: string };
+
   let {
     player,
     board,
@@ -26,6 +29,63 @@
   function cardOf(sq: Square) {
     return sq.building ? catalog[sq.building.card] : undefined;
   }
+
+  // Bau-Moment: rein aus Brett-Änderungen abgeleitet (kein Engine-Ereignis
+  // nötig) — funktioniert damit identisch am Einzelgerät, beim Host und bei
+  // Gästen, die nur Zustands-Snapshots empfangen. Beim ersten Rendern (Mount,
+  // Reload) gibt es kein Vorher-Brett, also auch keine Animation.
+  const reduceMotion =
+    typeof matchMedia !== 'undefined' && matchMedia('(prefers-reduced-motion: reduce)').matches;
+  let prevBoard: { card: string | null; resource: string | null }[] | null = null;
+  let fresh = $state<Record<number, 'build' | 'monument'>>({});
+  let ghosts = $state<Ghost[]>([]);
+  let ghostSeq = 0;
+  let fxTimer: ReturnType<typeof setTimeout> | undefined;
+
+  $effect(() => {
+    const snap = board.map((sq) => ({
+      card: sq.building?.card ?? null,
+      resource: sq.resource ?? null
+    }));
+    const prev = prevBoard;
+    prevBoard = snap;
+    if (!prev || reduceMotion) return;
+
+    const builtAt: number[] = [];
+    for (let i = 0; i < snap.length; i++) {
+      if (snap[i].card && !prev[i]?.card) builtAt.push(i);
+    }
+    if (builtAt.length === 0) return;
+
+    const marks: Record<number, 'build' | 'monument'> = {};
+    for (const i of builtAt) {
+      marks[i] = catalog[snap[i].card!]?.kind === 'monument' ? 'monument' : 'build';
+    }
+    fresh = marks;
+
+    // Verbrauchte Materialien fliegen sichtbar zum (ersten) neuen Gebäude
+    const target = builtAt[0];
+    const spawned: Ghost[] = [];
+    for (let i = 0; i < snap.length; i++) {
+      const lost = prev[i]?.resource;
+      if (lost && !snap[i].resource && !builtAt.includes(i)) {
+        spawned.push({
+          id: ghostSeq++,
+          col: i % 4,
+          row: Math.floor(i / 4),
+          dx: (target % 4 - i % 4) * 100,
+          dy: (Math.floor(target / 4) - Math.floor(i / 4)) * 100,
+          color: RESOURCE_CSS[lost as keyof typeof RESOURCE_CSS]
+        });
+      }
+    }
+    ghosts = spawned;
+    clearTimeout(fxTimer);
+    fxTimer = setTimeout(() => {
+      fresh = {};
+      ghosts = [];
+    }, 900);
+  });
 </script>
 
 <div class="board">
@@ -43,7 +103,12 @@
       onpointerup={() => oncell?.(i)}
     >
       {#if def}
-        <div class="building" style="--cat: {CATEGORY_CSS[def.color]}">
+        <div
+          class="building"
+          class:justBuilt={fresh[i] !== undefined}
+          class:gold={fresh[i] === 'monument'}
+          style="--cat: {CATEGORY_CSS[def.color]}"
+        >
           <span class="bart">{@html artFor(def) ?? ''}</span>
           {#if sq.building?.marked}
             <span class="dot marked" style="background: {RESOURCE_CSS[sq.building.marked]}"></span>
@@ -69,10 +134,19 @@
       {#if seed === i && !sq.building}<span class="seedMark">🌱</span>{/if}
     </div>
   {/each}
+  {#each ghosts as g (g.id)}
+    <span
+      class="ghost"
+      style="left: {g.col * 25}%; top: {g.row * 25}%; --dx: {g.dx}%; --dy: {g.dy}%"
+    >
+      <span class="ghostDot" style="background: {g.color}"></span>
+    </span>
+  {/each}
 </div>
 
 <style>
   .board {
+    position: relative; /* Bezugsrahmen für die fliegenden Material-Geister */
     display: grid;
     grid-template-columns: repeat(4, 1fr);
     grid-template-rows: repeat(4, 1fr);
@@ -101,7 +175,56 @@
     z-index: 1;
     animation: pulse 1s ease-in-out infinite alternate;
   }
-  @keyframes pulse { from { outline-color: var(--ok); } to { outline-color: transparent; } }
+  @keyframes pulse {
+    from { outline-color: var(--ok); box-shadow: inset 0 0 10px 1px color-mix(in srgb, var(--ok) 45%, transparent); }
+    to { outline-color: transparent; box-shadow: inset 0 0 2px 0 transparent; }
+  }
+
+  /* Bau-Moment: Gebäude ploppt auf (scale als Einzel-Property, kollidiert
+     nicht mit anderen Transforms), Monumente glühen zusätzlich golden */
+  .building.justBuilt {
+    animation: buildPop 380ms cubic-bezier(0.34, 1.56, 0.64, 1) 110ms backwards;
+    z-index: 2;
+  }
+  .building.justBuilt.gold {
+    animation:
+      buildPop 380ms cubic-bezier(0.34, 1.56, 0.64, 1) 110ms backwards,
+      monumentGlow 1.3s ease-out 110ms backwards;
+  }
+  @keyframes buildPop { from { scale: 0.2; opacity: 0; } }
+  @keyframes monumentGlow {
+    0% { box-shadow: 0 0 0 0 rgba(255, 205, 90, 0.95); }
+    100% { box-shadow: 0 0 20px 8px rgba(255, 205, 90, 0); }
+  }
+
+  /* Fliegende Material-Geister: verbrauchte Materialien ziehen sich zum
+     neuen Gebäude zusammen. translate in % der eigenen (Zellen-)Größe =
+     exakte Zellenkoordinaten. */
+  .ghost {
+    position: absolute;
+    width: 25%;
+    height: 25%;
+    display: grid;
+    place-items: center;
+    pointer-events: none;
+    z-index: 3;
+    animation: ghostFly 330ms ease-in forwards;
+  }
+  .ghostDot {
+    width: 46%;
+    height: 46%;
+    border-radius: 50%;
+    border: 2px solid rgba(0, 0, 0, 0.35);
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.4);
+  }
+  @keyframes ghostFly {
+    to { translate: var(--dx) var(--dy); scale: 0.3; opacity: 0.1; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .ghost { display: none; }
+    .building.justBuilt, .building.justBuilt.gold { animation: none; }
+    .cell.highlight { animation: none; }
+  }
   .building {
     position: absolute;
     inset: 0;
