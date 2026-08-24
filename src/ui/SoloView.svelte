@@ -79,6 +79,11 @@
     min-width: 0;
   }
   .slot { width: clamp(84px, 22vw, 130px); flex-shrink: 0; }
+  @media (max-width: 720px) {
+    /* Gegner-Bretter kompakter — sie sind reine Übersicht */
+    .opponents { gap: 8px; padding: 6px 8px 2px; }
+    .slot { width: clamp(58px, 16vw, 84px); }
+  }
   .strip { min-width: 0; min-height: 0; }
   .own {
     min-height: 0;

@@ -152,7 +152,7 @@
       </button>
     {/if}
   </div>
-  <div class="cards" class:alice={aliceOn} class:flipped={flipped && !solo}>
+  <div class="cards" class:alice={aliceOn} class:flipped={flipped && !solo} class:many={cardIds.length > 8}>
     {#each cardIds as id}
       <div class="cardWrap">
         <CardMini
@@ -289,6 +289,23 @@
       touch-action: auto;
     }
     .strip.soloStrip.horizontal .cardWrap { width: calc(25% - 5px); }
+    /* Mehr als 8 Karten (Monument als 9.): eine Reihe, seitlich scrollbar —
+       drei Umbruch-Reihen würden das Brett aus dem Bildschirm schieben */
+    .strip.soloStrip.horizontal .cards.many:not(.alice) {
+      flex-wrap: nowrap;
+      justify-content: flex-start;
+      overflow-x: auto;
+      overflow-y: hidden;
+      touch-action: pan-x;
+      /* Scroll-Container darf nicht mit dem Inhalt mitwachsen */
+      max-width: 100%;
+      min-width: 0;
+      align-self: stretch;
+    }
+    .strip.soloStrip.horizontal .cards.many:not(.alice) .cardWrap {
+      flex: 0 0 calc(25% - 5px);
+      min-width: 0;
+    }
   }
 
   /* Tablet-Hochformat (2 Spieler / Einzelansicht): genug Höhe — Karten

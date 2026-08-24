@@ -414,6 +414,7 @@
         tentative={mode === 'idle' ? tentative : null}
         seed={treesActive && p.seedSquare != null && p.seedSquare >= 0 ? p.seedSquare : null}
         rail={!!st.train}
+        trackEdge={st.train ? (rotation === 180 ? 'top' : 'bottom') : null}
         {oncell}
       />
       {#if mode === 'target'}<div class="hint">{t.chooseBuildTarget}</div>
