@@ -108,7 +108,7 @@ export const fr: Translation = {
   trainLoad: 'Charger dans le train',
   trainSwapHint: 'Échanger contre le contenu du wagon',
   trainAt: (name) => `Le train s'arrête chez ${name}`,
-  trainPassing: (name) => `Le train passe devant ${name}`,
+  trainPassing: (name) => `Le train s'arrête chez ${name} (pas de gare)`,
   trainTunnel: 'Le train est dans le tunnel',
   thDraw: 'Piocher la carte suivante',
   thStartFree: 'Lancer la manche : choix libre',
@@ -197,9 +197,10 @@ export const fr: Translation = {
     ],
     trainTitle: 'Mode chemin de fer (si activé au départ)',
     trainSteps: [
-      'Un train de 3 wagons avance d\'une ville à la fin de chaque manche (dans le sens horaire ; en solo il sort du tunnel toutes les 3 manches).',
-      'La gare est exposée comme 8e carte pour tous (pierre–bois–pierre, 2 points, au plus une par ville).',
-      'Quand le train s\'arrête à ta gare, au lieu de placer tu peux : charger la ressource reçue dans un wagon vide — ou l\'échanger contre le contenu d\'un wagon (tu places ensuite la ressource échangée normalement).',
+      'Les rails longent les bords inférieur et supérieur de l\'aire de jeu, avec des tunnels aux extrémités. Le train (3 wagons derrière la locomotive) reste toujours visible avec son chargement.',
+      'À la fin de chaque manche, il avance d\'une ville et s\'y arrête (en solo il sort du tunnel toutes les 3 manches).',
+      'La gare est exposée comme 8e carte pour tous (pierre–bois–pierre, 2 points, au plus une par ville) et doit être construite sur la voie — dans la rangée du bas de ta ville.',
+      'Seulement avec une gare tu peux, au lieu de placer : charger la ressource reçue dans un wagon vide — ou l\'échanger contre le contenu d\'un wagon (tu places ensuite la ressource échangée normalement).',
       'Les wagons sont publics : ce que tu déposes, un autre peut le prendre en route.'
     ],
     fortuneTitle: 'Extension : Fortune (pièces)',
@@ -271,6 +272,7 @@ export const fr: Translation = {
 
   errors: {
     // Eisenbahn
+    'Der Bahnhof muss an der Strecke liegen (unterste Reihe)': 'La gare doit être sur la voie (rangée du bas)',
     'Die Eisenbahn ist nicht im Spiel': "Le chemin de fer n'est pas dans cette partie",
     'Der Zug hält nicht an deinem Bahnhof': "Le train ne s'arrête pas à ta gare",
     'Der Zug wurde in dieser Runde bereits genutzt': 'Le train a déjà été utilisé ce tour-ci',

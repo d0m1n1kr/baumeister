@@ -3,7 +3,7 @@
 import type {
   Action, Catalog, GameConfig, GameState, PendingChoice, PlayerState, Resource, Square
 } from './types';
-import { CENTER_SQUARES, COIN_CAP, NUM_SQUARES, colOf, rowOf } from './types';
+import { BOARD_SIZE, CENTER_SQUARES, COIN_CAP, NUM_SQUARES, colOf, rowOf } from './types';
 import { matchesPattern } from './patterns';
 import { mulberry32, shuffled } from './registry';
 
@@ -662,9 +662,13 @@ function build(
     fail('Karte ist in dieser Partie nicht im Spiel');
   }
 
-  // Eisenbahn: höchstens ein Bahnhof pro Stadt
-  if (effects.includes('trainStation') && hasStation(p, catalog)) {
-    fail('Nur ein Bahnhof pro Stadt');
+  // Eisenbahn: höchstens ein Bahnhof pro Stadt, und nur an der Strecke
+  // (die Gleise verlaufen an der untersten Reihe jeder Stadt)
+  if (effects.includes('trainStation')) {
+    if (hasStation(p, catalog)) fail('Nur ein Bahnhof pro Stadt');
+    if (Math.floor(target / BOARD_SIZE) !== BOARD_SIZE - 1) {
+      fail('Der Bahnhof muss an der Strecke liegen (unterste Reihe)');
+    }
   }
 
   if (!matchesPattern(card, { board: p.board, squares, catalog })) {
@@ -793,9 +797,12 @@ function placeBuildingByEffect(
   s: GameState, player: number, card: string, target: number, catalog: Catalog
 ): void {
   const p = s.players[player];
-  // Eisenbahn: auch per Effekt darf kein zweiter Bahnhof entstehen
-  if ((catalog[card]?.effects ?? []).includes('trainStation') && hasStation(p, catalog)) {
-    fail('Nur ein Bahnhof pro Stadt');
+  // Eisenbahn: auch per Effekt kein zweiter Bahnhof und nur an der Strecke
+  if ((catalog[card]?.effects ?? []).includes('trainStation')) {
+    if (hasStation(p, catalog)) fail('Nur ein Bahnhof pro Stadt');
+    if (Math.floor(target / BOARD_SIZE) !== BOARD_SIZE - 1) {
+      fail('Der Bahnhof muss an der Strecke liegen (unterste Reihe)');
+    }
   }
   const cell = p.board[target];
   cell.building = { card };

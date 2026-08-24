@@ -108,7 +108,7 @@ export const en: Translation = {
   trainLoad: 'Load onto the train',
   trainSwapHint: 'Swap for this wagon\'s contents',
   trainAt: (name) => `The train is stopping at ${name}`,
-  trainPassing: (name) => `The train is passing ${name}`,
+  trainPassing: (name) => `The train stops at ${name} (no station)`,
   trainTunnel: 'The train is in the tunnel',
   thDraw: 'Draw the next card',
   thStartFree: 'Start round: free choice',
@@ -197,9 +197,10 @@ export const en: Translation = {
     ],
     trainTitle: 'Railway mode (if enabled in setup)',
     trainSteps: [
-      'A train with 3 wagons moves one town further at the end of every round (clockwise; solo it emerges from the tunnel every 3rd round).',
-      'The train station is laid out as an 8th card for everyone (stone–wood–stone, 2 points, at most one per town).',
-      'When the train stops at your station, instead of placing you may: load the received resource into an empty wagon — or swap it for a wagon\'s contents (then place the swapped resource normally).',
+      'The tracks run along the bottom and top edges of the play area, with tunnels at the ends. The train (3 wagons behind the locomotive) is always visible with its load.',
+      'At the end of every round it moves one town further and stops there (solo it emerges from the tunnel every 3rd round).',
+      'The station is laid out as an 8th card for everyone (stone–wood–stone, 2 points, at most one per town) and must be built on the track — in the bottom row of your town.',
+      'Only with a station may you, instead of placing: load the received resource into an empty wagon — or swap it for a wagon\'s contents (then place the swapped resource normally).',
       'The wagons are public: what you drop off, someone else may grab along the way.'
     ],
     fortuneTitle: 'Expansion: Fortune (coins)',
@@ -271,6 +272,7 @@ export const en: Translation = {
 
   errors: {
     // Eisenbahn
+    'Der Bahnhof muss an der Strecke liegen (unterste Reihe)': 'The station must sit on the track (bottom row)',
     'Die Eisenbahn ist nicht im Spiel': 'The railway is not in this game',
     'Der Zug hält nicht an deinem Bahnhof': 'The train is not stopping at your station',
     'Der Zug wurde in dieser Runde bereits genutzt': 'The train was already used this round',

@@ -101,20 +101,19 @@ const EFFECTS = {
   gameOver(): void {
     for (const [i, f] of [523, 659, 784, 1047].entries()) tone(i * 0.1, f, 0.25, 'triangle', 0.55);
   },
-  /** Eisenbahn: rhythmisches Schnaufen während der Fahrt. */
+  /** Eisenbahn: rhythmisches Schnaufen während der Fahrt (~2,5 s). */
   trainMove(): void {
-    for (let i = 0; i < 6; i++) {
-      const t = i * 0.16;
-      tone(t, 90 + (i % 2) * 14, 0.07, 'triangle', 0.55); // Tsch…
-      tone(t + 0.02, 800, 0.03, 'square', 0.05);          // …ff (Dampf)
+    for (let i = 0; i < 14; i++) {
+      const t = i * 0.17;
+      tone(t, 90 + (i % 2) * 14, 0.07, 'triangle', 0.5); // Tsch…
+      tone(t + 0.02, 800, 0.03, 'square', 0.05);         // …ff (Dampf)
     }
   },
-  /** Eisenbahn: zweitönige Pfeife beim Halt am Bahnhof. */
-  trainStop(): void {
-    tone(0, 587, 0.35, 'sine', 0.4);
-    tone(0.02, 880, 0.35, 'sine', 0.3);
-    tone(0.45, 587, 0.55, 'sine', 0.4);
-    tone(0.47, 880, 0.55, 'sine', 0.3);
+  /** Eisenbahn: Horn (getragener Zweiklang) bei der Einfahrt in den Bahnhof. */
+  trainHorn(): void {
+    tone(0, 233, 0.9, 'sawtooth', 0.18);
+    tone(0, 311, 0.9, 'sawtooth', 0.16);
+    tone(0, 466, 0.9, 'sine', 0.2);
   }
 };
 
