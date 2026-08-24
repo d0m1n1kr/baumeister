@@ -17,11 +17,15 @@ an den vier Ecken des Geräts, die 7 Gebäudekarten der Partie liegen in der Mit
   - *Fortune* — komplette Münz-Mechanik (verdienen bei 2+ Bauten, Truhe mit 4 Slots,
     Münze zahlen für ein anderes Material, 1 SP je Münze) plus 12 Gebäude und
     10 Monumente. Einzelne nicht öffentlich belegbare Karten sind „best effort“
-    umgesetzt und mit ⚠ markiert (Liste in `schema.md`).
+    alle 22 Karten nach den offiziellen Kartentexten verifiziert (Quellen in `schema.md`).
   - *Tiny Trees* — Samen-Marker: Überbauen bringt ein Gratis-Material, als letztes
     unbebautes Feld wird der Samen ein Baum (2 Punkte).
 - **Höhlen-Regel (im Setup wählbar, Standard aus):** bis zu 2 fremd angesagte
   Materialien pro Partie beiseitelegen — sie zählen am Ende weder Punkte noch Strafen.
+- **Rathaus-Modus (offizielle Town-Hall-Variante, im Setup wählbar):** kein
+  Baumeister — ein Materialdeck (15 Karten, 5 verdeckt abgeworfen) bestimmt zwei
+  Runden, jede 3. Runde wählt jeder frei. Fabrik/Lagerhaus/Münztausch wirken auf
+  gezogene Karten, die Bank sperrt die freie Wahl, Fort Eisenkraut setzt dabei aus.
 - **Multi-Touch:** Mehrere Spieler können gleichzeitig Materialien per Drag & Drop
   auf ihre Bretter ziehen; jede Ecke ist zum jeweiligen Spieler rotiert.
 - **Monument-Geheimhaltung:** 2 ziehen / 1 geheim wählen, Aufdecken nur nach

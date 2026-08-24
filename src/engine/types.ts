@@ -228,7 +228,8 @@ export type Phase =
   | { t: 'monumentDraft' }
   | { t: 'seedPlacement' }   // Tiny Trees: jeder wählt ein Feld für seinen Samen
   | { t: 'nameResource' }
-  | { t: 'round'; resource: Resource }
+  /** resource = null: Rathaus-Runde mit freier Materialwahl (jede 3. Runde). */
+  | { t: 'round'; resource: Resource | null }
   | { t: 'gameOver' };
 
 export interface GameConfig {
@@ -243,6 +244,12 @@ export interface GameConfig {
   solo?: boolean;
   /** Solo: gemischtes Material-Deck (15 Karten, 3 je Material), Index 0 = oben. */
   soloDeck?: Resource[];
+  /** Rathaus-Modus (offizielle Variante): kein Baumeister, Materialdeck + freie Wahl jede 3. Runde. */
+  townHall?: boolean;
+  /** Rathaus: gemischtes Material-Deck (15 Karten, 3 je Material), Index 0 = oben. */
+  townHallDeck?: Resource[];
+  /** Rathaus: Seed für deterministische Neumischungen des Abwurfstapels. */
+  thSeed?: number;
   /** Tages-Challenge: Datum des festen Seeds (z. B. „2026-08-23"). */
   dailyId?: string;
   /** Eindeutige Partie-Kennung (Bestenliste: jede Partie zählt nur einmal). */
@@ -261,6 +268,12 @@ export interface GameState {
   soloDeck?: Resource[];
   /** Solo: die 3 offen ausliegenden Material-Karten. */
   soloOffer?: Resource[];
+  /** Rathaus: verdeckter Nachziehstapel (Index 0 = oben). */
+  thDeck?: Resource[];
+  /** Rathaus: Abwurfstapel (inkl. der 5 anfangs verdeckt abgeworfenen Karten). */
+  thDiscard?: Resource[];
+  /** Rathaus: Anzahl bisheriger Neumischungen (macht den Reshuffle deterministisch). */
+  thShuffles?: number;
   config: GameConfig;
   players: PlayerState[];
   phase: Phase;
@@ -276,6 +289,8 @@ export type Action =
   | { t: 'chooseMonument'; player: number; card: string }
   | { t: 'nameResource'; resource: Resource }
   | { t: 'soloPick'; index: number }
+  | { t: 'townHallDraw' }
+  | { t: 'townHallPick'; player: number; resource: Resource }
   | { t: 'factorySwap'; player: number; take: Resource }
   | { t: 'coinSwap'; player: number; take: Resource }
   | { t: 'placeResource'; player: number; square: number }

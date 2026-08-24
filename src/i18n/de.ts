@@ -95,6 +95,14 @@ export const t = {
   aliceMode: 'Alice-Modus',
   aliceModeHint: 'Alle Karten dauerhaft mit Beschreibung zeigen',
 
+  townHallMode: 'Rathaus-Modus',
+  townHallModeHint: 'Ohne Baumeister: Ein Materialdeck bestimmt die Runden, jede 3. Runde wählt jeder frei.',
+  thDraw: 'Nächste Karte ziehen',
+  thStartFree: 'Runde starten: freie Wahl',
+  thDeckCount: (n: number) => `Nachziehstapel: ${n} Karten`,
+  thFreePick: 'Freie Wahl: Material aussuchen',
+  thFortSkip: 'Fort Eisenkraut: setzt in dieser Runde aus',
+
   cavernRule: 'Höhlen-Regel',
   cavernRuleHint: 'Bis zu 2 fremd angesagte Materialien pro Partie beiseitelegen (zählen am Ende nicht).',
   cavernButton: 'In die Höhle',
@@ -166,6 +174,14 @@ export const t = {
       'Ist deine Stadt voll und nichts mehr baubar, erklärst du sie für fertig. Am Ende wertet die App automatisch.'
     ],
     cavernNote: 'Höhlen-Regel (falls im Setup aktiviert): 2× pro Partie darfst du ein fremd angesagtes Material in die Höhle legen statt es zu platzieren.',
+    townhallTitle: 'Rathaus-Modus (falls im Setup aktiviert)',
+    townhallSteps: [
+      'Niemand ist Baumeister: Ein Materialdeck (15 Karten, 3 je Sorte) entscheidet — 5 Karten werden zu Beginn verdeckt abgeworfen.',
+      'Der Bürgermeister (🏛) zieht in zwei Runden je 1 Karte: Alle platzieren dieses Material. Jede 3. Runde wählt stattdessen jeder frei aus dem Vorrat.',
+      'Ist der Stapel leer, wird der Abwurf neu gemischt und wieder 5 Karten verdeckt abgeworfen. Mitzählen lohnt sich!',
+      'Fabrik, Lagerhaus, Münztausch & Co. wirken auf gezogene Karten; die Bank sperrt die freie Wahl, Fort Eisenkraut setzt in Wahlrunden aus.',
+      'Mit Fortune ist der Kuriositätenladen aus dem Spiel.'
+    ],
     fortuneTitle: 'Erweiterung: Fortune (Münzen)',
     fortuneSteps: [
       'Baust du in einer Runde 2 oder mehr Gebäude (mit Materialentfernen), erhältst du 1 Münze — die Truhe fasst höchstens 4 (manche Monumente geben 1 Extra-Platz).',

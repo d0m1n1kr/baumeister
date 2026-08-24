@@ -30,6 +30,13 @@
       {#each t.help.roundSteps as step}<li>{step}</li>{/each}
     </ol>
 
+    {#if mode !== 'solo'}
+      <h4>{t.help.townhallTitle}</h4>
+      <ol>
+        {#each t.help.townhallSteps as step}<li>{step}</li>{/each}
+      </ol>
+    {/if}
+
     <h4>{t.help.fortuneTitle}</h4>
     <ol>
       {#each t.help.fortuneSteps as step}<li>{step}</li>{/each}

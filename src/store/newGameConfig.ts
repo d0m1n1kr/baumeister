@@ -12,7 +12,7 @@ export function buildGameConfig(
   sets: string[],
   useMonuments: boolean,
   cavern = false,
-  opts: { solo?: boolean; dailyId?: string } = {}
+  opts: { solo?: boolean; dailyId?: string; townHall?: boolean } = {}
 ): GameConfig {
   const seed = opts.dailyId ? dailySeed(opts.dailyId) : randomSeed();
   const config = randomSetup(
@@ -26,7 +26,8 @@ export function buildGameConfig(
       trees: systemActive(sets, 'trees'),
       cavern
     },
-    opts.solo ?? false
+    opts.solo ?? false,
+    opts.townHall ?? false
   );
   config.dailyId = opts.dailyId;
   config.gameId = randomSeed().toString(36) + Date.now().toString(36);
