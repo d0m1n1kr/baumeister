@@ -9,35 +9,35 @@
     "en": "Southern Semaphore"
   },
   "text": {
-    "de": "Du erhältst jede Runde 1 zusätzliches Material des angesagten Typs (nicht tauschbar).",
-    "en": "You receive 1 additional resource of the named type each round (not swappable)."
+    "de": "1 Punkt. Sagt ein anderer Spieler ein Material an, darfst du sofort 1 zusätzliches Material desselben Typs platzieren — dafür +1 Münze. Münzen können keines der beiden Materialien tauschen.",
+    "en": "1 point. When another player names a resource you may immediately place an additional resource of the same type; if you do, gain 1 coin. Coins cannot be spent to change either resource."
   },
   "pattern": [
     [
-      "stone",
       null,
+      "wood",
       null
     ],
     [
-      "wood",
+      null,
       "glass",
-      "brick"
+      null
     ],
     [
       "wheat",
-      null,
-      null
+      "stone",
+      "brick"
     ]
   ],
   "features": [
     "interactive"
   ],
   "scoring": {
-    "type": "none"
+    "type": "flat",
+    "vp": 1
   },
   "effects": [
     "southernSemaphore"
   ],
-  "art": "southern_semaphore.svg",
-  "unverified": true
+  "art": "southern_semaphore.svg"
 }

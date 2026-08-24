@@ -9,19 +9,19 @@
     "en": "Cathedral"
   },
   "text": {
-    "de": "2 Punkte, wenn nicht an eine andere Kathedrale angrenzend. Beim Bau: Zahle 3 Münzen — kannst du nicht, wird stattdessen eine Hütte gebaut.",
-    "en": "2 points if not adjacent to another Cathedral. On construct: pay 3 coins; if you cannot, construct a cottage instead."
+    "de": "7 Punkte, wenn nicht an eine andere Kathedrale angrenzend. Beim Bau: Zahle 3 Münzen — sonst wird stattdessen das graue Gebäude der Partie auf dem Feld gebaut (mit dessen Bau-Effekt).",
+    "en": "7 points if not adjacent to another Cathedral. On construct: spend 3 coins; if you don't, remove the Cathedral and construct the game's gray building in that square instead."
   },
   "pattern": [
     [
       null,
-      "glass",
-      null
+      null,
+      "glass"
     ],
     [
       "stone",
-      "brick",
-      "stone"
+      "glass",
+      "brick"
     ]
   ],
   "features": [
@@ -36,11 +36,10 @@
         "card": "cathedral_fortune"
       }
     ],
-    "vp": 2
+    "vp": 7
   },
   "effects": [
     "cathedralTransform"
   ],
-  "art": "cathedral_fortune.svg",
-  "unverified": true
+  "art": "cathedral_fortune.svg"
 }

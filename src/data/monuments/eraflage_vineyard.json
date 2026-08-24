@@ -9,33 +9,29 @@
     "en": "Eraflage Vineyard"
   },
   "text": {
-    "de": "8 Punkte, −2 Punkte je anderem Gebäudetyp in seiner Zeile und Spalte.",
-    "en": "8 points, −2 per other building type in its row and column."
+    "de": "9 Punkte, wenn gefüttert. −2 Punkte je einzigartigem Gebäudetyp in seiner Zeile und Spalte (zählt sich selbst nicht).",
+    "en": "9 points if fed. −2 points for each unique building type in the same row and column (does not count itself)."
   },
   "pattern": [
     [
       "wheat",
-      null
-    ],
-    [
       "wood",
-      "glass"
-    ],
-    [
-      null,
+      "glass",
       "brick"
     ]
   ],
   "features": [
+    "feedable",
     "row-col",
     "negative-vp"
   ],
   "scoring": {
     "type": "handler",
     "handler": "eraflage",
-    "vp": 8
+    "vp": 9
   },
-  "effects": [],
-  "art": "eraflage_vineyard.svg",
-  "unverified": true
+  "effects": [
+    "fedMonument"
+  ],
+  "art": "eraflage_vineyard.svg"
 }

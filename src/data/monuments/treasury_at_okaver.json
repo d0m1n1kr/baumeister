@@ -9,32 +9,34 @@
     "en": "The Treasury at Okaver"
   },
   "text": {
-    "de": "3 Punkte. Beim Bau: +2 Münzen. (Angenommener Effekt — Original nicht verifizierbar.)",
-    "en": "3 points. On construct: gain 2 coins. (Assumed effect.)"
+    "de": "1 Punkt je angrenzender Hütte. Immer wenn du deine Truhe auf 4 Münzen füllst, darfst du eine Hütte auf einem beliebigen leeren Feld deiner Stadt bauen.",
+    "en": "1 point for each adjacent cottage. Whenever you fill your Chest to 4 coins, you may construct a cottage on any empty square in your town."
   },
   "pattern": [
     [
+      "wood",
       "wheat",
-      "glass",
-      "wheat"
+      null,
+      null
     ],
     [
-      "brick",
       null,
-      "brick"
+      "stone",
+      "glass",
+      "wood"
     ]
   ],
   "features": [
-    "coins",
-    "on-construct"
+    "adjacency",
+    "coins"
   ],
   "scoring": {
-    "type": "flat",
-    "vp": 3
+    "type": "perAdjacent",
+    "target": "cottage",
+    "vpEach": 1
   },
   "effects": [
-    "coinOnConstruct2"
+    "okaverCottage"
   ],
-  "art": "treasury_at_okaver.svg",
-  "unverified": true
+  "art": "treasury_at_okaver.svg"
 }

@@ -127,13 +127,38 @@ describe('Fortune-Gebäude', () => {
     expect(s.players[0].coins).toBe(3);
   });
 
-  it('Juwelier: ohne Münze erhalten alle anderen 1 Münze', () => {
+  it('Juwelier: ohne Münze erhalten alle anderen 1 Münze — erst am Rundenende', () => {
     let s = inRound(coinGame(3));
-    s.players[0].pending = null;
+    for (const p of s.players) p.pending = null;
     s = buildOn(s, 0, 'jeweler');
     expect(s.players[0].coins).toBe(0);
+    // sofort noch nichts — die Münzen kommen mit dem Rundenende
+    expect(s.players[1].coins).toBe(0);
+    s = a(s, { t: 'roundDone', player: 0 });
+    s = a(s, { t: 'roundDone', player: 1 });
+    s = a(s, { t: 'roundDone', player: 2 });
     expect(s.players[1].coins).toBe(1);
     expect(s.players[2].coins).toBe(1);
+    expect(s.players[0].coins).toBe(0);
+  });
+
+  it('Juwelier: mit Münze wird sie bezahlt, niemand sonst erhält etwas', () => {
+    let s = inRound(coinGame(3));
+    for (const p of s.players) p.pending = null;
+    s.players[0].coins = 1;
+    s = buildOn(s, 0, 'jeweler');
+    s = a(s, { t: 'roundDone', player: 0 });
+    s = a(s, { t: 'roundDone', player: 1 });
+    s = a(s, { t: 'roundDone', player: 2 });
+    expect(s.players[0].coins).toBe(0);
+    expect(s.players[1].coins).toBe(0);
+  });
+
+  it('Juwelier im Solo: ohne Münze nicht baubar', () => {
+    const s = inRound(coinGame());
+    s.config.solo = true;
+    s.players[0].pending = null;
+    expect(() => buildOn(s, 0, 'jeweler')).toThrow(RuleError);
   });
 
   it('Pfarrhaus: Münzen ≠ Hüttenzahl → alle Münzen weg', () => {
@@ -155,18 +180,22 @@ describe('Fortune-Gebäude', () => {
     expect(s.players[0].coins).toBe(0);
   });
 
-  it('Steinmetzgilde: je 1 Münze ein unterschiedliches Gebäude', () => {
+  it('Steinmetzgilde: je 1 Münze ein unterschiedliches Gebäude (mit dessen Bau-Effekt)', () => {
     let s = inRound(coinGame());
     s.players[0].pending = null;
     s.players[0].coins = 2;
     s.players[0].monument = { card: 'masons_guild', built: false };
     s = buildOn(s, 0, 'masons_guild');
     expect(s.players[0].choices[0]?.t).toBe('masonsGuild');
+    // die platzierte Mine bringt ihre Bau-Münze zurück (offizielle „Special Note")
     s = a(s, { t: 'resolveMasons', player: 0, card: 'mine', square: 15 });
     expect(s.players[0].board[15].building?.card).toBe('mine');
+    expect(s.players[0].coins).toBe(2);
     expect(() => a(s, { t: 'resolveMasons', player: 0, card: 'mine', square: 14 })).toThrow(RuleError);
     s = a(s, { t: 'resolveMasons', player: 0, card: 'farm', square: 14 });
-    expect(s.players[0].coins).toBe(0);
+    expect(s.players[0].coins).toBe(1);
+    // freiwillig aufhören
+    s = a(s, { t: 'resolveMasons', player: 0, card: null });
     expect(s.players[0].choices.length).toBe(0);
   });
 
@@ -188,35 +217,140 @@ describe('Fortune-Gebäude', () => {
     ).toThrow(RuleError);
   });
 
-  it('Kuriositätenladen: Baumeister-Zugriff gibt dem Besitzer 1 Münze', () => {
+  it('Kuriositätenladen: Baumeister-Zugriff gibt dem NEHMENDEN 1 Münze', () => {
     let s = coinGame();
     put(s, 1, 15, 'oddity_shop', { stored: ['glass'] });
     s.masterBuilder = 0;
     s = a(s, { t: 'oddityTake', player: 0, fromPlayer: 1, fromSquare: 15, targetSquare: 3 });
     expect(s.players[0].board[3].resource).toBe('glass');
-    expect(s.players[1].coins).toBe(1);
+    expect(s.players[0].coins).toBe(1);
+    expect(s.players[1].coins).toBe(0);
     expect(s.players[1].board[15].building?.stored).toEqual([]);
     expect(() =>
       a(s, { t: 'oddityTake', player: 0, fromPlayer: 1, fromSquare: 15, targetSquare: 4 })
     ).toThrow(RuleError);
   });
 
-  it('Museum: einlagern und 1×/Runde verkaufen', () => {
-    let s = inRound(coinGame(), 'wood');
-    put(s, 0, 15, 'museum');
-    s = a(s, { t: 'warehouseStore', player: 0, square: 15 });
-    expect(s.players[0].board[15].building?.stored).toEqual(['wood']);
-    s = a(s, { t: 'museumSell', player: 0, square: 15, storedIndex: 0 });
+  it('Museum: beim Bau 2 Materialien auflegen, passende Ansage → +1 Münze statt platzieren', () => {
+    let s = inRound(coinGame(2, ['cottage', 'farm', 'museum', 'chapel', 'theater', 'tavern', 'factory']));
+    s.players[0].pending = null;
+    s = buildOn(s, 0, 'museum');
+    expect(s.players[0].choices[0]?.t).toBe('museumStock');
+    s = a(s, { t: 'resolveMuseumStock', player: 0, resource: 'wood' });
+    s = a(s, { t: 'resolveMuseumStock', player: 0, resource: 'glass' });
+    expect(s.players[0].choices.length).toBe(0);
+    const museumSq = s.players[0].board.findIndex((sq) => sq.building?.card === 'museum');
+    expect(s.players[0].board[museumSq].building?.stored).toEqual(['wood', 'glass']);
+
+    // fremde Ansage „wood": zurückgeben statt platzieren
+    s.masterBuilder = 1;
+    s.players[0].pending = 'wood';
+    s = a(s, { t: 'museumSell', player: 0, square: museumSq });
     expect(s.players[0].coins).toBe(1);
-    expect(() => a(s, { t: 'museumSell', player: 0, square: 15, storedIndex: 0 })).toThrow(RuleError);
+    expect(s.players[0].pending).toBeNull();
+    expect(s.players[0].board[museumSq].building?.stored).toEqual(['glass']);
+    // nur 1×/Runde
+    s.players[0].pending = 'wood';
+    expect(() => a(s, { t: 'museumSell', player: 0, square: museumSq })).toThrow(RuleError);
   });
 
-  it('Kathedrale (Fortune): ohne 3 Münzen wird eine Hütte gebaut', () => {
+  it('Museum: nicht passendes Material und eigene Ansage werden abgelehnt', () => {
+    let s = inRound(coinGame(2, ['cottage', 'farm', 'museum', 'chapel', 'theater', 'tavern', 'factory']), 'brick');
+    put(s, 0, 15, 'museum', { stored: ['wood', 'glass'] });
+    // angesagt ist brick — liegt nicht auf dem Museum
+    s.masterBuilder = 1;
+    expect(() => a(s, { t: 'museumSell', player: 0, square: 15 })).toThrow(RuleError);
+    // eigene Ansage zählt nicht
+    const s2 = inRound(coinGame(2, ['cottage', 'farm', 'museum', 'chapel', 'theater', 'tavern', 'factory']), 'wood');
+    put(s2, 0, 15, 'museum', { stored: ['wood'] });
+    s2.masterBuilder = 0;
+    expect(() => a(s2, { t: 'museumSell', player: 0, square: 15 })).toThrow(RuleError);
+    // und das Museum ist kein Lagerhaus mehr
+    const s3 = inRound(coinGame(2, ['cottage', 'farm', 'museum', 'chapel', 'theater', 'tavern', 'factory']), 'wood');
+    put(s3, 0, 15, 'museum');
+    expect(() => a(s3, { t: 'warehouseStore', player: 0, square: 15 })).toThrow(RuleError);
+  });
+
+  it('Kathedrale (Fortune): zahlen ist freiwillig, sonst entsteht das graue Gebäude', () => {
+    // ohne 3 Münzen: nur Umwandeln möglich → Brunnen (graues Gebäude der Partie)
     let s = inRound(coinGame(2, ['cottage', 'farm', 'well', 'cathedral_fortune', 'theater', 'tavern', 'factory']));
     s.players[0].pending = null;
     s = buildOn(s, 0, 'cathedral_fortune');
+    expect(s.players[0].choices[0]?.t).toBe('cathedralChoice');
+    expect(() => a(s, { t: 'resolveCathedral', player: 0, pay: true })).toThrow(RuleError);
+    s = a(s, { t: 'resolveCathedral', player: 0, pay: false });
     const built = s.players[0].board.find((sq) => sq.building);
-    expect(built?.building?.card).toBe('cottage');
+    expect(built?.building?.card).toBe('well');
+
+    // mit 3 Münzen: zahlen hält die Kathedrale
+    let s2 = inRound(coinGame(2, ['cottage', 'farm', 'well', 'cathedral_fortune', 'theater', 'tavern', 'factory']));
+    s2.players[0].pending = null;
+    s2.players[0].coins = 3;
+    s2 = buildOn(s2, 0, 'cathedral_fortune');
+    s2 = a(s2, { t: 'resolveCathedral', player: 0, pay: true });
+    expect(s2.players[0].coins).toBe(0);
+    const built2 = s2.players[0].board.find((sq) => sq.building);
+    expect(built2?.building?.card).toBe('cathedral_fortune');
+  });
+
+  it('Kathedrale (Fortune): Umbau zur Mine bringt deren Bau-Münze', () => {
+    let s = inRound(coinGame(2, ['cottage', 'farm', 'mine', 'cathedral_fortune', 'theater', 'tavern', 'factory']));
+    s.players[0].pending = null;
+    s = buildOn(s, 0, 'cathedral_fortune');
+    s = a(s, { t: 'resolveCathedral', player: 0, pay: false });
+    const built = s.players[0].board.find((sq) => sq.building);
+    expect(built?.building?.card).toBe('mine');
+    expect(s.players[0].coins).toBe(1);
+  });
+
+  it('Schrein des Windes: +1 Münze je Gebäude des häufigsten Typs', () => {
+    let s = inRound(coinGame());
+    s.players[0].pending = null;
+    s.players[0].monument = { card: 'shrine_of_the_windseed', built: false };
+    put(s, 0, 12, 'cottage');
+    put(s, 0, 13, 'cottage');
+    put(s, 0, 14, 'cottage');
+    put(s, 0, 15, 'farm');
+    s = buildOn(s, 0, 'shrine_of_the_windseed');
+    expect(s.players[0].coins).toBe(3); // 3× Hütte ist der häufigste Typ
+  });
+
+  it('Münz-Slot: gebautes Slot-Monument erweitert die Truhe auf 5', () => {
+    let s = inRound(coinGame());
+    s.players[0].pending = null;
+    s.players[0].coins = 4;
+    s.players[0].monument = { card: 'shrine_of_the_windseed', built: false };
+    put(s, 0, 12, 'cottage');
+    put(s, 0, 13, 'cottage');
+    s = buildOn(s, 0, 'shrine_of_the_windseed');
+    expect(s.players[0].coins).toBe(5); // 4 + 2 (Hütten), gedeckelt bei 5 statt 4
+  });
+
+  it('Okavers Schatzkammer: Truhe auf 4 gefüllt → Gratis-Hütte', () => {
+    let s = inRound(coinGame(2, ['cottage', 'farm', 'mine', 'chapel', 'theater', 'tavern', 'factory']));
+    s.players[0].pending = null;
+    s.players[0].coins = 3;
+    s.players[0].monument = { card: 'treasury_at_okaver', built: true };
+    put(s, 0, 15, 'treasury_at_okaver');
+    s = buildOn(s, 0, 'mine'); // +1 Münze → Truhe voll
+    expect(s.players[0].coins).toBe(4);
+    const okaver = s.players[0].choices.find((c) => c.t === 'okaverCottage');
+    expect(okaver).toBeTruthy();
+    s = a(s, { t: 'resolveOkaver', player: 0, square: 11 });
+    expect(s.players[0].board[11].building?.card).toBe('cottage');
+  });
+
+  it('Hollow Hill: −2 Punkte je Münztausch nach dem Bau', () => {
+    let s = coinGame();
+    put(s, 0, 15, 'hollow_hill');
+    s.players[0].monument = { card: 'hollow_hill', built: true };
+    s.players[0].coins = 2;
+    s.masterBuilder = 1;
+    s = a(s, { t: 'nameResource', resource: 'wood' });
+    s = a(s, { t: 'coinSwap', player: 0, take: 'glass' });
+    expect(s.players[0].hollowHillSwaps).toBe(1);
+    const score = scorePlayer(s, 0, catalog);
+    expect(score.lines.find((l) => l.card === 'hollow_hill')?.points).toBe(5); // 7 − 2
   });
 
   it('Prismenschmiede: Bauen ohne Materialentfernen, 1×/Runde', () => {
@@ -235,18 +369,52 @@ describe('Fortune-Gebäude', () => {
     ).toThrow(RuleError);
   });
 
-  it('Südliches Semaphor: 1 Zusatz-Material, nicht tauschbar', () => {
+  it('Südliches Semaphor: Zusatz-Material nur bei fremder Ansage, Platzieren bringt 1 Münze', () => {
     let s = coinGame();
     put(s, 0, 15, 'southern_semaphore');
-    s.players[0].coins = 2;
     s.masterBuilder = 1;
     s = a(s, { t: 'nameResource', resource: 'wood' });
     expect(s.players[0].pendingExtra).toBe('wood');
+    expect(s.players[1].pendingExtra).toBeFalsy(); // P1 hat kein Semaphor
     s = a(s, { t: 'placeResource', player: 0, square: 0 });
     expect(s.players[0].pending).toBe('wood'); // Zusatz-Material rückt nach
     expect(s.players[0].pendingLocked).toBe(true);
     expect(() => a(s, { t: 'coinSwap', player: 0, take: 'glass' })).toThrow(RuleError);
     s = a(s, { t: 'placeResource', player: 0, square: 1 });
+    expect(s.players[0].pending).toBeNull();
+    expect(s.players[0].coins).toBe(1); // Münze fürs platzierte Zusatz-Material
+  });
+
+  it('Südliches Semaphor: eigene Ansage bringt kein Zusatz-Material', () => {
+    let s = coinGame();
+    put(s, 0, 15, 'southern_semaphore');
+    s.masterBuilder = 0;
+    s = a(s, { t: 'nameResource', resource: 'wood' });
+    expect(s.players[0].pendingExtra).toBeFalsy();
+  });
+
+  it('Südliches Semaphor: Zusatz-Material ist freiwillig („Fertig" verzichtet)', () => {
+    let s = coinGame();
+    put(s, 0, 15, 'southern_semaphore');
+    s.masterBuilder = 1;
+    s = a(s, { t: 'nameResource', resource: 'wood' });
+    s = a(s, { t: 'placeResource', player: 0, square: 0 });
+    expect(s.players[0].pendingLocked).toBe(true);
+    s = a(s, { t: 'roundDone', player: 0 });
+    expect(s.players[0].pending).toBeNull();
+    expect(s.players[0].roundDone).toBe(true);
+    expect(s.players[0].coins).toBe(0); // keine Münze ohne Platzierung
+  });
+
+  it('Südliches Semaphor: Münztausch des Erst-Materials verwirkt das Zusatz-Material', () => {
+    let s = coinGame();
+    put(s, 0, 15, 'southern_semaphore');
+    s.players[0].coins = 1;
+    s.masterBuilder = 1;
+    s = a(s, { t: 'nameResource', resource: 'wood' });
+    s = a(s, { t: 'coinSwap', player: 0, take: 'glass' });
+    expect(s.players[0].pendingExtra).toBeFalsy();
+    s = a(s, { t: 'placeResource', player: 0, square: 0 });
     expect(s.players[0].pending).toBeNull();
   });
 });
@@ -266,14 +434,20 @@ describe('Fortune-Wertungen', () => {
     expect(score.lines.find((l) => l.card === 'schoolhouse')?.points).toBe(4);
   });
 
-  it('Weingut Eraflage: 8 − 2 je Typ in Zeile/Spalte', () => {
+  it('Weingut Eraflage: 9 wenn gefüttert, −2 je Typ in Zeile/Spalte', () => {
     const s = coinGame();
     put(s, 0, 5, 'eraflage_vineyard');
     put(s, 0, 4, 'cottage');
     put(s, 0, 6, 'well');
     put(s, 0, 13, 'well'); // gleiche Spalte, gleicher Typ → zählt nur 1×
-    const score = scorePlayer(s, 0, catalog);
-    expect(score.lines.find((l) => l.card === 'eraflage_vineyard')?.points).toBe(4);
+    // ungefüttert: 0 − 4
+    let score = scorePlayer(s, 0, catalog);
+    expect(score.lines.find((l) => l.card === 'eraflage_vineyard')?.points).toBe(-4);
+    // mit Bauernhof: Weingut UND Hütte werden gefüttert → 9 − 4
+    put(s, 0, 15, 'farm');
+    score = scorePlayer(s, 0, catalog);
+    expect(score.lines.find((l) => l.card === 'eraflage_vineyard')?.points).toBe(5);
+    expect(score.lines.find((l) => l.card === 'cottage')?.points).toBe(3);
   });
 
   it('Wurzelkeller: Münzen füttern Zeilen/Spalten', () => {
@@ -329,57 +503,114 @@ describe('Fortune-Effekte: Teehaus, Promenade, Grotte', () => {
     expect(s.players[0].coins).toBe(3);
   });
 
-  it('Blütenpromenade: Münzen auf freie Felder, Einsammeln bei fremder Ansage', () => {
+  it('Blütenpromenade: 3 Münzen sind Pflicht, fremde Ansagen MÜSSEN aufs Münzfeld', () => {
     let s = inRound(coinGame());
     s.players[0].pending = null;
     s.players[0].monument = { card: 'petal_promenade', built: false };
     s = buildOn(s, 0, 'petal_promenade'); // Ziel = Feld 0
     expect(s.players[0].choices[0]?.t).toBe('promenadeCoins');
 
-    // belegtes Feld geht nicht
+    // belegtes Feld geht nicht; vorzeitig abbrechen auch nicht
     expect(() => a(s, { t: 'resolvePromenade', player: 0, square: 0 })).toThrow(RuleError);
+    expect(() => a(s, { t: 'resolvePromenade', player: 0, square: null })).toThrow(RuleError);
 
+    s = a(s, { t: 'resolvePromenade', player: 0, square: 13 });
+    s = a(s, { t: 'resolvePromenade', player: 0, square: 14 });
     s = a(s, { t: 'resolvePromenade', player: 0, square: 15 });
-    expect(s.players[0].board[15].coin).toBe(true);
-    // vorzeitig aufhören: Entscheidung ist erledigt
-    s = a(s, { t: 'resolvePromenade', player: 0, square: null });
     expect(s.players[0].choices.length).toBe(0);
+    expect(s.players[0].board[15].coin).toBe(true);
 
-    // Fremde Ansage (Baumeister ist ein anderer): Material aufs Münzfeld → Münze
+    // Fremde Ansage: Material MUSS auf ein Münzfeld — und bringt die Münze
     s.masterBuilder = 1;
     s.players[0].pending = 'wood';
+    expect(() => a(s, { t: 'placeResource', player: 0, square: 4 })).toThrow(RuleError);
     s = a(s, { t: 'placeResource', player: 0, square: 15 });
     expect(s.players[0].coins).toBe(1);
     expect(s.players[0].board[15].coin).toBeUndefined();
+    // das eingesammelte Material bleibt liegen (nicht verschiebbar)
+    expect(() => a(s, { t: 'moveResource', player: 0, square: 4 })).toThrow(RuleError);
   });
 
-  it('Blütenpromenade: eigene Ansage sammelt die Münze nicht ein', () => {
+  it('Blütenpromenade: eigene Ansagen dürfen nicht auf Münzfelder', () => {
     let s = inRound(coinGame());
     s.players[0].pending = null;
     s.players[0].monument = { card: 'petal_promenade', built: false };
     s = buildOn(s, 0, 'petal_promenade');
+    s = a(s, { t: 'resolvePromenade', player: 0, square: 13 });
+    s = a(s, { t: 'resolvePromenade', player: 0, square: 14 });
     s = a(s, { t: 'resolvePromenade', player: 0, square: 15 });
-    s = a(s, { t: 'resolvePromenade', player: 0, square: null });
 
     s.masterBuilder = 0; // eigene Ansage
     s.players[0].pending = 'wood';
-    s = a(s, { t: 'placeResource', player: 0, square: 15 });
+    expect(() => a(s, { t: 'placeResource', player: 0, square: 15 })).toThrow(RuleError);
+    s = a(s, { t: 'placeResource', player: 0, square: 4 });
     expect(s.players[0].coins).toBe(0);
-    expect(s.players[0].board[15].coin).toBe(true); // Münze bleibt liegen
+    expect(s.players[0].board[15].coin).toBe(true); // Münzen bleiben liegen
   });
 
-  it('Caterinas Grotte: Münzen auf freie Mittelfelder, Bauen sammelt ein', () => {
+  it('Caterinas Grotte: Münzen auf alle Mittelfelder, bebaute sofort, Bauen sammelt ein', () => {
     let s = inRound(coinGame(2, ['cottage', 'farm', 'well', 'chapel', 'theater', 'tavern', 'factory']));
     s.players[0].pending = null;
     s.players[0].monument = { card: 'caterinas_grotto', built: false };
-    s = buildOn(s, 0, 'caterinas_grotto'); // Ziel = Feld 1, Mittelfelder danach frei
-    for (const c of [5, 6, 9, 10]) expect(s.players[0].board[c].coin).toBe(true);
+    put(s, 0, 10, 'cottage'); // bebautes Mittelfeld → Münze sofort
+    s = buildOn(s, 0, 'caterinas_grotto');
+    expect(s.players[0].coins).toBe(1);
+    for (const c of [5, 6, 9]) expect(s.players[0].board[c].coin).toBe(true);
+    expect(s.players[0].board[10].coin).toBeUndefined();
+
+    // Material darf sich das Feld mit der Münze teilen — die Münze bleibt liegen
+    s.masterBuilder = 1;
+    s.players[0].pending = 'wood';
+    s = a(s, { t: 'placeResource', player: 0, square: 9 });
+    expect(s.players[0].coins).toBe(1);
+    expect(s.players[0].board[9].coin).toBe(true);
 
     // Bau auf einem Münzfeld nimmt die Münze
-    res(s, 0, 6, 'wood');
-    res(s, 0, 7, 'stone');
-    s = a(s, { t: 'build', player: 0, squares: [6, 7], card: 'well', target: 6 });
-    expect(s.players[0].coins).toBe(1);
+    res(s, 0, 5, 'wood');
+    res(s, 0, 6, 'stone');
+    s = a(s, { t: 'build', player: 0, squares: [5, 6], card: 'well', target: 6 });
+    expect(s.players[0].coins).toBe(2);
     expect(s.players[0].board[6].coin).toBeUndefined();
+  });
+
+  it('Prismenschmiede: 2 unterschiedliche Gebäude, Reste werden entfernt, beide zählen', () => {
+    let s = inRound(coinGame(2, ['cottage', 'farm', 'well', 'chapel', 'theater', 'tavern', 'factory']));
+    for (const p of s.players) p.pending = null;
+    put(s, 0, 12, 'prism_forge');
+    // Bauernhof (wheat²/wood²) und Brunnen (wood+stone) überlappen im wood auf Feld 4
+    res(s, 0, 0, 'wheat'); res(s, 0, 1, 'wheat');
+    res(s, 0, 4, 'wood'); res(s, 0, 5, 'wood'); res(s, 0, 8, 'stone');
+    s = a(s, { t: 'build', player: 0, squares: [0, 1, 4, 5], card: 'farm', target: 0, prism: true });
+    expect(s.players[0].board[4].resource).toBe('wood'); // liegt für den 2. Bau noch
+    s = a(s, { t: 'build', player: 0, squares: [4, 8], card: 'well', target: 8 });
+    expect(s.players[0].board[1].resource).toBeUndefined(); // Prisma-Reste entfernt
+    expect(s.players[0].board[5].resource).toBeUndefined();
+    expect(s.players[0].buildsThisRound).toBe(2);
+    s = a(s, { t: 'roundDone', player: 0 });
+    s = a(s, { t: 'roundDone', player: 1 });
+    expect(s.players[0].coins).toBe(1); // 2 Bauten → Rundenmünze
+  });
+
+  it('Prismenschmiede: dasselbe Gebäude zweimal ist verboten', () => {
+    let s = inRound(coinGame(2, ['cottage', 'farm', 'well', 'chapel', 'theater', 'tavern', 'factory']));
+    for (const p of s.players) p.pending = null;
+    put(s, 0, 12, 'prism_forge');
+    res(s, 0, 0, 'wood'); res(s, 0, 1, 'stone');
+    s = a(s, { t: 'build', player: 0, squares: [0, 1], card: 'well', target: 0, prism: true });
+    res(s, 0, 2, 'wood'); res(s, 0, 3, 'stone');
+    expect(() =>
+      a(s, { t: 'build', player: 0, squares: [2, 3], card: 'well', target: 2 })
+    ).toThrow(RuleError);
+  });
+
+  it('Prismenschmiede: ohne zweiten Bau räumt „Fertig" die Reste ab', () => {
+    let s = inRound(coinGame(2, ['cottage', 'farm', 'well', 'chapel', 'theater', 'tavern', 'factory']));
+    for (const p of s.players) p.pending = null;
+    put(s, 0, 12, 'prism_forge');
+    res(s, 0, 0, 'wood'); res(s, 0, 1, 'stone');
+    s = a(s, { t: 'build', player: 0, squares: [0, 1], card: 'well', target: 0, prism: true });
+    expect(s.players[0].board[1].resource).toBe('stone');
+    s = a(s, { t: 'roundDone', player: 0 });
+    expect(s.players[0].board[1].resource).toBeUndefined();
   });
 });

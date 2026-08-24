@@ -9,32 +9,30 @@
     "en": "The Prism Forge"
   },
   "text": {
-    "de": "Einmal pro Runde darfst du ein Gebäude bauen, OHNE die Materialien zu entfernen — sie können in derselben Runde für einen zweiten, anderen Bau genutzt werden.",
-    "en": "Once per round you may construct without removing the resources; they may be used again this round for a different building."
+    "de": "1 Punkt. Du darfst in derselben Runde 2 einzigartige Gebäude mit überlappenden Baumustern bauen — die gemeinsamen Materialien zählen für beide.",
+    "en": "1 point. You may construct 2 unique buildings using overlapping layouts in the same round."
   },
   "pattern": [
     [
       "glass",
-      "glass"
-    ],
-    [
-      "stone",
-      "brick"
+      "glass",
+      null
     ],
     [
       "wood",
-      null
+      "stone",
+      "wheat"
     ]
   ],
   "features": [
     "interactive"
   ],
   "scoring": {
-    "type": "none"
+    "type": "flat",
+    "vp": 1
   },
   "effects": [
     "prismForge"
   ],
-  "art": "prism_forge.svg",
-  "unverified": true
+  "art": "prism_forge.svg"
 }
