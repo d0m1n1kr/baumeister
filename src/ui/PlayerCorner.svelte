@@ -783,7 +783,7 @@
   {@const wh = p.board[warehouseSquare].building!}
   {@const whEffects = catalog[wh.card].effects ?? []}
   {@const museumSellable =
-    whEffects.includes('museum') && !p.museumSoldThisRound && !isMB &&
+    whEffects.includes('museum') && !p.museumSoldThisRound && (!isMB || st.config.solo) &&
     p.pending != null && p.pending === namedResource && !p.pendingLocked &&
     (wh.stored ?? []).includes(namedResource!)}
   <div class="scrim">

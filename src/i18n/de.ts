@@ -183,7 +183,8 @@ export const t = {
     soloSteps: [
       '15 Material-Karten (3 je Sorte) sind gemischt, 3 liegen offen aus.',
       'Jede Runde wählst du EINE der drei — die gewählte Karte wandert verdeckt unter den Stapel, von oben wird nachgezogen. Mitzählen lohnt sich!',
-      'Gasthaus, Bank, Fort Eisenkraut und Opaleyes Wacht sind aus dem Spiel; Fabrik & Co. wirken auf deine Deck-Wahl.',
+      'Gasthaus, Bank, Fort Eisenkraut und Opaleyes Wacht sind aus dem Spiel (mit Fortune auch Kuriositätenladen, Schulhaus und Semaphor; der Juwelier braucht 1 Münze).',
+      'Deine Deck-Wahl gilt als „fremde Ansage": Fabrik, Münztausch, Museum, Promenade und Bondmaker funktionieren damit ganz normal.',
       'Am Ende zeigt die Wertung deinen Rang (bis „Meister-Architekt" ab 38 Punkten) und die Bestenliste dieses Geräts.',
       'Tages-Challenge: fester Zufall des Tages — weltweit dieselben Karten. Vergleicht eure Punkte!'
     ],

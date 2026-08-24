@@ -283,7 +283,8 @@ function checkPlacementTarget(
     const hasBondmaker = p.monument?.built &&
       catalog[p.monument.card]?.effects?.includes('bondmaker');
     if (!hasBondmaker) fail('Feld ist bebaut');
-    if (s.masterBuilder === player) fail('Bondmaker wirkt nur bei fremder Ansage');
+    // Solo: die Deck-Wahl gilt als fremde Ansage (wie bei Fabrik und Münztausch)
+    if (!s.config.solo && s.masterBuilder === player) fail('Bondmaker wirkt nur bei fremder Ansage');
     const def = catalog[sq.building.card];
     const cottageLike = def.category === 'cottage' || (def.effects ?? []).includes('barrettCastle');
     if (!cottageLike) fail('Material kann nur auf Hütten gelagert werden');
@@ -301,10 +302,11 @@ function placeResource(s: GameState, player: number, square: number, catalog: Ca
   // Blütenpromenade: solange eigene Münzfelder existieren, MÜSSEN fremd
   // angesagte Materialien dorthin; eigene Ansagen dürfen NICHT auf Münzfelder
   // (außer es gibt kein münzfreies leeres Feld mehr).
+  // Solo: die Deck-Wahl gilt als fremde Ansage (wie bei Fabrik und Münztausch).
   if (hasBuiltEffect(p, 'promenadeCoins', catalog)) {
     const coinSquares = p.board.some((c) => c.coin);
     const freeWithoutCoin = p.board.some((c) => !c.building && !c.resource && !c.coin);
-    if (s.masterBuilder !== player) {
+    if (s.config.solo || s.masterBuilder !== player) {
       if (coinSquares && !sq.coin) fail('Das Material muss auf ein Münzfeld der Promenade');
     } else if (sq.coin && freeWithoutCoin) {
       fail('Eigene Ansagen dürfen nicht auf Münzfelder der Promenade');
@@ -451,7 +453,8 @@ function museumSell(s: GameState, player: number, square: number, catalog: Catal
   const named = requireRound(s);
   const p = activePlayer(s, player);
   if (p.museumSoldThisRound) fail('Museum bereits in dieser Runde genutzt');
-  if (s.masterBuilder === player) fail('Nur bei fremder Ansage möglich');
+  // Solo: die Deck-Wahl gilt als fremde Ansage (wie bei Fabrik und Münztausch)
+  if (!s.config.solo && s.masterBuilder === player) fail('Nur bei fremder Ansage möglich');
   if (p.pending !== named || p.pendingLocked) fail('Nur statt des angesagten Materials möglich');
   const b = p.board[square]?.building;
   if (!b || !catalog[b.card]?.effects?.includes('museum')) fail('Kein Museum hier');
