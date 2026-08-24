@@ -116,7 +116,7 @@ export const de = {
 
   deviceMode: 'Wie wird gespielt?',
   oneDevice: 'An einem Gerät',
-  oneDeviceHint: 'Reihum am selben iPad — funktioniert ohne Internet.',
+  oneDeviceHint: 'Reihum am selben Gerät — funktioniert ohne Internet.',
   ownDevices: 'Mit eigenen Geräten',
   ownDevicesHint: 'Mitspieler treten mit Handy oder Tablet bei. Monumente bleiben dabei wirklich geheim.',
   seatHere: 'hier',

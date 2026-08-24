@@ -19,8 +19,8 @@ export default defineConfig({
       manifest: {
         name: 'Tiny Towns',
         short_name: 'Tiny Towns',
-        description: 'Tiny Towns für das iPad — 2 bis 4 Spieler an einem Gerät',
-        lang: 'de',
+        description: 'Tiny Towns for tablets and phones — play on one device or together with your own devices',
+        lang: 'en',
         display: 'standalone',
         orientation: 'any',
         background_color: '#1e2a38',

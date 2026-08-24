@@ -116,7 +116,7 @@ export const fr: Translation = {
 
   deviceMode: 'Comment jouez-vous ?',
   oneDevice: 'Sur un seul appareil',
-  oneDeviceHint: 'À tour de rôle sur le même iPad — fonctionne entièrement hors ligne.',
+  oneDeviceHint: 'À tour de rôle sur le même appareil — fonctionne entièrement hors ligne.',
   ownDevices: 'Avec vos propres appareils',
   ownDevicesHint: 'Les joueurs rejoignent avec leur téléphone ou tablette. Les monuments restent vraiment secrets.',
   seatHere: 'ici',

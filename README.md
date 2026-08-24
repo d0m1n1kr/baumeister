@@ -1,136 +1,139 @@
-# Tiny Towns für das iPad
+# Tiny Towns for Tablets & Phones
 
-Digitale Umsetzung des Brettspiels *Tiny Towns* (Basisspiel) als rein clientseitige
-Web-App (PWA) für **2–4 Spieler an einem iPad im Querformat**: Alle spielen gleichzeitig
-an den vier Ecken des Geräts, die 7 Gebäudekarten der Partie liegen in der Mitte.
+Digital adaptation of the board game *Tiny Towns* (base game) as a purely client-side
+web app (PWA) for **tablets and phones**. The classic mode puts **2–4 players around
+one tablet in landscape**: everyone plays simultaneously at the four corners of the
+device, with the game's 7 building cards in the middle — or each player joins with
+their own device.
 
-**▶ Spielen: [d0m1n1kr.github.io/tiny-towns](https://d0m1n1kr.github.io/tiny-towns/)**
+**▶ Play: [d0m1n1kr.github.io/tiny-towns](https://d0m1n1kr.github.io/tiny-towns/)**
 
 ## Features
 
-- **Vollautomatische Regeln:** Muster-Validierung (Rotation + Spiegelung), alle
-  Gebäude-Effekte (Fabrik, Bank, Handelsposten, Lagerhaus, …), sämtliche
-  Monument-Effekte und die komplette Endwertung inkl. optimaler Fütterungs-Zuordnung.
-- **Komplettes Basisspiel:** 25 Gebäudekarten + 15 Monumente als erweiterbare
-  JSON/SVG-Assets (`src/data/`, Schema in [`src/data/schema.md`](src/data/schema.md)).
-- **Erweiterungen (im Setup wählbar):**
-  - *Fortune* — komplette Münz-Mechanik (verdienen bei 2+ Bauten, Truhe mit 4 Slots,
-    Münze zahlen für ein anderes Material, 1 SP je Münze) plus 12 Gebäude und
-    10 Monumente. Einzelne nicht öffentlich belegbare Karten sind „best effort“
-    alle 22 Karten nach den offiziellen Kartentexten verifiziert (Quellen in `schema.md`).
-  - *Tiny Trees* — Samen-Marker: Überbauen bringt ein Gratis-Material, als letztes
-    unbebautes Feld wird der Samen ein Baum (2 Punkte).
-- **8 Sprachen:** Deutsch, Englisch, Französisch, Spanisch, Italienisch,
-  Niederländisch, Portugiesisch, Polnisch — automatisch nach Browser-Sprache,
-  per 🌐-Umschalter (Start- und Beitritts-Bildschirm) übersteuerbar. Auch
-  alle Regel-Fehlermeldungen sind übersetzt; Kartentexte fallen außerhalb
-  von Deutsch auf die englischen Originaltexte zurück.
-- **Höhlen-Regel (im Setup wählbar, Standard aus):** bis zu 2 fremd angesagte
-  Materialien pro Partie beiseitelegen — sie zählen am Ende weder Punkte noch Strafen.
-- **Rathaus-Modus (offizielle Town-Hall-Variante, im Setup wählbar):** kein
-  Baumeister — ein Materialdeck (15 Karten, 5 verdeckt abgeworfen) bestimmt zwei
-  Runden, jede 3. Runde wählt jeder frei. Fabrik/Lagerhaus/Münztausch wirken auf
-  gezogene Karten, die Bank sperrt die freie Wahl, Fort Eisenkraut setzt dabei aus.
-- **Multi-Touch:** Mehrere Spieler können gleichzeitig Materialien per Drag & Drop
-  auf ihre Bretter ziehen; jede Ecke ist zum jeweiligen Spieler rotiert.
-- **Monument-Geheimhaltung:** 2 ziehen / 1 geheim wählen, Aufdecken nur nach
-  Bestätigung („Alle anderen wegschauen!“).
-- **Karten-Zoom:** Tippen vergrößert jede Karte, zum antippenden Spieler gedreht;
-  Mini-Karten zeigen Baumuster, Feature-Symbole und schematisches Artwork.
-  In der Einzelansicht (eigenes Gerät) blendet der **Alice-Modus** alle Karten
-  dauerhaft samt Beschreibung ein — nichts muss mehr angetippt werden.
-- **Solo-Modus (offizielle Variante):** 15 Material-Karten als Deck, 3 liegen aus,
-  eine wird gewählt und rotiert verdeckt nach unten. Mit offizieller Rangtabelle
-  (bis „Meister-Architekt"), Bestenliste je Gerät und **Tages-Challenge**
-  (fester Datums-Seed — weltweit dieselben Karten, Punkte vergleichbar).
-- **Zwei Spielweisen:**
-  - *An einem Gerät* (Standard, unverändert): reihum am selben iPad, **komplett offline**.
-  - *Mit eigenen Geräten*: Der Host öffnet einen Raum, Mitspieler treten per QR-Code
-    (Kamera-App oder eingebauter Scanner — wichtig für die installierte PWA)
-    oder 6-stelligem Code bei — **ohne Server**, direkt von Gerät zu Gerät (WebRTC).
-    Sitzplätze lassen sich mischen: einige Spieler am Host-Gerät, andere mit eigenem
-    Handy. Monumente sind dabei erstmals wirklich geheim.
-- **Soundeffekte (abschaltbar):** warme Marimba-, Holz- und Glockenklänge —
-  komplett per Web Audio synthetisiert (keine Asset-Dateien, keine Lizenzfragen,
-  offline). Ansage, Platzieren (Tonhöhe je Material), Bauen, Monument-Glocke,
-  Münze, Baum, Fehlerton, „du bist dran" und Schluss-Fanfare; 🔊-Schalter in
-  der Kartenleiste, Wahl wird je Gerät gemerkt.
-- **Persistenz:** Autosave im `localStorage` nach jeder Aktion, „Weiterspielen“ nach Reload.
-- **PWA:** vollständig offline-fähig (alle Assets werden beim ersten Besuch
-  precacht; Spiel-Logik und Spielstand liegen komplett im Client) — am iPad/Handy
-  über „Zum Home-Bildschirm“ installierbar. Die App prüft beim Start, beim
-  Zurückkehren in die App und alle 15 Minuten auf neue Versionen und bietet
-  ein Update per Banner an; der laufende Spielstand übersteht das Update.
+- **Fully automated rules:** pattern validation (rotation + mirroring), all building
+  effects (Factory, Bank, Trading Post, Warehouse, …), every monument effect, and the
+  complete final scoring including optimal feeding assignment.
+- **Complete base game:** 25 building cards + 15 monuments as extensible
+  JSON/SVG assets (`src/data/`, schema in [`src/data/schema.md`](src/data/schema.md)).
+- **Expansions (selectable in setup):**
+  - *Fortune* — the full coin mechanic (earn on 2+ builds, chest with 4 slots,
+    pay a coin for a different resource, 1 VP per coin) plus 12 buildings and
+    10 monuments. All 22 cards verified against the official card texts
+    (sources in `schema.md`).
+  - *Tiny Trees* — seed tokens: building over a seed grants a free resource; as the
+    last empty square, the seed becomes a tree (2 points).
+- **8 languages:** German, English, French, Spanish, Italian, Dutch, Portuguese,
+  Polish — auto-selected from the browser language, overridable via the 🌐 switcher
+  (setup and join screens). All rule error messages are translated too; card texts
+  fall back to the English originals outside German.
+- **Cavern rule (selectable in setup, off by default):** set aside up to 2 resources
+  named by others per game — at the end they count neither points nor penalties.
+- **Town Hall mode (official variant, selectable in setup):** no Master Builder —
+  a resource deck (15 cards, 5 discarded face-down) drives two rounds; every 3rd
+  round everyone chooses freely. Factory/Warehouse/coin swap apply to drawn cards,
+  the Bank blocks your free choice, Fort Ironweed sits out free rounds.
+- **Multi-touch:** several players can drag & drop resources onto their boards at
+  the same time; each corner is rotated toward its player.
+- **Monument secrecy:** draw 2 / secretly pick 1, revealing only after confirmation
+  ("Everyone else look away!").
+- **Card zoom:** tapping enlarges any card, rotated toward the tapping player;
+  mini cards show build patterns, feature icons, and schematic artwork.
+  In the single-board view (own device), **Alice mode** keeps all cards with their
+  descriptions permanently visible — no more tapping required.
+- **Solo mode (official variant):** 15 resource cards as a deck, 3 face up, one is
+  chosen and rotates face-down to the bottom. With the official rank table
+  (up to "Master Architect"), a per-device highscore list, and a **daily challenge**
+  (fixed date seed — the same cards worldwide, scores comparable).
+- **Two ways to play:**
+  - *On one device* (default, unchanged): taking turns around the same tablet,
+    **fully offline**.
+  - *With everyone's own devices*: the host opens a room, players join via QR code
+    (camera app or the built-in scanner — important for the installed PWA) or a
+    6-character code — **no server**, directly device to device (WebRTC).
+    Seats can be mixed: some players on the host device, others on their own phone.
+    Monuments are truly secret for the first time.
+- **Sound effects (can be muted):** warm marimba, wood, and bell tones —
+  fully synthesized via Web Audio (no asset files, no licensing questions,
+  offline). Resource call, placement (pitch per resource), building, monument bell,
+  coin, tree, error tone, "your turn", and the final fanfare; 🔊 toggle in the card
+  strip, the choice is remembered per device.
+- **Persistence:** autosave to `localStorage` after every action, "Continue" after reload.
+- **PWA:** fully offline-capable (all assets are precached on first visit; game
+  logic and game state live entirely in the client) — installable on tablets and
+  phones via "Add to Home Screen". The app checks for new versions on start, on
+  returning to the app, and every 15 minutes, offering an update via banner; the
+  running game survives the update.
 
-## Entwicklung
+## Development
 
 ```bash
 npm install
-npm run dev        # Dev-Server
-npm test           # Engine-, Netzwerk- und Store-Tests (Vitest)
-npx vitest run --coverage   # dito mit Coverage-Bericht
+npm run dev        # dev server
+npm test           # engine, network, and store tests (Vitest)
+npx vitest run --coverage   # same with coverage report
 npm run check      # svelte-check
-npm run build      # Produktions-Build (dist/)
-node scripts/smoke.mjs        # E2E: Ein-Gerät-Modus (Chromium)
-node scripts/smoke-multi.mjs  # E2E: Mehrgerätemodus in zwei Tabs
+npm run build      # production build (dist/)
+node scripts/smoke.mjs        # E2E: single-device mode (Chromium)
+node scripts/smoke-multi.mjs  # E2E: multi-device mode in two tabs
 ```
 
-Der Mehrgeräte-Test läuft über `?transport=channel`: derselbe Sitzungs- und Host-Code,
-aber über `BroadcastChannel` zwischen zwei Tabs statt über echtes P2P — dadurch ohne
-Netz testbar. Dieser Schalter eignet sich auch zum Entwickeln am Rechner.
+The multi-device test runs with `?transport=channel`: the same session and host code,
+but over `BroadcastChannel` between two tabs instead of real P2P — testable without
+any network. This switch is also handy for developing on a desktop.
 
-## Architektur
+## Architecture
 
 ```
-src/engine/   Pure-TS-Spiellogik (kein DOM): Reducer, Muster, Wertung, Effekte — Vitest-getestet
-src/data/     Karten-Assets: JSON je Karte + SVG-Artwork, automatisch geladen
-src/ui/       Svelte-5-Komponenten (Spieltisch, Ecken, Karten, Dialoge, Lobby)
-src/store/    Engine↔UI-Bindung, localStorage-Persistenz, Drag-Zustand
-src/net/      Mehrgerätemodus: Protokoll, austauschbarer Transport, Sitzplätze, Sitzung
+src/engine/   Pure-TS game logic (no DOM): reducer, patterns, scoring, effects — Vitest-tested
+src/data/     Card assets: JSON per card + SVG artwork, loaded automatically
+src/i18n/     Translations (8 languages), language detection, error-message mapping
+src/ui/       Svelte 5 components (game table, corners, cards, dialogs, lobby)
+src/store/    Engine↔UI binding, localStorage persistence, drag state
+src/net/      Multi-device mode: protocol, swappable transport, seats, session
 ```
 
-### Mehrgerätemodus
+### Multi-device mode
 
-Der Host führt die Spiel-Engine und ist die Regelinstanz; Gäste schicken nur Aktionen
-und rendern den empfangenen Zustand (~3 KB, wird komplett übertragen — keine Deltas).
-Die Umleitung sitzt an genau einer Stelle (`netBridge` in `src/store/gameStore.svelte.ts`):
-Ohne aktive Sitzung läuft exakt der bisherige Ein-Gerät-Pfad.
+The host runs the game engine and is the rules authority; guests only send actions
+and render the received state (~3 KB, transferred in full — no deltas).
+The redirection sits in exactly one place (`netBridge` in `src/store/gameStore.svelte.ts`):
+without an active session, exactly the previous single-device path runs.
 
-Der Transport steckt hinter einem schmalen Interface (`src/net/transport.ts`) — es gibt
-eine P2P-Variante (Trystero, wird nur bei Bedarf nachgeladen), eine BroadcastChannel-Variante
-für Tests und eine In-Memory-Variante für Unit-Tests. Ein Wechsel des Vermittlungsdienstes
-berührt die Spiellogik nicht. Die Vermittlung läuft über eine **handverlesene Liste von
-8 großen Nostr-Relays** (`trysteroTransport.ts`) statt der Trystero-Auslosung — die Liste
-ist der Treffpunkt aller Geräte, Änderungen daran immer zusammen mit `PROTOCOL_VERSION`.
-Beim Verbinden zeigt die App an, wie viele Relays erreichbar sind (auch in Host-Lobby
-und Raum-Code-Dialog). Nach längerem Hintergrund baut die App den Raum komplett neu
-auf — Nostr-Relays vergessen ihre Abos beim Socket-Abriss, und Trystero 0.25 erneuert
-sie nach einem Reconnect nicht (das Gerät würde sonst senden, aber nichts mehr hören).
+The transport sits behind a narrow interface (`src/net/transport.ts`) — there is a
+P2P variant (Trystero, lazy-loaded only when needed), a BroadcastChannel variant for
+tests, and an in-memory variant for unit tests. Swapping the signaling service does
+not touch the game logic. Signaling runs over a **hand-picked list of 8 large Nostr
+relays** (`trysteroTransport.ts`) instead of Trystero's random draw — the list is the
+meeting point of all devices; change it only together with `PROTOCOL_VERSION`.
+While connecting, the app shows how many relays are reachable (also in the host lobby
+and the room-code dialog). After a longer stay in the background, the app rebuilds the
+room from scratch — Nostr relays forget their subscriptions when the socket drops, and
+Trystero 0.25 does not renew them after a reconnect (the device would still send but
+no longer hear anything).
 
-**iOS-Eigenheit:** Wird die App in den Hintergrund geschickt oder das Display gesperrt,
-beendet iOS jede Verbindung — dagegen hilft keine Technik. Die App hält deshalb während
-der Partie den Bildschirm wach (Wake Lock) und gleicht bei jeder Rückkehr in den
-Vordergrund den vollen Zustand ab; getrennte Plätze bleiben reserviert. Wird der Tab
-komplett neu geladen (auch das macht iOS gern), tritt ein Gast automatisch wieder bei
-(Sitzung liegt im `localStorage`; beim Verbinden ruft er alle 3 s erneut, Frist 30 s,
-und selbst nach einem Fehlschlag bleibt die Sitzung für den nächsten Versuch gemerkt).
-Der Host stellt mit „Weiterspielen" Partie **und** Raum wieder her — die Gäste
-verbinden sich dann von selbst neu. Über den Raum-Code-Knopf im Spiel kann der Host
-außerdem jederzeit Plätze **per QR an (neue) Geräte übergeben** — auch mitten in
-der Partie, samt Spielstand.
+**iOS quirk:** when the app goes to the background or the display locks, iOS kills
+every connection — no technique prevents that. The app therefore keeps the screen
+awake during the game (Wake Lock) and re-syncs the full state on every return to the
+foreground; disconnected seats stay reserved. If the tab is fully reloaded (iOS likes
+doing that too), a guest rejoins automatically (the session lives in `localStorage`;
+while connecting it re-calls every 3 s with a 30 s deadline, and even after a failure
+the session is kept for the next attempt). The host restores both the game **and** the
+room via "Continue" — guests then reconnect on their own. Via the room-code button in
+the game, the host can also **hand seats to (new) devices via QR** at any time — even
+mid-game, including the game state.
 
-**Neue Karten** brauchen nur eine JSON-Datei (+ optional SVG) in `src/data/buildings/`
-bzw. `src/data/monuments/` — solange sie vorhandene Wertungs-/Effekt-Bausteine nutzen,
-ist kein Code nötig. Details: [`src/data/schema.md`](src/data/schema.md).
+**New cards** only need a JSON file (+ optional SVG) in `src/data/buildings/` or
+`src/data/monuments/` — as long as they use existing scoring/effect building blocks,
+no code is required. Details: [`src/data/schema.md`](src/data/schema.md).
 
 ## Deployment
 
-Der Workflow `.github/workflows/deploy.yml` baut bei jedem Push auf `main` und
-veröffentlicht auf **GitHub Pages**. Einmalig aktivieren:
-Repo-Einstellungen → *Pages* → *Source: GitHub Actions*.
+The workflow `.github/workflows/deploy.yml` builds on every push to `main` and
+publishes to **GitHub Pages**. One-time setup:
+repo settings → *Pages* → *Source: GitHub Actions*.
 
-## Hinweis
+## Note
 
-Fan-Projekt für den privaten Gebrauch. *Tiny Towns* ist ein Spiel von Peter McPherson
-(AEG). Alle Grafiken hier sind eigene, schematische Nachbildungen — es werden keine
-Original-Assets verwendet.
+Fan project for private use. *Tiny Towns* is a game by Peter McPherson
+(AEG). All graphics here are original, schematic recreations — no original
+assets are used.
