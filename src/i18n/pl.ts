@@ -198,7 +198,7 @@ export const pl: Translation = {
     trainTitle: 'Tryb kolejowy (jeśli włączony)',
     trainSteps: [
       'Tory biegną wzdłuż dolnej i górnej krawędzi pola gry, z tunelami na końcach. Pociąg (3 wagony za lokomotywą) jest zawsze widoczny wraz z ładunkiem.',
-      'Na koniec każdej rundy przejeżdża o jedno miasto dalej i tam się zatrzymuje (solo wyjeżdża z tunelu co 3 rundy).',
+      'Na koniec każdej rundy przesuwa się o jedną pozycję i zatrzymuje w każdym mieście; jeden odcinek trasy biegnie przez tunel — dzięki temu pociąg i mistrz budowy przesuwają się względem siebie (solo pojawia się co 3 rundy).',
       'Stacja leży jako 8. karta dla wszystkich (kamień–drewno–kamień, 2 punkty, najwyżej jedna na miasto) i musi zostać zbudowana przy torach — w dolnym rzędzie twojego miasta.',
       'Tylko ze stacją możesz podczas postoju, zamiast kłaść: załadować otrzymany surowiec do wolnego wagonu — albo wymienić go na zawartość wagonu (wymieniony surowiec kładziesz potem normalnie).',
       'Wagony są jawne: co zostawisz, ktoś inny może zabrać po drodze.'

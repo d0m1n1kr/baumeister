@@ -12,16 +12,29 @@
   const twoPlayer = $derived(st.players.length === 2);
   const single = $derived(st.players.length === 1);
   let confirmAbort = $state(false);
+
+  // Handy im Querformat: übereinander gestapelte Bretter passen nicht in die
+  // Höhe — Bretter nebeneinander, Kartenleiste vertikal dazwischen.
+  let shortLandscape = $state(false);
+  $effect(() => {
+    if (typeof matchMedia === 'undefined') return;
+    const mq = matchMedia('(orientation: landscape) and (max-height: 540px)');
+    const update = () => (shortLandscape = mq.matches);
+    update();
+    mq.addEventListener('change', update);
+    return () => mq.removeEventListener('change', update);
+  });
+  const sideways = $derived((twoPlayer || single) && shortLandscape);
 </script>
 
-<div class="table" class:two={twoPlayer} class:single>
+<div class="table" class:two={twoPlayer} class:single class:sideways>
   {#each st.players as p, i}
     <div class="slot" style="grid-area: {single ? 'bottom' : twoPlayer ? (p.corner >= 2 ? 'top' : 'bottom') : cornerArea(p.corner)}">
       <PlayerCorner player={i} wide={twoPlayer || single} solo={single} />
     </div>
   {/each}
   <div class="center">
-    <CardStrip horizontal={twoPlayer || single} solo={single} onabort={() => (confirmAbort = true)} />
+    <CardStrip horizontal={(twoPlayer || single) && !sideways} solo={single} onabort={() => (confirmAbort = true)} />
   </div>
 
   <!-- Geist-Chips für laufende Drags (unrotierte Tisch-Ebene) -->
@@ -77,6 +90,18 @@
     .table:not(.two):not(.single) {
       grid-template-columns: 1fr clamp(92px, 24vw, 120px) 1fr;
     }
+  }
+  /* Handy quer (2 Spieler): Bretter nebeneinander, Leiste vertikal */
+  .table.two.sideways {
+    grid-template-columns: 1fr clamp(110px, 14vw, 160px) 1fr;
+    grid-template-rows: minmax(0, 1fr);
+    grid-template-areas: 'top strip bottom';
+  }
+  /* Handy quer (Solo-Tisch): Leiste links, Brett rechts */
+  .table.single.sideways {
+    grid-template-columns: clamp(110px, 16vw, 170px) minmax(0, 1fr);
+    grid-template-rows: minmax(0, 1fr);
+    grid-template-areas: 'strip bottom';
   }
   .slot { min-width: 0; min-height: 0; overflow: hidden; }
   .center { grid-area: strip; position: relative; min-height: 0; min-width: 0; }

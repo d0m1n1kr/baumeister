@@ -59,10 +59,12 @@ export function newGame(config: GameConfig): GameState {
 
 // ---------- Eisenbahn (eigener Modus) ----------
 
-/** Länge des Rundkurses: eine Position je Stadt, solo mit 2 Tunnel-Segmenten
- *  (der Zug hält dann alle 3 Runden). */
+/** Länge des Rundkurses: eine Position je Stadt PLUS ein Tunnel-Segment —
+ *  der Zug verschwindet also bei jeder Spielerzahl regelmäßig im Tunnel und
+ *  verschiebt sich dadurch gegen die Baumeister-Rotation (solo: Zyklus 3,
+ *  der Zug taucht alle 3 Runden auf). */
 export function trainCycle(s: GameState): number {
-  return Math.max(s.players.length, 3);
+  return Math.max(s.players.length + 1, 3);
 }
 
 /** Spieler, an dessen Bahnhof der Zug in dieser Runde hält — sonst null. */

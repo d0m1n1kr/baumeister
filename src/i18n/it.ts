@@ -198,7 +198,7 @@ export const it: Translation = {
     trainTitle: 'Modalità ferrovia (se attivata)',
     trainSteps: [
       'I binari corrono lungo i bordi inferiore e superiore dell\'area di gioco, con gallerie alle estremità. Il treno (3 vagoni dietro la locomotiva) è sempre visibile con il suo carico.',
-      'Alla fine di ogni round avanza di una città e vi si ferma (in solitario esce dalla galleria ogni 3 round).',
+      'Alla fine di ogni round avanza di una posizione e ferma in ogni città; un tratto del percorso passa per la galleria — così il treno e il capomastro si sfalsano tra loro (in solitario esce ogni 3 round).',
       'La stazione è esposta come 8ª carta per tutti (pietra–legno–pietra, 2 punti, al massimo una per città) e va costruita sul binario — nella riga inferiore della tua città.',
       'Solo con una stazione puoi, invece di piazzare: caricare la risorsa ricevuta in un vagone libero — o scambiarla con il contenuto di un vagone (poi piazzi normalmente la risorsa scambiata).',
       'I vagoni sono pubblici: ciò che lasci, un altro può prenderlo lungo il percorso.'

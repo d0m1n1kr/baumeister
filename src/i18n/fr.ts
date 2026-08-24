@@ -198,7 +198,7 @@ export const fr: Translation = {
     trainTitle: 'Mode chemin de fer (si activé au départ)',
     trainSteps: [
       'Les rails longent les bords inférieur et supérieur de l\'aire de jeu, avec des tunnels aux extrémités. Le train (3 wagons derrière la locomotive) reste toujours visible avec son chargement.',
-      'À la fin de chaque manche, il avance d\'une ville et s\'y arrête (en solo il sort du tunnel toutes les 3 manches).',
+      'À la fin de chaque manche, il avance d\'une position et s\'arrête à chaque ville ; un tronçon du parcours passe par le tunnel — le train et le maître d\'œuvre se décalent ainsi l\'un par rapport à l\'autre (en solo il sort toutes les 3 manches).',
       'La gare est exposée comme 8e carte pour tous (pierre–bois–pierre, 2 points, au plus une par ville) et doit être construite sur la voie — dans la rangée du bas de ta ville.',
       'Seulement avec une gare tu peux, au lieu de placer : charger la ressource reçue dans un wagon vide — ou l\'échanger contre le contenu d\'un wagon (tu places ensuite la ressource échangée normalement).',
       'Les wagons sont publics : ce que tu déposes, un autre peut le prendre en route.'

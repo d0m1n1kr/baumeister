@@ -957,6 +957,12 @@
     align-self: flex-start;
   }
   .corner.wide .boardWrap { width: min(32vh, 44vw); }
+  /* Handy quer: Bretter stehen nebeneinander — die Höhe ist der Maßstab */
+  @media (orientation: landscape) and (max-height: 540px) {
+    .corner.wide .boardWrap { width: min(58vh, 34vw); }
+    .corner.wide .row { flex-direction: column; align-items: center; gap: 4px; }
+    .corner.wide .panel { align-items: center; width: 100%; flex: 0 1 auto; }
+  }
   .corner.wide .row { justify-content: center; }
   /* Panel nicht auf volle Restbreite strecken, damit die Gruppe mittig sitzt */
   .corner.wide .panel { flex: 0 1 360px; }

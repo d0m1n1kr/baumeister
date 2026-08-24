@@ -198,7 +198,7 @@ export const es: Translation = {
     trainTitle: 'Modo ferrocarril (si está activado)',
     trainSteps: [
       'Las vías recorren los bordes inferior y superior del área de juego, con túneles en los extremos. El tren (3 vagones detrás de la locomotora) siempre es visible con su carga.',
-      'Al final de cada ronda avanza una ciudad y para allí (en solitario sale del túnel cada 3 rondas).',
+      'Al final de cada ronda avanza una posición y para en cada ciudad; un tramo del recorrido pasa por el túnel — así el tren y el maestro constructor se desplazan entre sí (en solitario sale cada 3 rondas).',
       'La estación está expuesta como 8.ª carta para todos (piedra–madera–piedra, 2 puntos, máximo una por ciudad) y debe construirse junto a la vía — en la fila inferior de tu ciudad.',
       'Solo con estación puedes, en vez de colocar: cargar el recurso recibido en un vagón libre — o intercambiarlo por el contenido de un vagón (el recurso intercambiado se coloca normalmente).',
       'Los vagones son públicos: lo que dejas, otro puede llevárselo por el camino.'
