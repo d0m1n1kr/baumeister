@@ -977,7 +977,11 @@
     .corner.wide .panel { align-items: center; width: 100%; flex: 1; }
     .corner.wide header { justify-content: center; }
     /* Solo: das einzige Brett darf den Platz nutzen */
-    .corner.soloCorner .boardWrap { width: min(36vh, 86vw); }
+    .corner.soloCorner .boardWrap {
+      width: min(30vh, 76vw);
+      /* Platz für Gleis und Zug an der Brett-Unterkante */
+      margin-bottom: 26px;
+    }
   }
   @media (max-width: 700px) and (orientation: portrait) {
     /* 3–4 Spieler am Handy: Die Eckzellen sind zu schmal für Brett + Knöpfe

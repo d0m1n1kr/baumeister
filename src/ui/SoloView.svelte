@@ -80,7 +80,17 @@
   }
   .slot { width: clamp(84px, 22vw, 130px); flex-shrink: 0; }
   .strip { min-width: 0; min-height: 0; }
-  .own { min-height: 0; overflow: hidden; }
+  .own {
+    min-height: 0;
+    /* Scrollbar statt abgeschnitten: Die Knöpfe unter dem Brett müssen
+       auch auf kleinen Bildschirmen immer erreichbar sein */
+    overflow-y: auto;
+    touch-action: pan-y;
+  }
+  @media (max-width: 720px) {
+    /* Luft für Gleis + Zug an der Brett-Unterkante */
+    .own { padding-bottom: 26px; }
+  }
   .banner {
     position: absolute;
     top: 6px;

@@ -93,6 +93,17 @@
   let overlay = $state<{ card: CardDef; rotation: number } | null>(null);
   let soundOn = $state(sfx.enabled);
 
+  // Handy: kompakte Mini-Karten (kleinere Schrift, kleineres Muster)
+  let compactCards = $state(false);
+  $effect(() => {
+    if (typeof matchMedia === 'undefined') return;
+    const mq = matchMedia('(max-width: 720px)');
+    const update = () => (compactCards = mq.matches);
+    update();
+    mq.addEventListener('change', update);
+    return () => mq.removeEventListener('change', update);
+  });
+
   function open(card: CardDef, e: PointerEvent) {
     // Am Spieltisch zum antippenden Spieler drehen (obere Hälfte = 180°);
     // in der Solo-Ansicht schaut nur einer aufs Gerät — immer aufrecht.
@@ -146,6 +157,7 @@
       <div class="cardWrap">
         <CardMini
           card={catalog[id]}
+          compact={compactCards}
           description={aliceOn ? cardText(catalog[id]) : ''}
           onclick={(e) => open(catalog[id], e)}
         />

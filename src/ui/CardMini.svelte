@@ -78,6 +78,8 @@
     max-width: 100%;
   }
   .compact .name { font-size: 10px; }
+  .compact { padding: 4px 5px 3px; gap: 2px; }
+  .compact .feats { font-size: 9px; min-height: 9px; }
   .body { display: flex; align-items: center; gap: 6px; }
   .art { width: 30px; height: 30px; display: block; }
   .compact .art { width: 24px; height: 24px; }
