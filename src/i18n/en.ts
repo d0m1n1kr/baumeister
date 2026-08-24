@@ -102,6 +102,14 @@ export const en: Translation = {
 
   townHallMode: 'Town Hall mode',
   townHallModeHint: 'No Master Builder: a resource deck drives the rounds; every 3rd round everyone chooses freely.',
+  trainMode: 'Railway mode',
+  trainModeHint: 'A train with 3 wagons travels around the table round by round — with a built station you may load or swap resources.',
+  trainStopTitle: 'The train is stopping at your station!',
+  trainLoad: 'Load onto the train',
+  trainSwapHint: 'Swap for this wagon\'s contents',
+  trainAt: (name) => `The train is stopping at ${name}`,
+  trainPassing: (name) => `The train is passing ${name}`,
+  trainTunnel: 'The train is in the tunnel',
   thDraw: 'Draw the next card',
   thStartFree: 'Start round: free choice',
   thDeckCount: (n: number) => `Draw pile: ${n} cards`,
@@ -187,6 +195,13 @@ export const en: Translation = {
       'Factory, Warehouse, coin swap & co. apply to drawn cards; the Bank locks your free choice, Fort Ironweed sits out choice rounds.',
       'With Fortune, the Oddity Shop is removed from the game.'
     ],
+    trainTitle: 'Railway mode (if enabled in setup)',
+    trainSteps: [
+      'A train with 3 wagons moves one town further at the end of every round (clockwise; solo it emerges from the tunnel every 3rd round).',
+      'The train station is laid out as an 8th card for everyone (stone–wood–stone, 2 points, at most one per town).',
+      'When the train stops at your station, instead of placing you may: load the received resource into an empty wagon — or swap it for a wagon\'s contents (then place the swapped resource normally).',
+      'The wagons are public: what you drop off, someone else may grab along the way.'
+    ],
     fortuneTitle: 'Expansion: Fortune (coins)',
     fortuneSteps: [
       'Construct 2 or more buildings in one round (by removing resources) to gain 1 coin — the chest holds at most 4 (some monuments add 1 extra slot).',
@@ -255,6 +270,16 @@ export const en: Translation = {
   ],
 
   errors: {
+    // Eisenbahn
+    'Die Eisenbahn ist nicht im Spiel': 'The railway is not in this game',
+    'Der Zug hält nicht an deinem Bahnhof': 'The train is not stopping at your station',
+    'Der Zug wurde in dieser Runde bereits genutzt': 'The train was already used this round',
+    'Kein Material zum Verladen': 'No resource to load',
+    'Alle Waggons sind voll': 'All wagons are full',
+    'Das Zusatz-Material kann nicht getauscht werden': 'The bonus resource cannot be swapped',
+    'Ungültiger Waggon': 'Invalid wagon',
+    'Dieser Waggon ist leer': 'This wagon is empty',
+    'Nur ein Bahnhof pro Stadt': 'Only one train station per town',
     'Auf Münzfelder der Promenade nur direkt beim Platzieren': 'Promenade coin squares can only be used when placing directly',
     'Auswahl entspricht nicht dem Baumuster': 'Selection doesn’t match the building pattern',
     'Bauplatz ist nicht frei': 'Building square is not free',

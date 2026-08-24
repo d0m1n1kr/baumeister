@@ -4,6 +4,7 @@
   import type { CardDef } from '../engine/types';
   import { RESOURCE_CSS } from './helpers';
   import { cardText, t } from '../i18n';
+  import { trainStopPlayer } from '../engine/game';
   import CardMini from './CardMini.svelte';
   import CardOverlay from './CardOverlay.svelte';
   import { sfx } from './sound';
@@ -23,6 +24,16 @@
 
   const st = $derived(game.state!);
   const named = $derived(st.phase.t === 'round' ? st.phase.resource : null);
+
+  // Eisenbahn: Halt/Vorbeifahrt/Tunnel für die Statuszeile
+  const trainStatus = $derived.by(() => {
+    const train = st.train;
+    if (!train) return null;
+    const stopAt = trainStopPlayer(st, catalog);
+    if (stopAt != null) return t.trainAt(st.players[stopAt].name);
+    if (train.pos < st.players.length) return t.trainPassing(st.players[train.pos].name);
+    return t.trainTunnel;
+  });
 
   // Alice-Modus (Einzelansicht): alle Karten dauerhaft samt Beschreibung offen,
   // damit niemand jede Karte einzeln antippen muss. Reine Anzeige-Präferenz
@@ -115,6 +126,15 @@
         {t.resourceNames[named]}
       </span>
     {/if}
+    {#if st.train}
+      <span class="trainInfo" title={trainStatus}>
+        🚂
+        {#each st.train.wagons as w}
+          <span class="wagon" style={w ? `background: ${RESOURCE_CSS[w]}` : ''}></span>
+        {/each}
+      </span>
+      <span class="trainWhere">{trainStatus}</span>
+    {/if}
     {#if solo}
       <button class="aliceBtn" class:active={alice} onpointerup={toggleAlice} title={t.aliceModeHint}>
         📖 {t.aliceMode}
@@ -171,6 +191,16 @@
     line-height: 1;
   }
   .mb { color: var(--accent); font-weight: 700; }
+  .trainInfo { display: flex; align-items: center; gap: 3px; }
+  .wagon {
+    width: 11px;
+    height: 9px;
+    border-radius: 2px;
+    border: 1px solid rgba(255, 255, 255, 0.4);
+    background: rgba(255, 255, 255, 0.08);
+    display: inline-block;
+  }
+  .trainWhere { font-size: 10px; color: var(--text-dim); text-align: center; }
   .named { display: flex; align-items: center; gap: 5px; color: var(--text); font-weight: 600; }
   .dot { width: 12px; height: 12px; border-radius: 50%; display: inline-block; border: 1px solid rgba(0,0,0,0.4); }
   .cards {

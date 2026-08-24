@@ -102,6 +102,14 @@ export const it: Translation = {
 
   townHallMode: 'Modalità Municipio',
   townHallModeHint: 'Senza capomastro: un mazzo di risorse guida i round; ogni 3º round tutti scelgono liberamente.',
+  trainMode: 'Modalità ferrovia',
+  trainModeHint: 'Un treno con 3 vagoni gira attorno al tavolo round dopo round — con una stazione costruita puoi caricare o scambiare risorse.',
+  trainStopTitle: 'Il treno ferma alla tua stazione!',
+  trainLoad: 'Caricare sul treno',
+  trainSwapHint: 'Scambiare con il contenuto del vagone',
+  trainAt: (name) => `Il treno ferma da ${name}`,
+  trainPassing: (name) => `Il treno passa da ${name}`,
+  trainTunnel: 'Il treno è nella galleria',
   thDraw: 'Pesca la prossima carta',
   thStartFree: 'Avvia il round: scelta libera',
   thDeckCount: (n: number) => `Mazzo: ${n} carte`,
@@ -187,6 +195,13 @@ export const it: Translation = {
       'Fabbrica, Magazzino, scambio moneta ecc. valgono per le carte pescate; la Banca blocca la scelta libera, Forte Ferroverbena salta quei round.',
       'Con Fortune la Bottega delle Curiosità è fuori dal gioco.'
     ],
+    trainTitle: 'Modalità ferrovia (se attivata)',
+    trainSteps: [
+      'Un treno con 3 vagoni avanza di una città alla fine di ogni round (in senso orario; in solitario esce dalla galleria ogni 3 round).',
+      'La stazione è esposta come 8ª carta per tutti (pietra–legno–pietra, 2 punti, al massimo una per città).',
+      'Quando il treno ferma alla tua stazione, invece di piazzare puoi: caricare la risorsa ricevuta in un vagone libero — o scambiarla con il contenuto di un vagone (poi piazzi normalmente la risorsa scambiata).',
+      'I vagoni sono pubblici: ciò che lasci, un altro può prenderlo lungo il percorso.'
+    ],
     fortuneTitle: 'Espansione: Fortune (monete)',
     fortuneSteps: [
       'Costruisci 2 o più edifici in un round (rimuovendo risorse) per guadagnare 1 moneta — il forziere ne tiene al massimo 4 (alcuni monumenti aggiungono 1 slot).',
@@ -255,6 +270,16 @@ export const it: Translation = {
   ],
 
   errors: {
+    // Eisenbahn
+    'Die Eisenbahn ist nicht im Spiel': 'La ferrovia non è in questa partita',
+    'Der Zug hält nicht an deinem Bahnhof': 'Il treno non ferma alla tua stazione',
+    'Der Zug wurde in dieser Runde bereits genutzt': 'Il treno è già stato usato in questo round',
+    'Kein Material zum Verladen': 'Nessuna risorsa da caricare',
+    'Alle Waggons sind voll': 'Tutti i vagoni sono pieni',
+    'Das Zusatz-Material kann nicht getauscht werden': 'La risorsa extra non può essere scambiata',
+    'Ungültiger Waggon': 'Vagone non valido',
+    'Dieser Waggon ist leer': 'Questo vagone è vuoto',
+    'Nur ein Bahnhof pro Stadt': 'Una sola stazione per città',
     'Auf Münzfelder der Promenade nur direkt beim Platzieren': 'Le caselle con moneta della Passeggiata si usano solo piazzando direttamente',
     'Auswahl entspricht nicht dem Baumuster': 'La selezione non corrisponde allo schema di costruzione',
     'Bauplatz ist nicht frei': 'La casella di costruzione non è libera',

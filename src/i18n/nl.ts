@@ -102,6 +102,14 @@ export const nl: Translation = {
 
   townHallMode: 'Stadhuis-modus',
   townHallModeHint: 'Zonder meesterbouwer: een grondstoffenstapel bepaalt de rondes; elke 3e ronde kiest iedereen vrij.',
+  trainMode: 'Spoorwegmodus',
+  trainModeHint: 'Een trein met 3 wagons rijdt ronde na ronde rond de tafel — met een gebouwd station mag je grondstoffen laden of ruilen.',
+  trainStopTitle: 'De trein stopt bij jouw station!',
+  trainLoad: 'In de trein laden',
+  trainSwapHint: 'Ruilen tegen de inhoud van de wagon',
+  trainAt: (name) => `De trein stopt bij ${name}`,
+  trainPassing: (name) => `De trein rijdt langs ${name}`,
+  trainTunnel: 'De trein is in de tunnel',
   thDraw: 'Volgende kaart trekken',
   thStartFree: 'Ronde starten: vrije keuze',
   thDeckCount: (n: number) => `Trekstapel: ${n} kaarten`,
@@ -187,6 +195,13 @@ export const nl: Translation = {
       'Fabriek, Pakhuis, muntruil enz. gelden voor getrokken kaarten; de Bank blokkeert de vrije keuze, Fort IJzerkruid slaat keuzerondes over.',
       'Met Fortune doet de Curiosawinkel niet mee.'
     ],
+    trainTitle: 'Spoorwegmodus (indien geactiveerd)',
+    trainSteps: [
+      'Een trein met 3 wagons rijdt aan het einde van elke ronde één stad verder (met de klok mee; solo komt hij elke 3 rondes uit de tunnel).',
+      'Het station ligt als 8e kaart voor iedereen uit (steen–hout–steen, 2 punten, hoogstens één per stad).',
+      'Stopt de trein bij jouw station, dan mag je in plaats van plaatsen: de ontvangen grondstof in een lege wagon laden — of ruilen tegen de inhoud van een wagon (de geruilde grondstof plaats je daarna normaal).',
+      'De wagons zijn openbaar: wat jij aflevert, kan een ander onderweg meenemen.'
+    ],
     fortuneTitle: 'Uitbreiding: Fortune (munten)',
     fortuneSteps: [
       'Bouw 2 of meer gebouwen in één ronde (met grondstoffen weghalen) voor 1 munt — de kist houdt er hoogstens 4 (sommige monumenten geven 1 extra plek).',
@@ -255,6 +270,16 @@ export const nl: Translation = {
   ],
 
   errors: {
+    // Eisenbahn
+    'Die Eisenbahn ist nicht im Spiel': 'De spoorweg is niet in dit spel',
+    'Der Zug hält nicht an deinem Bahnhof': 'De trein stopt niet bij jouw station',
+    'Der Zug wurde in dieser Runde bereits genutzt': 'De trein is deze ronde al gebruikt',
+    'Kein Material zum Verladen': 'Geen grondstof om te laden',
+    'Alle Waggons sind voll': 'Alle wagons zijn vol',
+    'Das Zusatz-Material kann nicht getauscht werden': 'De bonusgrondstof kan niet geruild worden',
+    'Ungültiger Waggon': 'Ongeldige wagon',
+    'Dieser Waggon ist leer': 'Deze wagon is leeg',
+    'Nur ein Bahnhof pro Stadt': 'Slechts één station per stad',
     'Auf Münzfelder der Promenade nur direkt beim Platzieren': 'Muntvakjes van de Promenade alleen direct bij het plaatsen',
     'Auswahl entspricht nicht dem Baumuster': 'Selectie past niet bij het bouwpatroon',
     'Bauplatz ist nicht frei': 'Bouwvakje is niet vrij',

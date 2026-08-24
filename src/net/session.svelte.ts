@@ -80,11 +80,14 @@ export class Session {
   roomCode = $state('');
   netError = $state('');
   /** Vom Host beim Raumöffnen gewählte Partie-Optionen (Erweiterungen, Monumente, Höhle, Rathaus). */
-  setup = $state<{ sets: string[]; useMonuments: boolean; cavern?: boolean; townHall?: boolean }>({
+  setup = $state<{
+    sets: string[]; useMonuments: boolean; cavern?: boolean; townHall?: boolean; train?: boolean;
+  }>({
     sets: ['base'],
     useMonuments: true,
     cavern: false,
-    townHall: false
+    townHall: false,
+    train: false
   });
 
   private transport: Transport | null = null;

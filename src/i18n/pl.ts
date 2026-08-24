@@ -102,6 +102,14 @@ export const pl: Translation = {
 
   townHallMode: 'Tryb Ratusza',
   townHallModeHint: 'Bez mistrza budowniczego: talia surowców prowadzi rundy; co 3. rundę każdy wybiera dowolnie.',
+  trainMode: 'Tryb kolejowy',
+  trainModeHint: 'Pociąg z 3 wagonami objeżdża stół runda po rundzie — ze zbudowaną stacją możesz załadować lub wymienić surowce.',
+  trainStopTitle: 'Pociąg zatrzymuje się na twojej stacji!',
+  trainLoad: 'Załaduj do pociągu',
+  trainSwapHint: 'Wymień na zawartość wagonu',
+  trainAt: (name) => `Pociąg zatrzymuje się u ${name}`,
+  trainPassing: (name) => `Pociąg mija ${name}`,
+  trainTunnel: 'Pociąg jest w tunelu',
   thDraw: 'Dobierz następną kartę',
   thStartFree: 'Rozpocznij rundę: wolny wybór',
   thDeckCount: (n: number) => `Talia: ${n} kart`,
@@ -187,6 +195,13 @@ export const pl: Translation = {
       'Fabryka, Magazyn, wymiana za monetę itd. działają przy dobranych kartach; Bank blokuje wolny wybór, Fort pauzuje w rundach wyboru.',
       'Z dodatkiem Fortune Sklep z Osobliwościami nie bierze udziału.'
     ],
+    trainTitle: 'Tryb kolejowy (jeśli włączony)',
+    trainSteps: [
+      'Pociąg z 3 wagonami przesuwa się o jedno miasto na koniec każdej rundy (zgodnie z ruchem wskazówek zegara; solo wyjeżdża z tunelu co 3 rundy).',
+      'Stacja leży jako 8. karta dla wszystkich (kamień–drewno–kamień, 2 punkty, najwyżej jedna na miasto).',
+      'Gdy pociąg zatrzyma się na twojej stacji, zamiast kłaść możesz: załadować otrzymany surowiec do wolnego wagonu — albo wymienić go na zawartość wagonu (wymieniony surowiec kładziesz potem normalnie).',
+      'Wagony są jawne: co zostawisz, ktoś inny może zabrać po drodze.'
+    ],
     fortuneTitle: 'Dodatek: Fortune (monety)',
     fortuneSteps: [
       'Zbuduj 2 lub więcej budynków w rundzie (zdejmując surowce), aby zyskać 1 monetę — skrzynia mieści najwyżej 4 (niektóre monumenty dają 1 dodatkowe miejsce).',
@@ -255,6 +270,16 @@ export const pl: Translation = {
   ],
 
   errors: {
+    // Eisenbahn
+    'Die Eisenbahn ist nicht im Spiel': 'Kolej nie występuje w tej rozgrywce',
+    'Der Zug hält nicht an deinem Bahnhof': 'Pociąg nie zatrzymuje się na twojej stacji',
+    'Der Zug wurde in dieser Runde bereits genutzt': 'Pociąg został już użyty w tej rundzie',
+    'Kein Material zum Verladen': 'Brak surowca do załadunku',
+    'Alle Waggons sind voll': 'Wszystkie wagony są pełne',
+    'Das Zusatz-Material kann nicht getauscht werden': 'Dodatkowego surowca nie można wymienić',
+    'Ungültiger Waggon': 'Nieprawidłowy wagon',
+    'Dieser Waggon ist leer': 'Ten wagon jest pusty',
+    'Nur ein Bahnhof pro Stadt': 'Tylko jedna stacja na miasto',
     'Auf Münzfelder der Promenade nur direkt beim Platzieren': 'Pola z monetą Promenady tylko bezpośrednio przy kładzeniu',
     'Auswahl entspricht nicht dem Baumuster': 'Zaznaczenie nie pasuje do wzoru budowy',
     'Bauplatz ist nicht frei': 'Pole budowy nie jest wolne',

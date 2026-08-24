@@ -37,6 +37,11 @@
       </ol>
     {/if}
 
+    <h4>{t.help.trainTitle}</h4>
+    <ol>
+      {#each t.help.trainSteps as step}<li>{step}</li>{/each}
+    </ol>
+
     <h4>{t.help.fortuneTitle}</h4>
     <ol>
       {#each t.help.fortuneSteps as step}<li>{step}</li>{/each}

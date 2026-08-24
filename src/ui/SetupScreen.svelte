@@ -27,6 +27,7 @@
   let useMonuments = $state(true);
   let cavernRule = $state(false);
   let townHall = $state(false);
+  let train = $state(false);
   let chosenSets = $state<string[]>([]);
   let multiDevice = $state(false);
   let daily = $state(false);
@@ -71,7 +72,8 @@
         buildGameConfig(currentPlayers(), activeSets(), useMonuments, !solo && cavernRule, {
           solo,
           dailyId: solo && daily ? todayId() : undefined,
-          townHall: !solo && townHall
+          townHall: !solo && townHall,
+          train
         })
       );
     } catch (e) {
@@ -101,7 +103,7 @@
     busy = true;
     error = '';
     try {
-      session.setup = { sets: activeSets(), useMonuments, cavern: cavernRule, townHall };
+      session.setup = { sets: activeSets(), useMonuments, cavern: cavernRule, townHall, train };
       await session.openRoom(makeRoomCode(), seats, selectedTransport());
     } catch (e) {
       error = e instanceof Error ? e.message : String(e);
@@ -198,6 +200,11 @@
         <input type="checkbox" bind:checked={townHall} />
         <span>🏛 {t.townHallMode}</span>
         <span class="expDesc">{t.townHallModeHint}</span>
+      </label>
+      <label class="expRow">
+        <input type="checkbox" bind:checked={train} />
+        <span>🚂 {t.trainMode}</span>
+        <span class="expDesc">{t.trainModeHint}</span>
       </label>
       <label class="field toggle">
         <input type="checkbox" bind:checked={cavernRule} />
