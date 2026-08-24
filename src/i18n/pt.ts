@@ -198,7 +198,7 @@ export const pt: Translation = {
     trainTitle: 'Modo ferrovia (se ativado)',
     trainSteps: [
       'Os trilhos correm ao longo das bordas inferior e superior da área de jogo, com túneis nas pontas. O trem (3 vagões atrás da locomotiva) está sempre visível com a sua carga.',
-      'No fim de cada rodada ele avança uma cidade e para ali (no solo ele sai do túnel a cada 3 rodadas).',
+      'No fim de cada rodada ele avança uma posição e para em cada cidade; um trecho do percurso passa pelo túnel — assim o trem e o mestre construtor se deslocam entre si (no solo ele aparece a cada 3 rodadas).',
       'A estação fica exposta como 8ª carta para todos (pedra–madeira–pedra, 2 pontos, no máximo uma por cidade) e deve ser construída junto aos trilhos — na fila de baixo da tua cidade.',
       'Só com estação podes, em vez de colocar: carregar o recurso recebido num vagão livre — ou trocá-lo pelo conteúdo de um vagão (o recurso trocado é colocado normalmente).',
       'Os vagões são públicos: o que deixas, outro pode levar pelo caminho.'

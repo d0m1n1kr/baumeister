@@ -198,7 +198,7 @@ export const nl: Translation = {
     trainTitle: 'Spoorwegmodus (indien geactiveerd)',
     trainSteps: [
       'De rails lopen langs de onder- en bovenrand van het speelveld, met tunnels aan de uiteinden. De trein (3 wagons achter de locomotief) is altijd zichtbaar met zijn lading.',
-      'Aan het einde van elke ronde rijdt hij één stad verder en stopt daar (solo komt hij elke 3 rondes uit de tunnel).',
+      'Aan het einde van elke ronde rijdt hij één positie verder en stopt bij elke stad; één stuk van de route loopt door de tunnel — zo verschuiven trein en meesterbouwer ten opzichte van elkaar (solo komt hij elke 3 rondes tevoorschijn).',
       'Het station ligt als 8e kaart voor iedereen uit (steen–hout–steen, 2 punten, hoogstens één per stad) en moet aan het spoor gebouwd worden — in de onderste rij van jouw stad.',
       'Alleen met een station mag je bij de stop, in plaats van plaatsen: de ontvangen grondstof in een lege wagon laden — of ruilen tegen de inhoud van een wagon (de geruilde grondstof plaats je daarna normaal).',
       'De wagons zijn openbaar: wat jij aflevert, kan een ander onderweg meenemen.'

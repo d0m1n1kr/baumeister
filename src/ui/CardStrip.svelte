@@ -201,6 +201,11 @@
     display: inline-block;
   }
   .trainWhere { font-size: 10px; color: var(--text-dim); text-align: center; }
+  /* Am Handy: Der geparkte Zug auf den Gleisen zeigt die Position bereits —
+     die Textzeile ist dort verzichtbar und die Leiste bleibt kompakt */
+  @media (max-width: 700px), (max-height: 540px) {
+    .trainWhere { display: none; }
+  }
   .named { display: flex; align-items: center; gap: 5px; color: var(--text); font-weight: 600; }
   .dot { width: 12px; height: 12px; border-radius: 50%; display: inline-block; border: 1px solid rgba(0,0,0,0.4); }
   .cards {

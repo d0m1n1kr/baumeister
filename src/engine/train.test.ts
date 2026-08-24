@@ -54,7 +54,10 @@ describe('Eisenbahn: Setup', () => {
 });
 
 describe('Eisenbahn: Fahrt und Halt', () => {
-  it('fährt am Rundenende eine Position weiter (Zyklus = max(Spieler, 3))', () => {
+  it('fährt am Rundenende eine Position weiter; Zyklus = Spieler + 1 Tunnel (min 3)', () => {
+    // Jede Spielerzahl hat ein Tunnel-Segment: Zug und Baumeister verschieben sich
+    expect(trainCycle(newGame(trainConfig(3, 0)))).toBe(4);
+    expect(trainCycle(newGame(trainConfig(4, 0)))).toBe(5);
     let s = stopAt(0, 2);
     expect(trainCycle(s)).toBe(3);
     s = a(s, { t: 'placeResource', player: 0, square: 0 });

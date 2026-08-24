@@ -198,7 +198,7 @@ export const de = {
     trainTitle: 'Eisenbahn-Modus (falls im Setup aktiviert)',
     trainSteps: [
       'Die Gleise verlaufen am unteren und oberen Spielfeldrand, mit Tunneln an den Enden. Der Zug (3 Waggons hinter der Lok) ist samt Beladung immer sichtbar.',
-      'Am Ende jeder Runde fährt er eine Stadt weiter und hält dort (solo kommt er alle 3 Runden aus dem Tunnel).',
+      'Am Ende jeder Runde fährt er eine Position weiter und hält an jeder Stadt; ein Streckenabschnitt führt durch den Tunnel — dadurch verschieben sich Zug und Baumeister gegeneinander (solo taucht er alle 3 Runden auf).',
       'Der Bahnhof liegt als 8. Karte für alle aus (Stein–Holz–Stein, 2 Punkte, höchstens einer pro Stadt) und muss an der Strecke gebaut werden — in der untersten Reihe deiner Stadt.',
       'Nur mit Bahnhof darfst du beim Halt statt zu platzieren: das erhaltene Material in einen freien Waggon verladen — oder gegen einen Waggon-Inhalt tauschen (das getauschte platzierst du normal).',
       'Die Waggons sind öffentlich: Was du abgibst, kann unterwegs jemand anderes wegschnappen.'

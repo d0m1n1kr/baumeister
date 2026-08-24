@@ -198,7 +198,7 @@ export const en: Translation = {
     trainTitle: 'Railway mode (if enabled in setup)',
     trainSteps: [
       'The tracks run along the bottom and top edges of the play area, with tunnels at the ends. The train (3 wagons behind the locomotive) is always visible with its load.',
-      'At the end of every round it moves one town further and stops there (solo it emerges from the tunnel every 3rd round).',
+      'At the end of every round it moves one position further and stops at every town; one section of the route runs through the tunnel — so the train and the Master Builder shift against each other (solo it emerges every 3rd round).',
       'The station is laid out as an 8th card for everyone (stone–wood–stone, 2 points, at most one per town) and must be built on the track — in the bottom row of your town.',
       'Only with a station may you, instead of placing: load the received resource into an empty wagon — or swap it for a wagon\'s contents (then place the swapped resource normally).',
       'The wagons are public: what you drop off, someone else may grab along the way.'

@@ -254,10 +254,15 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: center;
+    /* KEIN justify-content:center: zusammen mit overflow-y:auto würde
+       überlaufender Inhalt oben abgeschnitten (Handy quer). Auto-Margins
+       zentrieren, solange Platz ist, und scrollen sauber, wenn nicht. */
     gap: 22px;
     overflow-y: auto;
+    touch-action: pan-y;
   }
+  main > :first-child { margin-top: auto; }
+  main > :last-child { margin-bottom: auto; }
   h1 { margin: 0; font-size: 34px; }
   section {
     display: flex;

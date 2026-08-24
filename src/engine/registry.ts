@@ -148,9 +148,10 @@ export function randomSetup(
       ? shuffled(RESOURCES.flatMap((r) => [r, r, r]), rng)
       : undefined,
     thSeed: townHall ? Math.floor(rng() * 0xffffffff) : undefined,
-    // Eisenbahn: zufällige Startposition auf dem Rundkurs (solo: 3 Segmente)
+    // Eisenbahn: zufällige Startposition auf dem Rundkurs
+    // (Zyklus = Spielerzahl + 1 Tunnel-Segment, mindestens 3 — wie trainCycle)
     trainStart: train
-      ? Math.floor(rng() * Math.max(players.length, 3))
+      ? Math.floor(rng() * Math.max(players.length + 1, 3))
       : undefined,
     sets,
     systems: {

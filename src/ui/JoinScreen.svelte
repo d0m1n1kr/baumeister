@@ -153,10 +153,15 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: center;
+    /* Auto-Margins statt justify-content:center — zusammen mit Scrollen
+       würde überlaufender Inhalt sonst oben abgeschnitten (Handy quer) */
     gap: 20px;
     padding: 20px;
+    overflow-y: auto;
+    touch-action: pan-y;
   }
+  main > :first-child { margin-top: auto; }
+  main > :last-child { margin-bottom: auto; }
   h1 { margin: 0; font-size: 26px; }
   .form, .status {
     background: var(--bg-panel);
