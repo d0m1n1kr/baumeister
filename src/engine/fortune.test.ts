@@ -161,6 +161,43 @@ describe('Fortune-Gebäude', () => {
     expect(() => buildOn(s, 0, 'jeweler')).toThrow(RuleError);
   });
 
+  it('Museum im Solo: Deck-Wahl gilt als fremde Ansage → Rückgabe möglich', () => {
+    let s = inRound(coinGame(1, ['cottage', 'farm', 'museum', 'chapel', 'theater', 'tavern', 'factory']), 'wood');
+    s.config.solo = true;
+    s.masterBuilder = 0; // solo ist man immer selbst Baumeister
+    put(s, 0, 15, 'museum', { stored: ['wood', 'glass'] });
+    s = a(s, { t: 'museumSell', player: 0, square: 15 });
+    expect(s.players[0].coins).toBe(1);
+    expect(s.players[0].pending).toBeNull();
+    expect(s.players[0].board[15].building?.stored).toEqual(['glass']);
+  });
+
+  it('Blütenpromenade im Solo: Pflichtfelder und Münzgewinn wie bei fremder Ansage', () => {
+    let s = inRound(coinGame(1), 'wood');
+    s.config.solo = true;
+    s.masterBuilder = 0;
+    s.players[0].monument = { card: 'petal_promenade', built: true };
+    put(s, 0, 0, 'petal_promenade');
+    s.players[0].board[15].coin = true;
+    // freies Nicht-Münzfeld existiert → Platzieren daneben verboten
+    expect(() => a(s, { t: 'placeResource', player: 0, square: 4 })).toThrow(RuleError);
+    s = a(s, { t: 'placeResource', player: 0, square: 15 });
+    expect(s.players[0].coins).toBe(1);
+    expect(s.players[0].board[15].coin).toBeUndefined();
+  });
+
+  it('Bondmaker im Solo: Material darf auf die eigene Hütte', () => {
+    let s = inRound(coinGame(1), 'wood');
+    s.config.solo = true;
+    s.masterBuilder = 0;
+    s.players[0].monument = { card: 'statue_of_the_bondmaker', built: true };
+    put(s, 0, 0, 'statue_of_the_bondmaker');
+    put(s, 0, 5, 'cottage');
+    s = a(s, { t: 'placeResource', player: 0, square: 5 });
+    expect(s.players[0].board[5].resource).toBe('wood');
+    expect(s.players[0].board[5].building?.card).toBe('cottage');
+  });
+
   it('Pfarrhaus: Münzen ≠ Hüttenzahl → alle Münzen weg', () => {
     let s = inRound(coinGame());
     s.players[0].pending = null;

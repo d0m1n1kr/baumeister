@@ -128,3 +128,9 @@ Wichtige Regel-Details aus den Klarstellungen, die im Code stecken:
   bringen ihre Bau-Effekte.
 
 Solo ausgeschlossen (Fortune): `oddity_shop`, `schoolhouse`, `southern_semaphore`.
+
+**Solo = fremde Ansage:** Die offizielle Solo-Regel erlaubt den Münztausch
+explizit für die Deck-Wahl — entsprechend behandelt die Engine die Deck-Wahl
+überall als „fremde Ansage": Fabrik, Münztausch, **Museum-Rückgabe**,
+**Promenaden-Pflichtfelder** (mit Münzgewinn) und **Bondmaker** funktionieren
+im Solo normal. Der Juwelier ist solo nur mit 1 Münze baubar.
