@@ -14,6 +14,7 @@
     tentative = null,
     seed = null,
     rail = false,
+    trackEdge = null,
     oncell
   }: {
     player: number;
@@ -24,9 +25,11 @@
     tentative?: number | null;
     /** Tiny Trees: Feld mit Samen. */
     seed?: number | null;
-    /** Eisenbahn: dieses Brett liegt an der Strecke — TrainTrack misst seine
-     *  Unterkante als Gleishöhe (nur die großen Bretter, keine Mini-Bretter). */
+    /** Eisenbahn: Gleis-Kante an der Unterkante zeichnen (Deko, auch Mini-Bretter). */
     rail?: boolean;
+    /** Eisenbahn: an dieser Bildschirmkante liegt die Strecke des Bretts —
+     *  meldet das Brett bei der Gleis-Messung an (nur die großen Bretter). */
+    trackEdge?: 'bottom' | 'top' | null;
     oncell?: (square: number) => void;
   } = $props();
 
@@ -92,7 +95,11 @@
   });
 </script>
 
-<div class="board" data-track={rail ? player : undefined}>
+<div
+  class="board"
+  data-track={trackEdge ? player : undefined}
+  data-track-edge={trackEdge ?? undefined}
+>
   {#each board as sq, i}
     {@const def = cardOf(sq)}
     <div

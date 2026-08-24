@@ -45,9 +45,9 @@
     for (const el of els) {
       const r = el.getBoundingClientRect();
       if (r.width === 0) continue;
-      // Obere Bretter sind zur Gegenseite gedreht — ihre „Unterkante" liegt
-      // in Bildschirmkoordinaten oben.
-      const edge: Edge = r.top + r.height / 2 < vh / 2 ? 'top' : 'bottom';
+      // Die Kante meldet das Brett selbst (aus seiner Rotation abgeleitet):
+      // gedrehte Bretter der Gegenseite haben ihre „Unterkante" oben.
+      const edge: Edge = el.dataset.trackEdge === 'top' ? 'top' : 'bottom';
       rows[edge].push(edge === 'top' ? r.top : r.bottom);
       slots[Number(el.dataset.track)] = { edge, x: ((r.left + r.width / 2) / vw) * 100 };
     }
@@ -70,8 +70,10 @@
   $effect(() => {
     measure();
     window.addEventListener('resize', measure);
-    // Ansichtswechsel (Tisch ↔ Einzelansicht) ändern das Layout ohne Resize
-    const timer = setInterval(measure, 2000);
+    // Ansichtswechsel und Phasenwechsel (Draft → Runde) ändern das Layout
+    // ohne Resize — kurz getaktet nachmessen (wenige getBoundingClientRect,
+    // praktisch kostenlos)
+    const timer = setInterval(measure, 500);
     return () => {
       window.removeEventListener('resize', measure);
       clearInterval(timer);
