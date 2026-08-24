@@ -2,7 +2,8 @@
   import { session } from '../net/session.svelte';
   import { codeFromScan, selectedTransport, joinCodeFromUrl, clearJoinHash, signalingStatus } from '../net';
   import { isValidRoomCode, normalizeRoomCode } from '../net/protocol';
-  import { t } from '../i18n/de';
+  import { t, translateError } from '../i18n';
+  import LanguagePicker from './LanguagePicker.svelte';
   import HelpDialog from './HelpDialog.svelte';
   import QrScanner from './QrScanner.svelte';
 
@@ -72,6 +73,7 @@
 </script>
 
 <main>
+  <div class="langRow"><LanguagePicker /></div>
   <h1>🏘 {t.joinTitle}</h1>
 
   {#if session.role === 'guest' && session.status !== 'error'}
@@ -119,11 +121,11 @@
       </label>
       <label>
         <span>{t.yourName}</span>
-        <input type="text" maxlength="14" bind:value={name} placeholder="Name" />
+        <input type="text" maxlength="14" bind:value={name} placeholder={t.yourName} />
       </label>
 
       {#if scanError && !scanning}<div class="error">{scanError}</div>{/if}
-      {#if session.netError}<div class="error">{session.netError}</div>{/if}
+      {#if session.netError}<div class="error">{translateError(session.netError)}</div>{/if}
 
       <div class="actions">
         <button onpointerup={leave}>{t.cancel}</button>
@@ -145,6 +147,7 @@
 {/if}
 
 <style>
+  .langRow { align-self: flex-end; display: flex; justify-content: flex-end; width: 100%; max-width: 420px; }
   main {
     height: 100%;
     display: flex;

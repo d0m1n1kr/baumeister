@@ -1,9 +1,10 @@
 <script lang="ts">
+  import { cardName, cardText } from '../i18n';
   import type { CardDef } from '../engine/types';
   import { artFor } from '../data';
   import { CATEGORY_CSS, FEATURE_ICONS } from './helpers';
   import PatternGrid from './PatternGrid.svelte';
-  import { t } from '../i18n/de';
+  import { t } from '../i18n';
 
   let {
     card,
@@ -24,12 +25,12 @@
   >
     <div class="bar"></div>
     <button class="flip" title="Zum Gegenüber drehen" onpointerup={() => (flip += 180)}>⟳</button>
-    <h2>{card.name.de}</h2>
+    <h2>{cardName(card)}</h2>
     <div class="row">
       <span class="art">{@html artFor(card) ?? ''}</span>
       <PatternGrid pattern={card.pattern} cell={22} />
     </div>
-    <p>{card.text.de}</p>
+    <p>{cardText(card)}</p>
     <div class="feats">
       {#each card.features as f}
         <span>{FEATURE_ICONS[f]?.icon} {FEATURE_ICONS[f]?.title}</span>

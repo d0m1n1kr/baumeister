@@ -20,6 +20,11 @@ an den vier Ecken des Geräts, die 7 Gebäudekarten der Partie liegen in der Mit
     alle 22 Karten nach den offiziellen Kartentexten verifiziert (Quellen in `schema.md`).
   - *Tiny Trees* — Samen-Marker: Überbauen bringt ein Gratis-Material, als letztes
     unbebautes Feld wird der Samen ein Baum (2 Punkte).
+- **8 Sprachen:** Deutsch, Englisch, Französisch, Spanisch, Italienisch,
+  Niederländisch, Portugiesisch, Polnisch — automatisch nach Browser-Sprache,
+  per 🌐-Umschalter (Start- und Beitritts-Bildschirm) übersteuerbar. Auch
+  alle Regel-Fehlermeldungen sind übersetzt; Kartentexte fallen außerhalb
+  von Deutsch auf die englischen Originaltexte zurück.
 - **Höhlen-Regel (im Setup wählbar, Standard aus):** bis zu 2 fremd angesagte
   Materialien pro Partie beiseitelegen — sie zählen am Ende weder Punkte noch Strafen.
 - **Rathaus-Modus (offizielle Town-Hall-Variante, im Setup wählbar):** kein

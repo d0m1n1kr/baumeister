@@ -8,7 +8,7 @@
   import type { CardDef, Resource } from '../engine/types';
   import { cornerRotation, RESOURCE_CSS } from './helpers';
   import { sfx } from './sound';
-  import { t } from '../i18n/de';
+  import { cardName, cardText, t, translateError } from '../i18n';
   import BoardGrid from './BoardGrid.svelte';
   import CardMini from './CardMini.svelte';
   import CardOverlay from './CardOverlay.svelte';
@@ -102,7 +102,7 @@
   $effect(() => {
     const remote = session.netError;
     if (remote && canControl && session.role === 'guest') {
-      showError(remote);
+      showError(translateError(remote));
       session.clearError();
     }
   });
@@ -660,11 +660,11 @@
             {#if grayCard}
               {#if (catalog[grayCard].effects ?? []).includes('buildAnywhereSelf')}
                 <button onpointerup={() => (mode = 'cathedralPlace')}>
-                  {t.cathedralTransform(catalog[grayCard].name.de)}
+                  {t.cathedralTransform(cardName(catalog[grayCard]))}
                 </button>
               {/if}
               <button onpointerup={() => showError(game.dispatch({ t: 'resolveCathedral', player, pay: false }))}>
-                {t.cathedralTransformHere(catalog[grayCard].name.de)}
+                {t.cathedralTransformHere(cardName(catalog[grayCard]))}
               </button>
             {:else}
               <button onpointerup={() => showError(game.dispatch({ t: 'resolveCathedral', player, pay: false }))}>
@@ -731,7 +731,7 @@
         {/if}
       {:else if p.monument?.built && monumentDef}
         <button class="monBuilt" onpointerup={() => (overlayCard = monumentDef)}>
-          🏛 {monumentDef.name.de} — {t.monumentBuilt}
+          🏛 {cardName(monumentDef)} — {t.monumentBuilt}
         </button>
       {/if}
 
@@ -821,7 +821,7 @@
     (wh.stored ?? []).includes(namedResource!)}
   <div class="scrim">
     <div class="pick" style="transform: rotate({rotation}deg)">
-      <h3>{catalog[wh.card].name.de}</h3>
+      <h3>{cardName(catalog[wh.card])}</h3>
       {#if whEffects.includes('museum') && wh.stored?.length}
         <span class="pickText">{t.museumContents}</span>
         <div class="btnRow">
@@ -866,7 +866,7 @@
         {#each p.monumentOptions as id}
           <div class="pickCard">
             <CardMini card={catalog[id]} />
-            <p class="pickText">{catalog[id].text.de}</p>
+            <p class="pickText">{cardText(catalog[id])}</p>
             <button class="primary" onpointerup={() => draftPick(id)}>{t.confirm}</button>
           </div>
         {/each}

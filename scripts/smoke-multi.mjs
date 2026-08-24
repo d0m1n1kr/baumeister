@@ -38,7 +38,7 @@ try {
   await waitForServer();
   browser = await chromium.launch({ executablePath: '/opt/pw-browsers/chromium' });
   // BroadcastChannel wirkt nur innerhalb eines Kontexts → beide Tabs im selben Kontext
-  const context = await browser.newContext({ viewport: { width: 1180, height: 820 } });
+  const context = await browser.newContext({ viewport: { width: 1180, height: 820 }, locale: 'de-DE' });
 
   const host = await context.newPage();
   host.on('pageerror', (e) => fail(`Host-Seitenfehler: ${e.message}`));
@@ -60,7 +60,7 @@ try {
   const guest = await context.newPage();
   guest.on('pageerror', (e) => fail(`Gast-Seitenfehler: ${e.message}`));
   await guest.goto(`${BASE_URL}#join=${code}`);
-  await guest.locator('input[placeholder="Name"]').fill('Anna');
+  await guest.locator('input[placeholder="Dein Name"]').fill('Anna');
   await guest.locator('button', { hasText: 'Beitreten' }).click();
 
   await host.locator('.seats li', { hasText: 'Anna' }).waitFor({ timeout: 10000 });
@@ -134,7 +134,7 @@ try {
   const fresh = await context.newPage();
   fresh.on('pageerror', (e) => fail(`Neues-Gerät-Seitenfehler: ${e.message}`));
   await fresh.goto(`${BASE_URL}#join=${code}`);
-  await fresh.locator('input[placeholder="Name"]').fill('Ben');
+  await fresh.locator('input[placeholder="Dein Name"]').fill('Ben');
   await fresh.locator('button', { hasText: 'Beitreten' }).click();
   await fresh.locator('.solo').waitFor({ timeout: 15000 });
   // Das neue Gerät sieht den laufenden Spielstand (Zug des ersten Gastes)

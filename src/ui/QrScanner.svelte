@@ -3,7 +3,7 @@
   // installierte PWA: Die iOS-Kamera-App würde den Link in Safari öffnen
   // statt in der App. jsQR wird erst hier nachgeladen (Ein-Gerät-Modus und
   // normale Beitritte laden es nie); der Chunk liegt trotzdem im Precache.
-  import { t } from '../i18n/de';
+  import { t } from '../i18n';
 
   let {
     onresult,

@@ -4,7 +4,7 @@
   // ein freigegebener Platz geht an das nächste Gerät, das dem Raum beitritt.
   import { session } from '../net/session.svelte';
   import { joinUrlFor, signalingStatus } from '../net';
-  import { t } from '../i18n/de';
+  import { t } from '../i18n';
   import QrCode from './QrCode.svelte';
 
   let { onclose }: { onclose: () => void } = $props();

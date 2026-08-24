@@ -7,8 +7,9 @@
   import { selectedTransport } from '../net';
   import { makeRoomCode } from '../net/protocol';
   import type { Seat } from '../net/seats';
-  import { t } from '../i18n/de';
+  import { t } from '../i18n';
   import CreditsFooter from './CreditsFooter.svelte';
+  import LanguagePicker from './LanguagePicker.svelte';
   import HelpDialog from './HelpDialog.svelte';
 
   let { onjoin }: { onjoin: () => void } = $props();
@@ -21,7 +22,7 @@
   };
 
   let count = $state(4);
-  let names = $state(['Spieler 1', 'Spieler 2', 'Spieler 3', 'Spieler 4']);
+  let names = $state([1, 2, 3, 4].map((n) => t.defaultPlayer(n)));
   let corners = $state([...DEFAULT_CORNERS[4]]);
   let useMonuments = $state(true);
   let cavernRule = $state(false);
@@ -54,7 +55,7 @@
 
   function currentPlayers() {
     return Array.from({ length: count }, (_, i) => ({
-      name: names[i].trim() || `Spieler ${i + 1}`,
+      name: names[i].trim() || t.defaultPlayer(i + 1),
       corner: corners[i],
       remote: multiDevice && remote[i]
     }));
@@ -87,7 +88,7 @@
     if (busy) return;
     const seated = sortPlayersClockwise(currentPlayers());
     if (!seated.some((p) => !p.remote)) {
-      error = 'Mindestens ein Platz muss an diesem Gerät bleiben.';
+      error = t.needLocalSeat;
       return;
     }
     const seats: Seat[] = seated.map((p, index) => ({
@@ -111,6 +112,7 @@
 </script>
 
 <main>
+  <div class="langRow"><LanguagePicker /></div>
   <h1>🏘 {t.appTitle}</h1>
   <section>
     <div class="field">
@@ -213,8 +215,8 @@
             checked={chosenSets.includes(set.id)}
             onchange={() => toggleSet(set.id)}
           />
-          <span class="expName">{set.name}</span>
-          <span class="expDesc">{set.description}</span>
+          <span class="expName">{t.sets[set.id]?.name ?? set.name}</span>
+          <span class="expDesc">{t.sets[set.id]?.description ?? set.description}</span>
         </label>
       {/each}
     </div>
@@ -239,6 +241,7 @@
 {/if}
 
 <style>
+  .langRow { align-self: flex-end; display: flex; justify-content: flex-end; width: 100%; max-width: 520px; }
   main {
     height: 100%;
     display: flex;

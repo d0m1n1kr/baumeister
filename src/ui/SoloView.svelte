@@ -3,7 +3,7 @@
   import { session } from '../net/session.svelte';
   import { drags } from '../store/dragStore.svelte';
   import { RESOURCE_CSS } from './helpers';
-  import { t } from '../i18n/de';
+  import { t } from '../i18n';
   import PlayerCorner from './PlayerCorner.svelte';
   import MiniBoard from './MiniBoard.svelte';
   import CardStrip from './CardStrip.svelte';
