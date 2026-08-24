@@ -341,11 +341,19 @@
     overflow-x: hidden;
     overflow-y: auto;
     touch-action: pan-y;
-    max-height: 46vh;
+    /* Deckel, damit Brett und Knöpfe darunter immer ins Bild passen —
+       bei Bedarf scrollt das Kartenraster in sich */
+    max-height: 36vh;
   }
   .strip.horizontal .cards.alice .cardWrap {
     width: auto;
     display: flex; /* Karte füllt die Rasterzelle in voller Höhe */
+  }
+  /* Mehr als 8 Karten (Monument als 9.): 5 Spalten statt 4 — das Raster
+     bleibt bei maximal 2 Zeilen und schiebt das Brett nicht aus dem Bild */
+  .strip.horizontal .cards.alice.many {
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    width: min(100%, 1100px);
   }
   @media (max-width: 720px) and (orientation: portrait) {
     /* Am Handy: zwei Spalten, Leiste fest gedeckelt und in sich scrollbar —
