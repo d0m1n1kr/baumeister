@@ -1,7 +1,7 @@
 <script lang="ts">
   import { game } from '../store/gameStore.svelte';
   import { session } from '../net/session.svelte';
-  import { t } from '../i18n/de';
+  import { t } from '../i18n';
   import BoardGrid from './BoardGrid.svelte';
 
   let { player }: { player: number } = $props();

@@ -1,7 +1,7 @@
 <script lang="ts">
   import { RESOURCES, type Resource } from '../engine/types';
   import { RESOURCE_CSS } from './helpers';
-  import { t } from '../i18n/de';
+  import { t } from '../i18n';
 
   let {
     label = t.pickResource,

@@ -2,6 +2,7 @@
 
 import { catalog } from '../data';
 import { apply, newGame, repairRound, RuleError } from '../engine/game';
+import { translateError } from '../i18n';
 import type { Action, GameConfig, GameState } from '../engine/types';
 import { saveGame, loadGame, clearSave } from './persist';
 
@@ -43,7 +44,7 @@ export const game = {
       netBridge.onLocalApplied?.();
       return null;
     } catch (e) {
-      if (e instanceof RuleError) return e.message;
+      if (e instanceof RuleError) return translateError(e.message);
       throw e;
     }
   },

@@ -1,7 +1,7 @@
 <script lang="ts">
   // Kurzanleitung je Spielweise: gemeinsamer Rundenablauf plus die Eigenheiten
   // des gewählten Modus (ein Gerät / Host / Gast).
-  import { t } from '../i18n/de';
+  import { t } from '../i18n';
 
   let { mode, onclose }: { mode: 'single' | 'host' | 'guest' | 'solo'; onclose: () => void } = $props();
 

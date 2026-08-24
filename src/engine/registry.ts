@@ -153,14 +153,24 @@ export function randomSetup(
   };
 }
 
-/** Offizielle Solo-Rangtabelle (Anleitung). */
+/** Offizielle Solo-Rangtabelle: Index (0 = bester Rang) für die i18n-Anzeige. */
+export function soloRankIndex(score: number): number {
+  if (score >= 38) return 0;
+  if (score >= 32) return 1;
+  if (score >= 25) return 2;
+  if (score >= 18) return 3;
+  if (score >= 10) return 4;
+  return 5;
+}
+
+const SOLO_RANKS_DE = [
+  'Meister-Architekt', 'Stadtplaner', 'Ingenieur',
+  'Zimmermann', 'Baulehrling', 'Angehender Architekt'
+];
+
+/** Offizielle Solo-Rangtabelle (deutsche Namen — fürs Speicherformat der Bestenliste). */
 export function soloRank(score: number): string {
-  if (score >= 38) return 'Meister-Architekt';
-  if (score >= 32) return 'Stadtplaner';
-  if (score >= 25) return 'Ingenieur';
-  if (score >= 18) return 'Zimmermann';
-  if (score >= 10) return 'Baulehrling';
-  return 'Angehender Architekt';
+  return SOLO_RANKS_DE[soloRankIndex(score)];
 }
 
 /** Deterministischer Seed für die Tages-Challenge: gleiches Datum = gleiche

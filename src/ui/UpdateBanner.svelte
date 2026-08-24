@@ -1,6 +1,6 @@
 <script lang="ts">
   import { useRegisterSW } from 'virtual:pwa-register/svelte';
-  import { t } from '../i18n/de';
+  import { t } from '../i18n';
 
   // Update-Prüfung: beim Start (Registrierung), beim Zurückkehren in die App
   // (visibilitychange) und periodisch alle 15 Minuten.

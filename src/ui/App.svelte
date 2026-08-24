@@ -4,7 +4,7 @@
   import { session } from '../net/session.svelte';
   import { clearJoinHash, joinCodeFromUrl, selectedTransport } from '../net';
   import { clearSession, loadSession, restoreSeats } from '../net/sessionPersist';
-  import { t } from '../i18n/de';
+  import { t } from '../i18n';
   import SetupScreen from './SetupScreen.svelte';
   import JoinScreen from './JoinScreen.svelte';
   import HostLobby from './HostLobby.svelte';

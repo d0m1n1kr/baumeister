@@ -1,7 +1,7 @@
 <script lang="ts">
   import { session } from '../net/session.svelte';
   import { joinUrlFor, signalingStatus } from '../net';
-  import { t } from '../i18n/de';
+  import { t } from '../i18n';
   import QrCode from './QrCode.svelte';
 
   let { onstart, oncancel }: { onstart: () => void; oncancel: () => void } = $props();

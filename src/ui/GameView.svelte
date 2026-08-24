@@ -1,7 +1,7 @@
 <script lang="ts">
   import { session } from '../net/session.svelte';
   import { keepScreenAwake } from './wakeLock';
-  import { t } from '../i18n/de';
+  import { t } from '../i18n';
   import GameTable from './GameTable.svelte';
   import SoloView from './SoloView.svelte';
   import HandoverDialog from './HandoverDialog.svelte';

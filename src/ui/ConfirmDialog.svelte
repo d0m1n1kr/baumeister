@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { t } from '../i18n/de';
+  import { t } from '../i18n';
 
   let {
     title,

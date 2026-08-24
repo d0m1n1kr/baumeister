@@ -3,7 +3,7 @@
   import { drags } from '../store/dragStore.svelte';
   import { cornerArea } from './helpers';
   import { RESOURCE_CSS } from './helpers';
-  import { t } from '../i18n/de';
+  import { t } from '../i18n';
   import PlayerCorner from './PlayerCorner.svelte';
   import CardStrip from './CardStrip.svelte';
   import ConfirmDialog from './ConfirmDialog.svelte';

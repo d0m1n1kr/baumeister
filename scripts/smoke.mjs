@@ -75,7 +75,7 @@ let browser;
 try {
   await waitForServer();
   browser = await chromium.launch({ executablePath: '/opt/pw-browsers/chromium' });
-  page = await browser.newPage({ viewport: { width: 1180, height: 820 } });
+  page = await browser.newPage({ viewport: { width: 1180, height: 820 }, locale: 'de-DE' });
   page.on('pageerror', (e) => fail(`Seitenfehler: ${e.message}`));
   await page.goto(BASE_URL);
 

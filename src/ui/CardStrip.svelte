@@ -3,7 +3,7 @@
   import { catalog } from '../data';
   import type { CardDef } from '../engine/types';
   import { RESOURCE_CSS } from './helpers';
-  import { t } from '../i18n/de';
+  import { cardText, t } from '../i18n';
   import CardMini from './CardMini.svelte';
   import CardOverlay from './CardOverlay.svelte';
   import { sfx } from './sound';
@@ -88,7 +88,7 @@
       <div class="cardWrap">
         <CardMini
           card={catalog[id]}
-          description={aliceOn ? catalog[id].text.de : ''}
+          description={aliceOn ? cardText(catalog[id]) : ''}
           onclick={(e) => open(catalog[id], e)}
         />
       </div>

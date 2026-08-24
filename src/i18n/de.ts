@@ -1,6 +1,10 @@
-// UI-Texte (Deutsch). Kartentexte kommen aus den JSON-Assets (name.de / text.de).
+// UI-Texte (Deutsch) — die Referenz: `Translation` wird von diesem Objekt
+// abgeleitet, alle anderen Sprachen müssen exakt dieselben Schlüssel liefern.
+// Kartentexte kommen aus den JSON-Assets (name/text je Sprache, Fallback en→de).
 
-export const t = {
+export const de = {
+  languageName: 'Deutsch',
+  language: 'Sprache',
   appTitle: 'Tiny Towns',
   newGame: 'Neues Spiel',
   resumeGame: 'Weiterspielen',
@@ -227,6 +231,33 @@ export const t = {
       'Kurz weg oder neu geladen? Die App tritt automatisch wieder bei. Klappt es nicht: Host-Gerät wecken oder dort den Platz neu vergeben lassen.'
     ]
   },
+
+  points: 'Punkte',
+  defaultPlayer: (n: number) => `Spieler ${n}`,
+  needLocalSeat: 'Mindestens ein Platz muss an diesem Gerät bleiben.',
+
+  /** Anzeige der Karten-Sets (Setup-Bildschirm). */
+  sets: {
+    base: { name: 'Basisspiel', description: '25 Gebäude + 15 Monumente' },
+    fortune: {
+      name: 'Fortune',
+      description: 'Münzen: 1 Münze bei 2+ Bauten pro Runde; 1 Münze zahlen, um ein anderes Material zu nehmen. 12 Gebäude + 10 Monumente.'
+    },
+    tiny_trees: {
+      name: 'Tiny Trees',
+      description: 'Mini-Erweiterung: Jeder startet mit einem Samen. Überbauen bringt ein Gratis-Material; als letzter freier Platz wird er ein Baum (2 Punkte).'
+    }
+  } as Record<string, { name: string; description: string }>,
+
+  /** Offizielle Solo-Ränge, bester zuerst (Index aus soloRankIndex). */
+  soloRanks: [
+    'Meister-Architekt', 'Stadtplaner', 'Ingenieur',
+    'Zimmermann', 'Baulehrling', 'Angehender Architekt'
+  ],
+
+  /** Übersetzungen der Engine-/Netz-Meldungen (Schlüssel = deutscher Originaltext).
+   *  Für Deutsch leer — unbekannte Schlüssel fallen auf das Original zurück. */
+  errors: {} as Record<string, string>,
 
   updateAvailable: 'Neue Version verfügbar',
   updateNow: 'Aktualisieren',

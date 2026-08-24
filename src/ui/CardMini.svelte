@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { cardName } from '../i18n';
   import type { CardDef } from '../engine/types';
   import { artFor } from '../data';
   import { CATEGORY_CSS, FEATURE_ICONS } from './helpers';
@@ -27,7 +28,7 @@
   onpointerup={(e) => onclick?.(e)}
 >
   <span class="bar"></span>
-  <span class="name">{card.name.de}</span>
+  <span class="name">{cardName(card)}</span>
   <span class="body">
     <span class="art">{@html artFor(card) ?? ''}</span>
     <PatternGrid pattern={card.pattern} cell={compact ? 7 : 9} />

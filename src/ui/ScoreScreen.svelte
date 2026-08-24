@@ -3,9 +3,9 @@
   import { session } from '../net/session.svelte';
   import { catalog } from '../data';
   import { scoreGame } from '../engine/scoring';
-  import { soloRank } from '../engine/registry';
+  import { soloRankIndex } from '../engine/registry';
   import { addHighscore, highscores, type HighscoreEntry } from '../store/highscore';
-  import { t } from '../i18n/de';
+  import { t } from '../i18n';
 
   const st = $derived(game.state!);
   const scores = $derived(scoreGame(st, catalog));
@@ -35,7 +35,7 @@
   // Solo: Rang bestimmen und Ergebnis genau EINMAL in die Bestenliste schreiben
   const solo = $derived(!!st.config.solo);
   const soloScore = $derived(scores[0]?.total ?? 0);
-  const rank = $derived(soloRank(soloScore));
+  const rank = $derived(t.soloRanks[soloRankIndex(soloScore)]);
   let place = $state<number | null>(null);
   let list = $state<HighscoreEntry[]>([]);
   $effect(() => {
@@ -62,12 +62,12 @@
   <h1>{t.scoreTitle}</h1>
   {#if solo}
     <p class="winner">
-      🏆 {t.soloRankTitle}: <strong>{rank}</strong> ({soloScore} Punkte)
+      🏆 {t.soloRankTitle}: <strong>{rank}</strong> ({soloScore} {t.points})
       {#if st.config.dailyId}<span class="daily">📅 {t.soloDaily} {st.config.dailyId}</span>{/if}
     </p>
     {#if place}<p class="best">⭐ {t.soloNewBest.replace('{n}', String(place))}</p>{/if}
   {:else}
-    <p class="winner">🏆 {t.winner}: <strong>{st.players[winnerIdx].name}</strong> ({scores[winnerIdx].total} Punkte)</p>
+    <p class="winner">🏆 {t.winner}: <strong>{st.players[winnerIdx].name}</strong> ({scores[winnerIdx].total} {t.points})</p>
   {/if}
   <div class="tableWrap">
     <table>
@@ -126,7 +126,7 @@
       <ol>
         {#each list.slice(0, 5) as e, i}
           <li class:hit={place === i + 1}>
-            <strong>{e.score}</strong> — {e.rank}
+            <strong>{e.score}</strong> — {t.soloRanks[soloRankIndex(e.score)]}
             <span class="hsMeta">{e.date}{e.dailyId ? ' · 📅' : ''}</span>
           </li>
         {/each}
