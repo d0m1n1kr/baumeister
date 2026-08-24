@@ -32,13 +32,17 @@ their own device.
   a resource deck (15 cards, 5 discarded face-down) drives two rounds; every 3rd
   round everyone chooses freely. Factory/Warehouse/coin swap apply to drawn cards,
   the Bank blocks your free choice, Fort Ironweed sits out free rounds.
-- **Railway mode (our own digital-native variant, selectable in setup):** a train
-  with 3 wagons travels around the table, moving one town per round. With a built
-  **train station** (an 8th card laid out for everyone, max. 1 per town) you may
-  load the received resource into an empty wagon instead of placing it — or swap
-  it for a wagon's contents. The wagons are public: what you drop off, an opponent
-  may grab along the way. The train drives across the screen with steam sounds and
-  a whistle at every stop — on phones it enters and leaves through tunnels.
+- **Railway mode (our own digital-native variant, selectable in setup):** tracks
+  run permanently along the top and bottom edges of the play area, with tunnel
+  portals at the ends. A train with 3 wagons (behind the locomotive) is always
+  visible with its load; at the end of every round it drives to the next town —
+  with steam sounds while moving and a horn when it pulls into a station. With a
+  built **train station** (an 8th card laid out for everyone, max. 1 per town,
+  must sit on the track — the bottom row of your town) you may load the received
+  resource into an empty wagon instead of placing it — or swap it for a wagon's
+  contents. The train stops at every town either way; without a station you just
+  can't load or unload. The wagons are public: what you drop off, an opponent may
+  grab along the way.
 - **Multi-touch:** several players can drag & drop resources onto their boards at
   the same time; each corner is rotated toward its player.
 - **Monument secrecy:** draw 2 / secretly pick 1, revealing only after confirmation

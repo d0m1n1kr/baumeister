@@ -135,22 +135,33 @@ describe('Eisenbahn: Bahnhof-Regeln', () => {
     let s = newGame(trainConfig(2, 2));
     s = inRound(s, 'stone');
     put(s, 0, 0, 'train_station');
-    s.players[0].board[4].resource = 'stone';
-    s.players[0].board[5].resource = 'wood';
-    s.players[0].board[6].resource = 'stone';
+    s.players[0].board[12].resource = 'stone';
+    s.players[0].board[13].resource = 'wood';
+    s.players[0].board[14].resource = 'stone';
     expect(() =>
-      a(s, { t: 'build', player: 0, squares: [4, 5, 6], card: 'train_station', target: 5 })
+      a(s, { t: 'build', player: 0, squares: [12, 13, 14], card: 'train_station', target: 13 })
     ).toThrow('Nur ein Bahnhof pro Stadt');
   });
 
-  it('Bahnhof ist baubar und zählt 2 Punkte', () => {
+  it('Bahnhof muss an der Strecke liegen (unterste Reihe)', () => {
     let s = newGame(trainConfig(2, 2));
     s = inRound(s, 'stone');
     s.players[0].board[4].resource = 'stone';
     s.players[0].board[5].resource = 'wood';
     s.players[0].board[6].resource = 'stone';
-    s = a(s, { t: 'build', player: 0, squares: [4, 5, 6], card: 'train_station', target: 5 });
-    expect(s.players[0].board[5].building?.card).toBe('train_station');
+    expect(() =>
+      a(s, { t: 'build', player: 0, squares: [4, 5, 6], card: 'train_station', target: 5 })
+    ).toThrow('an der Strecke');
+  });
+
+  it('Bahnhof ist an der Strecke baubar und zählt 2 Punkte', () => {
+    let s = newGame(trainConfig(2, 2));
+    s = inRound(s, 'stone');
+    s.players[0].board[12].resource = 'stone';
+    s.players[0].board[13].resource = 'wood';
+    s.players[0].board[14].resource = 'stone';
+    s = a(s, { t: 'build', player: 0, squares: [12, 13, 14], card: 'train_station', target: 13 });
+    expect(s.players[0].board[13].building?.card).toBe('train_station');
     const score = scorePlayer(s, 0, catalog);
     const line = score.lines.find((l) => l.card === 'train_station');
     expect(line?.points).toBe(2);

@@ -108,7 +108,7 @@ export const de = {
   trainLoad: 'In den Zug verladen',
   trainSwapHint: 'Gegen den Waggon-Inhalt tauschen',
   trainAt: (name: string) => `Der Zug hält bei ${name}`,
-  trainPassing: (name: string) => `Der Zug fährt an ${name} vorbei`,
+  trainPassing: (name: string) => `Der Zug hält bei ${name} (kein Bahnhof)`,
   trainTunnel: 'Der Zug ist im Tunnel',
   thDraw: 'Nächste Karte ziehen',
   thStartFree: 'Runde starten: freie Wahl',
@@ -197,9 +197,10 @@ export const de = {
     ],
     trainTitle: 'Eisenbahn-Modus (falls im Setup aktiviert)',
     trainSteps: [
-      'Ein Zug mit 3 Waggons fährt am Ende jeder Runde eine Stadt weiter (im Uhrzeigersinn; solo taucht er alle 3 Runden aus dem Tunnel auf).',
-      'Der Bahnhof liegt als 8. Karte für alle aus (Stein–Holz–Stein, 2 Punkte, höchstens einer pro Stadt).',
-      'Hält der Zug an deinem Bahnhof, darfst du statt zu platzieren: das erhaltene Material in einen freien Waggon verladen — oder gegen den Inhalt eines Waggons tauschen (das getauschte platzierst du dann normal).',
+      'Die Gleise verlaufen am unteren und oberen Spielfeldrand, mit Tunneln an den Enden. Der Zug (3 Waggons hinter der Lok) ist samt Beladung immer sichtbar.',
+      'Am Ende jeder Runde fährt er eine Stadt weiter und hält dort (solo kommt er alle 3 Runden aus dem Tunnel).',
+      'Der Bahnhof liegt als 8. Karte für alle aus (Stein–Holz–Stein, 2 Punkte, höchstens einer pro Stadt) und muss an der Strecke gebaut werden — in der untersten Reihe deiner Stadt.',
+      'Nur mit Bahnhof darfst du beim Halt statt zu platzieren: das erhaltene Material in einen freien Waggon verladen — oder gegen einen Waggon-Inhalt tauschen (das getauschte platzierst du normal).',
       'Die Waggons sind öffentlich: Was du abgibst, kann unterwegs jemand anderes wegschnappen.'
     ],
     fortuneTitle: 'Erweiterung: Fortune (Münzen)',

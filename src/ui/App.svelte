@@ -11,7 +11,6 @@
   import GameView from './GameView.svelte';
   import ScoreScreen from './ScoreScreen.svelte';
   import UpdateBanner from './UpdateBanner.svelte';
-  import TrainRide from './TrainRide.svelte';
   import CreditsFooter from './CreditsFooter.svelte';
   import { sfx } from './sound';
   import type { GameState } from '../engine/types';
@@ -167,7 +166,6 @@
 </script>
 
 <UpdateBanner />
-{#if game.state?.train}<TrainRide />{/if}
 
 {#if session.role === 'guest'}
   {#if session.status === 'playing' && game.state}

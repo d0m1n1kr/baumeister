@@ -2,9 +2,11 @@
   import { session } from '../net/session.svelte';
   import { keepScreenAwake } from './wakeLock';
   import { t } from '../i18n';
+  import { game } from '../store/gameStore.svelte';
   import GameTable from './GameTable.svelte';
   import SoloView from './SoloView.svelte';
   import HandoverDialog from './HandoverDialog.svelte';
+  import TrainTrack from './TrainTrack.svelte';
 
   // Gäste sehen immer ihr eigenes Brett; der Host kann zwischen Spieltisch
   // (alle Bretter, wie im Ein-Gerät-Modus) und eigener Ansicht umschalten.
@@ -13,6 +15,10 @@
   let handover = $state(false);
   const hasLocalSeat = $derived(session.seats.some((s) => s.kind === 'local'));
   const useSolo = $derived(session.role === 'guest' || (isHost && soloView && hasLocalSeat));
+  // Eisenbahn in der Einzelansicht: nur die eigene Stadt liegt an der Strecke
+  const mySeatIndex = $derived(
+    session.mySeat ?? Math.max(0, game.state?.players.findIndex((_, i) => session.controls(i)) ?? 0)
+  );
 
   // Displaysperre verhindern, solange gespielt wird (nützt auch am Einzelgerät).
   $effect(() => keepScreenAwake());
@@ -40,6 +46,10 @@
   <SoloView />
 {:else}
   <GameTable />
+{/if}
+
+{#if game.state?.train}
+  <TrainTrack focus={useSolo ? mySeatIndex : null} />
 {/if}
 
 {#if isHost}

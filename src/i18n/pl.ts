@@ -108,7 +108,7 @@ export const pl: Translation = {
   trainLoad: 'Załaduj do pociągu',
   trainSwapHint: 'Wymień na zawartość wagonu',
   trainAt: (name) => `Pociąg zatrzymuje się u ${name}`,
-  trainPassing: (name) => `Pociąg mija ${name}`,
+  trainPassing: (name) => `Pociąg zatrzymuje się u ${name} (brak stacji)`,
   trainTunnel: 'Pociąg jest w tunelu',
   thDraw: 'Dobierz następną kartę',
   thStartFree: 'Rozpocznij rundę: wolny wybór',
@@ -197,9 +197,10 @@ export const pl: Translation = {
     ],
     trainTitle: 'Tryb kolejowy (jeśli włączony)',
     trainSteps: [
-      'Pociąg z 3 wagonami przesuwa się o jedno miasto na koniec każdej rundy (zgodnie z ruchem wskazówek zegara; solo wyjeżdża z tunelu co 3 rundy).',
-      'Stacja leży jako 8. karta dla wszystkich (kamień–drewno–kamień, 2 punkty, najwyżej jedna na miasto).',
-      'Gdy pociąg zatrzyma się na twojej stacji, zamiast kłaść możesz: załadować otrzymany surowiec do wolnego wagonu — albo wymienić go na zawartość wagonu (wymieniony surowiec kładziesz potem normalnie).',
+      'Tory biegną wzdłuż dolnej i górnej krawędzi pola gry, z tunelami na końcach. Pociąg (3 wagony za lokomotywą) jest zawsze widoczny wraz z ładunkiem.',
+      'Na koniec każdej rundy przejeżdża o jedno miasto dalej i tam się zatrzymuje (solo wyjeżdża z tunelu co 3 rundy).',
+      'Stacja leży jako 8. karta dla wszystkich (kamień–drewno–kamień, 2 punkty, najwyżej jedna na miasto) i musi zostać zbudowana przy torach — w dolnym rzędzie twojego miasta.',
+      'Tylko ze stacją możesz podczas postoju, zamiast kłaść: załadować otrzymany surowiec do wolnego wagonu — albo wymienić go na zawartość wagonu (wymieniony surowiec kładziesz potem normalnie).',
       'Wagony są jawne: co zostawisz, ktoś inny może zabrać po drodze.'
     ],
     fortuneTitle: 'Dodatek: Fortune (monety)',
@@ -271,6 +272,7 @@ export const pl: Translation = {
 
   errors: {
     // Eisenbahn
+    'Der Bahnhof muss an der Strecke liegen (unterste Reihe)': 'Stacja musi leżeć przy torach (dolny rząd)',
     'Die Eisenbahn ist nicht im Spiel': 'Kolej nie występuje w tej rozgrywce',
     'Der Zug hält nicht an deinem Bahnhof': 'Pociąg nie zatrzymuje się na twojej stacji',
     'Der Zug wurde in dieser Runde bereits genutzt': 'Pociąg został już użyty w tej rundzie',

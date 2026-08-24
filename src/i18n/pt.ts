@@ -108,7 +108,7 @@ export const pt: Translation = {
   trainLoad: 'Carregar no trem',
   trainSwapHint: 'Trocar pelo conteúdo do vagão',
   trainAt: (name) => `O trem para em ${name}`,
-  trainPassing: (name) => `O trem passa por ${name}`,
+  trainPassing: (name) => `O trem para em ${name} (sem estação)`,
   trainTunnel: 'O trem está no túnel',
   thDraw: 'Comprar a próxima carta',
   thStartFree: 'Iniciar ronda: escolha livre',
@@ -197,9 +197,10 @@ export const pt: Translation = {
     ],
     trainTitle: 'Modo ferrovia (se ativado)',
     trainSteps: [
-      'Um trem com 3 vagões avança uma cidade no fim de cada rodada (em sentido horário; no solo ele sai do túnel a cada 3 rodadas).',
-      'A estação fica exposta como 8ª carta para todos (pedra–madeira–pedra, 2 pontos, no máximo uma por cidade).',
-      'Quando o trem para na tua estação, em vez de colocar podes: carregar o recurso recebido num vagão livre — ou trocá-lo pelo conteúdo de um vagão (o recurso trocado é colocado normalmente).',
+      'Os trilhos correm ao longo das bordas inferior e superior da área de jogo, com túneis nas pontas. O trem (3 vagões atrás da locomotiva) está sempre visível com a sua carga.',
+      'No fim de cada rodada ele avança uma cidade e para ali (no solo ele sai do túnel a cada 3 rodadas).',
+      'A estação fica exposta como 8ª carta para todos (pedra–madeira–pedra, 2 pontos, no máximo uma por cidade) e deve ser construída junto aos trilhos — na fila de baixo da tua cidade.',
+      'Só com estação podes, em vez de colocar: carregar o recurso recebido num vagão livre — ou trocá-lo pelo conteúdo de um vagão (o recurso trocado é colocado normalmente).',
       'Os vagões são públicos: o que deixas, outro pode levar pelo caminho.'
     ],
     fortuneTitle: 'Expansão: Fortune (moedas)',
@@ -271,6 +272,7 @@ export const pt: Translation = {
 
   errors: {
     // Eisenbahn
+    'Der Bahnhof muss an der Strecke liegen (unterste Reihe)': 'A estação deve ficar junto aos trilhos (fila de baixo)',
     'Die Eisenbahn ist nicht im Spiel': 'A ferrovia não está nesta partida',
     'Der Zug hält nicht an deinem Bahnhof': 'O trem não para na tua estação',
     'Der Zug wurde in dieser Runde bereits genutzt': 'O trem já foi usado nesta rodada',

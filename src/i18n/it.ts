@@ -108,7 +108,7 @@ export const it: Translation = {
   trainLoad: 'Caricare sul treno',
   trainSwapHint: 'Scambiare con il contenuto del vagone',
   trainAt: (name) => `Il treno ferma da ${name}`,
-  trainPassing: (name) => `Il treno passa da ${name}`,
+  trainPassing: (name) => `Il treno ferma da ${name} (senza stazione)`,
   trainTunnel: 'Il treno è nella galleria',
   thDraw: 'Pesca la prossima carta',
   thStartFree: 'Avvia il round: scelta libera',
@@ -197,9 +197,10 @@ export const it: Translation = {
     ],
     trainTitle: 'Modalità ferrovia (se attivata)',
     trainSteps: [
-      'Un treno con 3 vagoni avanza di una città alla fine di ogni round (in senso orario; in solitario esce dalla galleria ogni 3 round).',
-      'La stazione è esposta come 8ª carta per tutti (pietra–legno–pietra, 2 punti, al massimo una per città).',
-      'Quando il treno ferma alla tua stazione, invece di piazzare puoi: caricare la risorsa ricevuta in un vagone libero — o scambiarla con il contenuto di un vagone (poi piazzi normalmente la risorsa scambiata).',
+      'I binari corrono lungo i bordi inferiore e superiore dell\'area di gioco, con gallerie alle estremità. Il treno (3 vagoni dietro la locomotiva) è sempre visibile con il suo carico.',
+      'Alla fine di ogni round avanza di una città e vi si ferma (in solitario esce dalla galleria ogni 3 round).',
+      'La stazione è esposta come 8ª carta per tutti (pietra–legno–pietra, 2 punti, al massimo una per città) e va costruita sul binario — nella riga inferiore della tua città.',
+      'Solo con una stazione puoi, invece di piazzare: caricare la risorsa ricevuta in un vagone libero — o scambiarla con il contenuto di un vagone (poi piazzi normalmente la risorsa scambiata).',
       'I vagoni sono pubblici: ciò che lasci, un altro può prenderlo lungo il percorso.'
     ],
     fortuneTitle: 'Espansione: Fortune (monete)',
@@ -271,6 +272,7 @@ export const it: Translation = {
 
   errors: {
     // Eisenbahn
+    'Der Bahnhof muss an der Strecke liegen (unterste Reihe)': 'La stazione deve stare sul binario (riga inferiore)',
     'Die Eisenbahn ist nicht im Spiel': 'La ferrovia non è in questa partita',
     'Der Zug hält nicht an deinem Bahnhof': 'Il treno non ferma alla tua stazione',
     'Der Zug wurde in dieser Runde bereits genutzt': 'Il treno è già stato usato in questo round',

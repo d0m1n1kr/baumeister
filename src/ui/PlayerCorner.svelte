@@ -413,6 +413,7 @@
         {highlights}
         tentative={mode === 'idle' ? tentative : null}
         seed={treesActive && p.seedSquare != null && p.seedSquare >= 0 ? p.seedSquare : null}
+        rail={!!st.train}
         {oncell}
       />
       {#if mode === 'target'}<div class="hint">{t.chooseBuildTarget}</div>

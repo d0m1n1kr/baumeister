@@ -108,7 +108,7 @@ export const nl: Translation = {
   trainLoad: 'In de trein laden',
   trainSwapHint: 'Ruilen tegen de inhoud van de wagon',
   trainAt: (name) => `De trein stopt bij ${name}`,
-  trainPassing: (name) => `De trein rijdt langs ${name}`,
+  trainPassing: (name) => `De trein stopt bij ${name} (geen station)`,
   trainTunnel: 'De trein is in de tunnel',
   thDraw: 'Volgende kaart trekken',
   thStartFree: 'Ronde starten: vrije keuze',
@@ -197,9 +197,10 @@ export const nl: Translation = {
     ],
     trainTitle: 'Spoorwegmodus (indien geactiveerd)',
     trainSteps: [
-      'Een trein met 3 wagons rijdt aan het einde van elke ronde één stad verder (met de klok mee; solo komt hij elke 3 rondes uit de tunnel).',
-      'Het station ligt als 8e kaart voor iedereen uit (steen–hout–steen, 2 punten, hoogstens één per stad).',
-      'Stopt de trein bij jouw station, dan mag je in plaats van plaatsen: de ontvangen grondstof in een lege wagon laden — of ruilen tegen de inhoud van een wagon (de geruilde grondstof plaats je daarna normaal).',
+      'De rails lopen langs de onder- en bovenrand van het speelveld, met tunnels aan de uiteinden. De trein (3 wagons achter de locomotief) is altijd zichtbaar met zijn lading.',
+      'Aan het einde van elke ronde rijdt hij één stad verder en stopt daar (solo komt hij elke 3 rondes uit de tunnel).',
+      'Het station ligt als 8e kaart voor iedereen uit (steen–hout–steen, 2 punten, hoogstens één per stad) en moet aan het spoor gebouwd worden — in de onderste rij van jouw stad.',
+      'Alleen met een station mag je bij de stop, in plaats van plaatsen: de ontvangen grondstof in een lege wagon laden — of ruilen tegen de inhoud van een wagon (de geruilde grondstof plaats je daarna normaal).',
       'De wagons zijn openbaar: wat jij aflevert, kan een ander onderweg meenemen.'
     ],
     fortuneTitle: 'Uitbreiding: Fortune (munten)',
@@ -271,6 +272,7 @@ export const nl: Translation = {
 
   errors: {
     // Eisenbahn
+    'Der Bahnhof muss an der Strecke liegen (unterste Reihe)': 'Het station moet aan het spoor liggen (onderste rij)',
     'Die Eisenbahn ist nicht im Spiel': 'De spoorweg is niet in dit spel',
     'Der Zug hält nicht an deinem Bahnhof': 'De trein stopt niet bij jouw station',
     'Der Zug wurde in dieser Runde bereits genutzt': 'De trein is deze ronde al gebruikt',

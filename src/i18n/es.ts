@@ -108,7 +108,7 @@ export const es: Translation = {
   trainLoad: 'Cargar en el tren',
   trainSwapHint: 'Intercambiar por el contenido del vagón',
   trainAt: (name) => `El tren para en ${name}`,
-  trainPassing: (name) => `El tren pasa por ${name}`,
+  trainPassing: (name) => `El tren para en ${name} (sin estación)`,
   trainTunnel: 'El tren está en el túnel',
   thDraw: 'Robar la siguiente carta',
   thStartFree: 'Iniciar ronda: elección libre',
@@ -197,9 +197,10 @@ export const es: Translation = {
     ],
     trainTitle: 'Modo ferrocarril (si está activado)',
     trainSteps: [
-      'Un tren con 3 vagones avanza una ciudad al final de cada ronda (en sentido horario; en solitario sale del túnel cada 3 rondas).',
-      'La estación está expuesta como 8.ª carta para todos (piedra–madera–piedra, 2 puntos, máximo una por ciudad).',
-      'Cuando el tren para en tu estación, en vez de colocar puedes: cargar el recurso recibido en un vagón libre — o intercambiarlo por el contenido de un vagón (el recurso intercambiado se coloca normalmente).',
+      'Las vías recorren los bordes inferior y superior del área de juego, con túneles en los extremos. El tren (3 vagones detrás de la locomotora) siempre es visible con su carga.',
+      'Al final de cada ronda avanza una ciudad y para allí (en solitario sale del túnel cada 3 rondas).',
+      'La estación está expuesta como 8.ª carta para todos (piedra–madera–piedra, 2 puntos, máximo una por ciudad) y debe construirse junto a la vía — en la fila inferior de tu ciudad.',
+      'Solo con estación puedes, en vez de colocar: cargar el recurso recibido en un vagón libre — o intercambiarlo por el contenido de un vagón (el recurso intercambiado se coloca normalmente).',
       'Los vagones son públicos: lo que dejas, otro puede llevárselo por el camino.'
     ],
     fortuneTitle: 'Expansión: Fortune (monedas)',
@@ -271,6 +272,7 @@ export const es: Translation = {
 
   errors: {
     // Eisenbahn
+    'Der Bahnhof muss an der Strecke liegen (unterste Reihe)': 'La estación debe estar en la vía (fila inferior)',
     'Die Eisenbahn ist nicht im Spiel': 'El ferrocarril no está en esta partida',
     'Der Zug hält nicht an deinem Bahnhof': 'El tren no para en tu estación',
     'Der Zug wurde in dieser Runde bereits genutzt': 'El tren ya se usó en esta ronda',
