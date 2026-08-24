@@ -116,7 +116,7 @@ export const en: Translation = {
 
   deviceMode: 'How will you play?',
   oneDevice: 'On one device',
-  oneDeviceHint: 'Take turns on the same iPad — works fully offline.',
+  oneDeviceHint: 'Take turns on the same device — works fully offline.',
   ownDevices: 'With your own devices',
   ownDevicesHint: 'Players join with their phone or tablet. Monuments stay truly secret.',
   seatHere: 'here',

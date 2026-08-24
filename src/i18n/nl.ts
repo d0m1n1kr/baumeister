@@ -116,7 +116,7 @@ export const nl: Translation = {
 
   deviceMode: 'Hoe spelen jullie?',
   oneDevice: 'Op één apparaat',
-  oneDeviceHint: 'Om de beurt op dezelfde iPad — werkt volledig offline.',
+  oneDeviceHint: 'Om de beurt op hetzelfde apparaat — werkt volledig offline.',
   ownDevices: 'Met eigen apparaten',
   ownDevicesHint: 'Spelers doen mee met hun telefoon of tablet. Monumenten blijven echt geheim.',
   seatHere: 'hier',

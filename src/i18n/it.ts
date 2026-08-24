@@ -116,7 +116,7 @@ export const it: Translation = {
 
   deviceMode: 'Come giocate?',
   oneDevice: 'Su un solo dispositivo',
-  oneDeviceHint: 'A turno sullo stesso iPad — funziona completamente offline.',
+  oneDeviceHint: 'A turno sullo stesso dispositivo — funziona completamente offline.',
   ownDevices: 'Con i propri dispositivi',
   ownDevicesHint: 'I giocatori entrano con telefono o tablet. I monumenti restano davvero segreti.',
   seatHere: 'qui',

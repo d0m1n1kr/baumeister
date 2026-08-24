@@ -116,7 +116,7 @@ export const pl: Translation = {
 
   deviceMode: 'Jak gracie?',
   oneDevice: 'Na jednym urządzeniu',
-  oneDeviceHint: 'Na zmianę na tym samym iPadzie — działa całkowicie offline.',
+  oneDeviceHint: 'Na zmianę na tym samym urządzeniu — działa całkowicie offline.',
   ownDevices: 'Na własnych urządzeniach',
   ownDevicesHint: 'Gracze dołączają telefonem lub tabletem. Monumenty pozostają naprawdę tajne.',
   seatHere: 'tutaj',
