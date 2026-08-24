@@ -165,22 +165,38 @@
     })
   );
 
-  // Hinter der Kartenleiste (Tunnel): Zug während der Fahrt ausblenden,
-  // solange er den Leisten-Bereich kreuzt — per rAF an der echten Position.
+  // Hinter der Kartenleiste (Tunnel): Der Zug verschwindet Stück für Stück im
+  // Portal — per rAF wird an der echten Position ein clip-path berechnet, der
+  // den Teil hinter der Leiste abschneidet.
   let trainEl = $state<HTMLElement | null>(null);
-  let inStrip = $state(false);
+  let clip = $state('');
   $effect(() => {
     if (!driving) {
-      inStrip = false;
+      clip = '';
       return;
     }
     let raf = 0;
     const step = () => {
       const s = layout?.strip;
       if (s && trainEl) {
+        const vw = window.innerWidth;
+        const sl = (s.l / 100) * vw;
+        const sr = (s.r / 100) * vw;
         const r = trainEl.getBoundingClientRect();
-        const cx = (((r.left + r.right) / 2) / window.innerWidth) * 100;
-        inStrip = cx > s.l - 1.5 && cx < s.r + 1.5;
+        // clip-path wirkt VOR der Rotation: Auf der oberen Strecke (180°
+        // gedreht) sind lokale und Bildschirm-Seiten vertauscht.
+        const flip = driving?.edge === 'top';
+        if (r.left >= sl && r.right <= sr) {
+          clip = 'inset(0 100% 0 0)'; // komplett im Tunnel
+        } else if (r.right > sl && r.left < sl) {
+          const cut = r.right - sl; // rechter Teil steckt im Tunnel
+          clip = flip ? `inset(0 0 0 ${cut}px)` : `inset(0 ${cut}px 0 0)`;
+        } else if (r.left < sr && r.right > sr) {
+          const cut = sr - r.left; // linker Teil steckt noch im Tunnel
+          clip = flip ? `inset(0 ${cut}px 0 0)` : `inset(0 0 0 ${cut}px)`;
+        } else {
+          clip = '';
+        }
       }
       raf = requestAnimationFrame(step);
     };
@@ -191,23 +207,27 @@
 
 <div class="layer" aria-hidden="true">
   {#each trackList as tr (tr.edge)}
-    <div class="track" style="top: {tr.y - 5}px"></div>
-    <div class="tunnel left" class:up={tr.edge === 'top'} style="top: {tr.y - 20}px"></div>
-    <div class="tunnel right" class:up={tr.edge === 'top'} style="top: {tr.y - 20}px"></div>
     {#if layout?.strip}
       {@const strip = layout.strip}
-      <!-- Tunnelportale an der Kartenleiste: der Zug fährt hinter ihr durch -->
-      <div class="portal" style="left: calc({strip.l}% - 7px); top: {tr.y - 17}px"></div>
-      <div class="portal" style="left: calc({strip.r}% - 7px); top: {tr.y - 17}px"></div>
+      <!-- Gleise enden an den Tunnelportalen der Kartenleiste — dahinter
+           verläuft die Strecke unsichtbar „durch den Berg" -->
+      <div class="track" style="top: {tr.y - 5}px; left: 0; width: {strip.l}%"></div>
+      <div class="track" style="top: {tr.y - 5}px; left: {strip.r}%; right: 0"></div>
+      <div class="portal" style="left: calc({strip.l}% - 12px); top: {tr.y - 17}px"></div>
+      <div class="portal" style="left: calc({strip.r}% - 2px); top: {tr.y - 17}px"></div>
+    {:else}
+      <div class="track" style="top: {tr.y - 5}px; left: 0; right: 0"></div>
     {/if}
+    <div class="tunnel left" class:up={tr.edge === 'top'} style="top: {tr.y - 20}px"></div>
+    <div class="tunnel right" class:up={tr.edge === 'top'} style="top: {tr.y - 20}px"></div>
   {/each}
 
   {#if st?.train && spot && trackY != null}
     <div
       class="train"
       class:onTop={spot.edge === 'top'}
-      class:hiddenTrain={!spot.shown || inStrip}
-      style="left: {spot.x}%; top: {trackY}px; transition-duration: {spot.dur}ms"
+      class:hiddenTrain={!spot.shown}
+      style="left: {spot.x}%; top: {trackY}px; transition-duration: {spot.dur}ms; {clip ? `clip-path: ${clip};` : ''}"
       bind:this={trainEl}
     >
       <!-- Waggons hängen hinter der Lok (Fahrtrichtung: Lok vorn rechts) -->
@@ -231,8 +251,6 @@
   /* Gleisbett: zwei Schienen + Schwellen, exakt an der Brett-Unterkante */
   .track {
     position: absolute;
-    left: 0;
-    right: 0;
     height: 10px;
     background:
       repeating-linear-gradient(90deg, #55483a 0 4px, transparent 4px 14px) center / 100% 10px,
