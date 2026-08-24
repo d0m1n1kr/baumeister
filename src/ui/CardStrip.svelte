@@ -49,6 +49,36 @@
 
   const aliceOn = $derived(solo && alice);
 
+  // Kartenauslage um 180° drehen — für die Spieler auf der Gegenseite des
+  // Geräts. Reine Anzeige-Präferenz dieses Geräts, überlebt Reloads.
+  const FLIP_KEY = 'tinytowns.stripFlip';
+  let flipped = $state(readFlip());
+
+  function readFlip(): boolean {
+    try {
+      return localStorage.getItem(FLIP_KEY) === '1';
+    } catch {
+      return false;
+    }
+  }
+
+  function toggleFlip() {
+    flipped = !flipped;
+    try {
+      localStorage.setItem(FLIP_KEY, flipped ? '1' : '0');
+    } catch {
+      // privater Modus — gilt dann nur für diese Sitzung
+    }
+  }
+
+  // Gedreht auch in umgekehrter Reihenfolge, damit die Auslage für die
+  // Gegenseite genauso liegt, als wäre die ganze Leiste gedreht.
+  const cardIds = $derived(
+    flipped && !solo
+      ? [...st.config.activeCards, ...extraCards].reverse()
+      : [...st.config.activeCards, ...extraCards]
+  );
+
   let overlay = $state<{ card: CardDef; rotation: number } | null>(null);
   let soundOn = $state(sfx.enabled);
 
@@ -68,6 +98,14 @@
         onpointerup={() => (soundOn = sfx.toggle())}
         title={soundOn ? t.soundOff : t.soundOn}
       >{soundOn ? '🔊' : '🔇'}</button>
+      {#if !solo}
+        <button
+          class="abort"
+          class:flipActive={flipped}
+          onpointerup={toggleFlip}
+          title={t.flipCards}
+        >🔄</button>
+      {/if}
       <button class="abort" onpointerup={() => onabort?.()} title={t.abortGame}>✕</button>
     </span>
     <span class="mb">{st.config.townHall ? '🏛' : '👑'} {st.players[st.masterBuilder].name}</span>
@@ -83,8 +121,8 @@
       </button>
     {/if}
   </div>
-  <div class="cards" class:alice={aliceOn}>
-    {#each [...st.config.activeCards, ...extraCards] as id}
+  <div class="cards" class:alice={aliceOn} class:flipped={flipped && !solo}>
+    {#each cardIds as id}
       <div class="cardWrap">
         <CardMini
           card={catalog[id]}
@@ -146,6 +184,15 @@
     scrollbar-width: thin;
   }
   .cardWrap { flex-shrink: 0; }
+
+  /* Auslage für die Gegenseite: jede Karte um 180° gedreht (die Reihenfolge
+     kehrt das Skript um — zusammen wirkt es wie eine gedrehte Leiste) */
+  .cards.flipped .cardWrap { transform: rotate(180deg); }
+  .flipActive {
+    opacity: 1;
+    border-color: var(--accent);
+    color: var(--accent);
+  }
 
   /* horizontale Leiste (2-Spieler-Modus / Hochformat) */
   .strip.horizontal {

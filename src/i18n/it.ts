@@ -98,6 +98,7 @@ export const it: Translation = {
 
   aliceMode: 'Modalità Alice',
   aliceModeHint: 'Mostra sempre tutte le carte con il loro testo',
+  flipCards: 'Ruotare le carte verso il lato opposto',
 
   townHallMode: 'Modalità Municipio',
   townHallModeHint: 'Senza capomastro: un mazzo di risorse guida i round; ogni 3º round tutti scelgono liberamente.',

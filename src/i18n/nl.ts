@@ -98,6 +98,7 @@ export const nl: Translation = {
 
   aliceMode: 'Alice-modus',
   aliceModeHint: 'Alle kaarten permanent met tekst tonen',
+  flipCards: 'Kaarten draaien voor de overkant',
 
   townHallMode: 'Stadhuis-modus',
   townHallModeHint: 'Zonder meesterbouwer: een grondstoffenstapel bepaalt de rondes; elke 3e ronde kiest iedereen vrij.',
