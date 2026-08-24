@@ -4,6 +4,7 @@
   import { drags } from '../store/dragStore.svelte';
   import { catalog } from '../data';
   import { matchingCards } from '../engine/patterns';
+  import { hasFortIronweed } from '../engine/game';
   import type { CardDef, Resource } from '../engine/types';
   import { cornerRotation, RESOURCE_CSS } from './helpers';
   import { sfx } from './sound';
@@ -366,11 +367,25 @@
   );
 
   const buildableSelection = $derived(mode === 'select' && selected.length > 0);
+
+  // ---------- Rathaus-Modus ----------
+  const townHall = $derived(!!st.config.townHall);
+  /** Laufende Rathaus-Runde mit freier Materialwahl (jede 3. Runde). */
+  const freeChoice = $derived(inRound && st.phase.t === 'round' && st.phase.resource == null);
+  /** Die nächste Runde ist eine Wahlrunde (fürs Knopf-Label des Bürgermeisters). */
+  const nextIsFree = $derived((st.round + 1) % 3 === 0);
+  const fortBlocked = $derived(
+    freeChoice && hasFortIronweed(p, catalog) && st.players.filter((o) => !o.done).length > 1
+  );
+  const canPickFree = $derived(
+    freeChoice && !p.done && !p.roundDone && p.pending == null &&
+    p.placedSquare == null && !fortBlocked
+  );
 </script>
 
 <div class="corner" class:wide class:soloCorner={solo} style="transform: rotate({rotation}deg)">
   <header>
-    <span class="pname" class:mb={isMB}>{isMB ? '👑 ' : ''}{p.name}</span>
+    <span class="pname" class:mb={isMB}>{isMB ? (townHall ? '🏛 ' : '👑 ') : ''}{p.name}</span>
     {#if coinsActive}
       {@const chestCap = 4 + (p.monument?.built && (catalog[p.monument.card].effects ?? []).includes('coinSlot') ? 1 : 0)}
       <span class="chest" title={t.coins}>
@@ -447,9 +462,27 @@
             {/each}
           </div>
           <span class="deckCount">{t.soloDeckCount(st.soloDeck?.length ?? 0)}</span>
+        {:else if townHall}
+          <!-- Rathaus: der Bürgermeister startet die Runde -->
+          <button class="primary" onpointerup={() => showError(game.dispatch({ t: 'townHallDraw' }))}>
+            {nextIsFree ? `✋ ${t.thStartFree}` : `🃏 ${t.thDraw}`}
+          </button>
+          <span class="deckCount">{t.thDeckCount(st.thDeck?.length ?? 0)}</span>
         {:else}
           <ResourcePicker disabled={bankBlocked} onpick={(r) => showError(game.dispatch({ t: 'nameResource', resource: r }))} />
         {/if}
+      {/if}
+
+      {#if canPickFree && canControl}
+        <!-- Rathaus, jede 3. Runde: freie Materialwahl -->
+        <ResourcePicker
+          label={t.thFreePick}
+          disabled={bankBlocked}
+          onpick={(r) => showError(game.dispatch({ t: 'townHallPick', player, resource: r }))}
+        />
+      {/if}
+      {#if freeChoice && fortBlocked && !p.roundDone && !p.done}
+        <span class="status">{t.thFortSkip}</span>
       {/if}
 
       {#if inRound && !p.done}
@@ -507,7 +540,7 @@
               <span>✨ {t.prismToggle}</span>
             </label>
           {/if}
-          {#if mode === 'idle' && (p.pending == null || p.pendingLocked) && !p.roundDone}
+          {#if mode === 'idle' && (p.pending == null || p.pendingLocked) && !p.roundDone && !canPickFree}
             {#if tentative != null}
               <span class="moveHint">{t.moveHint}</span>
             {/if}

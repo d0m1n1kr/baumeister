@@ -106,7 +106,7 @@
     }
     if (monument) sfx.play('monument');
     else if (built) sfx.play('build');
-    else if (placed) sfx.play('place', st.phase.t === 'round' ? st.phase.resource : undefined);
+    else if (placed) sfx.play('place', (st.phase.t === 'round' ? st.phase.resource : undefined) ?? undefined);
     if (coined && !monument) sfx.play('coin');
     if (seeded) sfx.play('tree');
   });
@@ -156,9 +156,9 @@
   /** Host startet aus der Lobby: Konfiguration aus den aktuellen Sitzplätzen bauen. */
   function startFromLobby() {
     const players = session.seats.map((s) => ({ name: s.name, corner: s.corner }));
-    const { sets, useMonuments, cavern } = session.setup;
+    const { sets, useMonuments, cavern, townHall } = session.setup;
     try {
-      session.startGame(buildGameConfig(players, sets, useMonuments, cavern));
+      session.startGame(buildGameConfig(players, sets, useMonuments, cavern, { townHall }));
     } catch (e) {
       setupError = e instanceof Error ? e.message : String(e);
     }

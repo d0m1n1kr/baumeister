@@ -45,5 +45,8 @@ export function actionAllowed(action: Action, seat: number, state: GameState): s
   if (action.t === 'nameResource' || action.t === 'soloPick') {
     return state.masterBuilder === seat ? null : 'Nur der Baumeister sagt das Material an';
   }
+  if (action.t === 'townHallDraw') {
+    return state.masterBuilder === seat ? null : 'Nur der Bürgermeister zieht die Karte';
+  }
   return action.player === seat ? null : 'Diese Aktion gehört zu einem anderen Spielplatz';
 }

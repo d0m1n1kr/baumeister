@@ -28,5 +28,12 @@ export function redactFor(state: GameState, seat: number): GameState {
     i === seat ? deal : deal.map(() => HIDDEN_MONUMENT)
   );
 
+  // Rathaus: Stapel-Reihenfolge und die 5 verdeckt abgeworfenen Karten sind
+  // geheim — nur die Anzahlen bleiben sichtbar (für die Stapelanzeige).
+  if (out.thDeck) out.thDeck = out.thDeck.map(() => 'wood');
+  if (out.thDiscard) out.thDiscard = out.thDiscard.map(() => 'wood');
+  if (out.config.townHallDeck) out.config.townHallDeck = out.config.townHallDeck.map(() => 'wood');
+  delete out.config.thSeed;
+
   return out;
 }

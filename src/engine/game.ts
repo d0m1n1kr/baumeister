@@ -5,6 +5,7 @@ import type {
 } from './types';
 import { CENTER_SQUARES, COIN_CAP, NUM_SQUARES, colOf, rowOf } from './types';
 import { matchesPattern } from './patterns';
+import { mulberry32, shuffled } from './registry';
 
 export const SAVE_VERSION = 2;
 
@@ -32,11 +33,16 @@ export function newGame(config: GameConfig): GameState {
   }));
   // Solo: 3 Karten offen auslegen, der Rest ist der Nachziehstapel
   const deck = config.solo && config.soloDeck ? [...config.soloDeck] : undefined;
+  // Rathaus: 5 Karten verdeckt abwerfen, der Rest ist der Nachziehstapel
+  const thDeck = config.townHall && config.townHallDeck ? [...config.townHallDeck] : undefined;
   return {
     config,
     players,
     soloOffer: deck ? deck.splice(0, 3) : undefined,
     soloDeck: deck,
+    thDiscard: thDeck ? thDeck.splice(0, 5) : undefined,
+    thDeck,
+    thShuffles: thDeck ? 0 : undefined,
     phase: config.useMonuments
       ? { t: 'monumentDraft' }
       : config.systems.trees
@@ -101,6 +107,8 @@ function dispatchAction(s: GameState, action: Action, catalog: Catalog): GameSta
     case 'placeSeed': return placeSeed(s, action.player, action.square);
     case 'nameResource': return nameResource(s, action.resource, catalog);
     case 'soloPick': return soloPick(s, action.index, catalog);
+    case 'townHallDraw': return townHallDraw(s, catalog);
+    case 'townHallPick': return townHallPick(s, action.player, action.resource, catalog);
     case 'factorySwap': return factorySwap(s, action.player, action.take, catalog);
     case 'coinSwap': return coinSwap(s, action.player, action.take, catalog);
     case 'oddityStore': return oddityStore(s, action.player, action.square, catalog);
@@ -176,9 +184,18 @@ function soloPick(s: GameState, index: number, catalog: Catalog): GameState {
 
 function nameResource(s: GameState, resource: Resource, catalog: Catalog): GameState {
   if (s.phase.t !== 'nameResource') fail('Jetzt wird kein Material angesagt');
+  if (s.config.townHall) fail('Rathaus-Modus: Es wird vom Stapel gezogen');
   const mb = s.players[s.masterBuilder];
   // Bank: markiertes Material darf der Besitzer nie selbst ansagen
-  for (const sq of mb.board) {
+  bankCheck(mb, resource, catalog);
+  mb.masterBuilderTurns++;
+  startRound(s, resource, catalog);
+  return s;
+}
+
+/** Bank: dieses Material darf der Besitzer nie selbst ansagen/wählen. */
+function bankCheck(p: PlayerState, resource: Resource, catalog: Catalog): void {
+  for (const sq of p.board) {
     if (
       sq.building?.marked === resource &&
       catalog[sq.building.card]?.effects?.includes('bank')
@@ -186,8 +203,11 @@ function nameResource(s: GameState, resource: Resource, catalog: Catalog): GameS
       fail('Dieses Material ist durch deine Bank gesperrt');
     }
   }
+}
+
+/** Gemeinsamer Rundenstart. resource = null: Rathaus-Runde mit freier Wahl. */
+function startRound(s: GameState, resource: Resource | null, catalog: Catalog): void {
   s.round++;
-  mb.masterBuilderTurns++;
   s.oddityTaken = false;
   s.players.forEach((p, pi) => {
     p.placedSquare = null;
@@ -206,13 +226,68 @@ function nameResource(s: GameState, resource: Resource, catalog: Catalog): GameS
       p.pending = resource;
       p.roundDone = false;
       // Southern Semaphore: 1 Zusatz-Material — nur bei FREMDER Ansage
-      if (pi !== s.masterBuilder && hasBuiltEffect(p, 'southernSemaphore', catalog)) {
+      // (im Rathaus-Modus gilt jede gezogene Karte für alle als fremd)
+      const foreign = s.config.townHall ? resource != null : pi !== s.masterBuilder;
+      if (resource != null && foreign && hasBuiltEffect(p, 'southernSemaphore', catalog)) {
         p.pendingExtra = resource;
       }
     }
   });
   s.phase = { t: 'round', resource };
+}
+
+/**
+ * Rathaus-Modus: Der Bürgermeister startet jede Runde. In zwei von drei
+ * Runden zieht er die oberste Karte des Materialdecks (alle platzieren dieses
+ * Material), jede dritte Runde wählt jeder Spieler frei aus dem Vorrat.
+ * Leerer Stapel: Abwurf neu mischen und wieder 5 Karten verdeckt abwerfen.
+ */
+function townHallDraw(s: GameState, catalog: Catalog): GameState {
+  if (s.phase.t !== 'nameResource') fail('Die Runde läuft bereits');
+  if (!s.config.townHall) fail('Kein Rathaus-Spiel');
+  if ((s.round + 1) % 3 === 0) {
+    startRound(s, null, catalog); // freie Wahl
+    return s;
+  }
+  const deck = s.thDeck ?? fail('Kein Materialdeck');
+  const discard = (s.thDiscard ??= []);
+  if (deck.length === 0) {
+    const reshuffled = shuffled(discard, mulberry32((s.config.thSeed ?? 1) + (s.thShuffles ?? 0) * 7919));
+    s.thShuffles = (s.thShuffles ?? 0) + 1;
+    discard.length = 0;
+    discard.push(...reshuffled.splice(0, 5)); // wieder 5 verdeckt abwerfen
+    deck.push(...reshuffled);
+  }
+  const card = deck.shift() ?? fail('Materialdeck ist leer');
+  discard.push(card);
+  startRound(s, card, catalog);
   return s;
+}
+
+/** Rathaus, jede 3. Runde: jeder Spieler wählt sein Material selbst. */
+function townHallPick(s: GameState, player: number, resource: Resource, catalog: Catalog): GameState {
+  if (s.phase.t !== 'round' || s.phase.resource != null) fail('Jetzt wird nicht frei gewählt');
+  const p = activePlayer(s, player);
+  if (p.roundDone) fail('Runde bereits beendet');
+  if (p.placedSquare != null) fail('Material wurde bereits platziert');
+  // Fort Eisenkraut: setzt in Wahlrunden aus (außer als letzter aktiver Spieler)
+  if (hasFortIronweed(p, catalog) && s.players.filter((o) => !o.done).length > 1) {
+    fail('Fort Eisenkraut: keine freie Materialwahl');
+  }
+  bankCheck(p, resource, catalog);
+  p.pending = resource;
+  return s;
+}
+
+/**
+ * Gilt die aktuelle Ansage für diesen Spieler als „fremd"? Solo (Deck-Wahl)
+ * und Rathaus-Zieh-Runden zählen für alle als fremd; Rathaus-Wahlrunden und
+ * die eigene Baumeister-Ansage als eigen.
+ */
+function isForeignNaming(s: GameState, player: number): boolean {
+  if (s.config.townHall) return s.phase.t === 'round' && s.phase.resource != null;
+  if (s.config.solo) return true;
+  return s.masterBuilder !== player;
 }
 
 /** pending verbraucht: ggf. Zusatz-Material (Southern Semaphore) nachrücken. */
@@ -226,7 +301,7 @@ function consumePending(p: PlayerState): void {
   }
 }
 
-function requireRound(s: GameState): Resource {
+function requireRound(s: GameState): Resource | null {
   if (s.phase.t !== 'round') fail('Keine laufende Runde');
   return s.phase.resource;
 }
@@ -242,7 +317,7 @@ function factorySwap(s: GameState, player: number, take: Resource, catalog: Cata
   const p = activePlayer(s, player);
   if (p.pending !== named || p.pendingLocked) fail('Tausch nur vor dem Platzieren des angesagten Materials');
   // Offizielle Solo-Regel: Fabrik & Co. gelten für die Wahl aus dem Deck
-  if (!s.config.solo && s.masterBuilder === player) fail('Die Fabrik wirkt nur bei fremder Ansage');
+  if (!isForeignNaming(s, player)) fail('Die Fabrik wirkt nur bei fremder Ansage');
   const hasMatch = p.board.some(
     (sq) => sq.building?.marked === named && catalog[sq.building.card]?.effects?.includes('factory')
   );
@@ -257,7 +332,7 @@ function coinSwap(s: GameState, player: number, take: Resource, catalog: Catalog
   if (!s.config.systems.coins) fail('Münzen sind nicht im Spiel');
   const p = activePlayer(s, player);
   if (p.pending !== named || p.pendingLocked) fail('Tausch nur vor dem Platzieren des angesagten Materials');
-  if (!s.config.solo && s.masterBuilder === player) fail('Der Baumeister muss sein angesagtes Material nehmen');
+  if (!isForeignNaming(s, player)) fail('Der Baumeister muss sein angesagtes Material nehmen');
   if (take === named) fail('Bitte ein anderes Material wählen');
   if (p.coins < 1) fail('Keine Münze in der Truhe');
   p.coins--;
@@ -283,8 +358,7 @@ function checkPlacementTarget(
     const hasBondmaker = p.monument?.built &&
       catalog[p.monument.card]?.effects?.includes('bondmaker');
     if (!hasBondmaker) fail('Feld ist bebaut');
-    // Solo: die Deck-Wahl gilt als fremde Ansage (wie bei Fabrik und Münztausch)
-    if (!s.config.solo && s.masterBuilder === player) fail('Bondmaker wirkt nur bei fremder Ansage');
+    if (!isForeignNaming(s, player)) fail('Bondmaker wirkt nur bei fremder Ansage');
     const def = catalog[sq.building.card];
     const cottageLike = def.category === 'cottage' || (def.effects ?? []).includes('barrettCastle');
     if (!cottageLike) fail('Material kann nur auf Hütten gelagert werden');
@@ -306,7 +380,7 @@ function placeResource(s: GameState, player: number, square: number, catalog: Ca
   if (hasBuiltEffect(p, 'promenadeCoins', catalog)) {
     const coinSquares = p.board.some((c) => c.coin);
     const freeWithoutCoin = p.board.some((c) => !c.building && !c.resource && !c.coin);
-    if (s.config.solo || s.masterBuilder !== player) {
+    if (isForeignNaming(s, player)) {
       if (coinSquares && !sq.coin) fail('Das Material muss auf ein Münzfeld der Promenade');
     } else if (sq.coin && freeWithoutCoin) {
       fail('Eigene Ansagen dürfen nicht auf Münzfelder der Promenade');
@@ -340,7 +414,7 @@ function cavern(s: GameState, player: number): GameState {
   const p = activePlayer(s, player);
   if (!s.config.systems.cavern) fail('Die Höhlen-Regel ist in dieser Partie nicht aktiv');
   if (p.pending == null) fail('Kein Material zum Beiseitelegen');
-  if (s.masterBuilder === player) fail('Die eigene Ansage muss platziert werden');
+  if (!isForeignNaming(s, player)) fail('Die eigene Ansage muss platziert werden');
   if ((p.cavernUsed ?? 0) >= 2) fail('Die Höhle ist voll (höchstens 2 pro Partie)');
   p.cavernUsed = (p.cavernUsed ?? 0) + 1;
   consumePending(p); // ein evtl. Zusatz-Material (Semaphor) rückt regulär nach
@@ -383,8 +457,10 @@ function findStorage(p: PlayerState, square: number, catalog: Catalog) {
 }
 
 function warehouseStore(s: GameState, player: number, square: number, catalog: Catalog): GameState {
-  requireRound(s);
+  const named = requireRound(s);
   const p = activePlayer(s, player);
+  // Rathaus: das Lagerhaus wirkt nur in Runden mit gezogener Karte
+  if (s.config.townHall && named == null) fail('Lagerhaus nur bei gezogenen Karten');
   if (p.pending == null) fail('Kein Material zum Einlagern');
   const { b, cap } = findStorage(p, square, catalog);
   if (b.stored!.length >= cap) fail('Lager ist voll');
@@ -396,8 +472,9 @@ function warehouseStore(s: GameState, player: number, square: number, catalog: C
 function warehouseSwap(
   s: GameState, player: number, square: number, storedIndex: number, catalog: Catalog
 ): GameState {
-  requireRound(s);
+  const named = requireRound(s);
   const p = activePlayer(s, player);
+  if (s.config.townHall && named == null) fail('Lagerhaus nur bei gezogenen Karten');
   if (p.pending == null) fail('Kein Material zum Tauschen');
   const { b } = findStorage(p, square, catalog);
   if (!catalog[b.card]?.effects?.includes('warehouse')) fail('Tauschen nur beim Lagerhaus');
@@ -453,9 +530,10 @@ function museumSell(s: GameState, player: number, square: number, catalog: Catal
   const named = requireRound(s);
   const p = activePlayer(s, player);
   if (p.museumSoldThisRound) fail('Museum bereits in dieser Runde genutzt');
-  // Solo: die Deck-Wahl gilt als fremde Ansage (wie bei Fabrik und Münztausch)
-  if (!s.config.solo && s.masterBuilder === player) fail('Nur bei fremder Ansage möglich');
-  if (p.pending !== named || p.pendingLocked) fail('Nur statt des angesagten Materials möglich');
+  if (!isForeignNaming(s, player)) fail('Nur bei fremder Ansage möglich');
+  if (named == null || p.pending !== named || p.pendingLocked) {
+    fail('Nur statt des angesagten Materials möglich');
+  }
   const b = p.board[square]?.building;
   if (!b || !catalog[b.card]?.effects?.includes('museum')) fail('Kein Museum hier');
   const i = b.stored?.indexOf(named) ?? -1;
@@ -939,7 +1017,7 @@ function resolveSeedBonus(
 // ---------- Rundenende / Spielende ----------
 
 function roundDone(s: GameState, player: number, catalog: Catalog): GameState {
-  requireRound(s);
+  const named = requireRound(s);
   const p = activePlayer(s, player);
   // Southern Semaphore: das Zusatz-Material ist freiwillig — „Fertig" verzichtet darauf
   if (p.pending != null && p.pendingLocked) {
@@ -947,6 +1025,15 @@ function roundDone(s: GameState, player: number, catalog: Catalog): GameState {
     p.pendingLocked = false;
   }
   if (p.pending != null) fail('Erst das Material platzieren');
+  // Rathaus-Wahlrunde: Wählen und Platzieren ist Pflicht — außer für Fort
+  // Eisenkraut (setzt aus) oder wenn kein freies Feld mehr existiert
+  if (
+    s.config.townHall && named == null && p.placedSquare == null &&
+    !hasFortIronweed(p, catalog) &&
+    p.board.some((sq) => !sq.building && !sq.resource)
+  ) {
+    fail('Erst ein Material wählen und platzieren');
+  }
   if (p.choices.length > 0) fail('Erst offene Entscheidungen klären');
   cleanupPrismLeftovers(p);
   p.roundDone = true;
@@ -1000,7 +1087,8 @@ function maybeAdvance(s: GameState, catalog: Catalog): GameState {
   if (!allDone) return s;
 
   awardRoundCoins(s, catalog);
-  s.masterBuilder = nextMasterBuilder(s, catalog);
+  // Rathaus: der Bürgermeister bleibt derselbe — es gibt keinen Baumeister
+  if (!s.config.townHall) s.masterBuilder = nextMasterBuilder(s, catalog);
   s.oddityTaken = false;
   s.phase = { t: 'nameResource' };
   return s;

@@ -70,7 +70,7 @@
       >{soundOn ? '🔊' : '🔇'}</button>
       <button class="abort" onpointerup={() => onabort?.()} title={t.abortGame}>✕</button>
     </span>
-    <span class="mb">👑 {st.players[st.masterBuilder].name}</span>
+    <span class="mb">{st.config.townHall ? '🏛' : '👑'} {st.players[st.masterBuilder].name}</span>
     {#if named}
       <span class="named">
         <span class="dot" style="background: {RESOURCE_CSS[named]}"></span>

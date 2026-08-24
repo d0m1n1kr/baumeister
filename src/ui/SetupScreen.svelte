@@ -25,6 +25,7 @@
   let corners = $state([...DEFAULT_CORNERS[4]]);
   let useMonuments = $state(true);
   let cavernRule = $state(false);
+  let townHall = $state(false);
   let chosenSets = $state<string[]>([]);
   let multiDevice = $state(false);
   let daily = $state(false);
@@ -68,7 +69,8 @@
       game.start(
         buildGameConfig(currentPlayers(), activeSets(), useMonuments, !solo && cavernRule, {
           solo,
-          dailyId: solo && daily ? todayId() : undefined
+          dailyId: solo && daily ? todayId() : undefined,
+          townHall: !solo && townHall
         })
       );
     } catch (e) {
@@ -98,7 +100,7 @@
     busy = true;
     error = '';
     try {
-      session.setup = { sets: activeSets(), useMonuments, cavern: cavernRule };
+      session.setup = { sets: activeSets(), useMonuments, cavern: cavernRule, townHall };
       await session.openRoom(makeRoomCode(), seats, selectedTransport());
     } catch (e) {
       error = e instanceof Error ? e.message : String(e);
@@ -190,6 +192,11 @@
     </label>
 
     {#if !solo}
+      <label class="field toggle">
+        <input type="checkbox" bind:checked={townHall} />
+        <span>🏛 {t.townHallMode}</span>
+        <span class="expDesc">{t.townHallModeHint}</span>
+      </label>
       <label class="field toggle">
         <input type="checkbox" bind:checked={cavernRule} />
         <span>{t.cavernRule}</span>

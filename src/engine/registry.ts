@@ -51,7 +51,7 @@ export function randomSeed(): number {
   return Math.floor(Math.random() * 0xffffffff);
 }
 
-function shuffled<T>(arr: T[], rng: Rng): T[] {
+export function shuffled<T>(arr: T[], rng: Rng): T[] {
   const a = [...arr];
   for (let i = a.length - 1; i > 0; i--) {
     const j = Math.floor(rng() * (i + 1));
@@ -82,6 +82,9 @@ export const SOLO_EXCLUDED = [
   'oddity_shop', 'schoolhouse', 'southern_semaphore'
 ];
 
+/** Offizielle Rathaus-Regel (Fortune): der Kuriositätenladen bleibt draußen. */
+export const TOWNHALL_EXCLUDED = ['oddity_shop'];
+
 const RESOURCES: Resource[] = ['wood', 'brick', 'stone', 'wheat', 'glass'];
 
 export function randomSetup(
@@ -91,7 +94,8 @@ export function randomSetup(
   rng: Rng,
   sets: string[] = ['base'],
   systems: { coins?: boolean; trees?: boolean; cavern?: boolean } = {},
-  solo = false
+  solo = false,
+  townHall = false
 ): GameConfig {
   // Spielerreihenfolge = Sitzreihenfolge im Uhrzeigersinn, damit der
   // Baumeister im Uhrzeigersinn weiterwandert.
@@ -99,7 +103,9 @@ export function randomSetup(
   if (!sets.includes('base')) sets = ['base', ...sets];
   // Erweiterungskarten werden laut Anleitung einfach in die Stapel gemischt.
   const defs = Object.values(catalog).filter(
-    (d) => sets.includes(d.set) && !(solo && SOLO_EXCLUDED.includes(d.id))
+    (d) => sets.includes(d.set) &&
+      !(solo && SOLO_EXCLUDED.includes(d.id)) &&
+      !(townHall && TOWNHALL_EXCLUDED.includes(d.id))
   );
   const activeCards: string[] = [];
   for (const cat of CATEGORY_ORDER) {
@@ -133,6 +139,11 @@ export function randomSetup(
     soloDeck: solo
       ? shuffled(RESOURCES.flatMap((r) => [r, r, r]), rng)
       : undefined,
+    townHall: townHall || undefined,
+    townHallDeck: townHall
+      ? shuffled(RESOURCES.flatMap((r) => [r, r, r]), rng)
+      : undefined,
+    thSeed: townHall ? Math.floor(rng() * 0xffffffff) : undefined,
     sets,
     systems: {
       coins: systems.coins ?? false,
