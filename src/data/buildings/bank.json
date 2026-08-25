@@ -47,6 +47,17 @@
         "en": "4 points. On construction, place a resource not on any of your other Power Vaults; you may never name that resource as Master Builder."
       },
       "art": "mars_bank.svg"
+    },
+    "fantasy": {
+      "name": {
+        "de": "Drachenhort",
+        "en": "Dragon Hoard"
+      },
+      "text": {
+        "de": "4 Punkte. Beim Bau: Lege 1 Material darauf, das auf keinem anderen deiner Drachenhorte liegt. Dieses Material darfst du als Baumeister nie ansagen.",
+        "en": "4 points. On raising, place a resource not on any of your other Dragon Hoards; you may never name that resource as Master Builder."
+      },
+      "art": "fantasy_bank.svg"
     }
   }
 }

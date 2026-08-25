@@ -45,6 +45,17 @@
         "en": "Scores by count: 1→2, 2→5, 3→9, 4→14, 5+→20."
       },
       "art": "mars_tavern.svg"
+    },
+    "fantasy": {
+      "name": {
+        "de": "Drachenschänke",
+        "en": "Dragon's Tap"
+      },
+      "text": {
+        "de": "Punkte nach Anzahl gebauter Drachenschänken: 1→2, 2→5, 3→9, 4→14, 5+→20.",
+        "en": "Scores by count: 1→2, 2→5, 3→9, 4→14, 5+→20."
+      },
+      "art": "fantasy_tavern.svg"
     }
   }
 }

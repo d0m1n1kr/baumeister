@@ -50,6 +50,17 @@
         "en": "4 points if adjacent to a supplied habitat. On construct: you must have exactly 1 power cell per habitat in your colony, or you lose all power cells."
       },
       "art": "mars_parsonage.svg"
+    },
+    "fantasy": {
+      "name": {
+        "de": "Priesterhaus",
+        "en": "Priest's House"
+      },
+      "text": {
+        "de": "4 Punkte, wenn an eine verpflegte Kate angrenzend. Beim Bau: Hast du nicht GENAU 1 Mana je Kate in deinem Weiler, verlierst du alles Mana.",
+        "en": "4 points if adjacent to a provisioned croft. On raising: you must have exactly 1 mana per croft in your hamlet, or you lose all mana."
+      },
+      "art": "fantasy_parsonage.svg"
     }
   }
 }

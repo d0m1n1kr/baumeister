@@ -45,6 +45,17 @@
         "en": "1 point for each other unique module type in its row and column."
       },
       "art": "mars_theater.svg"
+    },
+    "fantasy": {
+      "name": {
+        "de": "Bardenbühne",
+        "en": "Bard's Stage"
+      },
+      "text": {
+        "de": "1 Punkt für jeden anderen Bauwerkstyp in derselben Zeile und Spalte wie die Bardenbühne.",
+        "en": "1 point for each other unique structure type in its row and column."
+      },
+      "art": "fantasy_theater.svg"
     }
   }
 }

@@ -47,6 +47,17 @@
         "en": "4 points. On construct: pay 1 power cell; if you cannot, every other player gains 1 power cell."
       },
       "art": "mars_jeweler.svg"
+    },
+    "fantasy": {
+      "name": {
+        "de": "Runenschmied",
+        "en": "Rune Smith"
+      },
+      "text": {
+        "de": "4 Punkte. Beim Bau: Zahle 1 Mana — kannst du nicht, erhalten alle anderen Spieler 1 Mana.",
+        "en": "4 points. On raising: pay 1 mana; if you cannot, every other player gains 1 mana."
+      },
+      "art": "fantasy_jeweler.svg"
     }
   }
 }

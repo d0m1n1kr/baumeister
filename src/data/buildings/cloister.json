@@ -46,6 +46,17 @@
         "en": "1 point for each orange module in a corner of your colony."
       },
       "art": "mars_cloister.svg"
+    },
+    "fantasy": {
+      "name": {
+        "de": "Klausnerei",
+        "en": "Hermitage"
+      },
+      "text": {
+        "de": "1 Punkt für jedes orange Bauwerk in einer Ecke deines Weilers.",
+        "en": "1 point for each orange structure in a corner of your hamlet."
+      },
+      "art": "fantasy_cloister.svg"
     }
   }
 }

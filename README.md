@@ -22,15 +22,18 @@ their own device.
     (sources in `schema.md`).
   - *Tiny Trees* — seed tokens: building over a seed grants a free resource; as the
     last empty square, the seed becomes a tree (2 points).
-- **Themes (per device):** the classic forest town or a **Mars colony** — same
-  rules, different world. All base-game cards get Mars names, rule texts, and
-  artwork (Habitat, Hydroponics, Airlock, Tube Station, …), resources become
-  regolith/iron/titanium/food/ice (same colors), the boards turn to regolith,
-  and the railway becomes a **transit tube** with airlocks and a cargo capsule.
+- **Themes (per device):** the classic forest town, a **Mars colony**, or a
+  **dragon realm** — same rules, different world. Every card (base game,
+  monuments, Fortune, station) gets its own name, rule text, and artwork, and the
+  vocabulary changes with it: on Mars you supply habitats in a colony with
+  regolith and ice, coins become power cells; in the dragon realm you provision
+  crofts in a hamlet with elfwood, dragonscale, runestone, moongrain, and
+  faeglass, coins become **mana**, and Tiny Trees seeds become faeseeds growing
+  into a World Tree. The railway changes shape too: a **transit capsule** gliding
+  through a tube with airlocks, or a **dragon** flying along the board edges with
+  three slings, vanishing into cloud banks and roaring as it lands on an eyrie.
   Since the game state is theme-agnostic, players in one multi-device game can
-  each use their own theme. Fortune and Tiny Trees are themed too:
-  coins become power cells, the chest a battery, seeds become spores that grow
-  into lichen. Switch via the 🎨 picker.
+  each use their own theme. Switch via the 🎨 picker.
 - **8 languages:** German, English, French, Spanish, Italian, Dutch, Portuguese,
   Polish — auto-selected from the browser language, overridable via the 🌐 switcher
   (setup and join screens). All rule error messages are translated too; card texts
@@ -107,6 +110,7 @@ any network. This switch is also handy for developing on a desktop.
 src/engine/   Pure-TS game logic (no DOM): reducer, patterns, scoring, effects — Vitest-tested
 src/data/     Card assets: JSON per card + SVG artwork, loaded automatically
 src/i18n/     Translations (8 languages), language detection, error-message mapping
+src/theme/    Themes (Mars, dragon realm): card/resource/UI overrides per device
 src/ui/       Svelte 5 components (game table, corners, cards, dialogs, lobby)
 src/store/    Engine↔UI binding, localStorage persistence, drag state
 src/net/      Multi-device mode: protocol, swappable transport, seats, session

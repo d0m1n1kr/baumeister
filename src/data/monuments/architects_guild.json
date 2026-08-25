@@ -51,6 +51,17 @@
         "en": "1 point. On construction, replace up to 2 modules in your colony with other module types from the supply."
       },
       "art": "mars_architects_guild.svg"
+    },
+    "fantasy": {
+      "name": {
+        "de": "Baumeistergilde",
+        "en": "Master Builders' Guild"
+      },
+      "text": {
+        "de": "1 Punkt. Beim Bau: Ersetze bis zu 2 Bauwerke deines Weilers durch beliebige andere Bauwerkstypen aus dem Vorrat (keine Monumente).",
+        "en": "1 point. On raising, replace up to 2 structures in your hamlet with other structure types from the supply."
+      },
+      "art": "fantasy_architects_guild.svg"
     }
   }
 }

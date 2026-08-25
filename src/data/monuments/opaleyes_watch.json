@@ -54,6 +54,17 @@
         "en": "On construction, place 3 unique modules on this card. When a neighbor constructs one of those types, take it and place it on any empty square."
       },
       "art": "mars_opaleyes_watch.svg"
+    },
+    "fantasy": {
+      "name": {
+        "de": "Opalauges Seherturm",
+        "en": "Opaleye's Seer Tower"
+      },
+      "text": {
+        "de": "Beim Bau: Lege 3 verschiedene Bauwerke aus dem Vorrat hierauf. Errichtet dein linker oder rechter Nachbar eines dieser Bauwerke, nimm es und platziere es auf einem freien Feld.",
+        "en": "On raising, place 3 unique structures on this card. When a neighbor raises one of those types, take it and place it on any empty square."
+      },
+      "art": "fantasy_opaleyes_watch.svg"
     }
   }
 }

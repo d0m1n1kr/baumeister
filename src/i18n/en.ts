@@ -7,6 +7,7 @@ export const en: Translation = {
   themeLabel: 'Theme',
   themeClassic: 'Forest town',
   themeMars: 'Mars colony',
+  themeFantasy: 'Dragon realm',
   language: 'Language',
   appTitle: 'Tiny Towns',
   newGame: 'New game',

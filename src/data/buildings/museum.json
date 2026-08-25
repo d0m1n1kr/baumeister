@@ -47,6 +47,17 @@
         "en": "When constructed, place 2 resources on the Colony Museum. When another player names a resource on the Museum, instead of placing that resource you may return it to the supply and gain 1 power cell (once per round)."
       },
       "art": "mars_museum.svg"
+    },
+    "fantasy": {
+      "name": {
+        "de": "Reliquienhalle",
+        "en": "Reliquary Hall"
+      },
+      "text": {
+        "de": "Beim Bau: Lege 2 Materialien in die Reliquienhalle. Sagt ein anderer Spieler ein Material an, das dort liegt, darfst du es statt zu platzieren in den Vorrat zurückgeben → +1 Mana (1×/Runde).",
+        "en": "When raised, place 2 resources in the Reliquary Hall. When another player names a resource lying there, instead of placing it you may return it to the supply and gain 1 mana (once per round)."
+      },
+      "art": "fantasy_museum.svg"
     }
   }
 }

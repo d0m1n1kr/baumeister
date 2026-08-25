@@ -47,6 +47,17 @@
         "en": "On construct: gain 1 power cell. At game end: for 1 power cell each, supplies all habitats in one row or column."
       },
       "art": "mars_root_cellar.svg"
+    },
+    "fantasy": {
+      "name": {
+        "de": "Wurzelgewölbe",
+        "en": "Root Vault"
+      },
+      "text": {
+        "de": "Beim Bau: +1 Mana. Bei der Endwertung: Für je 1 Mana verpflegt das Wurzelgewölbe alle Katen einer Zeile oder Spalte.",
+        "en": "On raising: gain 1 mana. At game end: for 1 mana each, provisions all crofts in one row or column."
+      },
+      "art": "fantasy_root_cellar.svg"
     }
   }
 }

@@ -55,6 +55,17 @@
         "en": "3 points if not adjacent to a black, green, or yellow module."
       },
       "art": "mars_abbey.svg"
+    },
+    "fantasy": {
+      "name": {
+        "de": "Druidenkloster",
+        "en": "Druid Priory"
+      },
+      "text": {
+        "de": "3 Punkte, wenn das Druidenkloster NICHT an ein schwarzes, grünes oder gelbes Bauwerk angrenzt.",
+        "en": "3 points if not adjacent to a black, green, or yellow structure."
+      },
+      "art": "fantasy_abbey.svg"
     }
   }
 }

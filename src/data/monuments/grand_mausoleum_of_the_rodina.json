@@ -43,6 +43,17 @@
         "en": "Your unsupplied habitats are worth 3 points each (habitat scoring only)."
       },
       "art": "mars_grand_mausoleum_of_the_rodina.svg"
+    },
+    "fantasy": {
+      "name": {
+        "de": "Gruft der Ahnen von Rodina",
+        "en": "Ancestral Crypt of the Rodina"
+      },
+      "text": {
+        "de": "Deine unverpflegten Katen sind 3 Punkte wert (gilt nur für die Katen-Wertung).",
+        "en": "Your unprovisioned crofts are worth 3 points each (croft scoring only)."
+      },
+      "art": "fantasy_grand_mausoleum_of_the_rodina.svg"
     }
   }
 }

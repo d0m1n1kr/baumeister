@@ -78,6 +78,20 @@ button {
 }
 button:disabled { opacity: 0.4; cursor: default; }
 
+/* ---------- Theme: Drachenreich ----------
+   Zauberwald bei Nacht: tiefes Violett, Pergament-Felder, Gold als Akzent. */
+[data-theme='fantasy'] {
+  --bg: #1b1430;
+  --bg-panel: #2c2247;
+  --bg-card: #f4ecd8;
+  --board-bg: #3a2f56;
+  --board-border: #55467a;
+  --cell: #e0d3ae;
+  --card-paper: #f4ecd8;
+  --accent: #e8c65b;
+  --text-dim: #b3a7cc;
+}
+
 /* ---------- Theme: Mars-Kolonie ----------
    Reine Anzeige — gleiche Regeln, andere Welt: Rost- und Regolith-Töne. */
 [data-theme='mars'] {

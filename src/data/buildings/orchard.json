@@ -45,6 +45,17 @@
         "en": "Supplies all habitat modules in the same row and column as it."
       },
       "art": "mars_orchard.svg"
+    },
+    "fantasy": {
+      "name": {
+        "de": "Feenhain",
+        "en": "Fae Grove"
+      },
+      "text": {
+        "de": "Verpflegt alle Katen in derselben Zeile und Spalte wie der Feenhain.",
+        "en": "Provisions all crofts in the same row and column as it."
+      },
+      "art": "fantasy_orchard.svg"
     }
   }
 }

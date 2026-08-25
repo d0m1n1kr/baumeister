@@ -40,6 +40,17 @@
         "en": "On construct: gain 1 power cell."
       },
       "art": "mars_mine.svg"
+    },
+    "fantasy": {
+      "name": {
+        "de": "Kristallmine",
+        "en": "Crystal Mine"
+      },
+      "text": {
+        "de": "Beim Bau: +1 Mana.",
+        "en": "On raising: gain 1 mana."
+      },
+      "art": "fantasy_mine.svg"
     }
   }
 }

@@ -40,6 +40,17 @@
         "en": "On construct: gain 1 power cell per module type of which you have 3+."
       },
       "art": "mars_statue.svg"
+    },
+    "fantasy": {
+      "name": {
+        "de": "Heldenstatue",
+        "en": "Hero's Statue"
+      },
+      "text": {
+        "de": "Beim Bau: +1 Mana für jeden Bauwerkstyp, von dem du mindestens 3 Exemplare hast.",
+        "en": "On raising: gain 1 mana per structure type of which you have 3+."
+      },
+      "art": "fantasy_statue.svg"
     }
   }
 }

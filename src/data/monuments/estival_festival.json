@@ -48,6 +48,17 @@
         "en": "4 points. Construction costs 2 power cells. At game end your power cells are worth 2 points each."
       },
       "art": "mars_estival_festival.svg"
+    },
+    "fantasy": {
+      "name": {
+        "de": "Estival-Lichterfest",
+        "en": "Estival Festival of Lights"
+      },
+      "text": {
+        "de": "4 Punkte. Der Bau kostet zusätzlich 2 Mana. Am Spielende ist dein Mana 2 statt 1 Punkt wert.",
+        "en": "4 points. Raising costs 2 mana. At game end your mana is worth 2 points each."
+      },
+      "art": "fantasy_estival_festival.svg"
     }
   }
 }

@@ -7,6 +7,7 @@ export const de = {
   themeLabel: 'Thema',
   themeClassic: 'Wald-Städtchen',
   themeMars: 'Mars-Kolonie',
+  themeFantasy: 'Drachenreich',
   language: 'Sprache',
   appTitle: 'Tiny Towns',
   newGame: 'Neues Spiel',

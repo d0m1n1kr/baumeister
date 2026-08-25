@@ -50,6 +50,17 @@
         "en": "2 points. Each Meteorite Shop can store 1 resource named by another player. At the start of their turn as Master Builder, other players may take this resource, place it on their board, and gain 1 power cell."
       },
       "art": "mars_oddity_shop.svg"
+    },
+    "fantasy": {
+      "name": {
+        "de": "Wunderkammer",
+        "en": "Cabinet of Wonders"
+      },
+      "text": {
+        "de": "2 Punkte. Sagt ein anderer Spieler ein Material an, darfst du es hier ablegen (max. 1). Ein neuer Baumeister darf vor seiner Ansage 1 Material aus einer fremden Wunderkammer auf sein Brett nehmen und erhält dafür 1 Mana.",
+        "en": "2 points. Each Cabinet of Wonders can store 1 resource named by another player. At the start of their turn as Master Builder, other players may take this resource, place it on their board, and gain 1 mana."
+      },
+      "art": "fantasy_oddity_shop.svg"
     }
   }
 }

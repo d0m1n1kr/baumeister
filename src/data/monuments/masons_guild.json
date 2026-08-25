@@ -45,6 +45,17 @@
         "en": "3 points. On construct: spend any number of power cells and construct that many unique modules."
       },
       "art": "mars_masons_guild.svg"
+    },
+    "fantasy": {
+      "name": {
+        "de": "Runenmetzgilde",
+        "en": "Runemasons' Guild"
+      },
+      "text": {
+        "de": "3 Punkte. Beim Bau: Gib beliebig viel Mana aus und errichte je Mana 1 weiteres, unterschiedliches Bauwerk aus dem Vorrat.",
+        "en": "3 points. On raising: spend any amount of mana and raise that many unique structures."
+      },
+      "art": "fantasy_masons_guild.svg"
     }
   }
 }

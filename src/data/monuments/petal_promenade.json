@@ -44,6 +44,17 @@
         "en": "3 points. On construct: place 1 power cell on 3 empty squares. The next 3 resources named by other players must be placed on those squares; gain each cell when you place a resource there. You may not place resources you name on cell squares."
       },
       "art": "mars_petal_promenade.svg"
+    },
+    "fantasy": {
+      "name": {
+        "de": "Die Blütenallee",
+        "en": "The Petal Avenue"
+      },
+      "text": {
+        "de": "3 Punkte. Beim Bau: Lege 1 Mana auf 3 leere Felder. Die nächsten 3 fremd angesagten Materialien MÜSSEN auf diese Felder — jede Platzierung bringt das Mana. Eigene Ansagen dürfen nicht auf Mana-Felder.",
+        "en": "3 points. On raising: place 1 mana on 3 empty squares. The next 3 resources named by other players must be placed on those squares; gain each mana when you place a resource there. You may not place resources you name on mana squares."
+      },
+      "art": "fantasy_petal_promenade.svg"
     }
   }
 }

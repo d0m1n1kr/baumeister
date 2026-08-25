@@ -48,6 +48,17 @@
         "en": "5 points if supplied. Counts as 2 habitats for all scoring purposes."
       },
       "art": "mars_barrett_castle.svg"
+    },
+    "fantasy": {
+      "name": {
+        "de": "Drachenfeste Barrett",
+        "en": "Barrett Dragonhold"
+      },
+      "text": {
+        "de": "5 Punkte, wenn verpflegt. Zählt für alle Wertungen als 2 Katen.",
+        "en": "5 points if provisioned. Counts as 2 crofts for all scoring purposes."
+      },
+      "art": "fantasy_barrett_castle.svg"
     }
   }
 }

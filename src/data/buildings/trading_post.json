@@ -46,6 +46,17 @@
         "en": "1 point. Counts as a wild resource for construction and is not removed when used; at least 1 real resource is required."
       },
       "art": "mars_trading_post.svg"
+    },
+    "fantasy": {
+      "name": {
+        "de": "Krämerkarren",
+        "en": "Peddler's Cart"
+      },
+      "text": {
+        "de": "1 Punkt. Zählt beim Bauen als beliebiges Material und wird dabei nicht entfernt. Mindestens 1 echtes Material ist nötig.",
+        "en": "1 point. Counts as a wild resource for raising and is not removed when used; at least 1 real resource is required."
+      },
+      "art": "fantasy_trading_post.svg"
     }
   }
 }

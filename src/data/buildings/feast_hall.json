@@ -40,6 +40,17 @@
         "en": "2 points each; 3 points each if you have more than the player on your right."
       },
       "art": "mars_feast_hall.svg"
+    },
+    "fantasy": {
+      "name": {
+        "de": "Bankettsaal",
+        "en": "Banquet Hall"
+      },
+      "text": {
+        "de": "2 Punkte je Bankettsaal; 3 Punkte je Bankettsaal, wenn du mehr davon hast als der Spieler rechts von dir.",
+        "en": "2 points each; 3 points each if you have more than the player on your right."
+      },
+      "art": "fantasy_feast_hall.svg"
     }
   }
 }

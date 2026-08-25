@@ -42,6 +42,17 @@
         "en": "Scores by colony-completion order: 1st→6, 2nd→3, 3rd→2, 4th+→0."
       },
       "art": "mars_the_starloom.svg"
+    },
+    "fantasy": {
+      "name": {
+        "de": "Der Schicksalswebstuhl",
+        "en": "The Loom of Fate"
+      },
+      "text": {
+        "de": "Punkte nach Reihenfolge der Weiler-Fertigstellung: 1.→6, 2.→3, 3.→2, danach 0. Gleiche Runde = gleicher Rang.",
+        "en": "Scores by hamlet-completion order: 1st→6, 2nd→3, 3rd→2, 4th+→0."
+      },
+      "art": "fantasy_the_starloom.svg"
     }
   }
 }

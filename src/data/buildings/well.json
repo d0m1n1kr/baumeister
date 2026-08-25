@@ -39,6 +39,17 @@
         "en": "1 point for each adjacent habitat."
       },
       "art": "mars_well.svg"
+    },
+    "fantasy": {
+      "name": {
+        "de": "Wunschbrunnen",
+        "en": "Wishing Well"
+      },
+      "text": {
+        "de": "1 Punkt für jede angrenzende Kate (verpflegt oder nicht).",
+        "en": "1 point for each adjacent croft."
+      },
+      "art": "fantasy_well.svg"
     }
   }
 }

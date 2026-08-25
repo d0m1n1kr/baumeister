@@ -45,6 +45,17 @@
         "en": "When constructed, gain 1 power cell for each module of the type you have the most of in your colony."
       },
       "art": "mars_shrine_of_the_windseed.svg"
+    },
+    "fantasy": {
+      "name": {
+        "de": "Schrein der Windsaat",
+        "en": "Shrine of the Windseed"
+      },
+      "text": {
+        "de": "Beim Bau: +1 Mana für jedes Bauwerk des Bauwerkstyps, den du am häufigsten in deinem Weiler hast.",
+        "en": "When raised, gain 1 mana for each structure of the type you have the most of in your hamlet."
+      },
+      "art": "fantasy_shrine_of_the_windseed.svg"
     }
   }
 }

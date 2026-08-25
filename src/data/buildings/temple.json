@@ -46,6 +46,17 @@
         "en": "4 points if adjacent to at least 2 supplied habitats."
       },
       "art": "mars_temple.svg"
+    },
+    "fantasy": {
+      "name": {
+        "de": "Lichttempel",
+        "en": "Temple of Light"
+      },
+      "text": {
+        "de": "4 Punkte, wenn der Lichttempel an mindestens 2 verpflegte Katen angrenzt.",
+        "en": "4 points if adjacent to at least 2 provisioned crofts."
+      },
+      "art": "fantasy_temple.svg"
     }
   }
 }

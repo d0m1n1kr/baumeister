@@ -45,6 +45,17 @@
         "en": "Supplies 4 habitat modules anywhere in your colony."
       },
       "art": "mars_farm.svg"
+    },
+    "fantasy": {
+      "name": {
+        "de": "Gutshof",
+        "en": "Homestead"
+      },
+      "text": {
+        "de": "Verpflegt 4 Katen, egal wo sie in deinem Weiler stehen.",
+        "en": "Provisions 4 crofts anywhere in your hamlet."
+      },
+      "art": "fantasy_farm.svg"
     }
   }
 }

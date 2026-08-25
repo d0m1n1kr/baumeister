@@ -48,6 +48,17 @@
         "en": "When another player names a resource, you may place it on a square with a habitat (1 per habitat); such resources can never be used to build."
       },
       "art": "mars_statue_of_the_bondmaker.svg"
+    },
+    "fantasy": {
+      "name": {
+        "de": "Statue des Paktschmieds",
+        "en": "Statue of the Pactsmith"
+      },
+      "text": {
+        "de": "Sagt ein anderer Spieler ein Material an, darfst du es auf ein Feld mit einer Kate legen (1 je Kate). Solche Materialien sind nie verbaubar.",
+        "en": "When another player names a resource, you may place it on a square with a croft (1 per croft); such resources can never be used to raise anything."
+      },
+      "art": "fantasy_statue_of_the_bondmaker.svg"
     }
   }
 }
