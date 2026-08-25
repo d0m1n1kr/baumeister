@@ -266,7 +266,6 @@ export const nl: Translation = {
     hintStart: 'Leerpartij starten',
     gotIt: 'Begrepen',
     hideTips: 'Tips uit',
-    resetTips: 'Uitleg opnieuw tonen',
     multiplayer: 'Met meerdere spelers',
     suggestion: 'Suggestie',
     suggestCompletes: (card: string) => `het gemarkeerde vak — daarmee is ${card} compleet`,

@@ -182,11 +182,6 @@
         {#if soloMode === 'daily'}{t.soloDailyHint}{/if}
         {#if soloMode === 'learn'}{t.learn.setupHint}{/if}
         <button class="link helpLink" onpointerup={() => (showHelp = true)}>📖 {t.helpButton}</button>
-        {#if soloMode === 'learn' && learn.anyDismissed}
-          <button class="link helpLink" onpointerup={() => learn.resetSeen()}>
-            ↺ {t.learn.resetTips}
-          </button>
-        {/if}
       </p>
     {/if}
 

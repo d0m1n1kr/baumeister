@@ -266,7 +266,6 @@ export const fr: Translation = {
     hintStart: 'Lancer une partie d’apprentissage',
     gotIt: 'Compris',
     hideTips: 'Masquer les astuces',
-    resetTips: 'Revoir les explications',
     multiplayer: 'À plusieurs joueurs',
     suggestion: 'Suggestion',
     suggestCompletes: (card: string) => `la case marquée — ${card} est alors complet`,

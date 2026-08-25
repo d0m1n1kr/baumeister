@@ -266,7 +266,6 @@ export const pt: Translation = {
     hintStart: 'Iniciar uma partida de aprendizagem',
     gotIt: 'Entendido',
     hideTips: 'Ocultar dicas',
-    resetTips: 'Mostrar as explicações de novo',
     multiplayer: 'Com vários jogadores',
     suggestion: 'Sugestão',
     suggestCompletes: (card: string) => `a casa marcada — assim ${card} fica completo`,
