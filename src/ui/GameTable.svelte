@@ -58,6 +58,7 @@
 <style>
   .table {
     height: 100%;
+    padding-bottom: var(--safe-bottom);
     display: grid;
     grid-template-columns: 1fr clamp(130px, 15vw, 180px) 1fr;
     grid-template-rows: 1fr 1fr;

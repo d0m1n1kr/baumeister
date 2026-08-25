@@ -259,6 +259,7 @@
        überlaufender Inhalt oben abgeschnitten (Handy quer). Auto-Margins
        zentrieren, solange Platz ist, und scrollen sauber, wenn nicht. */
     gap: 22px;
+    padding-bottom: var(--safe-bottom);
     overflow-y: auto;
     touch-action: pan-y;
   }
