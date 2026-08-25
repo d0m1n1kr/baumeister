@@ -196,10 +196,51 @@ async function run(browser, label, viewport) {
   await context.close();
 }
 
+/**
+ * Hinweis auf den Lernmodus im Startbildschirm: Er startet das Lernspiel mit
+ * einem Tipp und kommt nach dem Wegklicken nie wieder.
+ */
+async function hintChecks(browser) {
+  // a) Der Knopf startet das Lernspiel direkt
+  let context = await browser.newContext({ viewport: { width: 1180, height: 820 }, locale: 'de-DE' });
+  let page = await context.newPage();
+  page.on('pageerror', (e) => fail(`Hinweis: Seitenfehler: ${e.message}`));
+  await page.goto(BASE_URL);
+  await page.locator('#splash').waitFor({ state: 'detached', timeout: 10000 });
+  if ((await page.locator('.learnHint').count()) === 0) fail('Hinweis fehlt beim ersten Start');
+  await page.locator('.learnHint button.primary').click();
+  await page.locator('.bubble.ready').waitFor({ timeout: 8000 });
+  if ((await page.locator('.boardWrap').count()) !== 1) fail('Hinweis-Knopf startet kein Solospiel');
+  await page.reload();
+  await page.locator('#splash').waitFor({ state: 'detached', timeout: 10000 });
+  await page.locator('button', { hasText: 'Weiterspielen' }).waitFor({ timeout: 5000 });
+  console.log('✓ Hinweis-Knopf startet das Lernspiel mit einem Tipp');
+  await context.close();
+
+  // b) Weggeklickt bleibt weggeklickt — auch nach einem Reload
+  context = await browser.newContext({ viewport: { width: 390, height: 844 }, locale: 'de-DE' });
+  page = await context.newPage();
+  page.on('pageerror', (e) => fail(`Hinweis: Seitenfehler: ${e.message}`));
+  await page.goto(BASE_URL);
+  await page.locator('#splash').waitFor({ state: 'detached', timeout: 10000 });
+  const hint = await page.locator('.learnHint').boundingBox();
+  const startBtn = await page.locator('section button.big').boundingBox();
+  if (!hint || !startBtn) fail('Hinweis oder Start-Knopf fehlt am Handy');
+  if (hint.y + hint.height > startBtn.y) fail('Hinweis überdeckt den Start-Knopf');
+  await page.locator('.hintClose').click();
+  if ((await page.locator('.learnHint').count()) !== 0) fail('✕ blendet den Hinweis nicht aus');
+  await page.reload();
+  await page.locator('#splash').waitFor({ state: 'detached', timeout: 10000 });
+  if ((await page.locator('.learnHint').count()) !== 0) fail('Weggeklickter Hinweis kommt wieder');
+  console.log('✓ Weggeklickter Hinweis bleibt weg (auch nach Reload)');
+  await context.close();
+}
+
 let browser;
 try {
   await waitForServer();
   browser = await chromium.launch({ executablePath: '/opt/pw-browsers/chromium' });
+  await hintChecks(browser);
   await run(browser, 'tablet', { width: 1180, height: 820 });
   await run(browser, 'phone', { width: 390, height: 844 });
   console.log('Lernmodus-Test bestanden.');

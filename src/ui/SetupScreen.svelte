@@ -57,6 +57,15 @@
     }
   }
 
+  /** Hinweis-Knopf: direkt ins Lernspiel, ohne weitere Einstellungen. */
+  function startLearning() {
+    learn.dismissHint();
+    multiDevice = false;
+    setCount(1);
+    setSoloMode('learn');
+    start();
+  }
+
   function setCount(n: number) {
     count = n;
     corners = [...DEFAULT_CORNERS[n]];
@@ -132,6 +141,17 @@
 <main>
   <div class="langRow"><ThemePicker /><LanguagePicker /></div>
   <h1>🏘 {t.appTitle}</h1>
+
+  {#if learn.showHint}
+    <!-- Einstiegshilfe: einmal weggeklickt, kommt sie nicht wieder -->
+    <aside class="learnHint">
+      <button class="hintClose" title={t.close} onpointerup={() => learn.dismissHint()}>✕</button>
+      <span class="hintTitle">🎓 {t.learn.hintTitle}</span>
+      <p class="hintText">{t.learn.hintText}</p>
+      <button class="primary hintStart" onpointerup={startLearning}>{t.learn.hintStart}</button>
+    </aside>
+  {/if}
+
   <section>
     <div class="field">
       <span class="label">{t.players}</span>
@@ -354,4 +374,34 @@
     text-decoration: underline;
   }
   .helpLink { font-size: 12px; padding: 0 0 0 8px; }
+
+  /* Hinweis auf den Lernmodus (nur bis zum ersten Wegklicken) */
+  .learnHint {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    align-items: flex-start;
+    width: min(420px, 90vw);
+    margin-bottom: -8px; /* die Lücke zur Sektion bleibt wie ohne Hinweis */
+    background: var(--bg-panel);
+    border: 1px solid var(--accent);
+    border-radius: 14px;
+    padding: 14px 18px;
+  }
+  .hintTitle { font-size: 14px; font-weight: 700; color: var(--accent); }
+  .hintText { margin: 0; font-size: 12px; line-height: 1.45; color: var(--text-dim); padding-right: 22px; }
+  .hintStart { font-size: 13px; padding: 8px 14px; }
+  .hintClose {
+    position: absolute;
+    top: 6px;
+    right: 6px;
+    width: 24px;
+    height: 24px;
+    padding: 0;
+    border-radius: 50%;
+    font-size: 12px;
+    line-height: 1;
+    opacity: 0.6;
+  }
 </style>

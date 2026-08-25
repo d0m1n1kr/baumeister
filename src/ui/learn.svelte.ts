@@ -6,12 +6,21 @@ import { LEARN_STEPS, pickStep, type LearnCtx, type LearnStepId } from './learnS
 
 const KEY = 'tinytowns.learn';
 const SEEN_KEY = 'tinytowns.learn.seen';
+const HINT_KEY = 'tinytowns.learn.hint';
 
 function readEnabled(): boolean {
   try {
     return localStorage.getItem(KEY) === '1'; // Standard: aus
   } catch {
     return false;
+  }
+}
+
+function readHint(): boolean {
+  try {
+    return localStorage.getItem(HINT_KEY) !== '0'; // Standard: zeigen
+  } catch {
+    return true;
   }
 }
 
@@ -38,6 +47,7 @@ function store(key: string, value: string): void {
 let enabled = $state(readEnabled());
 let seen = $state<LearnStepId[]>(readSeen());
 let ctx = $state<LearnCtx | null>(null);
+let hint = $state(readHint());
 
 export const learn = {
   get enabled(): boolean {
@@ -66,6 +76,17 @@ export const learn = {
   toggle(): boolean {
     this.set(!enabled);
     return enabled;
+  },
+
+  /** Hinweis auf den Lernmodus im Startbildschirm noch zeigen? */
+  get showHint(): boolean {
+    return hint;
+  },
+
+  /** Weggeklickt oder benutzt — beim nächsten Start nicht mehr zeigen. */
+  dismissHint(): void {
+    hint = false;
+    store(HINT_KEY, '0');
   },
 
   /** Blase weggetippt — in dieser und in künftigen Partien nicht mehr zeigen. */
