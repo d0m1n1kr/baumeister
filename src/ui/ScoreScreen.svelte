@@ -5,7 +5,8 @@
   import { scoreGame } from '../engine/scoring';
   import { soloRankIndex } from '../engine/registry';
   import { addHighscore, highscores, type HighscoreEntry } from '../store/highscore';
-  import { t } from '../i18n';
+  import { cardName, t } from '../i18n';
+  import { learn } from './learn.svelte';
 
   const st = $derived(game.state!);
   const scores = $derived(scoreGame(st, catalog));
@@ -25,7 +26,7 @@
   const cardRows = $derived.by(() => {
     const ids = new Set<string>();
     for (const s of scores) for (const l of s.lines) ids.add(l.card);
-    return [...ids].sort((a, b) => catalog[a].name.de.localeCompare(catalog[b].name.de));
+    return [...ids].sort((a, b) => cardName(catalog[a]).localeCompare(cardName(catalog[b])));
   });
 
   function lineFor(pi: number, card: string) {
@@ -82,7 +83,7 @@
       <tbody>
         {#each cardRows as card}
           <tr>
-            <td class="cardName">{catalog[card].name.de}</td>
+            <td class="cardName">{cardName(catalog[card])}</td>
             {#each st.players as _, pi}
               {@const line = lineFor(pi, card)}
               <td>{line ? `${line.points > 0 ? '+' : ''}${line.points} (${line.count}×)` : '—'}</td>
@@ -134,6 +135,16 @@
     </div>
   {/if}
 
+  {#if solo && learn.enabled}
+    <!-- Abschluss des Lernspiels: was mit Mitspielern anders läuft -->
+    <div class="learnBox">
+      <h2>🎓 {t.learn.multiTitle}</h2>
+      <ol>
+        {#each t.learn.multiSteps as line}<li>{line}</li>{/each}
+      </ol>
+    </div>
+  {/if}
+
   <button class="primary big" onpointerup={() => game.reset({ keepSave: session.role === 'guest' })}>{t.playAgain}</button>
 </main>
 
@@ -177,4 +188,21 @@
   .hs ol { margin: 0; padding-left: 20px; display: flex; flex-direction: column; gap: 3px; font-size: 13px; }
   .hs li.hit { color: var(--accent); }
   .hsMeta { color: var(--text-dim); font-size: 11px; margin-left: 6px; }
+  .learnBox {
+    background: var(--bg-panel);
+    border: 1px solid var(--accent);
+    border-radius: 12px;
+    padding: 12px 18px;
+    width: min(560px, 92vw);
+  }
+  .learnBox h2 { margin: 0 0 6px; font-size: 14px; color: var(--accent); }
+  .learnBox ol {
+    margin: 0;
+    padding-left: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    font-size: 12px;
+    line-height: 1.45;
+  }
 </style>

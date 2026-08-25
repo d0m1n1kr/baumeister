@@ -12,6 +12,7 @@
   import LanguagePicker from './LanguagePicker.svelte';
   import ThemePicker from './ThemePicker.svelte';
   import HelpDialog from './HelpDialog.svelte';
+  import { learn } from './learn.svelte';
 
   let { onjoin }: { onjoin: () => void } = $props();
 
@@ -31,7 +32,9 @@
   let train = $state(false);
   let chosenSets = $state<string[]>([]);
   let multiDevice = $state(false);
-  let daily = $state(false);
+  // Solo: freies Spiel, Tages-Challenge oder Lernspiel (mit Erklärblasen).
+  let soloMode = $state<'free' | 'daily' | 'learn'>(learn.enabled ? 'learn' : 'free');
+  const daily = $derived(soloMode === 'daily');
   const solo = $derived(count === 1);
   let remote = $state([false, true, true, true]);
   let error = $state('');
@@ -42,6 +45,16 @@
     chosenSets = chosenSets.includes(id)
       ? chosenSets.filter((s) => s !== id)
       : [...chosenSets, id];
+  }
+
+  /** Lernspiel: schlanke Vorauswahl (Basisspiel + Monumente), änderbar. */
+  function setSoloMode(mode: 'free' | 'daily' | 'learn') {
+    soloMode = mode;
+    if (mode === 'learn') {
+      chosenSets = [];
+      useMonuments = true;
+      train = false;
+    }
   }
 
   function setCount(n: number) {
@@ -69,6 +82,8 @@
 
   function start() {
     try {
+      // Der Lernmodus ist eine Anzeige-Präferenz dieses Geräts, kein Spielstand
+      learn.set(solo && soloMode === 'learn');
       game.start(
         buildGameConfig(currentPlayers(), activeSets(), useMonuments, !solo && cavernRule, {
           solo,
@@ -132,13 +147,26 @@
       <div class="field modeRow">
         <span class="label">{t.soloMode}</span>
         <div class="seg">
-          <button class:primary={!daily} onpointerup={() => (daily = false)}>{t.soloFree}</button>
-          <button class:primary={daily} onpointerup={() => (daily = true)}>📅 {t.soloDaily}</button>
+          <button class:primary={soloMode === 'free'} onpointerup={() => setSoloMode('free')}>
+            {t.soloFree}
+          </button>
+          <button class:primary={soloMode === 'daily'} onpointerup={() => setSoloMode('daily')}>
+            📅 {t.soloDaily}
+          </button>
+          <button class:primary={soloMode === 'learn'} onpointerup={() => setSoloMode('learn')}>
+            🎓 {t.learn.setupOption}
+          </button>
         </div>
       </div>
       <p class="modeHint">
-        {#if daily}{t.soloDailyHint}{/if}
+        {#if soloMode === 'daily'}{t.soloDailyHint}{/if}
+        {#if soloMode === 'learn'}{t.learn.setupHint}{/if}
         <button class="link helpLink" onpointerup={() => (showHelp = true)}>📖 {t.helpButton}</button>
+        {#if soloMode === 'learn' && learn.anyDismissed}
+          <button class="link helpLink" onpointerup={() => learn.resetSeen()}>
+            ↺ {t.learn.resetTips}
+          </button>
+        {/if}
       </p>
     {/if}
 

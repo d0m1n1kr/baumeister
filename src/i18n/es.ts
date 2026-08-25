@@ -254,6 +254,96 @@ export const es: Translation = {
     ]
   },
 
+  /** Modo aprendizaje (solo): burbujas por fase + sugerencias de jugada.
+   *  Redactado a propósito sin vocabulario de tema. */
+  learn: {
+    mode: 'Modo aprendizaje',
+    modeHint: 'Explicaciones de cada fase y sugerencias de jugada',
+    setupOption: 'Partida de aprendizaje',
+    setupHint: 'Las burbujas te guían por cada fase, sugieren jugadas y explican qué cambia con varios jugadores.',
+    gotIt: 'Entendido',
+    hideTips: 'Ocultar consejos',
+    resetTips: 'Mostrar las explicaciones otra vez',
+    multiplayer: 'Con varios jugadores',
+    suggestion: 'Sugerencia',
+    suggestCompletes: (card: string) => `la casilla marcada: así ${card} queda completo`,
+    suggestTowards: (card: string, have: number, need: number) =>
+      `la casilla marcada: ${have} de ${need} casillas para ${card}`,
+    suggestBuild: (card: string) => `${card} está completo: ya se puede construir`,
+    multiTitle: 'Qué cambia con varios jugadores',
+    multiSteps: [
+      'De dos a cuatro, cada uno llena sus propias 16 casillas: a la vez, nadie espera su turno.',
+      'En lugar del mazo, el maestro constructor (👑) anuncia el recurso para todos; la corona pasa cada ronda.',
+      'Las cartas que cambian o recogen un recurso al anunciarlo otro solo funcionan entonces: como maestro constructor te quedas sin nada. En solitario tu elección del mazo contaba siempre como ajena.',
+      'Cuatro cartas solo entran en juego con rivales (tres más con Fortune): necesitan vecinos.',
+      'Los monumentos siguen siendo secretos: en un solo dispositivo todos confirman mirar hacia otro lado; en el propio, nadie más lo ve.',
+      'La partida acaba cuando todos han terminado; gana la puntuación más alta y, en empate, quien fue maestro constructor menos veces.',
+      'El modo Ayuntamiento y la regla de la caverna solo existen con varios jugadores.'
+    ],
+    steps: {
+      welcome: {
+        title: '4 × 4 casillas',
+        body: 'Cada ronda recibes un recurso. Si los recursos del tablero encajan en el patrón de una carta, puedes construirla.',
+        mp: 'De dos a cuatro, cada uno llena su propio tablero: a la vez, en un dispositivo o cada uno en el suyo.'
+      },
+      monument: {
+        title: 'Elige un monumento',
+        body: 'Recibes dos monumentos y te quedas con uno. Solo puntúa si lo terminas antes del final.',
+        mp: 'Allí sigue en secreto: en un dispositivo confirmas que todos miran hacia otro lado; en el propio, nadie más llega a verlo.'
+      },
+      seed: {
+        title: 'Coloca tu semilla',
+        body: 'Pon la semilla en una casilla libre. Si más tarde construyes encima, eliges además un recurso gratis.',
+        mp: 'Todos colocan su semilla a la vez, cada uno en su tablero.'
+      },
+      select: {
+        title: 'Marca las casillas',
+        body: 'Toca exactamente las casillas que forman el patrón de la carta: ni más ni menos. Girado y reflejado siempre vale.',
+        mp: 'Igual que aquí.'
+      },
+      target: {
+        title: 'Elige el sitio',
+        body: 'Toca la casilla donde va la carta. Tiene que ser una de las marcadas: esos recursos se gastan.',
+        mp: 'Igual que aquí; algunas cartas permiten en cambio cualquier casilla libre.'
+      },
+      train: {
+        title: 'Una parada en tu tablero',
+        body: 'En vez de colocar puedes entregar el recurso o cambiarlo por la carga: para eso necesitas la carta adecuada en la ruta.',
+        mp: 'La carga es pública: lo que entregas, otro puede llevárselo por el camino.'
+      },
+      swap: {
+        title: 'Cambiar en vez de colocar',
+        body: 'Una de tus cartas permite cambiar este recurso por otro. El recurso cambiado lo colocas con normalidad.',
+        mp: 'Solo funciona cuando lo anuncia otro. En solitario tu elección del mazo cuenta como ajena: como maestro constructor con varios jugadores no puedes cambiar.'
+      },
+      offer: {
+        title: 'Un recurso del mazo',
+        body: 'Hay tres cartas boca arriba. La elegida va boca abajo bajo el mazo y entra una nueva: contar cartas compensa.',
+        mp: 'Allí no hay mazo: el maestro constructor (👑) anuncia un recurso para todos y después pasa la corona.'
+      },
+      place: {
+        title: 'Coloca el recurso',
+        body: 'Tócalo o arrástralo a una casilla libre. Hasta «Listo» aún puedes moverlo.',
+        mp: 'Todos reciben el mismo recurso y colocan a la vez.'
+      },
+      build: {
+        title: 'Construir',
+        body: '«🔨 Construir» abre el modo construcción. Por ronda puedes construir tantas veces como patrones consigas.',
+        mp: 'Igual que aquí: cada uno construye solo en su propio tablero.'
+      },
+      complete: {
+        title: 'Cerrar',
+        body: '¿Ninguna casilla libre y nada que construir? Entonces cierras y empieza el recuento.',
+        mp: 'La partida solo acaba cuando todos han cerrado; quien ya terminó no recibe más recursos.'
+      },
+      done: {
+        title: 'Terminar la ronda',
+        body: '«✓ Listo» cierra tu ronda: el recurso colocado queda ya fijo.',
+        mp: 'La ronda solo cambia cuando todos han terminado; entonces pasa la corona.'
+      }
+    }
+  },
+
   points: 'puntos',
   defaultPlayer: (n: number) => `Jugador ${n}`,
   needLocalSeat: 'Al menos un asiento debe quedarse en este dispositivo.',

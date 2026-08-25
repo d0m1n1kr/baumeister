@@ -254,6 +254,96 @@ export const en: Translation = {
     ]
   },
 
+  /** Learning mode (solo): explanation bubbles per phase + move suggestions.
+   *  Deliberately theme-neutral wording — no theme needs its own learn texts. */
+  learn: {
+    mode: 'Learning mode',
+    modeHint: 'Explanations for every phase and move suggestions',
+    setupOption: 'Learning game',
+    setupHint: 'Bubbles walk you through every phase, suggest moves and tell you what changes with several players.',
+    gotIt: 'Got it',
+    hideTips: 'Tips off',
+    resetTips: 'Show explanations again',
+    multiplayer: 'With several players',
+    suggestion: 'Suggestion',
+    suggestCompletes: (card: string) => `the marked square — that completes ${card}`,
+    suggestTowards: (card: string, have: number, need: number) =>
+      `the marked square — ${have} of ${need} squares for ${card}`,
+    suggestBuild: (card: string) => `${card} is complete — ready to construct`,
+    multiTitle: 'What changes with several players',
+    multiSteps: [
+      'With two to four players everyone fills their own 16 squares — at the same time, nobody waits for a turn.',
+      'Instead of the deck the Master Builder (👑) names the resource for everyone; the crown moves on every round.',
+      'Cards that swap or take in a resource on another player’s naming only work then — as Master Builder you get nothing. In solo your deck pick always counted as another player’s.',
+      'Four cards only enter the game with fellow players (three more with Fortune) — they need neighbours.',
+      'Monuments stay secret: on one device everyone confirms to look away, on their own devices nobody else ever sees it.',
+      'The game ends once everyone has finished; the highest score wins, ties go to whoever was Master Builder less often.',
+      'Only with several players there is also the Town Hall mode and the cavern rule.'
+    ],
+    steps: {
+      welcome: {
+        title: '4 × 4 squares',
+        body: 'Every round you receive one resource. When the resources on your board match a card’s pattern, you can construct it.',
+        mp: 'With two to four players everyone fills their own board — at the same time, on one device or on their own devices.'
+      },
+      monument: {
+        title: 'Choose a monument',
+        body: 'You get two monuments and keep one. It only scores if you finish it before the end.',
+        mp: 'There it stays secret: on one device you confirm that everyone looks away, on their own devices nobody else gets to see it.'
+      },
+      seed: {
+        title: 'Place your seed',
+        body: 'Put the seed on an empty square. If you later construct over it, you also choose a free resource.',
+        mp: 'Everyone places their seed at the same time, each on their own board.'
+      },
+      select: {
+        title: 'Mark the squares',
+        body: 'Tap exactly the squares that form the card’s pattern — no more, no less. Rotated and mirrored is always allowed.',
+        mp: 'Exactly as here.'
+      },
+      target: {
+        title: 'Choose the spot',
+        body: 'Tap the square the card should stand on. It has to be one of the marked resource squares — those resources are used up.',
+        mp: 'Exactly as here; a few cards let you pick any empty square instead.'
+      },
+      train: {
+        title: 'A stop at yours',
+        body: 'Instead of placing you may hand over the resource or swap it for the load — for that you need the matching card on the route.',
+        mp: 'The load is public: what you hand over, someone else may take along the way.'
+      },
+      swap: {
+        title: 'Swap instead of place',
+        body: 'One of your cards lets you swap this resource for another one. You place the swapped resource normally.',
+        mp: 'That only works on another player’s naming. In solo your deck pick counts as theirs — as Master Builder with several players you may not swap.'
+      },
+      offer: {
+        title: 'A resource from the deck',
+        body: 'Three cards lie face up. The one you pick goes face down under the deck and a new one comes up — counting pays off.',
+        mp: 'There is no deck there: the Master Builder (👑) names one resource for everyone, then the crown moves on.'
+      },
+      place: {
+        title: 'Place the resource',
+        body: 'Tap or drag it onto an empty square. You can still move it until “Done”.',
+        mp: 'Everyone receives the same resource and places at the same time.'
+      },
+      build: {
+        title: 'Construct',
+        body: '“🔨 Construct” opens construction mode. Per round you may construct as often as you can put patterns together.',
+        mp: 'Exactly as here — everyone only constructs on their own board.'
+      },
+      complete: {
+        title: 'Finish up',
+        body: 'No empty square left and nothing to construct? Then you finish and the scoring begins.',
+        mp: 'The game only ends once everyone has finished; whoever is done receives no more resources.'
+      },
+      done: {
+        title: 'End your round',
+        body: '“✓ Done” closes your round — the placed resource is then final.',
+        mp: 'The round only changes when everyone is done; then the crown moves on.'
+      }
+    }
+  },
+
   points: 'points',
   defaultPlayer: (n: number) => `Player ${n}`,
   needLocalSeat: 'At least one seat must stay on this device.',

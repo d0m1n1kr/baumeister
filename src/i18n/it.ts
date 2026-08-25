@@ -254,6 +254,96 @@ export const it: Translation = {
     ]
   },
 
+  /** Modalità apprendimento (solitario): fumetti per fase + suggerimenti.
+   *  Formulazione volutamente neutra rispetto ai temi. */
+  learn: {
+    mode: 'Modalità apprendimento',
+    modeHint: 'Spiegazioni per ogni fase e suggerimenti di mossa',
+    setupOption: 'Partita di apprendimento',
+    setupHint: 'I fumetti ti guidano in ogni fase, suggeriscono una mossa e dicono cosa cambia in più giocatori.',
+    gotIt: 'Capito',
+    hideTips: 'Nascondi i suggerimenti',
+    resetTips: 'Rivedere le spiegazioni',
+    multiplayer: 'Con più giocatori',
+    suggestion: 'Suggerimento',
+    suggestCompletes: (card: string) => `la casella evidenziata: così ${card} è completo`,
+    suggestTowards: (card: string, have: number, need: number) =>
+      `la casella evidenziata: ${have} caselle su ${need} per ${card}`,
+    suggestBuild: (card: string) => `${card} è completo: ora si può costruire`,
+    multiTitle: 'Cosa cambia con più giocatori',
+    multiSteps: [
+      'In due fino a quattro ognuno riempie le proprie 16 caselle: tutti insieme, nessuno aspetta il suo turno.',
+      'Al posto del mazzo il capomastro (👑) annuncia la risorsa per tutti; la corona passa ogni round.',
+      'Le carte che scambiano o accolgono una risorsa su annuncio altrui funzionano solo allora: come capomastro resti a mani vuote. In solitario la tua scelta dal mazzo contava sempre come altrui.',
+      'Quattro carte entrano in gioco solo con avversari (con Fortune altre tre): hanno bisogno di vicini.',
+      'I monumenti restano segreti: su un solo dispositivo tutti confermano di guardare altrove, sul proprio nessun altro lo vede mai.',
+      'La partita finisce quando tutti hanno chiuso; vince il punteggio più alto, a pari merito chi è stato capomastro meno volte.',
+      'Solo con più giocatori esistono anche la modalità Municipio e la regola della caverna.'
+    ],
+    steps: {
+      welcome: {
+        title: '4 × 4 caselle',
+        body: 'Ogni round ricevi una risorsa. Se le risorse sul tabellone formano lo schema di una carta, puoi costruirla.',
+        mp: 'In due fino a quattro ognuno riempie il proprio tabellone: tutti insieme, su un dispositivo o ognuno sul suo.'
+      },
+      monument: {
+        title: 'Scegli un monumento',
+        body: 'Ricevi due monumenti e ne tieni uno. Dà punti solo se lo completi entro la fine.',
+        mp: 'Là resta segreto: su un dispositivo confermi che tutti guardano altrove, sul proprio nessun altro riesce a vederlo.'
+      },
+      seed: {
+        title: 'Posiziona il seme',
+        body: 'Metti il seme su una casella libera. Se più tardi ci costruisci sopra, scegli anche una risorsa gratis.',
+        mp: 'Tutti posizionano il seme insieme, ognuno sul proprio tabellone.'
+      },
+      select: {
+        title: 'Evidenzia le caselle',
+        body: 'Tocca esattamente le caselle che formano lo schema della carta: né più né meno. Ruotato e specchiato è sempre permesso.',
+        mp: 'Esattamente come qui.'
+      },
+      target: {
+        title: 'Scegli il posto',
+        body: 'Tocca la casella su cui va la carta. Deve essere una di quelle evidenziate: quelle risorse si consumano.',
+        mp: 'Esattamente come qui; alcune carte permettono invece una qualsiasi casella libera.'
+      },
+      train: {
+        title: 'Una fermata da te',
+        body: 'Invece di posizionare puoi consegnare la risorsa o scambiarla con il carico: ti serve la carta adatta lungo il percorso.',
+        mp: 'Il carico è pubblico: quello che consegni, un altro può portarselo via strada facendo.'
+      },
+      swap: {
+        title: 'Scambiare invece di posizionare',
+        body: 'Una delle tue carte permette di scambiare questa risorsa con un’altra. Quella scambiata la posizioni normalmente.',
+        mp: 'Funziona solo su annuncio altrui. In solitario la tua scelta dal mazzo conta come tale: come capomastro con più giocatori non puoi scambiare.'
+      },
+      offer: {
+        title: 'Una risorsa dal mazzo',
+        body: 'Tre carte sono scoperte. Quella scelta va coperta sotto il mazzo e ne arriva una nuova: contare le carte conviene.',
+        mp: 'Là non c’è mazzo: il capomastro (👑) annuncia una risorsa per tutti, poi la corona passa.'
+      },
+      place: {
+        title: 'Posiziona la risorsa',
+        body: 'Toccala o trascinala su una casella libera. Fino a «Fatto» puoi ancora spostarla.',
+        mp: 'Tutti ricevono la stessa risorsa e posizionano insieme.'
+      },
+      build: {
+        title: 'Costruire',
+        body: '«🔨 Costruisci» apre la modalità costruzione. Per round puoi costruire tutte le volte che riesci a comporre schemi.',
+        mp: 'Esattamente come qui: ognuno costruisce solo sul proprio tabellone.'
+      },
+      complete: {
+        title: 'Chiudere',
+        body: 'Nessuna casella libera e niente da costruire? Allora chiudi e inizia il conteggio.',
+        mp: 'La partita finisce solo quando tutti hanno chiuso; chi ha finito non riceve più risorse.'
+      },
+      done: {
+        title: 'Chiudere il round',
+        body: '«✓ Fatto» chiude il tuo round: la risorsa posizionata resta definitiva.',
+        mp: 'Il round cambia solo quando tutti hanno finito; poi la corona passa.'
+      }
+    }
+  },
+
   points: 'punti',
   defaultPlayer: (n: number) => `Giocatore ${n}`,
   needLocalSeat: 'Almeno un posto deve restare su questo dispositivo.',

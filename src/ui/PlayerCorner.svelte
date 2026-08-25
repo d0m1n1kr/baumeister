@@ -4,10 +4,12 @@
   import { drags } from '../store/dragStore.svelte';
   import { catalog } from '../data';
   import { matchingCards } from '../engine/patterns';
+  import { suggestBuild, suggestPlacement } from '../engine/advice';
   import { hasFortIronweed, trainStopPlayer } from '../engine/game';
   import type { CardDef, Resource } from '../engine/types';
   import { cornerRotation, RESOURCE_CSS } from './helpers';
   import { sfx } from './sound';
+  import { learn } from './learn.svelte';
   import { cardName, cardText, t, translateError } from '../i18n';
   import BoardGrid from './BoardGrid.svelte';
   import CardMini from './CardMini.svelte';
@@ -351,6 +353,12 @@
     )
   );
 
+  /** Fortune: Münztausch möglich (nur bei fremder Ansage — solo immer). */
+  const coinSwapAvailable = $derived(
+    coinsActive && inRound && (!isMB || st.config.solo) && !p.pendingLocked &&
+    p.pending != null && p.pending === namedResource && p.coins >= 1
+  );
+
   // ---------- Eisenbahn ----------
   // Der Zug hält an diesem Bahnhof und die Zug-Aktion ist noch offen
   const trainHere = $derived(
@@ -373,6 +381,61 @@
   );
 
   const buildableSelection = $derived(mode === 'select' && selected.length > 0);
+
+  // ---------- Lernmodus ----------
+  // Nur im Solospiel am eigenen Gerät: Erklärblasen und Zugvorschläge. Reine
+  // Anzeige — die Vorschläge greifen nie selbst ein.
+  const learning = $derived(learn.enabled && solo && !!st.config.solo && canControl && !p.done);
+  const placeAdvice = $derived(
+    learning && inRound && mode === 'idle' && p.pending != null
+      ? suggestPlacement(st, player, p.pending, catalog)
+      : null
+  );
+  const buildAdvice = $derived(
+    learning && inRound && !p.roundDone ? suggestBuild(st, player, catalog) : null
+  );
+  const suggestSquares = $derived(
+    mode === 'select' && buildAdvice ? buildAdvice.squares
+    : mode === 'idle' && placeAdvice ? [placeAdvice.square]
+    : []
+  );
+  const adviceText = $derived.by(() => {
+    if (placeAdvice?.completes) {
+      return t.learn.suggestCompletes(cardName(catalog[placeAdvice.completes]));
+    }
+    if (placeAdvice?.towards) {
+      return t.learn.suggestTowards(
+        cardName(catalog[placeAdvice.towards]), placeAdvice.have, placeAdvice.need
+      );
+    }
+    if (buildAdvice && mode === 'idle') {
+      return t.learn.suggestBuild(cardName(catalog[buildAdvice.card]));
+    }
+    return '';
+  });
+
+  // Die Blase entscheidet der Store — er kennt nur diese Lagemeldung.
+  $effect(() => {
+    if (!learning) {
+      learn.ctx = null;
+      return;
+    }
+    learn.ctx = {
+      phase: st.phase.t,
+      monumentPending: !p.monument,
+      seedPending: p.seedSquare == null,
+      offer: st.phase.t === 'nameResource' && isMB && !!st.soloOffer,
+      pending: p.pending != null,
+      swap: !!(factoryAvailable || coinSwapAvailable),
+      trainHere,
+      canBuild: !!buildAdvice,
+      mode: mode === 'select' || mode === 'target' ? mode : mode === 'idle' ? 'idle' : 'other',
+      boardFull,
+      roundDone: p.roundDone,
+      canFinish: inRound && !p.roundDone && p.pending == null
+    };
+    return () => (learn.ctx = null);
+  });
 
   // ---------- Rathaus-Modus ----------
   const townHall = $derived(!!st.config.townHall);
@@ -404,13 +467,14 @@
     {:else if inRound && p.roundDone}<span class="status">{t.waitingForOthers}</span>{/if}
   </header>
 
-  <div class="row">
+  <div class="row" data-learn={solo ? 'play' : undefined}>
     <div class="boardWrap">
       <BoardGrid
         {player}
         board={p.board}
         {selected}
         {highlights}
+        suggest={suggestSquares}
         tentative={mode === 'idle' ? tentative : null}
         seed={treesActive && p.seedSquare != null && p.seedSquare >= 0 ? p.seedSquare : null}
         rail={!!st.train}
@@ -512,7 +576,7 @@
             {#if factoryAvailable}
               <button onpointerup={() => (factoryDialog = true)}>⚙ {t.factorySwap}</button>
             {/if}
-            {#if coinsActive && (!isMB || st.config.solo) && !p.pendingLocked && p.pending === namedResource && p.coins >= 1}
+            {#if coinSwapAvailable}
               <button onpointerup={() => (coinDialog = true)}>{t.coinIcon} {t.coinSwap}</button>
             {/if}
             {#if st.config.systems.cavern && !isMB && (p.cavernUsed ?? 0) < 2}
@@ -546,10 +610,14 @@
           </div>
         {/if}
 
+        {#if adviceText}
+          <span class="learnTip">🎓 {t.learn.suggestion}: {adviceText}</span>
+        {/if}
+
         {#if !choice}
           {#if mode === 'idle'}
             {#if !p.roundDone}
-              <button onpointerup={() => (mode = 'select')}>🔨 {t.buildMode}</button>
+              <button class:learnPoint={learning && !!buildAdvice} onpointerup={() => (mode = 'select')}>🔨 {t.buildMode}</button>
             {/if}
           {:else}
             <button onpointerup={resetMode}>{t.cancel}</button>
@@ -578,7 +646,11 @@
             {#if p.pending != null && p.pendingLocked}
               <span class="moveHint">{t.semaphoreSkipHint}</span>
             {/if}
-            <button class="primary" onpointerup={() => showError(game.dispatch({ t: 'roundDone', player }))}>
+            <button
+              class="primary"
+              class:learnPoint={learning && !buildAdvice}
+              onpointerup={() => showError(game.dispatch({ t: 'roundDone', player }))}
+            >
               ✓ {t.roundDone}
             </button>
           {/if}
@@ -752,7 +824,7 @@
         {#if solo && monumentDef}
           <!-- Eigenes Gerät: das Monument darf offen liegen -->
           <button class="monBuilt" onpointerup={() => (overlayCard = monumentDef)}>
-            🏛 {monumentDef.name.de}
+            🏛 {cardName(monumentDef)}
           </button>
         {:else}
           <button class="monBack" onpointerup={() => (confirming = 'reveal')} title={t.monument}>
@@ -1038,6 +1110,16 @@
     display: inline-block;
   }
   .pendingLabel { font-size: 11px; color: var(--text-dim); }
+  /* Lernmodus: Zugvorschlag und der Knopf, der als Nächstes dran ist */
+  .learnTip { font-size: 11px; line-height: 1.35; color: var(--accent); }
+  @media (prefers-reduced-motion: no-preference) {
+    .panel button.learnPoint { animation: learnPoint 1.4s ease-in-out infinite; }
+  }
+  .panel button.learnPoint { border-color: var(--accent); }
+  @keyframes learnPoint {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(232, 184, 75, 0.5); }
+    50% { box-shadow: 0 0 0 5px rgba(232, 184, 75, 0); }
+  }
   .moveHint { font-size: 11px; color: var(--text-dim); }
   .chip {
     width: 56px;
