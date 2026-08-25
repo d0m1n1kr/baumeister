@@ -4,14 +4,13 @@
   // erreichbar: Sie soll die Zahlen liefern, die man aus Screenshots nur
   // rekonstruieren kann — Viewport, gemeldete Insets und die Unterkanten der
   // Layout-Kästen. Fliegt wieder raus, sobald die Ursache feststeht.
-  import { measureAppHeight, probeHeight } from './viewport';
+  import { viewportFacts } from './viewport';
 
   let { onclose }: { onclose: () => void } = $props();
 
   let lines = $state<string[]>([]);
 
   function read() {
-    const cs = getComputedStyle(document.documentElement);
     const num = (v: string) => Math.round(parseFloat(v) || 0);
     const rect = (sel: string) => {
       const el = document.querySelector(sel);
@@ -19,15 +18,9 @@
       const r = el.getBoundingClientRect();
       return `${sel} ${Math.round(r.top)}–${Math.round(r.bottom)} (h ${Math.round(r.height)})`;
     };
-    const vv = window.visualViewport;
     const out = [
-      `screen ${screen.width}×${screen.height} dpr ${window.devicePixelRatio}`,
-      `inner ${innerWidth}×${innerHeight} client ${document.documentElement.clientHeight}`,
-      vv ? `visual ${Math.round(vv.width)}×${Math.round(vv.height)} offTop ${Math.round(vv.offsetTop)} pageTop ${Math.round(vv.pageTop)}` : 'visual —',
       // Custom Properties mit env() lassen sich nur über eine Messung lesen
-      `inset oben ${probeHeight('var(--safe-raw-top)')} unten roh ${probeHeight('var(--safe-raw-bottom)')} genutzt ${probeHeight('var(--safe-bottom)')}`,
-      `vh ${probeHeight('100vh')} svh ${probeHeight('100svh')} lvh ${probeHeight('100lvh')} dvh ${probeHeight('100dvh')}`,
-      `app-h ${cs.getPropertyValue('--app-h').trim() || '—'} (${measureAppHeight().reason})`,
+      ...viewportFacts(),
       rect('#app'),
       rect('.table'),
       rect('.solo'),
@@ -65,7 +58,12 @@
 <div class="probe">
   <button onpointerup={onclose}>✕ schließen</button>
   {#each lines as line}<span>{line}</span>{/each}
+  <span class="hint">Der magenta Balken ist die Unterkante des Viewports.</span>
 </div>
+
+<!-- Sichtbare Marke: Wo endet der Bereich, den die Plattform überhaupt
+     zeichnet? Alles darunter ist am Gerät nicht zu sehen. -->
+<div class="edge"></div>
 
 <style>
   .probe {
@@ -87,4 +85,15 @@
     color: #fff;
   }
   .probe button { align-self: flex-end; font-size: 10px; padding: 2px 6px; }
+  .probe .hint { color: #ff7bf0; }
+  .edge {
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: 4px;
+    background: #ff2bd1;
+    z-index: 201;
+    pointer-events: none;
+  }
 </style>

@@ -77,9 +77,6 @@ html, body {
      Höhe beider Insets blieb (im Browser unsichtbar, weil dort 0). */
   position: fixed;
   inset: 0;
-  /* --app-h wird nur gesetzt, wenn die Plattform die Höhe falsch meldet
-     (installierte iOS-PWA, siehe src/ui/viewport.ts); sonst gilt inset: 0. */
-  height: var(--app-h, auto);
   padding-top: env(safe-area-inset-top, 0px);
   padding-left: env(safe-area-inset-left, 0px);
   padding-right: env(safe-area-inset-right, 0px);

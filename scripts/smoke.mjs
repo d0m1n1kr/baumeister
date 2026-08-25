@@ -193,10 +193,10 @@ try {
   console.log('✓ Safe-Area: volle Höhe genutzt, unten nur der Home-Indicator-Rand');
   await insetPage.close();
 
-  // ---------- Installierte iOS-PWA: gemeldete Höhe ist zu klein ----------
-  // Nachgebildet wird die am Gerät gemessene Signatur: Bildschirm 874,
-  // gemeldeter Viewport 812, oberer Inset 62 — die Differenz IST der Inset.
-  // Dann muss die App auf Bildschirmhöhe gehen, sonst bleiben unten 62 px brach.
+  // ---------- Installierte iOS-PWA ----------
+  // Nachgebildet wird die am Gerät gemessene Lage: Bildschirm 874, gemeldeter
+  // Viewport 812, oberer Inset 62. Die Hülle bleibt am Viewport (alles darunter
+  // zeichnet die Plattform nicht), und alle Bedienelemente müssen hineinpassen.
   const pwaContext = await browser.newContext({
     viewport: { width: 402, height: 812 },
     screen: { width: 402, height: 874 },
@@ -225,18 +225,18 @@ try {
       return el ? Math.round(el.getBoundingClientRect().bottom) : null;
     };
     return {
-      appH: getComputedStyle(document.documentElement).getPropertyValue('--app-h').trim(),
       app: bottom('#app'),
       table: bottom('.table'),
       panel: bottom('.panel'),
       screenH: screen.height
     };
   });
-  if (pwa.appH !== '874px') fail(`iOS-PWA: --app-h ist "${pwa.appH}", erwartet 874px`);
-  if (pwa.app !== 874) fail(`iOS-PWA: Hülle endet bei ${pwa.app}, erwartet 874`);
-  if (pwa.table !== 874) fail(`iOS-PWA: Spieltisch endet bei ${pwa.table}, erwartet 874`);
-  if (874 - pwa.panel > 42) fail(`iOS-PWA: toter Streifen unter dem Panel (${874 - pwa.panel}px)`);
-  console.log(`✓ iOS-PWA: Hülle wächst auf Bildschirmhöhe (${pwa.appH}), Panel endet ${874 - pwa.panel}px darüber`);
+  // Die Hülle bleibt am Layout-Viewport: Inhalt darunter wäre am Gerät
+  // unsichtbar (v2.4.5 hatte sie auf Bildschirmhöhe wachsen lassen — falsch).
+  if (pwa.app !== 812) fail(`iOS-PWA: Hülle endet bei ${pwa.app}, erwartet 812 (Viewport)`);
+  if (pwa.table !== 812) fail(`iOS-PWA: Spieltisch endet bei ${pwa.table}, erwartet 812`);
+  if (812 - pwa.panel > 42) fail(`iOS-PWA: toter Streifen unter dem Panel (${812 - pwa.panel}px)`);
+  console.log(`✓ iOS-PWA: Hülle bleibt am Viewport (${pwa.app}), Panel endet ${812 - pwa.panel}px darüber`);
 
   // Am Handy muss das Panel ohne Scrollen reichen — sonst ist der letzte Knopf
   // (Monument) unerreichbar
@@ -281,15 +281,6 @@ try {
   if (scrolled <= 0) fail('iOS-PWA: Kartenraster lässt sich nicht mit dem Finger scrollen');
   console.log(`✓ iOS-PWA: Fingerscrollen im Kartenraster wirkt (${scrolled}px)`);
 
-  // Gegenprobe: ohne Inset (Browser) bleibt CSS zuständig
-  const plainPage = await pwaContext.newPage();
-  await plainPage.goto(BASE_URL);
-  await plainPage.locator('#splash').waitFor({ state: 'detached', timeout: 10000 });
-  const plainH = await plainPage.evaluate(() =>
-    getComputedStyle(document.documentElement).getPropertyValue('--app-h').trim()
-  );
-  if (plainH) fail(`Browser: --app-h sollte leer bleiben, ist "${plainH}"`);
-  console.log('✓ Browser: keine gemessene Höhe, CSS bleibt zuständig');
   await pwaContext.close();
 
   console.log('Smoke-Test bestanden.');
