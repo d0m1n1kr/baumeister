@@ -1,6 +1,12 @@
 import { mount } from 'svelte';
 import './app.css';
 import App from './ui/App.svelte';
+import { markCoverViewport } from './ui/viewport';
+
+// Viewport-Lage prüfen, bevor die App zeichnet (Details in viewport.ts)
+markCoverViewport();
+addEventListener('resize', markCoverViewport);
+addEventListener('orientationchange', markCoverViewport);
 
 const app = mount(App, { target: document.getElementById('app')! });
 

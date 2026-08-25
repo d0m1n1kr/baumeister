@@ -4,7 +4,7 @@
   // erreichbar: Sie soll die Zahlen liefern, die man aus Screenshots nur
   // rekonstruieren kann — Viewport, gemeldete Insets und die Unterkanten der
   // Layout-Kästen. Fliegt wieder raus, sobald die Ursache feststeht.
-  import { viewportFacts } from './viewport';
+  import { probeHeight, viewportFacts } from './viewport';
 
   let { onclose }: { onclose: () => void } = $props();
 
@@ -40,6 +40,28 @@
     }
     lines = out;
   }
+
+  // Der eigentliche Versuch: Wird UNTERHALB des Layout-Viewports gezeichnet?
+  // Solange die Messanzeige offen ist, dürfen html/body die volle Web-View-Höhe
+  // nutzen; darin liegt ein cyan gestreifter Balken genau in der Zone
+  // zwischen innerHeight und 100vh. Ist er am Gerät zu sehen, lässt sich der
+  // Streifen zurückholen — sonst gehört er der Plattform.
+  $effect(() => {
+    const inner = Math.round(window.innerHeight);
+    const large = probeHeight('100vh');
+    if (large <= inner + 1) return;
+    document.documentElement.classList.add('probeBand');
+    const band = document.createElement('div');
+    band.className = 'probeBandMark';
+    band.style.top = `${inner}px`;
+    band.style.height = `${large - inner}px`;
+    band.textContent = `sichtbar? ${inner}–${large}`;
+    document.body.appendChild(band);
+    return () => {
+      document.documentElement.classList.remove('probeBand');
+      band.remove();
+    };
+  });
 
   $effect(() => {
     read();

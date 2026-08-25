@@ -21,6 +21,22 @@ export function probeHeight(css: string): number {
   return Math.round(h);
 }
 
+/**
+ * Markiert den Fall „Layout-Viewport kleiner als die Web-View": Am Gerät
+ * gemessen melden vh und lvh 874 (die ganze Web-View), innerHeight/svh/dvh aber
+ * 812 — und die Insets sind gesetzt (62/34). Der Home-Indicator sitzt dann
+ * UNTERHALB des Layout-Viewports, sein Rand muss also nicht freigehalten
+ * werden (CSS: html[data-cover] { --safe-bottom: 0px }).
+ */
+export function markCoverViewport(): void {
+  const topInset = probeHeight('var(--safe-raw-top)');
+  const large = probeHeight('100vh');
+  const inner = Math.round(window.innerHeight);
+  const cover = topInset > 0 && large > inner + 1;
+  if (cover) document.documentElement.dataset.cover = '';
+  else delete document.documentElement.dataset.cover;
+}
+
 /** Lage des Viewports auf dem Bildschirm — für die Messanzeige. */
 export function viewportFacts(): string[] {
   const vv = window.visualViewport;
@@ -36,6 +52,7 @@ export function viewportFacts(): string[] {
     )} genutzt ${probeHeight('var(--safe-bottom)')}`,
     `vh ${probeHeight('100vh')} svh ${probeHeight('100svh')} lvh ${probeHeight(
       '100lvh'
-    )} dvh ${probeHeight('100dvh')}`
+    )} dvh ${probeHeight('100dvh')}`,
+    `cover ${document.documentElement.dataset.cover !== undefined}`
   ];
 }

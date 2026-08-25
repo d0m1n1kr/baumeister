@@ -257,6 +257,25 @@ try {
   }
   console.log('✓ iOS-PWA: alle Bedienelemente passen ohne Scrollen ins Panel');
 
+  // Sicherung gegen Fehlalarm: Der Home-Indicator-Rand darf nur dort entfallen,
+  // wo der Layout-Viewport wirklich kleiner ist als die Web-View (vh > inner).
+  // Hier sind sie gleich groß, also muss data-cover FEHLEN.
+  const cover = await pwaPage.evaluate(() => ({
+    cover: document.documentElement.dataset.cover !== undefined,
+    vh: (() => {
+      const el = document.createElement('div');
+      el.style.cssText = 'position:absolute;height:100vh;visibility:hidden';
+      document.body.appendChild(el);
+      const h = Math.round(el.getBoundingClientRect().height);
+      el.remove();
+      return h;
+    })(),
+    inner: innerHeight
+  }));
+  if (cover.vh !== cover.inner) fail(`Test-Annahme verletzt: vh ${cover.vh} != inner ${cover.inner}`);
+  if (cover.cover) fail('data-cover trotz gleich großem Viewport gesetzt — Rand würde fehlen');
+  console.log('✓ Kein Fehlalarm: data-cover bleibt aus, wenn vh == innerHeight');
+
   // Fingerscrollen muss funktionieren: touch-action an html/body wirkt über die
   // ganze Vorfahrenkette — mit „none" ließ sich kein Kind mehr scrollen.
   const cards = await pwaPage.evaluate(() => {
