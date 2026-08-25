@@ -487,5 +487,7 @@ export const nl: Translation = {
   updateAvailable: 'Nieuwe versie beschikbaar',
   updateNow: 'Bijwerken',
   updateLater: 'Later',
+  updateCheck: 'Zoeken naar update',
+  updateCurrent: 'actueel',
   offlineReady: 'Klaar voor offline spelen'
 };

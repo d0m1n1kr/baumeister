@@ -1,36 +1,29 @@
 <script lang="ts">
-  import { useRegisterSW } from 'virtual:pwa-register/svelte';
   import { t } from '../i18n';
+  import { updater } from './updater.svelte';
 
-  // Update-Prüfung: beim Start (Registrierung), beim Zurückkehren in die App
-  // (visibilitychange) und periodisch alle 15 Minuten.
-  const CHECK_INTERVAL = 15 * 60 * 1000;
-
-  const { needRefresh, updateServiceWorker } = useRegisterSW({
-    onRegisteredSW(_swUrl, registration) {
-      if (!registration) return;
-      setInterval(() => registration.update().catch(() => {}), CHECK_INTERVAL);
-      document.addEventListener('visibilitychange', () => {
-        if (!document.hidden) registration.update().catch(() => {});
-      });
-    }
-  });
-
+  // „Später" gilt nur für den Moment: Beim nächsten Zurückkehren in die App
+  // fragt der Hinweis wieder. Vorher blieb er nach einem Tipp für immer weg —
+  // ein lange offener Tab hing damit auf seiner alten Fassung fest.
   let dismissed = $state(false);
   let updating = $state(false);
+
+  $effect(() => {
+    const back = () => {
+      if (!document.hidden) dismissed = false;
+    };
+    document.addEventListener('visibilitychange', back);
+    return () => document.removeEventListener('visibilitychange', back);
+  });
 
   async function doUpdate() {
     if (updating) return;
     updating = true;
-    // Neue SW-Version aktivieren; anschließend explizit neu laden
-    // (der automatische Reload ist nicht in allen Plugin-Versionen zuverlässig).
-    // Der Spielstand liegt im localStorage und übersteht den Reload.
-    await updateServiceWorker(true);
-    location.reload();
+    await updater.apply();
   }
 </script>
 
-{#if $needRefresh && !dismissed}
+{#if updater.waiting && !dismissed}
   <div class="banner">
     <span>⬆ {t.updateAvailable}</span>
     <button class="primary" disabled={updating} onpointerup={doUpdate}>{t.updateNow}</button>

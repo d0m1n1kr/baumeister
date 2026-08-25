@@ -487,5 +487,7 @@ export const it: Translation = {
   updateAvailable: 'Nuova versione disponibile',
   updateNow: 'Aggiorna',
   updateLater: 'Più tardi',
+  updateCheck: 'Cerca aggiornamenti',
+  updateCurrent: 'aggiornato',
   offlineReady: 'Pronto per giocare offline'
 };
