@@ -413,7 +413,9 @@
     .strip.soloStrip.horizontal .cards.alice {
       grid-template-columns: repeat(2, minmax(0, 1fr));
       gap: 5px;
-      max-height: 30vh;
+      /* Deckel: Der Rest des Bildschirms gehört Brett und Knöpfen. Die Karten
+         scrollen in sich — seit touch-action das auch zulässt. */
+      max-height: 26vh;
     }
     .strip.soloStrip.horizontal .cards.alice .cardWrap { width: auto; }
   }

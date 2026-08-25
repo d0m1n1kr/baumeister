@@ -193,13 +193,14 @@ try {
   console.log('✓ Safe-Area: volle Höhe genutzt, unten nur der Home-Indicator-Rand');
   await insetPage.close();
 
-  // ---------- Installierte iOS-PWA: gemeldete Höhe ist zu klein ----------
-  // Nachgebildet wird die am Gerät gemessene Signatur: Bildschirm 874,
-  // gemeldeter Viewport 812, oberer Inset 62 — die Differenz IST der Inset.
-  // Dann muss die App auf Bildschirmhöhe gehen, sonst bleiben unten 62 px brach.
+  // ---------- Installierte iOS-PWA ----------
+  // Nachgebildet wird die am Gerät gemessene Lage: Bildschirm 874, gemeldeter
+  // Viewport 812, oberer Inset 62. Die Hülle bleibt am Viewport (alles darunter
+  // zeichnet die Plattform nicht), und alle Bedienelemente müssen hineinpassen.
   const pwaContext = await browser.newContext({
     viewport: { width: 402, height: 812 },
     screen: { width: 402, height: 874 },
+    hasTouch: true,
     locale: 'de-DE'
   });
   const pwaPage = await pwaContext.newPage();
@@ -224,28 +225,62 @@ try {
       return el ? Math.round(el.getBoundingClientRect().bottom) : null;
     };
     return {
-      appH: getComputedStyle(document.documentElement).getPropertyValue('--app-h').trim(),
       app: bottom('#app'),
       table: bottom('.table'),
       panel: bottom('.panel'),
       screenH: screen.height
     };
   });
-  if (pwa.appH !== '874px') fail(`iOS-PWA: --app-h ist "${pwa.appH}", erwartet 874px`);
-  if (pwa.app !== 874) fail(`iOS-PWA: Hülle endet bei ${pwa.app}, erwartet 874`);
-  if (pwa.table !== 874) fail(`iOS-PWA: Spieltisch endet bei ${pwa.table}, erwartet 874`);
-  if (874 - pwa.panel > 42) fail(`iOS-PWA: toter Streifen unter dem Panel (${874 - pwa.panel}px)`);
-  console.log(`✓ iOS-PWA: Hülle wächst auf Bildschirmhöhe (${pwa.appH}), Panel endet ${874 - pwa.panel}px darüber`);
+  // Die Hülle bleibt am Layout-Viewport: Inhalt darunter wäre am Gerät
+  // unsichtbar (v2.4.5 hatte sie auf Bildschirmhöhe wachsen lassen — falsch).
+  if (pwa.app !== 812) fail(`iOS-PWA: Hülle endet bei ${pwa.app}, erwartet 812 (Viewport)`);
+  if (pwa.table !== 812) fail(`iOS-PWA: Spieltisch endet bei ${pwa.table}, erwartet 812`);
+  if (812 - pwa.panel > 42) fail(`iOS-PWA: toter Streifen unter dem Panel (${812 - pwa.panel}px)`);
+  console.log(`✓ iOS-PWA: Hülle bleibt am Viewport (${pwa.app}), Panel endet ${812 - pwa.panel}px darüber`);
 
-  // Gegenprobe: ohne Inset (Browser) bleibt CSS zuständig
-  const plainPage = await pwaContext.newPage();
-  await plainPage.goto(BASE_URL);
-  await plainPage.locator('#splash').waitFor({ state: 'detached', timeout: 10000 });
-  const plainH = await plainPage.evaluate(() =>
-    getComputedStyle(document.documentElement).getPropertyValue('--app-h').trim()
-  );
-  if (plainH) fail(`Browser: --app-h sollte leer bleiben, ist "${plainH}"`);
-  console.log('✓ Browser: keine gemessene Höhe, CSS bleibt zuständig');
+  // Am Handy muss das Panel ohne Scrollen reichen — sonst ist der letzte Knopf
+  // (Monument) unerreichbar
+  await pwaPage.locator('.aliceBtn').first().click(); // Alice-Modus: mehr Kartenhöhe
+  await pwaPage.waitForTimeout(150);
+  const fit = await pwaPage.evaluate(() => {
+    const panel = document.querySelector('.panel');
+    const last = panel.lastElementChild;
+    return {
+      overflow: panel.scrollHeight - panel.clientHeight,
+      lastBottom: Math.round(last.getBoundingClientRect().bottom),
+      panelBottom: Math.round(panel.getBoundingClientRect().bottom)
+    };
+  });
+  if (fit.overflow > 0) fail(`iOS-PWA: Panel läuft über (${fit.overflow}px verdeckt)`);
+  if (fit.lastBottom > fit.panelBottom) {
+    fail(`iOS-PWA: letztes Bedienelement ist abgeschnitten (${fit.lastBottom} > ${fit.panelBottom})`);
+  }
+  console.log('✓ iOS-PWA: alle Bedienelemente passen ohne Scrollen ins Panel');
+
+  // Fingerscrollen muss funktionieren: touch-action an html/body wirkt über die
+  // ganze Vorfahrenkette — mit „none" ließ sich kein Kind mehr scrollen.
+  const cards = await pwaPage.evaluate(() => {
+    const el = document.querySelector('.cards');
+    return { over: el.scrollHeight - el.clientHeight };
+  });
+  if (cards.over <= 0) fail('iOS-PWA: Kartenraster läuft nicht über — Test greift nicht');
+  const cardBox = await pwaPage.locator('.cards').boundingBox();
+  const touch = await pwaContext.newCDPSession(pwaPage);
+  const tx = cardBox.x + cardBox.width / 2;
+  const ty = cardBox.y + cardBox.height - 20;
+  await touch.send('Input.dispatchTouchEvent', { type: 'touchStart', touchPoints: [{ x: tx, y: ty }] });
+  for (let i = 1; i <= 8; i++) {
+    await touch.send('Input.dispatchTouchEvent', {
+      type: 'touchMove', touchPoints: [{ x: tx, y: ty - i * 10 }]
+    });
+    await pwaPage.waitForTimeout(16);
+  }
+  await touch.send('Input.dispatchTouchEvent', { type: 'touchEnd', touchPoints: [] });
+  await pwaPage.waitForTimeout(400);
+  const scrolled = await pwaPage.evaluate(() => document.querySelector('.cards').scrollTop);
+  if (scrolled <= 0) fail('iOS-PWA: Kartenraster lässt sich nicht mit dem Finger scrollen');
+  console.log(`✓ iOS-PWA: Fingerscrollen im Kartenraster wirkt (${scrolled}px)`);
+
   await pwaContext.close();
 
   console.log('Smoke-Test bestanden.');

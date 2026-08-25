@@ -1,19 +1,14 @@
-// Höhe der App-Hülle. Normalerweise erledigt das CSS (`inset: 0`) — außer in
-// der installierten iOS-PWA: Dort melden ALLE Höhenquellen (innerHeight,
-// clientHeight, visualViewport, vh/svh/lvh/dvh) den Bildschirm MINUS dem
-// oberen Safe-Area-Inset, obwohl die Web-View mit viewport-fit=cover den
-// ganzen Bildschirm bedeckt. Am Gerät gemessen: Bildschirm 874, gemeldet 812,
-// oberer Inset 62 — die fehlenden 62 px lagen unten brach (plus dem
-// reservierten Home-Indicator-Rand ergab das den toten Streifen).
+// Messhilfen für die Höhen-Frage der installierten iOS-PWA.
 //
-// Erkannt wird genau diese Signatur: „Bildschirmhöhe − gemeldete Höhe == oberer
-// Safe-Area-Inset, und der ist größer als 0". Sie tritt nur auf, wenn die App
-// die Insets selbst verwaltet (viewport-fit=cover ohne Browser-Leisten) — im
-// Browser ist der obere Inset 0 (am Gerät nachgemessen), und die Differenz zum
-// Bildschirm sind dort die Leisten. In allen anderen Fällen bleibt CSS
-// zuständig; die Bildschirmhöhe wäre dort grob falsch.
-
-const KEY = '--app-h';
+// Am Gerät gemessen: Bildschirm 402×874, gemeldeter Viewport 402×812, oberer
+// Inset 62 — die Differenz IST der obere Inset. In v2.4.5 hat die Hülle darauf
+// hin auf Bildschirmhöhe gewachsen; das war falsch: Der Bereich unter dem
+// Layout-Viewport wird nicht gezeichnet, Inhalt dort verschwindet hinter dem
+// Hintergrund. Die Hülle bleibt daher am Layout-Viewport (CSS `inset: 0`).
+//
+// Offen ist nur noch, WO dieser Viewport auf dem Bildschirm sitzt — davon
+// hängt ab, ob der untere Rand (Home-Indicator) überhaupt freigehalten werden
+// muss. Das beantwortet die Messanzeige (siehe LayoutProbe.svelte).
 
 /** Höhe, die ein CSS-Ausdruck ergibt (misst z. B. `env()` oder `100lvh`). */
 export function probeHeight(css: string): number {
@@ -26,32 +21,21 @@ export function probeHeight(css: string): number {
   return Math.round(h);
 }
 
-export interface AppHeight {
-  /** Gesetzte Höhe in px, oder null: dann bleibt CSS (`inset: 0`) zuständig. */
-  height: number | null;
-  reason: string;
-}
-
-export function measureAppHeight(): AppHeight {
-  const inner = Math.round(window.visualViewport?.height ?? window.innerHeight);
-  const topInset = probeHeight('var(--safe-raw-top)');
-  const screenH = Math.round(screen.height);
-  if (topInset > 0 && screenH > inner && Math.abs(screenH - inner - topInset) <= 2) {
-    return { height: screenH, reason: `Bildschirm (+${screenH - inner})` };
-  }
-  return { height: null, reason: topInset > 0 ? 'Viewport' : 'ohne Inset' };
-}
-
-/** Setzt --app-h und hält es aktuell. Ohne Befund bleibt die Variable leer. */
-export function syncAppHeight(): void {
-  const apply = () => {
-    const { height } = measureAppHeight();
-    if (height) document.documentElement.style.setProperty(KEY, `${height}px`);
-    else document.documentElement.style.removeProperty(KEY);
-  };
-  apply();
-  addEventListener('resize', apply);
-  addEventListener('orientationchange', apply);
-  addEventListener('pageshow', apply);
-  window.visualViewport?.addEventListener('resize', apply);
+/** Lage des Viewports auf dem Bildschirm — für die Messanzeige. */
+export function viewportFacts(): string[] {
+  const vv = window.visualViewport;
+  return [
+    `screen ${screen.width}×${screen.height} dpr ${window.devicePixelRatio}`,
+    `inner ${innerWidth}×${innerHeight} outer ${outerWidth}×${outerHeight}`,
+    `screenX ${window.screenX} screenY ${window.screenY} client ${document.documentElement.clientHeight}`,
+    vv
+      ? `visual ${Math.round(vv.width)}×${Math.round(vv.height)} offTop ${Math.round(vv.offsetTop)}`
+      : 'visual —',
+    `inset oben ${probeHeight('var(--safe-raw-top)')} unten roh ${probeHeight(
+      'var(--safe-raw-bottom)'
+    )} genutzt ${probeHeight('var(--safe-bottom)')}`,
+    `vh ${probeHeight('100vh')} svh ${probeHeight('100svh')} lvh ${probeHeight(
+      '100lvh'
+    )} dvh ${probeHeight('100dvh')}`
+  ];
 }
