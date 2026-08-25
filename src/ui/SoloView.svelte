@@ -65,6 +65,7 @@
 <style>
   .solo {
     height: 100%;
+    padding-bottom: var(--safe-bottom);
     display: grid;
     grid-template-rows: auto auto 1fr;
     overflow: hidden;

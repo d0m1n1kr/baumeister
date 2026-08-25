@@ -210,6 +210,7 @@
 <style>
   .resume {
     height: 100%;
+    padding-bottom: var(--safe-bottom);
     display: flex;
     flex-direction: column;
     align-items: center;

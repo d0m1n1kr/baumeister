@@ -70,6 +70,7 @@
     justify-content: center;
     gap: 18px;
     padding: 20px;
+    padding-bottom: calc(20px + var(--safe-bottom));
     overflow-y: auto;
     touch-action: pan-y;
   }

@@ -143,10 +143,17 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: center;
+    /* Auto-Margins statt justify-content:center: zentriert, solange Platz
+       ist, und scrollt sauber, wenn die Wertung länger wird (4 Spieler,
+       Fortune) — center + overflow würde oben abschneiden. */
     gap: 16px;
     padding: 20px;
+    padding-bottom: calc(20px + var(--safe-bottom));
+    overflow-y: auto;
+    touch-action: pan-y;
   }
+  main > :first-child { margin-top: auto; }
+  main > :last-child { margin-bottom: auto; }
   h1 { margin: 0; }
   .winner { margin: 0; font-size: 18px; color: var(--accent); }
   .tableWrap {
