@@ -8,6 +8,7 @@
   import CardMini from './CardMini.svelte';
   import CardOverlay from './CardOverlay.svelte';
   import { sfx } from './sound';
+  import { learn } from './learn.svelte';
 
   let {
     onabort,
@@ -148,8 +149,19 @@
     {/if}
     {#if solo}
       <button class="aliceBtn" class:active={alice} onpointerup={toggleAlice} title={t.aliceModeHint}>
-        📖 {t.aliceMode}
+        📖 <span class="btnLabel">{t.aliceMode}</span>
       </button>
+      {#if st.config.solo}
+        <!-- Lernmodus: nur im Solospiel, dort führen die Blasen durch die Phasen -->
+        <button
+          class="aliceBtn"
+          class:active={learn.enabled}
+          onpointerup={() => learn.toggle()}
+          title={t.learn.modeHint}
+        >
+          🎓 <span class="btnLabel">{t.learn.mode}</span>
+        </button>
+      {/if}
     {/if}
   </div>
   <div class="cards" class:alice={aliceOn} class:flipped={flipped && !solo} class:many={cardIds.length > 8}>
@@ -324,6 +336,10 @@
     font-size: 11px;
     padding: 3px 8px;
     opacity: 0.7;
+  }
+  /* Am Handy bleibt nur das Symbol — die Zeile ist dort knapp */
+  @media (max-width: 720px), (max-height: 540px) {
+    .btnLabel { display: none; }
   }
   .aliceBtn.active {
     opacity: 1;

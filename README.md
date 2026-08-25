@@ -94,6 +94,16 @@ device (the host runs the engine and broadcasts it).
   chosen and rotates face-down to the bottom. With the official rank table
   (up to "Master Architect"), a per-device highscore list, and a **daily challenge**
   (fixed date seed — the same cards worldwide, scores comparable).
+- **Learning mode (🎓, solo):** a guided game for newcomers. Instruction bubbles
+  walk through every phase — monument draft, deck pick, placing, marking a
+  pattern, choosing the spot, ending the round, finishing the town — and each one
+  also says what changes **with several players** (a Master Builder instead of
+  the deck, simultaneous play, swap cards only on another player's naming). The
+  suggested square is highlighted with its reason ("2 of 3 for the Farm"); the
+  advice comes from a pure analyser (`src/engine/advice.ts`) that reuses the
+  pattern matcher, so it never proposes an illegal move — and stays silent when
+  it has nothing useful to say. Bubbles are dismissed one at a time and
+  remembered per device; the final screen sums up the multiplayer differences.
 - **Two ways to play:**
   - *On one device* (default, unchanged): taking turns around the same tablet,
     **fully offline**.
@@ -125,6 +135,7 @@ npm run check      # svelte-check
 npm run build      # production build (dist/)
 node scripts/smoke.mjs        # E2E: single-device mode (Chromium)
 node scripts/smoke-multi.mjs  # E2E: multi-device mode in two tabs
+node scripts/smoke-learn.mjs  # E2E: learning mode (bubbles, phone + tablet)
 ```
 
 The multi-device test runs with `?transport=channel`: the same session and host code,
@@ -134,7 +145,8 @@ any network. This switch is also handy for developing on a desktop.
 ## Architecture
 
 ```
-src/engine/   Pure-TS game logic (no DOM): reducer, patterns, scoring, effects — Vitest-tested
+src/engine/   Pure-TS game logic (no DOM): reducer, patterns, scoring, effects,
+              move advice for the learning mode — Vitest-tested
 src/data/     Card assets: JSON per card + SVG artwork, loaded automatically
 src/i18n/     Translations (8 languages), language detection, error-message mapping
 src/theme/    Themes (Mars, dragon realm): card/resource/UI overrides per device

@@ -12,6 +12,7 @@
     board,
     selected = [],
     highlights = [],
+    suggest = [],
     tentative = null,
     seed = null,
     rail = false,
@@ -22,6 +23,8 @@
     board: Square[];
     selected?: number[];
     highlights?: number[];
+    /** Lernmodus: vorgeschlagene Felder (reiner Hinweis, keine Regel). */
+    suggest?: number[];
     /** Unbestätigt platziertes Material (noch verschiebbar). */
     tentative?: number | null;
     /** Tiny Trees: Feld mit Samen. */
@@ -107,6 +110,7 @@
       class="cell"
       class:selected={selected.includes(i)}
       class:highlight={highlights.includes(i)}
+      class:suggest={suggest.includes(i)}
       class:tentative={tentative === i}
       data-player={player}
       data-square={i}
@@ -181,6 +185,13 @@
   }
   .cell.selected { outline: 3px solid var(--accent); outline-offset: -1px; z-index: 1; }
   .cell.tentative { outline: 3px dashed var(--accent); outline-offset: -1px; z-index: 1; }
+  /* Lernmodus: Vorschlag — golden gestrichelt, ruhiger als die Bau-Hinweise */
+  .cell.suggest {
+    outline: 2px dashed var(--accent);
+    outline-offset: -1px;
+    box-shadow: inset 0 0 10px rgba(232, 184, 75, 0.55);
+    z-index: 1;
+  }
   .cell.highlight {
     outline: 3px dashed var(--ok);
     outline-offset: -1px;

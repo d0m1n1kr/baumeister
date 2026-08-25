@@ -254,6 +254,96 @@ export const nl: Translation = {
     ]
   },
 
+  /** Leermodus (solo): uitlegballonnen per fase + zetsuggesties.
+   *  Bewust themaneutraal geformuleerd. */
+  learn: {
+    mode: 'Leermodus',
+    modeHint: 'Uitleg bij elke fase en zetsuggesties',
+    setupOption: 'Leerpartij',
+    setupHint: 'Ballonnen loodsen je door elke fase, stellen een zet voor en vertellen wat er met meer spelers anders gaat.',
+    gotIt: 'Begrepen',
+    hideTips: 'Tips uit',
+    resetTips: 'Uitleg opnieuw tonen',
+    multiplayer: 'Met meerdere spelers',
+    suggestion: 'Suggestie',
+    suggestCompletes: (card: string) => `het gemarkeerde vak — daarmee is ${card} compleet`,
+    suggestTowards: (card: string, have: number, need: number) =>
+      `het gemarkeerde vak — ${have} van ${need} vakken voor ${card}`,
+    suggestBuild: (card: string) => `${card} is compleet — nu te bouwen`,
+    multiTitle: 'Wat er met meerdere spelers anders is',
+    multiSteps: [
+      'Met twee tot vier vult iedereen zijn eigen 16 vakken — gelijktijdig, niemand wacht op een zet.',
+      'In plaats van het deck noemt de bouwmeester (👑) de grondstof voor iedereen; de kroon schuift elke ronde door.',
+      'Kaarten die bij een aankondiging van een ander ruilen of iets opnemen, werken alleen dan — als bouwmeester krijg je niets. In solo gold jouw deckkeuze altijd als die van een ander.',
+      'Vier kaarten komen pas met medespelers in het spel (met Fortune nog drie) — ze hebben buren nodig.',
+      'Monumenten blijven geheim: op één apparaat bevestigt iedereen weg te kijken, op een eigen apparaat ziet niemand anders het ooit.',
+      'De partij eindigt als iedereen heeft afgesloten; de hoogste score wint, bij gelijkspel wie het minst vaak bouwmeester was.',
+      'Alleen met meerdere spelers bestaan ook de raadhuis-modus en de grotregel.'
+    ],
+    steps: {
+      welcome: {
+        title: '4 × 4 vakken',
+        body: 'Elke ronde krijg je één grondstof. Passen de grondstoffen op je bord bij het patroon van een kaart, dan kun je die bouwen.',
+        mp: 'Met twee tot vier vult iedereen zijn eigen bord — gelijktijdig, op één apparaat of ieder op zijn eigen.'
+      },
+      monument: {
+        title: 'Monument kiezen',
+        body: 'Je krijgt twee monumenten en houdt er één. Het levert alleen punten op als je het voor het einde afmaakt.',
+        mp: 'Daar blijft het geheim: op één apparaat bevestig je dat iedereen wegkijkt, op een eigen apparaat ziet niemand anders het.'
+      },
+      seed: {
+        title: 'Zaadje plaatsen',
+        body: 'Leg het zaadje op een leeg vak. Bouw je er later over, dan kies je er een gratis grondstof bij.',
+        mp: 'Iedereen legt zijn zaadje gelijktijdig, ieder op zijn eigen bord.'
+      },
+      select: {
+        title: 'Vakken markeren',
+        body: 'Tik precies de vakken aan die het patroon van de kaart vormen — niet meer en niet minder. Gedraaid en gespiegeld mag altijd.',
+        mp: 'Precies zoals hier.'
+      },
+      target: {
+        title: 'Bouwplek kiezen',
+        body: 'Tik het vak aan waar de kaart komt te staan. Het moet een van de gemarkeerde vakken zijn — die grondstoffen gaan eraf.',
+        mp: 'Precies zoals hier; een paar kaarten laten in plaats daarvan elk leeg vak toe.'
+      },
+      train: {
+        title: 'Halte bij jou',
+        body: 'In plaats van plaatsen mag je de grondstof afgeven of ruilen tegen de lading — daarvoor heb je de juiste kaart aan de route nodig.',
+        mp: 'De lading is openbaar: wat jij afgeeft, kan iemand anders onderweg meenemen.'
+      },
+      swap: {
+        title: 'Ruilen in plaats van plaatsen',
+        body: 'Een van je kaarten laat je deze grondstof tegen een andere ruilen. De geruilde plaats je gewoon.',
+        mp: 'Dat gaat alleen bij een aankondiging van een ander. In solo geldt jouw deckkeuze als die van een ander — als bouwmeester met meer spelers mag je niet ruilen.'
+      },
+      offer: {
+        title: 'Grondstof uit het deck',
+        body: 'Er liggen drie kaarten open. De gekozen kaart gaat dicht onder de stapel en er komt een nieuwe bij — meetellen loont.',
+        mp: 'Daar is geen deck: de bouwmeester (👑) noemt één grondstof voor iedereen, daarna schuift de kroon door.'
+      },
+      place: {
+        title: 'Grondstof plaatsen',
+        body: 'Tik of sleep hem naar een leeg vak. Tot «Klaar» kun je hem nog verschuiven.',
+        mp: 'Iedereen krijgt dezelfde grondstof en plaatst gelijktijdig.'
+      },
+      build: {
+        title: 'Bouwen',
+        body: '«🔨 Bouwen» opent de bouwmodus. Per ronde mag je zo vaak bouwen als je patronen bij elkaar krijgt.',
+        mp: 'Precies zoals hier — iedereen bouwt alleen op zijn eigen bord.'
+      },
+      complete: {
+        title: 'Afsluiten',
+        body: 'Geen leeg vak meer en niets meer te bouwen? Dan sluit je af en begint de telling.',
+        mp: 'De partij eindigt pas als iedereen heeft afgesloten; wie klaar is, krijgt geen grondstoffen meer.'
+      },
+      done: {
+        title: 'Ronde beëindigen',
+        body: '«✓ Klaar» sluit je ronde af — de geplaatste grondstof ligt dan definitief.',
+        mp: 'De ronde wisselt pas als iedereen klaar is; dan schuift de kroon door.'
+      }
+    }
+  },
+
   points: 'punten',
   defaultPlayer: (n: number) => `Speler ${n}`,
   needLocalSeat: 'Minstens één plaats moet op dit apparaat blijven.',

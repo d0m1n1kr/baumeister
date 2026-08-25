@@ -7,6 +7,8 @@
   import SoloView from './SoloView.svelte';
   import HandoverDialog from './HandoverDialog.svelte';
   import TrainTrack from './TrainTrack.svelte';
+  import LearnBubble from './LearnBubble.svelte';
+  import { learn } from './learn.svelte';
 
   // Gäste sehen immer ihr eigenes Brett; der Host kann zwischen Spieltisch
   // (alle Bretter, wie im Ein-Gerät-Modus) und eigener Ansicht umschalten.
@@ -46,6 +48,13 @@
 
 {#if game.state?.train}
   <TrainTrack />
+{/if}
+
+<!-- Lernmodus: die Blase liegt über beiden Ansichten und richtet sich am
+     Spielbereich aus (siehe data-learn="play" in PlayerCorner). -->
+{#if learn.step}
+  {@const step = learn.step}
+  <LearnBubble {step} ondismiss={() => learn.dismiss(step)} onoff={() => learn.set(false)} />
 {/if}
 
 {#if isHost}

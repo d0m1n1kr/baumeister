@@ -254,6 +254,97 @@ export const de = {
     ]
   },
 
+  /** Lernmodus (Solo): Erklärblasen je Phase + Zugvorschläge. Absichtlich
+   *  themeneutral formuliert (keine Hütten, Städte, Münzen, Bahnhöfe) —
+   *  deshalb braucht kein Theme eigene Lerntexte; geprüft in ui/learn.test.ts. */
+  learn: {
+    mode: 'Lernmodus',
+    modeHint: 'Erklärungen zu jeder Phase und Zugvorschläge',
+    setupOption: 'Lernspiel',
+    setupHint: 'Erklärblasen führen durch jede Phase, schlagen Züge vor und sagen, was mit mehreren Spielern anders läuft.',
+    gotIt: 'Verstanden',
+    hideTips: 'Tipps aus',
+    resetTips: 'Erklärungen zurücksetzen',
+    multiplayer: 'Mit mehreren Spielern',
+    suggestion: 'Vorschlag',
+    suggestCompletes: (card: string) => `markiertes Feld — damit ist ${card} vollständig`,
+    suggestTowards: (card: string, have: number, need: number) =>
+      `markiertes Feld — ${have} von ${need} Feldern für ${card}`,
+    suggestBuild: (card: string) => `${card} ist vollständig — jetzt baubar`,
+    multiTitle: 'Was mit mehreren Spielern anders ist',
+    multiSteps: [
+      'Zu zweit bis viert füllt jeder seine eigenen 16 Felder — gleichzeitig, niemand wartet auf einen Zug.',
+      'Statt des Decks sagt der Baumeister (👑) das Material für alle an; die Krone wandert jede Runde weiter.',
+      'Karten, die bei fremder Ansage tauschen oder Material aufnehmen, wirken nur dann — als Baumeister gehst du leer aus. Solo galt deine Deck-Wahl immer als fremd.',
+      'Vier Karten kommen erst mit Mitspielern ins Spiel (mit Fortune drei weitere) — sie brauchen Nachbarn.',
+      'Monumente bleiben geheim: an einem Gerät bestätigt man „alle wegschauen", auf eigenen Geräten sieht es niemand sonst.',
+      'Die Partie endet, wenn alle abgeschlossen haben; es gewinnt die höchste Punktzahl, bei Gleichstand wer seltener Baumeister war.',
+      'Nur mit mehreren Spielern gibt es zusätzlich den Rathaus-Modus und die Höhlen-Regel.'
+    ],
+    steps: {
+      welcome: {
+        title: '4 × 4 Felder',
+        body: 'Jede Runde bekommst du ein Material. Passen die Materialien auf dem Brett zum Muster einer Karte, kannst du sie bauen.',
+        mp: 'Zu zweit bis viert füllt jeder sein eigenes Brett — gleichzeitig, an einem Gerät oder auf eigenen Geräten.'
+      },
+      monument: {
+        title: 'Monument wählen',
+        body: 'Du bekommst zwei Monumente und behältst eines. Punkte bringt es nur, wenn du es bis zum Ende fertig baust.',
+        mp: 'Dort bleibt es geheim: an einem Gerät bestätigst du vor dem Ansehen, dass alle wegschauen; auf eigenen Geräten bekommt es niemand sonst zu sehen.'
+      },
+      seed: {
+        title: 'Samen setzen',
+        body: 'Lege den Samen auf ein freies Feld. Überbaust du ihn später, wählst du ein Gratis-Material dazu.',
+        mp: 'Alle setzen ihren Samen gleichzeitig, jeder auf seinem eigenen Brett.'
+      },
+      select: {
+        title: 'Felder markieren',
+        body: 'Tippe genau die Felder an, die das Muster der Karte bilden — nicht mehr und nicht weniger. Gedreht und gespiegelt ist immer erlaubt.',
+        mp: 'Genauso wie hier.'
+      },
+      target: {
+        title: 'Bauplatz wählen',
+        body: 'Tippe das Feld an, auf dem die Karte stehen soll. Es muss eines der markierten Materialfelder sein — die Materialien darunter verschwinden.',
+        mp: 'Genauso wie hier; einzelne Karten erlauben stattdessen ein beliebiges freies Feld.'
+      },
+      train: {
+        title: 'Halt bei dir',
+        body: 'Statt zu platzieren darfst du das Material abgeben oder gegen die Ladung tauschen — dafür brauchst du die passende Karte an der Strecke.',
+        mp: 'Die Ladung ist öffentlich: Was du abgibst, kann unterwegs jemand anderes mitnehmen.'
+      },
+      swap: {
+        title: 'Tauschen statt platzieren',
+        body: 'Eine deiner Karten erlaubt, dieses Material gegen ein anderes zu tauschen. Das getauschte platzierst du normal.',
+        mp: 'Das geht nur bei fremder Ansage. Solo gilt deine Deck-Wahl als fremd — als Baumeister mit mehreren Spielern darfst du nicht tauschen.'
+      },
+      offer: {
+        title: 'Material aus dem Deck',
+        body: 'Drei Karten liegen offen. Die gewählte wandert verdeckt unter den Stapel, eine neue kommt nach — Mitzählen lohnt sich.',
+        mp: 'Dort gibt es kein Deck: Der Baumeister (👑) sagt ein Material für alle an, danach wandert die Krone weiter.'
+      },
+      place: {
+        title: 'Material platzieren',
+        body: 'Tippe oder ziehe es auf ein freies Feld. Bis „Fertig" darfst du es noch verschieben.',
+        mp: 'Alle bekommen dasselbe Material und platzieren gleichzeitig.'
+      },
+      build: {
+        title: 'Bauen',
+        body: '„🔨 Bauen" öffnet den Bau-Modus. Pro Runde darfst du so oft bauen, wie du Muster zusammenbekommst.',
+        mp: 'Genauso wie hier — jeder baut nur auf seinem eigenen Brett.'
+      },
+      complete: {
+        title: 'Abschließen',
+        body: 'Kein freies Feld mehr und nichts mehr baubar? Dann schließt du ab und die Wertung beginnt.',
+        mp: 'Die Partie endet erst, wenn alle abgeschlossen haben; wer schon fertig ist, bekommt kein Material mehr.'
+      },
+      done: {
+        title: 'Runde beenden',
+        body: '„✓ Fertig" schließt deine Runde ab — das platzierte Material liegt dann endgültig.',
+        mp: 'Die Runde wechselt erst, wenn alle fertig sind; dann wandert die Krone weiter.'
+      }
+    }
+  },
+
   points: 'Punkte',
   defaultPlayer: (n: number) => `Spieler ${n}`,
   needLocalSeat: 'Mindestens ein Platz muss an diesem Gerät bleiben.',

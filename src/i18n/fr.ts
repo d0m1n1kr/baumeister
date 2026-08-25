@@ -254,6 +254,96 @@ export const fr: Translation = {
     ]
   },
 
+  /** Mode apprentissage (solo) : bulles d’explication par phase + suggestions.
+   *  Formulé volontairement sans vocabulaire de thème. */
+  learn: {
+    mode: 'Mode apprentissage',
+    modeHint: 'Explications de chaque phase et suggestions de coups',
+    setupOption: 'Partie d’apprentissage',
+    setupHint: 'Des bulles t’accompagnent à chaque phase, suggèrent un coup et disent ce qui change à plusieurs.',
+    gotIt: 'Compris',
+    hideTips: 'Masquer les astuces',
+    resetTips: 'Revoir les explications',
+    multiplayer: 'À plusieurs joueurs',
+    suggestion: 'Suggestion',
+    suggestCompletes: (card: string) => `la case marquée — ${card} est alors complet`,
+    suggestTowards: (card: string, have: number, need: number) =>
+      `la case marquée — ${have} cases sur ${need} pour ${card}`,
+    suggestBuild: (card: string) => `${card} est complet — constructible maintenant`,
+    multiTitle: 'Ce qui change à plusieurs joueurs',
+    multiSteps: [
+      'À deux à quatre, chacun remplit ses propres 16 cases — en même temps, personne n’attend son tour.',
+      'À la place du paquet, le maître bâtisseur (👑) annonce la ressource pour tous ; la couronne passe à chaque manche.',
+      'Les cartes qui échangent ou récupèrent une ressource sur l’annonce d’un autre ne servent que dans ce cas — en tant que maître bâtisseur, tu n’as rien. En solo, ton choix dans le paquet comptait toujours comme celui d’un autre.',
+      'Quatre cartes n’entrent en jeu qu’avec des adversaires (trois de plus avec Fortune) — il leur faut des voisins.',
+      'Les monuments restent secrets : sur un seul appareil, tout le monde confirme de détourner le regard ; sur son propre appareil, personne d’autre ne le voit jamais.',
+      'La partie s’achève quand tout le monde a terminé ; le meilleur score gagne, à égalité celui qui a été maître bâtisseur le moins souvent.',
+      'Le mode Hôtel de ville et la règle des cavernes n’existent qu’à plusieurs.'
+    ],
+    steps: {
+      welcome: {
+        title: '4 × 4 cases',
+        body: 'Chaque manche tu reçois une ressource. Si les ressources posées forment le motif d’une carte, tu peux la construire.',
+        mp: 'À deux à quatre, chacun remplit son propre plateau — en même temps, sur un seul appareil ou chacun sur le sien.'
+      },
+      monument: {
+        title: 'Choisis un monument',
+        body: 'Tu reçois deux monuments et en gardes un. Il ne rapporte que si tu l’achèves avant la fin.',
+        mp: 'Là il reste secret : sur un seul appareil tu confirmes que tous détournent le regard, sur son propre appareil personne d’autre ne le voit.'
+      },
+      seed: {
+        title: 'Pose ta graine',
+        body: 'Mets la graine sur une case vide. Si tu construis dessus plus tard, tu choisis en plus une ressource gratuite.',
+        mp: 'Tout le monde pose sa graine en même temps, chacun sur son plateau.'
+      },
+      select: {
+        title: 'Marque les cases',
+        body: 'Touche exactement les cases qui forment le motif de la carte — ni plus, ni moins. Tourné et retourné est toujours permis.',
+        mp: 'Exactement comme ici.'
+      },
+      target: {
+        title: 'Choisis l’emplacement',
+        body: 'Touche la case où la carte doit se poser. Ce doit être une des cases marquées — ces ressources sont consommées.',
+        mp: 'Exactement comme ici ; quelques cartes permettent au contraire n’importe quelle case vide.'
+      },
+      train: {
+        title: 'Un arrêt chez toi',
+        body: 'Au lieu de placer, tu peux remettre la ressource ou l’échanger contre le chargement — il te faut la carte adéquate sur le parcours.',
+        mp: 'Le chargement est public : ce que tu déposes, un autre peut l’emporter en route.'
+      },
+      swap: {
+        title: 'Échanger au lieu de placer',
+        body: 'Une de tes cartes permet d’échanger cette ressource contre une autre. Tu poses ensuite la ressource échangée normalement.',
+        mp: 'Cela ne marche que sur l’annonce d’un autre. En solo, ton choix dans le paquet compte comme tel — en tant que maître bâtisseur à plusieurs, tu ne peux pas échanger.'
+      },
+      offer: {
+        title: 'Une ressource du paquet',
+        body: 'Trois cartes sont face visible. Celle que tu prends passe face cachée sous le paquet et une nouvelle arrive — compter les cartes, ça paie.',
+        mp: 'Là, pas de paquet : le maître bâtisseur (👑) annonce une ressource pour tous, puis la couronne passe.'
+      },
+      place: {
+        title: 'Place la ressource',
+        body: 'Touche ou glisse-la sur une case vide. Tu peux encore la déplacer jusqu’à « Terminé ».',
+        mp: 'Tout le monde reçoit la même ressource et place en même temps.'
+      },
+      build: {
+        title: 'Construire',
+        body: '« 🔨 Construire » ouvre le mode construction. Par manche, tu construis autant de fois que tu réunis de motifs.',
+        mp: 'Exactement comme ici — chacun ne construit que sur son propre plateau.'
+      },
+      complete: {
+        title: 'Terminer',
+        body: 'Plus de case vide et rien à construire ? Alors tu termines et le décompte commence.',
+        mp: 'La partie ne s’achève que quand tout le monde a terminé ; celui qui a fini ne reçoit plus de ressources.'
+      },
+      done: {
+        title: 'Clore la manche',
+        body: '« ✓ Terminé » clôt ta manche — la ressource posée est alors définitive.',
+        mp: 'La manche ne change que quand tout le monde a fini ; la couronne passe ensuite.'
+      }
+    }
+  },
+
   points: 'points',
   defaultPlayer: (n: number) => `Joueur ${n}`,
   needLocalSeat: 'Au moins une place doit rester sur cet appareil.',

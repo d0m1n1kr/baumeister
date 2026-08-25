@@ -254,6 +254,96 @@ export const pt: Translation = {
     ]
   },
 
+  /** Modo aprendizagem (solo): balões de explicação por fase + sugestões.
+   *  Redigido de propósito sem vocabulário de tema. */
+  learn: {
+    mode: 'Modo aprendizagem',
+    modeHint: 'Explicações de cada fase e sugestões de jogada',
+    setupOption: 'Partida de aprendizagem',
+    setupHint: 'Os balões acompanham-te em cada fase, sugerem uma jogada e dizem o que muda com vários jogadores.',
+    gotIt: 'Entendido',
+    hideTips: 'Ocultar dicas',
+    resetTips: 'Mostrar as explicações de novo',
+    multiplayer: 'Com vários jogadores',
+    suggestion: 'Sugestão',
+    suggestCompletes: (card: string) => `a casa marcada — assim ${card} fica completo`,
+    suggestTowards: (card: string, have: number, need: number) =>
+      `a casa marcada — ${have} de ${need} casas para ${card}`,
+    suggestBuild: (card: string) => `${card} está completo — já pode ser construído`,
+    multiTitle: 'O que muda com vários jogadores',
+    multiSteps: [
+      'De dois a quatro, cada um enche as suas próprias 16 casas — ao mesmo tempo, ninguém espera pela sua vez.',
+      'Em vez do baralho, o mestre construtor (👑) anuncia o recurso para todos; a coroa passa a cada ronda.',
+      'As cartas que trocam ou recolhem um recurso no anúncio de outro só funcionam então — como mestre construtor ficas sem nada. A solo a tua escolha do baralho contava sempre como alheia.',
+      'Quatro cartas só entram em jogo com adversários (com Fortune outras três) — precisam de vizinhos.',
+      'Os monumentos ficam secretos: num só aparelho todos confirmam olhar para o lado, no próprio aparelho mais ninguém o vê.',
+      'A partida acaba quando todos fecharam; ganha a pontuação mais alta e, em empate, quem foi mestre construtor menos vezes.',
+      'Só com vários jogadores existem ainda o modo Câmara Municipal e a regra da caverna.'
+    ],
+    steps: {
+      welcome: {
+        title: '4 × 4 casas',
+        body: 'Em cada ronda recebes um recurso. Se os recursos no tabuleiro formarem o padrão de uma carta, podes construí-la.',
+        mp: 'De dois a quatro, cada um enche o seu tabuleiro — ao mesmo tempo, num aparelho ou cada um no seu.'
+      },
+      monument: {
+        title: 'Escolher um monumento',
+        body: 'Recebes dois monumentos e ficas com um. Só dá pontos se o terminares até ao fim.',
+        mp: 'Aí fica secreto: num aparelho confirmas que todos olham para o lado; no próprio, mais ninguém chega a vê-lo.'
+      },
+      seed: {
+        title: 'Colocar a semente',
+        body: 'Põe a semente numa casa livre. Se mais tarde construíres por cima, escolhes ainda um recurso grátis.',
+        mp: 'Todos colocam a semente ao mesmo tempo, cada um no seu tabuleiro.'
+      },
+      select: {
+        title: 'Marcar as casas',
+        body: 'Toca exatamente nas casas que formam o padrão da carta — nem mais nem menos. Rodado e espelhado é sempre permitido.',
+        mp: 'Exatamente como aqui.'
+      },
+      target: {
+        title: 'Escolher o lugar',
+        body: 'Toca na casa onde a carta vai ficar. Tem de ser uma das casas marcadas — esses recursos são gastos.',
+        mp: 'Exatamente como aqui; algumas cartas permitem em vez disso qualquer casa livre.'
+      },
+      train: {
+        title: 'Uma parada em ti',
+        body: 'Em vez de colocar podes entregar o recurso ou trocá-lo pela carga — para isso precisas da carta adequada no percurso.',
+        mp: 'A carga é pública: o que entregas, outro pode levar pelo caminho.'
+      },
+      swap: {
+        title: 'Trocar em vez de colocar',
+        body: 'Uma das tuas cartas permite trocar este recurso por outro. O recurso trocado colocas normalmente.',
+        mp: 'Isso só funciona no anúncio de outro. A solo a tua escolha do baralho conta como tal — como mestre construtor com vários jogadores não podes trocar.'
+      },
+      offer: {
+        title: 'Um recurso do baralho',
+        body: 'Estão três cartas viradas. A escolhida vai voltada para baixo sob o baralho e entra uma nova — contar cartas compensa.',
+        mp: 'Aí não há baralho: o mestre construtor (👑) anuncia um recurso para todos e depois a coroa passa.'
+      },
+      place: {
+        title: 'Colocar o recurso',
+        body: 'Toca ou arrasta-o para uma casa livre. Até «Pronto» ainda o podes mover.',
+        mp: 'Todos recebem o mesmo recurso e colocam ao mesmo tempo.'
+      },
+      build: {
+        title: 'Construir',
+        body: '«🔨 Construir» abre o modo de construção. Por ronda podes construir tantas vezes quantos padrões conseguires juntar.',
+        mp: 'Exatamente como aqui — cada um constrói só no seu tabuleiro.'
+      },
+      complete: {
+        title: 'Fechar',
+        body: 'Sem casa livre e nada para construir? Então fechas e começa a contagem.',
+        mp: 'A partida só acaba quando todos fecharam; quem já terminou não recebe mais recursos.'
+      },
+      done: {
+        title: 'Terminar a ronda',
+        body: '«✓ Pronto» fecha a tua ronda — o recurso colocado fica definitivo.',
+        mp: 'A ronda só muda quando todos terminaram; depois a coroa passa.'
+      }
+    }
+  },
+
   points: 'pontos',
   defaultPlayer: (n: number) => `Jogador ${n}`,
   needLocalSeat: 'Pelo menos um lugar tem de ficar neste dispositivo.',

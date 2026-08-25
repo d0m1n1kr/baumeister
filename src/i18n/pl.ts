@@ -254,6 +254,96 @@ export const pl: Translation = {
     ]
   },
 
+  /** Tryb nauki (solo): dymki objaśniające przy każdej fazie + podpowiedzi.
+   *  Sformułowane celowo neutralnie wobec motywów. */
+  learn: {
+    mode: 'Tryb nauki',
+    modeHint: 'Objaśnienia każdej fazy i podpowiedzi ruchów',
+    setupOption: 'Partia nauki',
+    setupHint: 'Dymki prowadzą przez każdą fazę, podpowiadają ruch i mówią, co zmienia się przy kilku graczach.',
+    gotIt: 'Rozumiem',
+    hideTips: 'Ukryj wskazówki',
+    resetTips: 'Pokaż objaśnienia od nowa',
+    multiplayer: 'Przy kilku graczach',
+    suggestion: 'Podpowiedź',
+    suggestCompletes: (card: string) => `zaznaczone pole — dzięki temu ${card} jest gotowy`,
+    suggestTowards: (card: string, have: number, need: number) =>
+      `zaznaczone pole — ${have} z ${need} pól dla ${card}`,
+    suggestBuild: (card: string) => `${card} jest gotowy — można budować`,
+    multiTitle: 'Co zmienia się przy kilku graczach',
+    multiSteps: [
+      'W dwie do czterech osób każdy zapełnia własne 16 pól — jednocześnie, nikt nie czeka na swoją kolej.',
+      'Zamiast talii budowniczy (👑) ogłasza surowiec dla wszystkich; korona przechodzi po każdej rundzie.',
+      'Karty, które przy cudzym ogłoszeniu wymieniają lub przyjmują surowiec, działają tylko wtedy — jako budowniczy nie dostajesz nic. W solo twój wybór z talii zawsze liczył się jako cudzy.',
+      'Cztery karty wchodzą do gry tylko z innymi graczami (z Fortune jeszcze trzy) — potrzebują sąsiadów.',
+      'Monumenty pozostają tajne: na jednym urządzeniu wszyscy potwierdzają, że odwracają wzrok, na własnym urządzeniu nikt inny go nie widzi.',
+      'Partia kończy się, gdy wszyscy zamkną; wygrywa najwyższy wynik, przy remisie ten, kto rzadziej był budowniczym.',
+      'Tylko przy kilku graczach są jeszcze tryb ratusza i zasada jaskini.'
+    ],
+    steps: {
+      welcome: {
+        title: '4 × 4 pola',
+        body: 'W każdej rundzie dostajesz jeden surowiec. Gdy surowce na planszy pasują do wzoru karty, możesz ją zbudować.',
+        mp: 'W dwie do czterech osób każdy zapełnia własną planszę — jednocześnie, na jednym urządzeniu albo każdy na swoim.'
+      },
+      monument: {
+        title: 'Wybierz monument',
+        body: 'Dostajesz dwa monumenty i zatrzymujesz jeden. Punktuje tylko wtedy, gdy skończysz go do końca partii.',
+        mp: 'Tam pozostaje tajny: na jednym urządzeniu potwierdzasz, że wszyscy odwracają wzrok, na własnym nikt inny go nie zobaczy.'
+      },
+      seed: {
+        title: 'Połóż nasiono',
+        body: 'Połóż nasiono na wolnym polu. Jeśli później je zabudujesz, wybierzesz dodatkowo darmowy surowiec.',
+        mp: 'Wszyscy kładą nasiono jednocześnie, każdy na swojej planszy.'
+      },
+      select: {
+        title: 'Zaznacz pola',
+        body: 'Dotknij dokładnie tych pól, które tworzą wzór karty — ani więcej, ani mniej. Obrót i odbicie są zawsze dozwolone.',
+        mp: 'Dokładnie tak jak tutaj.'
+      },
+      target: {
+        title: 'Wybierz miejsce',
+        body: 'Dotknij pola, na którym ma stanąć karta. Musi to być jedno z zaznaczonych pól — te surowce zostają zużyte.',
+        mp: 'Dokładnie tak jak tutaj; pojedyncze karty pozwalają zamiast tego na dowolne wolne pole.'
+      },
+      train: {
+        title: 'Przystanek u ciebie',
+        body: 'Zamiast kłaść możesz oddać surowiec albo wymienić go na ładunek — potrzebujesz do tego właściwej karty przy trasie.',
+        mp: 'Ładunek jest jawny: to, co oddasz, ktoś inny może zabrać po drodze.'
+      },
+      swap: {
+        title: 'Wymiana zamiast położenia',
+        body: 'Jedna z twoich kart pozwala wymienić ten surowiec na inny. Wymieniony kładziesz normalnie.',
+        mp: 'Działa to tylko przy cudzym ogłoszeniu. W solo twój wybór z talii liczy się jako cudzy — jako budowniczy przy kilku graczach nie możesz wymieniać.'
+      },
+      offer: {
+        title: 'Surowiec z talii',
+        body: 'Trzy karty leżą odkryte. Wybrana wędruje zakryta pod talię, a na wierzch przychodzi nowa — liczenie kart się opłaca.',
+        mp: 'Tam nie ma talii: budowniczy (👑) ogłasza jeden surowiec dla wszystkich, potem korona przechodzi dalej.'
+      },
+      place: {
+        title: 'Połóż surowiec',
+        body: 'Dotknij go lub przeciągnij na wolne pole. Do «Gotowe» możesz go jeszcze przesunąć.',
+        mp: 'Wszyscy dostają ten sam surowiec i kładą jednocześnie.'
+      },
+      build: {
+        title: 'Budowanie',
+        body: '«🔨 Buduj» otwiera tryb budowania. W rundzie możesz budować tyle razy, ile wzorów zdołasz złożyć.',
+        mp: 'Dokładnie tak jak tutaj — każdy buduje tylko na własnej planszy.'
+      },
+      complete: {
+        title: 'Zamknięcie',
+        body: 'Nie ma wolnego pola i nie ma co budować? Wtedy zamykasz i zaczyna się podliczanie.',
+        mp: 'Partia kończy się dopiero, gdy wszyscy zamknęli; kto skończył, nie dostaje już surowców.'
+      },
+      done: {
+        title: 'Zakończ rundę',
+        body: '«✓ Gotowe» zamyka twoją rundę — położony surowiec zostaje na stałe.',
+        mp: 'Runda zmienia się dopiero, gdy wszyscy skończą; wtedy korona przechodzi dalej.'
+      }
+    }
+  },
+
   points: 'punktów',
   defaultPlayer: (n: number) => `Gracz ${n}`,
   needLocalSeat: 'Co najmniej jedno miejsce musi zostać na tym urządzeniu.',
