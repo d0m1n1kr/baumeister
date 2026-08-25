@@ -68,6 +68,7 @@ export const fr: Translation = {
   decline: 'Refuser',
 
   expansions: 'Extensions',
+  coinIcon: '🪙',
   coins: 'Pièces',
   coinSwap: 'Pièce : autre ressource',
   coinSwapHint: 'Paie 1 pièce et prends n’importe quelle autre ressource',

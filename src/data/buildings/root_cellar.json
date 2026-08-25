@@ -35,5 +35,18 @@
   "effects": [
     "coinOnConstruct"
   ],
-  "art": "root_cellar.svg"
+  "art": "root_cellar.svg",
+  "themes": {
+    "mars": {
+      "name": {
+        "de": "Vorratsbunker",
+        "en": "Storage Bunker"
+      },
+      "text": {
+        "de": "Beim Bau: +1 Energiezelle. Bei der Endwertung: Für je 1 Energiezelle versorgt der Vorratsbunker alle Habitate einer Zeile oder Spalte.",
+        "en": "On construct: gain 1 power cell. At game end: for 1 power cell each, supplies all habitats in one row or column."
+      },
+      "art": "mars_root_cellar.svg"
+    }
+  }
 }

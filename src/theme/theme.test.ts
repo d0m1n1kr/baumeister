@@ -3,10 +3,12 @@ import { allCards, artBySvgName } from '../data';
 import { pickTheme, THEME_RESOURCES } from './index';
 
 describe('Mars-Theme: Vollständigkeit', () => {
-  const themed = allCards.filter((c) => c.set === 'base' || c.set === 'internal');
+  const themed = allCards.filter(
+    (c) => c.set === 'base' || c.set === 'internal' || c.set === 'fortune'
+  );
 
-  it('deckt alle Basis- und internen Karten ab (Name, Text, Artwork de+en)', () => {
-    expect(themed.length).toBe(42);
+  it('deckt alle Basis-, internen und Fortune-Karten ab (Name, Text, Artwork de+en)', () => {
+    expect(themed.length).toBe(64);
     for (const card of themed) {
       const mars = card.themes?.mars;
       expect(mars, `${card.id}: themes.mars fehlt`).toBeTruthy();
@@ -23,8 +25,8 @@ describe('Mars-Theme: Vollständigkeit', () => {
     for (const card of themed) {
       const text = card.themes!.mars.text;
       for (const [lang, forbidden] of [
-        ['de', [/Hütte/, /gefüttert/, /füttert/i, /\bStadt\b/, /Gebäude/]],
-        ['en', [/cottage/i, /\bfed\b/i, /\btown\b/i, /building/i]]
+        ['de', [/Hütte/, /gefüttert/, /füttert/i, /\bStadt\b/, /Gebäude/, /Münze/, /Truhe/]],
+        ['en', [/cottage/i, /\bfed\b/i, /\btown\b/i, /building/i, /\bcoins?\b/i, /\bchest\b/i]]
       ] as const) {
         for (const re of forbidden) {
           expect(text[lang]!, `${card.id} (${lang}): "${re}" übrig`).not.toMatch(re);

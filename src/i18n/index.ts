@@ -5,7 +5,7 @@
 // Spielstand und Mehrgeräte-Sitzung überleben den Reload ohnehin.
 
 import type { CardDef } from '../engine/types';
-import { theme, themedResourceNames } from '../theme';
+import { theme, themedResourceNames, themedStrings } from '../theme';
 import { de } from './de';
 import { en } from './en';
 import { fr } from './fr';
@@ -69,6 +69,19 @@ if (typeof document !== 'undefined') {
 {
   const themed = themedResourceNames(lang);
   if (themed) t.resourceNames = { ...t.resourceNames, ...themed };
+  // UI-Texte des Themes (Münzen → Energiezellen usw.): sets und help werden
+  // schlüsselweise gemischt, alles andere ersetzt den Eintrag direkt.
+  const strings = themedStrings(lang);
+  if (strings) {
+    const target = t as unknown as Record<string, unknown>;
+    for (const [key, value] of Object.entries(strings)) {
+      if (key === 'sets' || key === 'help') {
+        Object.assign(target[key] as Record<string, unknown>, value);
+      } else {
+        target[key] = value;
+      }
+    }
+  }
 }
 
 /** Umschalter: Wahl speichern und mit der neuen Sprache neu laden. */

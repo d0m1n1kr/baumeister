@@ -33,5 +33,18 @@
   "effects": [
     "masonsGuild"
   ],
-  "art": "masons_guild.svg"
+  "art": "masons_guild.svg",
+  "themes": {
+    "mars": {
+      "name": {
+        "de": "Druckergilde",
+        "en": "Printers' Guild"
+      },
+      "text": {
+        "de": "3 Punkte. Beim Bau: Gib beliebig viele Energiezellen aus und baue je Zelle 1 weiteres, unterschiedliches Modul aus dem Vorrat.",
+        "en": "3 points. On construct: spend any number of power cells and construct that many unique modules."
+      },
+      "art": "mars_masons_guild.svg"
+    }
+  }
 }

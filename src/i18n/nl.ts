@@ -68,6 +68,7 @@ export const nl: Translation = {
   decline: 'Afwijzen',
 
   expansions: 'Uitbreidingen',
+  coinIcon: '🪙',
   coins: 'Munten',
   coinSwap: 'Munt: andere grondstof',
   coinSwapHint: 'Betaal 1 munt en neem een willekeurige andere grondstof',

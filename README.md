@@ -28,8 +28,9 @@ their own device.
   regolith/iron/titanium/food/ice (same colors), the boards turn to regolith,
   and the railway becomes a **transit tube** with airlocks and a cargo capsule.
   Since the game state is theme-agnostic, players in one multi-device game can
-  each use their own theme. Switch via the 🎨 picker; Fortune keeps its classic
-  look for now.
+  each use their own theme. Fortune and Tiny Trees are themed too:
+  coins become power cells, the chest a battery, seeds become spores that grow
+  into lichen. Switch via the 🎨 picker.
 - **8 languages:** German, English, French, Spanish, Italian, Dutch, Portuguese,
   Polish — auto-selected from the browser language, overridable via the 🌐 switcher
   (setup and join screens). All rule error messages are translated too; card texts

@@ -396,7 +396,7 @@
       {@const chestCap = 4 + (p.monument?.built && (catalog[p.monument.card].effects ?? []).includes('coinSlot') ? 1 : 0)}
       <span class="chest" title={t.coins}>
         {#each Array.from({ length: chestCap }) as _, i}
-          <span class="slot" class:filled={i < p.coins}>{i < p.coins ? '🪙' : ''}</span>
+          <span class="slot" class:filled={i < p.coins}>{i < p.coins ? t.coinIcon : ''}</span>
         {/each}
       </span>
     {/if}
@@ -513,7 +513,7 @@
               <button onpointerup={() => (factoryDialog = true)}>⚙ {t.factorySwap}</button>
             {/if}
             {#if coinsActive && (!isMB || st.config.solo) && !p.pendingLocked && p.pending === namedResource && p.coins >= 1}
-              <button onpointerup={() => (coinDialog = true)}>🪙 {t.coinSwap}</button>
+              <button onpointerup={() => (coinDialog = true)}>{t.coinIcon} {t.coinSwap}</button>
             {/if}
             {#if st.config.systems.cavern && !isMB && (p.cavernUsed ?? 0) < 2}
               <button onpointerup={() => showError(game.dispatch({ t: 'cavern', player }))}>
@@ -645,7 +645,7 @@
         </div>
       {:else if choice?.t === 'masonsGuild'}
         <div class="choice">
-          <span class="choiceTitle">{t.masonsTitle} ({p.coins} 🪙)</span>
+          <span class="choiceTitle">{t.masonsTitle} ({p.coins} {t.coinIcon})</span>
           {#if mode !== 'masonsPlace'}
             <div class="matches">
               {#each st.config.activeCards.filter((id) => !choice.picked.includes(id)) as id}
@@ -685,7 +685,7 @@
           <div class="btnRow">
             {#if p.coins >= 3}
               <button class="primary" onpointerup={() => showError(game.dispatch({ t: 'resolveCathedral', player, pay: true }))}>
-                🪙 {t.cathedralPay}
+                {t.coinIcon} {t.cathedralPay}
               </button>
             {/if}
             {#if grayCard}
@@ -866,7 +866,7 @@
         <button class="primary" onpointerup={() => {
           showError(game.dispatch({ t: 'museumSell', player, square: warehouseSquare! }));
           warehouseSquare = null;
-        }}>🪙 {t.museumSell}</button>
+        }}>{t.coinIcon} {t.museumSell}</button>
       {/if}
       {#if whEffects.includes('warehouse') && p.pending != null && (wh.stored?.length ?? 0) < 3}
         <button class="primary" onpointerup={() => {

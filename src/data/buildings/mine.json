@@ -28,5 +28,18 @@
   "effects": [
     "coinOnConstruct"
   ],
-  "art": "mine.svg"
+  "art": "mine.svg",
+  "themes": {
+    "mars": {
+      "name": {
+        "de": "Tiefbohrmine",
+        "en": "Deep Mine"
+      },
+      "text": {
+        "de": "Beim Bau: +1 Energiezelle.",
+        "en": "On construct: gain 1 power cell."
+      },
+      "art": "mars_mine.svg"
+    }
+  }
 }

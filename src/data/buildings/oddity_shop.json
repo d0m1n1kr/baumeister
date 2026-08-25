@@ -38,5 +38,18 @@
   "effects": [
     "oddityShop"
   ],
-  "art": "oddity_shop.svg"
+  "art": "oddity_shop.svg",
+  "themes": {
+    "mars": {
+      "name": {
+        "de": "Meteoritenladen",
+        "en": "Meteorite Shop"
+      },
+      "text": {
+        "de": "2 Punkte. Sagt ein anderer Spieler ein Material an, darfst du es hier ablegen (max. 1). Ein neuer Baumeister darf vor seiner Ansage 1 Material aus einem fremden Meteoritenladen auf sein Brett nehmen und erhält dafür 1 Energiezelle.",
+        "en": "2 points. Each Meteorite Shop can store 1 resource named by another player. At the start of their turn as Master Builder, other players may take this resource, place it on their board, and gain 1 power cell."
+      },
+      "art": "mars_oddity_shop.svg"
+    }
+  }
 }

@@ -29,5 +29,18 @@
     "handler": "schoolhouse"
   },
   "effects": [],
-  "art": "schoolhouse.svg"
+  "art": "schoolhouse.svg",
+  "themes": {
+    "mars": {
+      "name": {
+        "de": "Ausbildungsmodul",
+        "en": "Training Module"
+      },
+      "text": {
+        "de": "2 Punkte, wenn an ein versorgtes Habitat angrenzend; +2 Punkte, wenn du am Ende mindestens so viele Energiezellen hast wie der Spieler rechts von dir.",
+        "en": "2 points if adjacent to a supplied habitat; +2 if you have at least as many power cells as the player on your right."
+      },
+      "art": "mars_schoolhouse.svg"
+    }
+  }
 }

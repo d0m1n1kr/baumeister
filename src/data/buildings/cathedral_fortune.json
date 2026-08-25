@@ -41,5 +41,18 @@
   "effects": [
     "cathedralTransform"
   ],
-  "art": "cathedral_fortune.svg"
+  "art": "cathedral_fortune.svg",
+  "themes": {
+    "mars": {
+      "name": {
+        "de": "Solardom",
+        "en": "Solar Dome"
+      },
+      "text": {
+        "de": "7 Punkte, wenn nicht an einen anderen Solardom angrenzend. Beim Bau: Zahle 3 Energiezellen — sonst wird stattdessen das graue Modul der Partie auf dem Feld gebaut (mit dessen Bau-Effekt).",
+        "en": "7 points if not adjacent to another Solar Dome. On construct: spend 3 power cells; if you don't, remove the Solar Dome and construct the game's gray module in that square instead."
+      },
+      "art": "mars_cathedral_fortune.svg"
+    }
+  }
 }

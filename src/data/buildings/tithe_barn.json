@@ -34,5 +34,18 @@
     "type": "none"
   },
   "effects": [],
-  "art": "tithe_barn.svg"
+  "art": "tithe_barn.svg",
+  "themes": {
+    "mars": {
+      "name": {
+        "de": "Rationslager",
+        "en": "Ration Store"
+      },
+      "text": {
+        "de": "Versorgt alle angrenzenden Habitate. Zusätzlich versorgt es beliebige Habitate für 1 Energiezelle je 2 Habitate.",
+        "en": "Supplies all adjacent habitats. Additionally supplies any habitats for 1 power cell per 2 habitats."
+      },
+      "art": "mars_tithe_barn.svg"
+    }
+  }
 }
