@@ -7,7 +7,7 @@
   import { suggestBuild, suggestPlacement } from '../engine/advice';
   import { hasFortIronweed, trainStopPlayer } from '../engine/game';
   import type { CardDef, Resource } from '../engine/types';
-  import { cornerRotation, RESOURCE_CSS } from './helpers';
+  import { cornerRotation, resLabel, RESOURCE_CSS } from './helpers';
   import { sfx } from './sound';
   import { learn } from './learn.svelte';
   import { cardName, cardText, t, translateError } from '../i18n';
@@ -530,7 +530,7 @@
                 style="background: {RESOURCE_CSS[r]}"
                 title={t.resourceNames[r]}
                 onpointerup={() => showError(game.dispatch({ t: 'soloPick', index: i }))}
-              ><span>{t.resourceNames[r]}</span></button>
+              ><span class={resLabel(t.resourceNames[r])} data-res={r}>{t.resourceNames[r]}</span></button>
             {/each}
           </div>
           <span class="deckCount">{t.soloDeckCount(st.soloDeck?.length ?? 0)}</span>
@@ -571,7 +571,9 @@
               onpointerup={chipUp}
               onpointercancel={() => (drags[player] = undefined)}
             >
-              {t.resourceNames[p.pending]}
+              <span class={resLabel(t.resourceNames[p.pending])} data-res={p.pending}>
+                {t.resourceNames[p.pending]}
+              </span>
             </div>
             {#if factoryAvailable}
               <button onpointerup={() => (factoryDialog = true)}>⚙ {t.factorySwap}</button>
@@ -908,7 +910,7 @@
             oddityFrom = { player: target.player, square: target.square };
             oddityDialog = false;
             mode = 'oddityPlace';
-          }}>{target.name}</button>
+          }}><span class={resLabel(target.name)} data-res={target.resource}>{target.name}</span></button>
         {/each}
       </div>
       <button onpointerup={() => (oddityDialog = false)}>{t.cancel}</button>
@@ -930,7 +932,9 @@
         <span class="pickText">{t.museumContents}</span>
         <div class="btnRow">
           {#each wh.stored as r}
-            <span class="chip" style="background: {RESOURCE_CSS[r]}">{t.resourceNames[r]}</span>
+            <span class="chip" style="background: {RESOURCE_CSS[r]}">
+              <span class={resLabel(t.resourceNames[r])} data-res={r}>{t.resourceNames[r]}</span>
+            </span>
           {/each}
         </div>
       {/if}
@@ -953,7 +957,7 @@
             <button class="chip" style="background: {RESOURCE_CSS[r]}" onpointerup={() => {
               showError(game.dispatch({ t: 'warehouseSwap', player, square: warehouseSquare!, storedIndex: i }));
               warehouseSquare = null;
-            }}>{t.resourceNames[r]}</button>
+            }}><span class={resLabel(t.resourceNames[r])} data-res={r}>{t.resourceNames[r]}</span></button>
           {/each}
         </div>
       {/if}
@@ -1065,7 +1069,7 @@
     .corner:not(.wide) header { justify-content: center; }
     .boardWrap { width: min(26vh, 40vw); }
     .panel button { font-size: 12px; padding: 6px 9px; }
-    .chip { width: 46px; height: 46px; }
+    .chip { min-width: 46px; height: 46px; border-radius: 23px; padding: 0 8px; }
   }
   .hint {
     position: absolute;
@@ -1122,16 +1126,15 @@
   }
   .moveHint { font-size: 11px; color: var(--text-dim); }
   .chip {
-    width: 56px;
+    /* Kreis bei kurzen Namen, Kapsel bei langen — der Text bleibt einzeilig */
+    min-width: 56px;
     height: 56px;
-    border-radius: 50%;
+    padding: 0 10px;
+    border-radius: 28px;
     border: 3px solid rgba(255, 255, 255, 0.5);
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
     display: grid;
     place-items: center;
-    font-size: 10px;
-    font-weight: 700;
-    color: rgba(0, 0, 0, 0.75);
     touch-action: none;
     cursor: grab;
   }
@@ -1216,20 +1219,15 @@
   .pickText { font-size: 12px; color: var(--text-dim); margin: 0; text-align: center; }
   .offer { display: flex; gap: 10px; justify-content: center; }
   .offerChip {
-    width: 56px;
+    /* Kreis bei kurzen Namen, Kapsel bei langen — der Text bleibt einzeilig */
+    min-width: 56px;
     height: 56px;
-    border-radius: 50%;
+    border-radius: 28px;
     border: 2px solid rgba(0, 0, 0, 0.35);
     display: grid;
     place-items: center;
-    padding: 0;
+    padding: 0 10px;
     line-height: 1;
-  }
-  .offerChip span {
-    font-size: 10px;
-    font-weight: 700;
-    color: rgba(0, 0, 0, 0.75);
-    text-shadow: 0 1px 1px rgba(255, 255, 255, 0.3);
   }
   .deckCount { font-size: 11px; color: var(--text-dim); }
 </style>

@@ -88,6 +88,35 @@ try {
   if (chests !== 2) fail(`Erwartet 2 Münz-Truhen (Fortune aktiv), gefunden: ${chests}`);
   console.log('✓ Setup (mit Fortune: Truhen sichtbar)');
 
+  // Marken-Beschriftung: Lange Namen (Themen und andere Sprachen liefern sie)
+  // dürfen nicht über die Marke hinaushängen — sie wächst zur Kapsel, der Text
+  // bleibt einzeilig. Und auf dunklem Material muss der Text hell sein.
+  const chipFit = await page.evaluate(() => {
+    const label = document.querySelector('.picker .resLabel');
+    const chip = label.closest('.chip');
+    const before = chip.getBoundingClientRect().width;
+    label.textContent = 'Drachenschuppenglas';
+    label.className = 'resLabel xlong';
+    const ink = (res) => {
+      const el = document.querySelector(`.picker .resLabel[data-res="${res}"]`);
+      return getComputedStyle(el).color;
+    };
+    return {
+      before,
+      after: chip.getBoundingClientRect().width,
+      clipped: label.scrollWidth > label.clientWidth + 1,
+      lines: label.getClientRects().length,
+      woodInk: ink('wood'),
+      stoneInk: ink('stone')
+    };
+  });
+  if (chipFit.clipped) fail('Marke: langer Name wird abgeschnitten');
+  if (chipFit.after <= chipFit.before) fail('Marke: wächst bei langem Namen nicht mit');
+  if (chipFit.lines !== 1) fail(`Marke: Beschriftung bricht um (${chipFit.lines} Zeilen)`);
+  if (chipFit.woodInk !== 'rgb(255, 255, 255)') fail(`Marke: Holz-Text nicht hell (${chipFit.woodInk})`);
+  if (chipFit.stoneInk === 'rgb(255, 255, 255)') fail('Marke: Stein-Text sollte dunkel sein');
+  console.log('✓ Marken-Beschriftung: einzeilig, ohne Überlauf, Kontrast je Material');
+
   // Hütten-Muster für Spieler 0: Weizen(0,1), Ziegel(1,0), Glas(1,1)
   await playRound('Weizen', 1);
 
