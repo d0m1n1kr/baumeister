@@ -8,6 +8,33 @@ their own device.
 
 **▶ Play: [d0m1n1kr.github.io/tiny-towns](https://d0m1n1kr.github.io/tiny-towns/)**
 
+## In the game
+
+**One tablet, four towns.** Everyone plays at the same time; each corner is
+rotated toward its player, and the round's building cards sit in the middle.
+The Master Builder (👑) has named wheat — everyone places it on their own board.
+
+![Four players around one tablet](docs/screenshots/tablet-table.png)
+
+**Everyone on their own device — no server.** The host opens a room; the others
+join by scanning the QR code with the normal camera app (or typing the
+6-character code). Seats can be mixed: some players on the host tablet, others
+on their own phone.
+
+| Host opens a room | Guest on their phone |
+| --- | --- |
+| <img src="docs/screenshots/lan-lobby.png" alt="Host lobby with QR code and seat list" width="420"> | <img src="docs/screenshots/lan-guest-phone.png" alt="Guest view on a phone: own board large, opponents as mini boards" width="200"> |
+
+On a phone you get your own board big, with the opponents shown as compact
+mini boards above — and your monument stays genuinely secret, because nobody
+else's device ever receives it.
+
+**The host still sees the whole table.** Here seat 1 is played on the host
+tablet while Anna and Ben are on their phones — the state is identical on every
+device (the host runs the engine and broadcasts it).
+
+![Host table with two remote players](docs/screenshots/lan-host-table.png)
+
 ## Features
 
 - **Fully automated rules:** pattern validation (rotation + mirroring), all building

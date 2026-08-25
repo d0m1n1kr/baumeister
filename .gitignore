@@ -9,3 +9,5 @@ coverage/
 *.png
 !public/**/*.png
 !icons/**/*.png
+# README-Bilder sind gewollt im Repo:
+!docs/screenshots/**/*.png
