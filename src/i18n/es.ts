@@ -7,6 +7,7 @@ export const es: Translation = {
   themeLabel: 'Tema',
   themeClassic: 'Pueblo del bosque',
   themeMars: 'Colonia marciana',
+  themeFantasy: 'Reino de dragones',
   language: 'Idioma',
   appTitle: 'Tiny Towns',
   newGame: 'Nueva partida',

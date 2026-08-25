@@ -42,6 +42,17 @@
         "en": "1 point for each unique module type in your colony (monuments excluded)."
       },
       "art": "mars_archive_of_the_second_age.svg"
+    },
+    "fantasy": {
+      "name": {
+        "de": "Bibliothek der Erzmagier",
+        "en": "Library of the Archmages"
+      },
+      "text": {
+        "de": "1 Punkt für jeden einzigartigen Bauwerkstyp in deinem Weiler (ohne Monumente).",
+        "en": "1 point for each unique structure type in your hamlet (monuments excluded)."
+      },
+      "art": "fantasy_archive_of_the_second_age.svg"
     }
   }
 }

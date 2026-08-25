@@ -45,6 +45,17 @@
         "en": "Supplies all habitat modules in the 8 squares surrounding it."
       },
       "art": "mars_granary.svg"
+    },
+    "fantasy": {
+      "name": {
+        "de": "Erntehalle",
+        "en": "Harvest Hall"
+      },
+      "text": {
+        "de": "Verpflegt alle Katen auf den 8 Feldern rund um die Erntehalle.",
+        "en": "Provisions all crofts in the 8 squares surrounding it."
+      },
+      "art": "fantasy_granary.svg"
     }
   }
 }

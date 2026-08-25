@@ -44,6 +44,17 @@
         "en": "Scores by number of modules in your colony when constructed: 1→1 … 5→5, 6+→8."
       },
       "art": "mars_shrine_of_the_elder_tree.svg"
+    },
+    "fantasy": {
+      "name": {
+        "de": "Schrein des Weltenbaums",
+        "en": "Shrine of the World Tree"
+      },
+      "text": {
+        "de": "Punkte nach Zahl der Bauwerke in deinem Weiler beim Bau des Schreins: 1→1 … 5→5, 6+→8.",
+        "en": "Scores by number of structures in your hamlet when raised: 1→1 … 5→5, 6+→8."
+      },
+      "art": "fantasy_shrine_of_the_elder_tree.svg"
     }
   }
 }

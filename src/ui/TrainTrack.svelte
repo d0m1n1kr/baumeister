@@ -359,4 +359,60 @@
     background: #4a3227;
     border-color: #8a5a3e;
   }
+
+  /* ---------- Theme: Drachenreich — Flugroute statt Gleis ---------- */
+  /* Flugpfad: gestrichelte Spur statt Schienen */
+  :global([data-theme='fantasy']) .track {
+    background: none;
+    border-top: 2px dashed rgba(232, 198, 91, 0.55);
+    height: 2px;
+    opacity: 0.9;
+  }
+  /* Drachenkopf/-hals statt Lok (gezeichnet, damit die Richtung stimmt) */
+  :global([data-theme='fantasy']) .loco {
+    font-size: 0;
+    width: 30px;
+    height: 20px;
+    margin-bottom: 0;
+    position: relative;
+    background: linear-gradient(#7e9d55, #4c6b34);
+    border: 2px solid #2f2418;
+    border-radius: 14px 6px 10px 4px;
+  }
+  /* Schnauze + Auge + Flügel */
+  :global([data-theme='fantasy']) .loco::before {
+    content: '';
+    position: absolute;
+    left: -6px;
+    top: 3px;
+    width: 12px;
+    height: 9px;
+    background: #7e9d55;
+    border: 2px solid #2f2418;
+    border-radius: 6px 2px 2px 6px;
+  }
+  :global([data-theme='fantasy']) .loco::after {
+    content: '';
+    position: absolute;
+    right: 6px;
+    top: -9px;
+    width: 16px;
+    height: 12px;
+    background: #8e6bc4;
+    border: 2px solid #2f2418;
+    border-radius: 10px 10px 2px 2px;
+  }
+  /* Traglasten: Netze unter dem Drachen */
+  :global([data-theme='fantasy']) .car {
+    background: rgba(163, 112, 63, 0.5);
+    border-color: #6b4a2f;
+    border-radius: 3px 3px 9px 9px;
+  }
+  /* Wolkenbänke statt Tunnelportale */
+  :global([data-theme='fantasy']) .tunnel,
+  :global([data-theme='fantasy']) .portal {
+    background: #4b4270;
+    border-color: #6f639b;
+    border-radius: 999px 999px 40% 40%;
+  }
 </style>

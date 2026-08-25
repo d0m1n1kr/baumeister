@@ -45,6 +45,17 @@
         "en": "You may place all future modules on any empty square."
       },
       "art": "mars_obelisk_of_the_crescent.svg"
+    },
+    "fantasy": {
+      "name": {
+        "de": "Obelisk der Mondmagie",
+        "en": "Obelisk of Moon Magic"
+      },
+      "text": {
+        "de": "Alle deine künftigen Bauwerke dürfen auf einem beliebigen freien Feld errichtet werden.",
+        "en": "You may raise all future structures on any empty square."
+      },
+      "art": "fantasy_obelisk_of_the_crescent.svg"
     }
   }
 }

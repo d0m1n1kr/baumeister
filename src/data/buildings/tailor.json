@@ -47,6 +47,17 @@
         "en": "1 point, plus 1 point for each yellow module in the 4 center squares."
       },
       "art": "mars_tailor.svg"
+    },
+    "fantasy": {
+      "name": {
+        "de": "Gewandmeisterei",
+        "en": "Robemaker's"
+      },
+      "text": {
+        "de": "1 Punkt, plus 1 Punkt für jedes gelbe Bauwerk auf den 4 Mittelfeldern deines Weilers.",
+        "en": "1 point, plus 1 point for each yellow structure in the 4 center squares."
+      },
+      "art": "fantasy_tailor.svg"
     }
   }
 }

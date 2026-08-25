@@ -42,6 +42,17 @@
         "en": "2 points. On construct: gain 2 power cells if you have exactly 1 power cell."
       },
       "art": "mars_gamblers_den.svg"
+    },
+    "fantasy": {
+      "name": {
+        "de": "Würfelhöhle",
+        "en": "Dice Den"
+      },
+      "text": {
+        "de": "2 Punkte. Beim Bau: Hast du genau 1 Mana, erhältst du 2 Mana dazu.",
+        "en": "2 points. On raising: gain 2 mana if you have exactly 1 mana."
+      },
+      "art": "fantasy_gamblers_den.svg"
     }
   }
 }

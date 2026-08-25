@@ -46,6 +46,17 @@
         "en": "3 points. On construction, immediately place a module from the supply on an empty square."
       },
       "art": "mars_grove_university.svg"
+    },
+    "fantasy": {
+      "name": {
+        "de": "Magierakademie im Hain",
+        "en": "Mage Academy of the Grove"
+      },
+      "text": {
+        "de": "3 Punkte. Beim Bau: Errichte sofort ein Bauwerk aus dem Vorrat auf einem freien Feld deines Weilers.",
+        "en": "3 points. On raising, immediately place a structure from the supply on an empty square."
+      },
+      "art": "fantasy_grove_university.svg"
     }
   }
 }

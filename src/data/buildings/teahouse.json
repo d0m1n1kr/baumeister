@@ -48,6 +48,17 @@
         "en": "1 point. On construct: gain 1 power cell for each unique module type in the same row or column (not both, max 3)."
       },
       "art": "mars_teahouse.svg"
+    },
+    "fantasy": {
+      "name": {
+        "de": "Kräuterstube",
+        "en": "Herb Parlour"
+      },
+      "text": {
+        "de": "1 Punkt. Beim Bau: +1 Mana je einzigartigem Bauwerkstyp in seiner Zeile ODER Spalte (nicht beide, max. 3).",
+        "en": "1 point. On raising: gain 1 mana for each unique structure type in the same row or column (not both, max 3)."
+      },
+      "art": "fantasy_teahouse.svg"
     }
   }
 }

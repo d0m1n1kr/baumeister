@@ -53,6 +53,17 @@
         "en": "7 points if not adjacent to another Solar Dome. On construct: spend 3 power cells; if you don't, remove the Solar Dome and construct the game's gray module in that square instead."
       },
       "art": "mars_cathedral_fortune.svg"
+    },
+    "fantasy": {
+      "name": {
+        "de": "Hochdom",
+        "en": "High Dome"
+      },
+      "text": {
+        "de": "7 Punkte, wenn nicht an einen anderen Hochdom angrenzend. Beim Bau: Zahle 3 Mana — sonst wird stattdessen das graue Bauwerk der Partie auf dem Feld errichtet (mit dessen Bau-Effekt).",
+        "en": "7 points if not adjacent to another High Dome. On raising: spend 3 mana; if you don't, remove the High Dome and raise the game's grey structure in that square instead."
+      },
+      "art": "fantasy_cathedral_fortune.svg"
     }
   }
 }

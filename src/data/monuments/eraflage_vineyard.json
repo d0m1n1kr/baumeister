@@ -45,6 +45,17 @@
         "en": "9 points if supplied. −2 points for each unique module type in the same row and column (does not count itself)."
       },
       "art": "mars_eraflage_vineyard.svg"
+    },
+    "fantasy": {
+      "name": {
+        "de": "Eraflage-Rebgut",
+        "en": "Eraflage Vineyard"
+      },
+      "text": {
+        "de": "9 Punkte, wenn verpflegt. −2 Punkte je einzigartigem Bauwerkstyp in seiner Zeile und Spalte (zählt sich selbst nicht).",
+        "en": "9 points if provisioned. −2 points for each unique structure type in the same row and column (does not count itself)."
+      },
+      "art": "fantasy_eraflage_vineyard.svg"
     }
   }
 }

@@ -39,6 +39,17 @@
         "en": "This player's special module stays secret until it is constructed."
       },
       "art": "mars_hidden_monument.svg"
+    },
+    "fantasy": {
+      "name": {
+        "de": "Versiegeltes Monument",
+        "en": "Sealed Monument"
+      },
+      "text": {
+        "de": "Das Monument dieses Spielers bleibt geheim, bis es gebaut wird.",
+        "en": "This player's monument stays secret until it is raised."
+      },
+      "art": "fantasy_hidden_monument.svg"
     }
   }
 }

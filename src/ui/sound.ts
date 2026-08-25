@@ -48,6 +48,48 @@ function tone(
   osc.stop(t0 + dur + 0.02);
 }
 
+
+/** Gefiltertes Rauschen — für Luft, Dampf und Flügelschläge (Oszillatoren
+ *  allein klingen dafür zu „sauber"). */
+function noise(at: number, dur: number, vol = 0.2, cutoff = 800): void {
+  const ac = ctx!;
+  const frames = Math.max(1, Math.floor(ac.sampleRate * dur));
+  const buf = ac.createBuffer(1, frames, ac.sampleRate);
+  const data = buf.getChannelData(0);
+  for (let i = 0; i < frames; i++) data[i] = Math.random() * 2 - 1;
+  const src = ac.createBufferSource();
+  src.buffer = buf;
+  const filter = ac.createBiquadFilter();
+  filter.type = 'lowpass';
+  filter.frequency.value = cutoff;
+  const gain = ac.createGain();
+  const t0 = ac.currentTime + at;
+  gain.gain.setValueAtTime(vol, t0);
+  gain.gain.exponentialRampToValueAtTime(0.0001, t0 + dur);
+  src.connect(filter).connect(gain).connect(master!);
+  src.start(t0);
+  src.stop(t0 + dur + 0.02);
+}
+
+/** Ton mit gleitender Tonhöhe — für Sirenen, Whooshes und Gebrüll. */
+function sweep(
+  at: number, fromHz: number, toHz: number, dur: number,
+  type: OscillatorType = 'sawtooth', vol = 0.25
+): void {
+  const ac = ctx!;
+  const osc = ac.createOscillator();
+  const gain = ac.createGain();
+  osc.type = type;
+  const t0 = ac.currentTime + at;
+  osc.frequency.setValueAtTime(fromHz, t0);
+  osc.frequency.exponentialRampToValueAtTime(Math.max(20, toHz), t0 + dur);
+  gain.gain.setValueAtTime(vol, t0);
+  gain.gain.exponentialRampToValueAtTime(0.0001, t0 + dur);
+  osc.connect(gain).connect(master!);
+  osc.start(t0);
+  osc.stop(t0 + dur + 0.02);
+}
+
 /** Materialklänge: jedes Material hat seine eigene Tonhöhe (Holz tief, Glas hell). */
 const RESOURCE_PITCH: Record<Resource, number> = {
   wood: 220,
@@ -105,6 +147,15 @@ const EFFECTS = {
   /** Eisenbahn: Fahrgeräusch — klassisch Schnaufen, auf dem Mars ein
    *  gleitendes Rohr-Whoosh (~2,5 s). */
   trainMove(): void {
+    if (theme === 'fantasy') {
+      // Flügelschläge: dumpfe Luftstöße im Takt, dazu ein tiefes Rauschen
+      for (let i = 0; i < 6; i++) {
+        const t = i * 0.42;
+        noise(t, 0.26, 0.3, 380);          // Flügel schlägt
+        tone(t + 0.02, 58, 0.2, 'sine', 0.35);
+      }
+      return;
+    }
     if (theme === 'mars') {
       tone(0, 65, 2.2, 'sine', 0.3); // tiefes Rohr-Brummen
       for (let i = 0; i < 8; i++) {
@@ -121,6 +172,13 @@ const EFFECTS = {
   /** Eisenbahn: Einfahrt in den Bahnhof — klassisch Horn, auf dem Mars ein
    *  Docking-Signal mit Verriegelungs-Klack. */
   trainHorn(): void {
+    if (theme === 'fantasy') {
+      // Gebrüll: fallender Sägezahn mit Rauschanteil
+      sweep(0, 320, 90, 0.85, 'sawtooth', 0.22);
+      sweep(0.02, 160, 55, 0.9, 'square', 0.1);
+      noise(0, 0.8, 0.18, 600);
+      return;
+    }
     if (theme === 'mars') {
       tone(0, 880, 0.14, 'sine', 0.3);
       tone(0.2, 660, 0.22, 'sine', 0.3);

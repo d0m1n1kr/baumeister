@@ -51,6 +51,17 @@
         "en": "1 point. When another player names a resource you may immediately place an additional resource of the same type; if you do, gain 1 power cell. Power cells cannot be spent to change either resource."
       },
       "art": "mars_southern_semaphore.svg"
+    },
+    "fantasy": {
+      "name": {
+        "de": "Südliche Signalbake",
+        "en": "Southern Beacon"
+      },
+      "text": {
+        "de": "1 Punkt. Sagt ein anderer Spieler ein Material an, darfst du sofort 1 zusätzliches Material desselben Typs platzieren — dafür +1 Mana. Mana kann keines der beiden Materialien tauschen.",
+        "en": "1 point. When another player names a resource you may immediately place an additional resource of the same type; if you do, gain 1 mana. Mana cannot be spent to change either resource."
+      },
+      "art": "fantasy_southern_semaphore.svg"
     }
   }
 }

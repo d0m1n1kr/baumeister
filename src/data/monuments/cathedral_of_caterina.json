@@ -44,6 +44,17 @@
         "en": "2 points. Your empty squares are worth 0 instead of −1 point."
       },
       "art": "mars_cathedral_of_caterina.svg"
+    },
+    "fantasy": {
+      "name": {
+        "de": "Caterinas Sternenkathedrale",
+        "en": "Caterina's Star Cathedral"
+      },
+      "text": {
+        "de": "2 Punkte. Leere Felder deines Weilers zählen 0 statt −1 Punkt.",
+        "en": "2 points. Your empty squares are worth 0 instead of −1 point."
+      },
+      "art": "fantasy_cathedral_of_caterina.svg"
     }
   }
 }

@@ -7,6 +7,7 @@ export const nl: Translation = {
   themeLabel: 'Thema',
   themeClassic: 'Bosstadje',
   themeMars: 'Marskolonie',
+  themeFantasy: 'Drakenrijk',
   language: 'Taal',
   appTitle: 'Tiny Towns',
   newGame: 'Nieuw spel',

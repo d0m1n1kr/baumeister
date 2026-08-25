@@ -43,6 +43,17 @@
         "en": "2 points for each unique adjacent module type."
       },
       "art": "mars_mandras_palace.svg"
+    },
+    "fantasy": {
+      "name": {
+        "de": "Mandras' Zauberpalast",
+        "en": "Mandras' Sorcerous Palace"
+      },
+      "text": {
+        "de": "2 Punkte für jeden einzigartigen angrenzenden Bauwerkstyp.",
+        "en": "2 points for each unique adjacent structure type."
+      },
+      "art": "fantasy_mandras_palace.svg"
     }
   }
 }

@@ -47,6 +47,17 @@
         "en": "1 point, plus 1 point per module in your largest contiguous group of same-type modules."
       },
       "art": "mars_silva_forum.svg"
+    },
+    "fantasy": {
+      "name": {
+        "de": "Hain der Ältesten",
+        "en": "Grove of the Elders"
+      },
+      "text": {
+        "de": "1 Punkt, plus 1 Punkt für jedes Bauwerk deiner größten zusammenhängenden Gruppe gleicher Bauwerke.",
+        "en": "1 point, plus 1 point per structure in your largest contiguous group of same-type structures."
+      },
+      "art": "fantasy_silva_forum.svg"
     }
   }
 }

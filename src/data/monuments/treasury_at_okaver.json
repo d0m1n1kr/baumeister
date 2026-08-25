@@ -50,6 +50,17 @@
         "en": "1 point for each adjacent habitat. Whenever you fill your battery to 4 power cells, you may construct a habitat on any empty square in your colony."
       },
       "art": "mars_treasury_at_okaver.svg"
+    },
+    "fantasy": {
+      "name": {
+        "de": "Okavers Schatzkammer",
+        "en": "The Treasury at Okaver"
+      },
+      "text": {
+        "de": "1 Punkt je angrenzender Kate. Immer wenn du deinen Manaquell auf 4 Mana füllst, darfst du eine Kate auf einem beliebigen leeren Feld deines Weilers errichten.",
+        "en": "1 point for each adjacent croft. Whenever you fill your mana well to 4 mana, you may raise a croft on any empty square in your hamlet."
+      },
+      "art": "fantasy_treasury_at_okaver.svg"
     }
   }
 }

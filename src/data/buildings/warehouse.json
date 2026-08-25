@@ -48,6 +48,17 @@
         "en": "−1 point per resource on it at game end. Instead of placing, you may store the named resource (max 3) or swap it with a stored one."
       },
       "art": "mars_warehouse.svg"
+    },
+    "fantasy": {
+      "name": {
+        "de": "Vorratsgewölbe",
+        "en": "Storage Vault"
+      },
+      "text": {
+        "de": "−1 Punkt je Material darin am Spielende. Statt zu platzieren darfst du das angesagte Material einlagern (max. 3) oder mit einem eingelagerten tauschen.",
+        "en": "−1 point per resource in it at game end. Instead of placing, you may store the named resource (max 3) or swap it with a stored one."
+      },
+      "art": "fantasy_warehouse.svg"
     }
   }
 }

@@ -44,6 +44,17 @@
         "en": "1 point for each Trade Platform in the same row and column (counting itself once)."
       },
       "art": "mars_market.svg"
+    },
+    "fantasy": {
+      "name": {
+        "de": "Basar",
+        "en": "Bazaar"
+      },
+      "text": {
+        "de": "1 Punkt für jeden Basar in derselben Zeile und Spalte (diesen einmal mitgezählt).",
+        "en": "1 point for each Bazaar in the same row and column (counting itself once)."
+      },
+      "art": "fantasy_market.svg"
     }
   }
 }

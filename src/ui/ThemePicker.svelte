@@ -6,7 +6,8 @@
 
   const NAMES: Record<ThemeId, string> = {
     classic: t.themeClassic,
-    mars: t.themeMars
+    mars: t.themeMars,
+    fantasy: t.themeFantasy
   };
 </script>
 

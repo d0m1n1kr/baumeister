@@ -49,6 +49,17 @@
         "en": "2 points for each module type missing from your colony."
       },
       "art": "mars_the_sky_baths.svg"
+    },
+    "fantasy": {
+      "name": {
+        "de": "Die Wolkenbäder",
+        "en": "The Cloud Baths"
+      },
+      "text": {
+        "de": "2 Punkte für jeden Bauwerkstyp dieser Partie, der in deinem Weiler fehlt.",
+        "en": "2 points for each structure type missing from your hamlet."
+      },
+      "art": "fantasy_the_sky_baths.svg"
     }
   }
 }

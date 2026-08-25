@@ -51,6 +51,17 @@
         "en": "2 points. On construct: place 1 power cell on each of the 4 center squares; occupied squares yield their cell immediately. Constructing on a cell square gains that cell. Leftover cells are removed at game end."
       },
       "art": "mars_caterinas_grotto.svg"
+    },
+    "fantasy": {
+      "name": {
+        "de": "Caterinas Kristallgrotte",
+        "en": "Caterina's Crystal Grotto"
+      },
+      "text": {
+        "de": "2 Punkte. Beim Bau: Lege 1 Mana auf jedes der 4 Mittelfelder — bebaute Felder bringen das Mana sofort. Ein späteres Bauwerk auf einem Mana-Feld bringt dessen Mana. Übriges Mana verfällt am Ende.",
+        "en": "2 points. On raising: place 1 mana on each of the 4 center squares; occupied squares yield their mana immediately. Raising on a mana square gains that mana. Leftover mana is removed at game end."
+      },
+      "art": "fantasy_caterinas_grotto.svg"
     }
   }
 }

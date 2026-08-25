@@ -21,7 +21,7 @@
         <i></i><i><b class="c5"></b></i><i></i><i><b class="c6"></b></i>
         <i><b class="c2"></b></i><i></i><i><b class="c1"></b></i><i></i>
       </div>
-      <div class="title">🏘 Tiny Towns</div>
+      <div class="title"><span class="ico"></span> Tiny Towns</div>
       <div class="credit">v__APP_VERSION__ · Dominik Rössler &amp; Claude</div>
     </div>
     <style>
@@ -41,6 +41,15 @@
         transition: opacity 0.4s ease;
       }
       #splash.done { opacity: 0; }
+      /* Splash je Theme: Symbol, Grundfarbe und Feldfarbe */
+      #splash .ico::before { content: '🏘'; }
+      [data-theme='mars'] #splash { background: #2a1712; }
+      [data-theme='mars'] #splash .board i { background: #d9b08a; }
+      [data-theme='mars'] #splash .ico::before { content: '🛰'; }
+      [data-theme='fantasy'] #splash { background: #1b1430; }
+      [data-theme='fantasy'] #splash .board i { background: #e0d3ae; }
+      [data-theme='fantasy'] #splash .ico::before { content: '🐉'; }
+
       #splash .board {
         display: grid;
         grid-template-columns: repeat(4, 44px);

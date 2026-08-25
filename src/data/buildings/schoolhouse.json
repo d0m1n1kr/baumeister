@@ -41,6 +41,17 @@
         "en": "2 points if adjacent to a supplied habitat; +2 if you have at least as many power cells as the player on your right."
       },
       "art": "mars_schoolhouse.svg"
+    },
+    "fantasy": {
+      "name": {
+        "de": "Lehrlingsstube",
+        "en": "Apprentice Hall"
+      },
+      "text": {
+        "de": "2 Punkte, wenn an eine verpflegte Kate angrenzend; +2 Punkte, wenn du am Ende mindestens so viel Mana hast wie der Spieler rechts von dir.",
+        "en": "2 points if adjacent to a provisioned croft; +2 if you have at least as much mana as the player on your right."
+      },
+      "art": "fantasy_schoolhouse.svg"
     }
   }
 }

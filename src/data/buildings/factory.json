@@ -49,6 +49,17 @@
         "en": "On construction, place 1 resource on it. When another player names that resource, you may take a different resource instead."
       },
       "art": "mars_factory.svg"
+    },
+    "fantasy": {
+      "name": {
+        "de": "Alchemistenwerkstatt",
+        "en": "Alchemist's Workshop"
+      },
+      "text": {
+        "de": "Beim Bau: Lege 1 Material auf die Alchemistenwerkstatt. Sagt ein anderer Spieler dieses Material an, darfst du es stattdessen in ein beliebiges anderes wandeln.",
+        "en": "On raising, place 1 resource on it. When another player names that resource, you may transmute it into any other resource instead."
+      },
+      "art": "fantasy_factory.svg"
     }
   }
 }

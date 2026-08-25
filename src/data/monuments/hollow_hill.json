@@ -48,6 +48,17 @@
         "en": "7 points. −2 points for each power cell you spend to change resources after constructing Hollow Crater."
       },
       "art": "mars_hollow_hill.svg"
+    },
+    "fantasy": {
+      "name": {
+        "de": "Feenhügel",
+        "en": "Fae Hollow"
+      },
+      "text": {
+        "de": "7 Punkte. −2 Punkte für jedes Mana, das du nach dem Bau ausgibst, um Materialien zu tauschen.",
+        "en": "7 points. −2 points for each mana you spend to change resources after raising the Fae Hollow."
+      },
+      "art": "fantasy_hollow_hill.svg"
     }
   }
 }

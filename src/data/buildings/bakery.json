@@ -52,6 +52,17 @@
         "en": "3 points if adjacent to a red or black module."
       },
       "art": "mars_bakery.svg"
+    },
+    "fantasy": {
+      "name": {
+        "de": "Backstube",
+        "en": "Bakehouse"
+      },
+      "text": {
+        "de": "3 Punkte, wenn die Backstube an ein rotes oder schwarzes Bauwerk angrenzt.",
+        "en": "3 points if adjacent to a red or black structure."
+      },
+      "art": "fantasy_bakery.svg"
     }
   }
 }

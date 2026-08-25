@@ -42,6 +42,17 @@
         "en": "3 points if this habitat is supplied."
       },
       "art": "mars_cottage.svg"
+    },
+    "fantasy": {
+      "name": {
+        "de": "Kate",
+        "en": "Croft"
+      },
+      "text": {
+        "de": "3 Punkte, wenn diese Kate verpflegt ist. Rote Bauwerke verpflegen Katen.",
+        "en": "3 points if this croft is provisioned."
+      },
+      "art": "fantasy_cottage.svg"
     }
   }
 }

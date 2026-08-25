@@ -40,6 +40,17 @@
         "en": "1 point. May be constructed on any empty square in your colony."
       },
       "art": "mars_shed.svg"
+    },
+    "fantasy": {
+      "name": {
+        "de": "Waldlager",
+        "en": "Forest Camp"
+      },
+      "text": {
+        "de": "1 Punkt. Das Waldlager darf auf einem beliebigen freien Feld deines Weilers gebaut werden.",
+        "en": "1 point. May be raised on any empty square in your hamlet."
+      },
+      "art": "fantasy_shed.svg"
     }
   }
 }

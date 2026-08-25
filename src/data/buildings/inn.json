@@ -42,6 +42,17 @@
         "en": "3 points if not in a row or column with another Guest Quarters."
       },
       "art": "mars_inn.svg"
+    },
+    "fantasy": {
+      "name": {
+        "de": "Herberge zum Greif",
+        "en": "Griffin Lodge"
+      },
+      "text": {
+        "de": "3 Punkte, wenn keine weitere Herberge in derselben Zeile oder Spalte steht.",
+        "en": "3 points if not in a row or column with another Griffin Lodge."
+      },
+      "art": "fantasy_inn.svg"
     }
   }
 }

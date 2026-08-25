@@ -46,6 +46,17 @@
         "en": "Supplies all adjacent habitats. Additionally supplies any habitats for 1 power cell per 2 habitats."
       },
       "art": "mars_tithe_barn.svg"
+    },
+    "fantasy": {
+      "name": {
+        "de": "Zehntspeicher",
+        "en": "Tithe Store"
+      },
+      "text": {
+        "de": "Verpflegt alle angrenzenden Katen. Zusätzlich verpflegt er beliebige Katen für 1 Mana je 2 Katen.",
+        "en": "Provisions all adjacent crofts. Additionally provisions any crofts for 1 mana per 2 crofts."
+      },
+      "art": "fantasy_tithe_barn.svg"
     }
   }
 }

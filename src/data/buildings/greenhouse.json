@@ -44,6 +44,17 @@
         "en": "Supplies 1 contiguous group of habitat modules anywhere in your colony."
       },
       "art": "mars_greenhouse.svg"
+    },
+    "fantasy": {
+      "name": {
+        "de": "Alraunengarten",
+        "en": "Mandrake Garden"
+      },
+      "text": {
+        "de": "Verpflegt eine zusammenhängende Gruppe von Katen, egal wo in deinem Weiler.",
+        "en": "Provisions 1 contiguous group of crofts anywhere in your hamlet."
+      },
+      "art": "fantasy_greenhouse.svg"
     }
   }
 }

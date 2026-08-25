@@ -41,6 +41,17 @@
         "en": "2 points. Must sit on the tube (bottom row). When the capsule stops in your colony, you may load the received resource into an empty cargo pod instead of placing it — or swap it for a pod's contents."
       },
       "art": "mars_train_station.svg"
+    },
+    "fantasy": {
+      "name": {
+        "de": "Drachenhorst",
+        "en": "Dragon Eyrie"
+      },
+      "text": {
+        "de": "2 Punkte. Muss an der Flugroute liegen (unterste Reihe). Landet der Drache in deinem Weiler, darfst du das erhaltene Material statt zu platzieren in eine freie Traglast aufladen — oder gegen den Inhalt einer Traglast tauschen.",
+        "en": "2 points. Must lie on the flight path (bottom row). When the dragon lands in your hamlet, you may load the received resource into an empty sling instead of placing it — or swap it for a sling's contents."
+      },
+      "art": "fantasy_train_station.svg"
     }
   }
 }

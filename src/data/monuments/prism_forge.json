@@ -46,6 +46,17 @@
         "en": "1 point. You may construct 2 unique modules using overlapping layouts in the same round."
       },
       "art": "mars_prism_forge.svg"
+    },
+    "fantasy": {
+      "name": {
+        "de": "Die Kristallschmiede",
+        "en": "The Crystal Forge"
+      },
+      "text": {
+        "de": "1 Punkt. Du darfst in derselben Runde 2 einzigartige Bauwerke mit überlappenden Baumustern errichten — die gemeinsamen Materialien zählen für beide.",
+        "en": "1 point. You may raise 2 unique structures using overlapping layouts in the same round."
+      },
+      "art": "fantasy_prism_forge.svg"
     }
   }
 }

@@ -47,6 +47,17 @@
         "en": "Scores by count: 1→−1, 2→5, 3→−3, 4→15, 5→−5, 6+→26."
       },
       "art": "mars_almshouse.svg"
+    },
+    "fantasy": {
+      "name": {
+        "de": "Pilgerhospiz",
+        "en": "Pilgrim's Hospice"
+      },
+      "text": {
+        "de": "Punkte nach Anzahl: 1→−1, 2→5, 3→−3, 4→15, 5→−5, 6+→26.",
+        "en": "Scores by count: 1→−1, 2→5, 3→−3, 4→15, 5→−5, 6+→26."
+      },
+      "art": "fantasy_almshouse.svg"
     }
   }
 }
