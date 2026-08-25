@@ -200,6 +200,7 @@ try {
   const pwaContext = await browser.newContext({
     viewport: { width: 402, height: 812 },
     screen: { width: 402, height: 874 },
+    hasTouch: true,
     locale: 'de-DE'
   });
   const pwaPage = await pwaContext.newPage();
@@ -236,6 +237,49 @@ try {
   if (pwa.table !== 874) fail(`iOS-PWA: Spieltisch endet bei ${pwa.table}, erwartet 874`);
   if (874 - pwa.panel > 42) fail(`iOS-PWA: toter Streifen unter dem Panel (${874 - pwa.panel}px)`);
   console.log(`✓ iOS-PWA: Hülle wächst auf Bildschirmhöhe (${pwa.appH}), Panel endet ${874 - pwa.panel}px darüber`);
+
+  // Am Handy muss das Panel ohne Scrollen reichen — sonst ist der letzte Knopf
+  // (Monument) unerreichbar
+  await pwaPage.locator('.aliceBtn').first().click(); // Alice-Modus: mehr Kartenhöhe
+  await pwaPage.waitForTimeout(150);
+  const fit = await pwaPage.evaluate(() => {
+    const panel = document.querySelector('.panel');
+    const last = panel.lastElementChild;
+    return {
+      overflow: panel.scrollHeight - panel.clientHeight,
+      lastBottom: Math.round(last.getBoundingClientRect().bottom),
+      panelBottom: Math.round(panel.getBoundingClientRect().bottom)
+    };
+  });
+  if (fit.overflow > 0) fail(`iOS-PWA: Panel läuft über (${fit.overflow}px verdeckt)`);
+  if (fit.lastBottom > fit.panelBottom) {
+    fail(`iOS-PWA: letztes Bedienelement ist abgeschnitten (${fit.lastBottom} > ${fit.panelBottom})`);
+  }
+  console.log('✓ iOS-PWA: alle Bedienelemente passen ohne Scrollen ins Panel');
+
+  // Fingerscrollen muss funktionieren: touch-action an html/body wirkt über die
+  // ganze Vorfahrenkette — mit „none" ließ sich kein Kind mehr scrollen.
+  const cards = await pwaPage.evaluate(() => {
+    const el = document.querySelector('.cards');
+    return { over: el.scrollHeight - el.clientHeight };
+  });
+  if (cards.over <= 0) fail('iOS-PWA: Kartenraster läuft nicht über — Test greift nicht');
+  const cardBox = await pwaPage.locator('.cards').boundingBox();
+  const touch = await pwaContext.newCDPSession(pwaPage);
+  const tx = cardBox.x + cardBox.width / 2;
+  const ty = cardBox.y + cardBox.height - 20;
+  await touch.send('Input.dispatchTouchEvent', { type: 'touchStart', touchPoints: [{ x: tx, y: ty }] });
+  for (let i = 1; i <= 8; i++) {
+    await touch.send('Input.dispatchTouchEvent', {
+      type: 'touchMove', touchPoints: [{ x: tx, y: ty - i * 10 }]
+    });
+    await pwaPage.waitForTimeout(16);
+  }
+  await touch.send('Input.dispatchTouchEvent', { type: 'touchEnd', touchPoints: [] });
+  await pwaPage.waitForTimeout(400);
+  const scrolled = await pwaPage.evaluate(() => document.querySelector('.cards').scrollTop);
+  if (scrolled <= 0) fail('iOS-PWA: Kartenraster lässt sich nicht mit dem Finger scrollen');
+  console.log(`✓ iOS-PWA: Fingerscrollen im Kartenraster wirkt (${scrolled}px)`);
 
   // Gegenprobe: ohne Inset (Browser) bleibt CSS zuständig
   const plainPage = await pwaContext.newPage();

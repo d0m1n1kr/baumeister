@@ -452,7 +452,13 @@
   );
 </script>
 
-<div class="corner" class:wide class:soloCorner={solo} style="transform: rotate({rotation}deg)">
+<div
+  class="corner"
+  class:wide
+  class:soloCorner={solo}
+  class:railed={!!st.train}
+  style="transform: rotate({rotation}deg)"
+>
   <header>
     <span class="pname" class:mb={isMB}>{isMB ? (townHall ? '🏛 ' : '👑 ') : ''}{p.name}</span>
     {#if coinsActive}
@@ -1055,10 +1061,11 @@
     .corner.wide header { justify-content: center; }
     /* Solo: das einzige Brett darf den Platz nutzen */
     .corner.soloCorner .boardWrap {
-      width: min(30vh, 76vw);
-      /* Platz für Gleis und Zug an der Brett-Unterkante */
-      margin-bottom: 26px;
+      width: min(26vh, 70vw);
     }
+    /* Platz für Gleis und Zug an der Brett-Unterkante — nur im Eisenbahn-Modus,
+       sonst waren es 26 px, die den Knöpfen darunter fehlten */
+    .corner.soloCorner.railed .boardWrap { margin-bottom: 26px; }
   }
   @media (max-width: 700px) and (orientation: portrait) {
     /* 3–4 Spieler am Handy: Die Eckzellen sind zu schmal für Brett + Knöpfe

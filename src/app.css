@@ -55,7 +55,11 @@ html, body {
   -webkit-user-select: none;
   user-select: none;
   -webkit-tap-highlight-color: transparent;
-  touch-action: none;
+  /* pan statt none: touch-action wirkt über die ganze Vorfahrenkette — mit
+     „none" hier ließ sich KEIN Kind mehr mit dem Finger scrollen (Panel,
+     Kartenleiste). Doppeltipp- und Pinch-Zoom bleiben aus. Die Flächen, auf
+     denen gezogen wird (Brett, Material-Marke), setzen selbst „none". */
+  touch-action: pan-x pan-y;
   overscroll-behavior: none;
 }
 
