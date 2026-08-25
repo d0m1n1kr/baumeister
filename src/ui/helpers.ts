@@ -44,6 +44,18 @@ export const FEATURE_ICONS: Record<FeatureId, { icon: string; title: string }> =
   coins: { icon: '🪙', title: 'Münz-Effekt' }
 };
 
+/**
+ * Klassen für die Beschriftung einer Materialmarke: `.resLabel` bricht um und
+ * setzt die Schriftfarbe passend zum Material (siehe app.css); lange Namen —
+ * Themen und andere Sprachen liefern sie reichlich — werden kleiner gesetzt,
+ * damit sie in die runde Marke passen statt darüber hinauszuhängen.
+ */
+export function resLabel(text: string): string {
+  if (text.length > 12) return 'resLabel xlong';
+  if (text.length > 9) return 'resLabel long';
+  return 'resLabel';
+}
+
 /** Rotation der Ecke, damit das UI zum Spieler zeigt (Ecken 2/3 sitzen oben). */
 export function cornerRotation(corner: number): number {
   return corner === 2 || corner === 3 ? 180 : 0;

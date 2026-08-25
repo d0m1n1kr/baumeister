@@ -1,6 +1,6 @@
 <script lang="ts">
   import { RESOURCES, type Resource } from '../engine/types';
-  import { RESOURCE_CSS } from './helpers';
+  import { RESOURCE_CSS, resLabel } from './helpers';
   import { t } from '../i18n';
 
   let {
@@ -21,7 +21,7 @@
         onpointerup={() => onpick(r)}
         title={t.resourceNames[r]}
       >
-        <span>{t.resourceNames[r]}</span>
+        <span class={resLabel(t.resourceNames[r])} data-res={r}>{t.resourceNames[r]}</span>
       </button>
     {/each}
   </div>
@@ -32,19 +32,15 @@
   .label { font-size: 13px; font-weight: 600; color: var(--accent); }
   .row { display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; }
   .chip {
-    width: 54px;
+    /* Kreis bei kurzen Namen, Kapsel bei langen — der Text bleibt einzeilig */
+    min-width: 54px;
     height: 54px;
-    border-radius: 50%;
+    padding: 0 9px;
+    border-radius: 27px;
     border: 2px solid rgba(0, 0, 0, 0.35);
     display: grid;
     place-items: center;
     padding: 0;
-  }
-  .chip span {
-    font-size: 9px;
-    font-weight: 700;
-    color: rgba(0, 0, 0, 0.75);
-    text-shadow: 0 1px 1px rgba(255, 255, 255, 0.3);
   }
   .chip:disabled { opacity: 0.25; }
 </style>
