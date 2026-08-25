@@ -224,19 +224,28 @@ try {
       const el = document.querySelector(sel);
       return el ? Math.round(el.getBoundingClientRect().bottom) : null;
     };
+    const probe = document.createElement('div');
+    probe.style.cssText = 'position:absolute;height:100vh;visibility:hidden';
+    document.body.appendChild(probe);
+    const vh = Math.round(probe.getBoundingClientRect().height);
+    probe.remove();
     return {
       app: bottom('#app'),
       table: bottom('.table'),
       panel: bottom('.panel'),
+      htmlH: Math.round(document.documentElement.getBoundingClientRect().height),
+      cover: document.documentElement.dataset.cover !== undefined,
+      vh,
       screenH: screen.height
     };
   });
-  // Die Hülle bleibt am Layout-Viewport: Inhalt darunter wäre am Gerät
-  // unsichtbar (v2.4.5 hatte sie auf Bildschirmhöhe wachsen lassen — falsch).
-  if (pwa.app !== 812) fail(`iOS-PWA: Hülle endet bei ${pwa.app}, erwartet 812 (Viewport)`);
-  if (pwa.table !== 812) fail(`iOS-PWA: Spieltisch endet bei ${pwa.table}, erwartet 812`);
-  if (812 - pwa.panel > 42) fail(`iOS-PWA: toter Streifen unter dem Panel (${812 - pwa.panel}px)`);
-  console.log(`✓ iOS-PWA: Hülle bleibt am Viewport (${pwa.app}), Panel endet ${812 - pwa.panel}px darüber`);
+  // Insets gemeldet → html/body dürfen 100vh hoch sein, die Hülle füllt sie
+  if (!pwa.cover) fail('iOS-PWA: data-cover fehlt trotz gemeldetem Inset');
+  if (pwa.htmlH !== pwa.vh) fail(`iOS-PWA: html ist ${pwa.htmlH} hoch, erwartet 100vh = ${pwa.vh}`);
+  if (pwa.app !== pwa.vh) fail(`iOS-PWA: Hülle endet bei ${pwa.app}, erwartet ${pwa.vh}`);
+  if (pwa.table !== pwa.vh) fail(`iOS-PWA: Spieltisch endet bei ${pwa.table}, erwartet ${pwa.vh}`);
+  if (pwa.vh - pwa.panel > 42) fail(`iOS-PWA: toter Streifen unter dem Panel (${pwa.vh - pwa.panel}px)`);
+  console.log(`✓ iOS-PWA: html/Hülle nutzen 100vh (${pwa.vh}), Panel endet ${pwa.vh - pwa.panel}px darüber`);
 
   // Am Handy muss das Panel ohne Scrollen reichen — sonst ist der letzte Knopf
   // (Monument) unerreichbar
@@ -257,24 +266,20 @@ try {
   }
   console.log('✓ iOS-PWA: alle Bedienelemente passen ohne Scrollen ins Panel');
 
-  // Sicherung gegen Fehlalarm: Der Home-Indicator-Rand darf nur dort entfallen,
-  // wo der Layout-Viewport wirklich kleiner ist als die Web-View (vh > inner).
-  // Hier sind sie gleich groß, also muss data-cover FEHLEN.
-  const cover = await pwaPage.evaluate(() => ({
+  // Gegenprobe: OHNE gemeldeten Inset (Browser) bleibt alles beim Alten —
+  // dort wäre 100vh die Höhe ohne Leisten und damit zu groß.
+  const plainPage = await pwaContext.newPage();
+  await plainPage.goto(BASE_URL);
+  await plainPage.locator('#splash').waitFor({ state: 'detached', timeout: 10000 });
+  const plain = await plainPage.evaluate(() => ({
     cover: document.documentElement.dataset.cover !== undefined,
-    vh: (() => {
-      const el = document.createElement('div');
-      el.style.cssText = 'position:absolute;height:100vh;visibility:hidden';
-      document.body.appendChild(el);
-      const h = Math.round(el.getBoundingClientRect().height);
-      el.remove();
-      return h;
-    })(),
+    htmlH: Math.round(document.documentElement.getBoundingClientRect().height),
     inner: innerHeight
   }));
-  if (cover.vh !== cover.inner) fail(`Test-Annahme verletzt: vh ${cover.vh} != inner ${cover.inner}`);
-  if (cover.cover) fail('data-cover trotz gleich großem Viewport gesetzt — Rand würde fehlen');
-  console.log('✓ Kein Fehlalarm: data-cover bleibt aus, wenn vh == innerHeight');
+  if (plain.cover) fail('Browser: data-cover gesetzt, obwohl kein Inset gemeldet wird');
+  if (plain.htmlH !== plain.inner) fail(`Browser: html ${plain.htmlH} != innerHeight ${plain.inner}`);
+  console.log('✓ Browser: keine Markierung, html bleibt am Viewport');
+  await plainPage.close();
 
   // Fingerscrollen muss funktionieren: touch-action an html/body wirkt über die
   // ganze Vorfahrenkette — mit „none" ließ sich kein Kind mehr scrollen.

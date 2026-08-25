@@ -22,18 +22,20 @@ export function probeHeight(css: string): number {
 }
 
 /**
- * Markiert den Fall „Layout-Viewport kleiner als die Web-View": Am Gerät
- * gemessen melden vh und lvh 874 (die ganze Web-View), innerHeight/svh/dvh aber
- * 812 — und die Insets sind gesetzt (62/34). Der Home-Indicator sitzt dann
- * UNTERHALB des Layout-Viewports, sein Rand muss also nicht freigehalten
- * werden (CSS: html[data-cover] { --safe-bottom: 0px }).
+ * Markiert die installierte PWA, die ihre Safe-Area-Insets selbst verwaltet
+ * (viewport-fit=cover) — erkennbar am gemeldeten OBEREN Inset: Im Browser ist
+ * er 0 (am Gerät nachgemessen, iOS-Safari 0/0), in der installierten PWA 62.
+ *
+ * Warum das nötig ist: Mit `height: 100%` blieben html/body am kleinen
+ * Viewport (am iPhone 812 statt 874 — 100 % einer Höhe, die iOS ohne die
+ * Insets meldet). Die fehlenden 62 px lagen unten brach, und fixierte
+ * Elemente wurden dort nicht mehr gezeichnet. Dürfen html/body dagegen
+ * 100vh hoch sein, meldet iOS auch innerHeight/dvh als 874 — am Gerät mit
+ * einem Versuchsbalken nachgewiesen. Im Browser wäre 100vh falsch (dort ist
+ * es die Höhe OHNE Leisten), deshalb die Bindung an den Inset.
  */
 export function markCoverViewport(): void {
-  const topInset = probeHeight('var(--safe-raw-top)');
-  const large = probeHeight('100vh');
-  const inner = Math.round(window.innerHeight);
-  const cover = topInset > 0 && large > inner + 1;
-  if (cover) document.documentElement.dataset.cover = '';
+  if (probeHeight('var(--safe-raw-top)') > 0) document.documentElement.dataset.cover = '';
   else delete document.documentElement.dataset.cover;
 }
 
