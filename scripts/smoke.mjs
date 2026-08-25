@@ -158,6 +158,41 @@ try {
   if (p1Res !== 3) fail(`Nach Reload: erwartet 3 Materialien bei Spieler 2, gefunden: ${p1Res}`);
   console.log('✓ Persistenz (Reload + Weiterspielen)');
 
+  // ---------- Safe-Area: nutzt die App die ganze Höhe? ----------
+  // Mit NACHGEBILDETEN iOS-Insets (oben 59, unten 34 wie ein iPhone mit
+  // Dynamic Island in der installierten PWA). Der Fehler trat zweimal auf,
+  // beide Male unsichtbar im Browser — hier wird er messbar.
+  const insetPage = await browser.newPage({ viewport: { width: 393, height: 852 }, locale: 'de-DE' });
+  insetPage.on('pageerror', (e) => fail(`Safe-Area: Seitenfehler: ${e.message}`));
+  await insetPage.goto(BASE_URL);
+  await insetPage.addStyleTag({
+    content: ':root { --safe-bottom: 34px; } #app { padding-top: 59px; }'
+  });
+  await insetPage.locator('#splash').waitFor({ state: 'detached', timeout: 10000 });
+  await insetPage.locator('.seg button', { hasText: '1' }).first().click();
+  await insetPage.locator('section button.big').click();
+  await insetPage.locator('.boardWrap').waitFor({ timeout: 5000 });
+  const layout = await insetPage.evaluate(() => {
+    const rect = (sel) => {
+      const el = document.querySelector(sel);
+      return el ? Math.round(el.getBoundingClientRect().bottom) : null;
+    };
+    const safe =
+      parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--safe-bottom')) || 0;
+    return { vh: innerHeight, app: rect('#app'), table: rect('.table'), panel: rect('.panel'), safe };
+  });
+  if (layout.app !== layout.vh) {
+    fail(`Safe-Area: #app endet ${layout.vh - layout.app}px über dem Bildschirmrand`);
+  }
+  if (layout.vh - layout.table > 1) {
+    fail(`Safe-Area: Spieltisch endet ${layout.vh - layout.table}px zu früh`);
+  }
+  if (layout.vh - layout.panel > layout.safe + 8) {
+    fail(`Safe-Area: toter Streifen unter dem Panel (${layout.vh - layout.panel}px)`);
+  }
+  console.log('✓ Safe-Area: volle Höhe genutzt, unten nur der Home-Indicator-Rand');
+  await insetPage.close();
+
   console.log('Smoke-Test bestanden.');
 } finally {
   await browser?.close();

@@ -59,9 +59,13 @@ html, body {
    weil dort der Inset 0 ist). Stattdessen als Variable, die nur die
    Screens anwenden, deren Inhalt fest am unteren Rand klebt. */
 #app {
-  height: 100%;
-  /* iOS: 100% der (dynamischen) Viewport-Höhe statt geerbter Kette */
-  height: 100dvh;
+  /* Fest am Layout-Viewport verankert statt über eine Höhenangabe: Mit
+     viewport-fit=cover ist das genau der ganze Bildschirm. 100dvh war hier
+     falsch — die installierte iOS-PWA meldet als „dynamische" Höhe den
+     Bereich OHNE die Safe-Area-Insets, wodurch unten ein toter Streifen in
+     Höhe beider Insets blieb (im Browser unsichtbar, weil dort 0). */
+  position: fixed;
+  inset: 0;
   padding-top: env(safe-area-inset-top, 0px);
   padding-left: env(safe-area-inset-left, 0px);
   padding-right: env(safe-area-inset-right, 0px);
