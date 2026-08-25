@@ -193,6 +193,61 @@ try {
   console.log('✓ Safe-Area: volle Höhe genutzt, unten nur der Home-Indicator-Rand');
   await insetPage.close();
 
+  // ---------- Installierte iOS-PWA: gemeldete Höhe ist zu klein ----------
+  // Nachgebildet wird die am Gerät gemessene Signatur: Bildschirm 874,
+  // gemeldeter Viewport 812, oberer Inset 62 — die Differenz IST der Inset.
+  // Dann muss die App auf Bildschirmhöhe gehen, sonst bleiben unten 62 px brach.
+  const pwaContext = await browser.newContext({
+    viewport: { width: 402, height: 812 },
+    screen: { width: 402, height: 874 },
+    locale: 'de-DE'
+  });
+  const pwaPage = await pwaContext.newPage();
+  pwaPage.on('pageerror', (e) => fail(`iOS-PWA: Seitenfehler: ${e.message}`));
+  // Insets ins HTML einsetzen — sie müssen VOR dem ersten Skript gelten,
+  // denn die Höhenmessung läuft beim Start
+  const INSET_STYLE =
+    '<style>:root{--safe-raw-top:62px;--safe-bottom:34px}#app{padding-top:62px}</style>';
+  await pwaPage.route(BASE_URL, async (route) => {
+    const res = await route.fetch();
+    const body = (await res.text()).replace('</head>', `${INSET_STYLE}</head>`);
+    await route.fulfill({ response: res, body, headers: res.headers() });
+  });
+  await pwaPage.goto(BASE_URL);
+  await pwaPage.locator('#splash').waitFor({ state: 'detached', timeout: 10000 });
+  await pwaPage.locator('.seg button', { hasText: '1' }).first().click();
+  await pwaPage.locator('section button.big').click();
+  await pwaPage.locator('.boardWrap').waitFor({ timeout: 5000 });
+  const pwa = await pwaPage.evaluate(() => {
+    const bottom = (sel) => {
+      const el = document.querySelector(sel);
+      return el ? Math.round(el.getBoundingClientRect().bottom) : null;
+    };
+    return {
+      appH: getComputedStyle(document.documentElement).getPropertyValue('--app-h').trim(),
+      app: bottom('#app'),
+      table: bottom('.table'),
+      panel: bottom('.panel'),
+      screenH: screen.height
+    };
+  });
+  if (pwa.appH !== '874px') fail(`iOS-PWA: --app-h ist "${pwa.appH}", erwartet 874px`);
+  if (pwa.app !== 874) fail(`iOS-PWA: Hülle endet bei ${pwa.app}, erwartet 874`);
+  if (pwa.table !== 874) fail(`iOS-PWA: Spieltisch endet bei ${pwa.table}, erwartet 874`);
+  if (874 - pwa.panel > 42) fail(`iOS-PWA: toter Streifen unter dem Panel (${874 - pwa.panel}px)`);
+  console.log(`✓ iOS-PWA: Hülle wächst auf Bildschirmhöhe (${pwa.appH}), Panel endet ${874 - pwa.panel}px darüber`);
+
+  // Gegenprobe: ohne Inset (Browser) bleibt CSS zuständig
+  const plainPage = await pwaContext.newPage();
+  await plainPage.goto(BASE_URL);
+  await plainPage.locator('#splash').waitFor({ state: 'detached', timeout: 10000 });
+  const plainH = await plainPage.evaluate(() =>
+    getComputedStyle(document.documentElement).getPropertyValue('--app-h').trim()
+  );
+  if (plainH) fail(`Browser: --app-h sollte leer bleiben, ist "${plainH}"`);
+  console.log('✓ Browser: keine gemessene Höhe, CSS bleibt zuständig');
+  await pwaContext.close();
+
   console.log('Smoke-Test bestanden.');
 } finally {
   await browser?.close();

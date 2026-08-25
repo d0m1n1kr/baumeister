@@ -1,6 +1,11 @@
 import { mount } from 'svelte';
 import './app.css';
 import App from './ui/App.svelte';
+import { syncAppHeight } from './ui/viewport';
+
+// Höhe der Hülle prüfen, bevor die App zeichnet (installierte iOS-PWA meldet
+// sie zu klein — Details in viewport.ts)
+syncAppHeight();
 
 const app = mount(App, { target: document.getElementById('app')! });
 

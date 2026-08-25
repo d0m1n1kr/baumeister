@@ -4,6 +4,8 @@
   // erreichbar: Sie soll die Zahlen liefern, die man aus Screenshots nur
   // rekonstruieren kann — Viewport, gemeldete Insets und die Unterkanten der
   // Layout-Kästen. Fliegt wieder raus, sobald die Ursache feststeht.
+  import { measureAppHeight, probeHeight } from './viewport';
+
   let { onclose }: { onclose: () => void } = $props();
 
   let lines = $state<string[]>([]);
@@ -22,8 +24,10 @@
       `screen ${screen.width}×${screen.height} dpr ${window.devicePixelRatio}`,
       `inner ${innerWidth}×${innerHeight} client ${document.documentElement.clientHeight}`,
       vv ? `visual ${Math.round(vv.width)}×${Math.round(vv.height)} offTop ${Math.round(vv.offsetTop)} pageTop ${Math.round(vv.pageTop)}` : 'visual —',
-      `inset roh oben ${num(cs.getPropertyValue('--safe-raw-top'))} unten ${num(cs.getPropertyValue('--safe-raw-bottom'))}`,
-      `inset genutzt unten ${num(cs.getPropertyValue('--safe-bottom'))}`,
+      // Custom Properties mit env() lassen sich nur über eine Messung lesen
+      `inset oben ${probeHeight('var(--safe-raw-top)')} unten roh ${probeHeight('var(--safe-raw-bottom)')} genutzt ${probeHeight('var(--safe-bottom)')}`,
+      `vh ${probeHeight('100vh')} svh ${probeHeight('100svh')} lvh ${probeHeight('100lvh')} dvh ${probeHeight('100dvh')}`,
+      `app-h ${cs.getPropertyValue('--app-h').trim() || '—'} (${measureAppHeight().reason})`,
       rect('#app'),
       rect('.table'),
       rect('.solo'),
