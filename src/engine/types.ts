@@ -136,6 +136,8 @@ export interface CardDef {
   art?: string;
   /** Kartentext/-muster nicht aus Primärquellen verifiziert (siehe schema.md). */
   unverified?: boolean;
+  /** Themes (reine Anzeige): andere Namen/Texte/Artworks bei identischen Regeln. */
+  themes?: Record<string, { name: I18nText; text: I18nText; art?: string }>;
 }
 
 export type Catalog = Record<string, CardDef>;

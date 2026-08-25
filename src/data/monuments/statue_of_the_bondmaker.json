@@ -36,5 +36,18 @@
   "effects": [
     "bondmaker"
   ],
-  "art": "statue_of_the_bondmaker.svg"
+  "art": "statue_of_the_bondmaker.svg",
+  "themes": {
+    "mars": {
+      "name": {
+        "de": "Statue des Pioniers",
+        "en": "Statue of the Pioneer"
+      },
+      "text": {
+        "de": "Sagt ein anderer Spieler ein Material an, darfst du es auf ein Feld mit einem Habitat legen (1 je Habitat). Solche Materialien sind nie verbaubar.",
+        "en": "When another player names a resource, you may place it on a square with a habitat (1 per habitat); such resources can never be used to build."
+      },
+      "art": "mars_statue_of_the_bondmaker.svg"
+    }
+  }
 }

@@ -33,5 +33,18 @@
     "type": "none"
   },
   "effects": [],
-  "art": "orchard.svg"
+  "art": "orchard.svg",
+  "themes": {
+    "mars": {
+      "name": {
+        "de": "Gewächskuppel",
+        "en": "Growth Dome"
+      },
+      "text": {
+        "de": "Versorgt alle Habitat-Module in derselben Zeile und Spalte wie die Gewächskuppel.",
+        "en": "Supplies all habitat modules in the same row and column as it."
+      },
+      "art": "mars_orchard.svg"
+    }
+  }
 }

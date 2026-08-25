@@ -28,5 +28,18 @@
   "effects": [
     "buildAnywhereSelf"
   ],
-  "art": "shed.svg"
+  "art": "shed.svg",
+  "themes": {
+    "mars": {
+      "name": {
+        "de": "Frachtcontainer",
+        "en": "Cargo Container"
+      },
+      "text": {
+        "de": "1 Punkt. Der Frachtcontainer darf auf einem beliebigen freien Feld deiner Kolonie gebaut werden.",
+        "en": "1 point. May be constructed on any empty square in your colony."
+      },
+      "art": "mars_shed.svg"
+    }
+  }
 }

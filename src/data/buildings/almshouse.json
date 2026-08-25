@@ -35,5 +35,18 @@
     "overflow": 26
   },
   "effects": [],
-  "art": "almshouse.svg"
+  "art": "almshouse.svg",
+  "themes": {
+    "mars": {
+      "name": {
+        "de": "Notunterkunft",
+        "en": "Emergency Shelter"
+      },
+      "text": {
+        "de": "Punkte nach Anzahl: 1→−1, 2→5, 3→−3, 4→15, 5→−5, 6+→26.",
+        "en": "Scores by count: 1→−1, 2→5, 3→−3, 4→15, 5→−5, 6+→26."
+      },
+      "art": "mars_almshouse.svg"
+    }
+  }
 }

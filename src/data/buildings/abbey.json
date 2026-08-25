@@ -43,5 +43,18 @@
     "vp": 3
   },
   "effects": [],
-  "art": "abbey.svg"
+  "art": "abbey.svg",
+  "themes": {
+    "mars": {
+      "name": {
+        "de": "Forschungszentrum",
+        "en": "Research Center"
+      },
+      "text": {
+        "de": "3 Punkte, wenn das Forschungszentrum NICHT an ein schwarzes, grünes oder gelbes Modul angrenzt.",
+        "en": "3 points if not adjacent to a black, green, or yellow module."
+      },
+      "art": "mars_abbey.svg"
+    }
+  }
 }

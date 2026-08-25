@@ -34,5 +34,18 @@
   "effects": [
     "fortIronweed"
   ],
-  "art": "fort_ironweed.svg"
+  "art": "fort_ironweed.svg",
+  "themes": {
+    "mars": {
+      "name": {
+        "de": "Fort Ferrum",
+        "en": "Fort Ferrum"
+      },
+      "text": {
+        "de": "7 Punkte. Du bist nie mehr Baumeister — außer alle anderen Spieler sind fertig.",
+        "en": "7 points. You no longer take Master Builder turns, unless you are the last player remaining."
+      },
+      "art": "mars_fort_ironweed.svg"
+    }
+  }
 }

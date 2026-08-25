@@ -32,5 +32,18 @@
     "type": "none"
   },
   "effects": [],
-  "art": "greenhouse.svg"
+  "art": "greenhouse.svg",
+  "themes": {
+    "mars": {
+      "name": {
+        "de": "Algenfarm",
+        "en": "Algae Farm"
+      },
+      "text": {
+        "de": "Versorgt eine zusammenhängende Gruppe von Habitat-Modulen, egal wo in deiner Kolonie.",
+        "en": "Supplies 1 contiguous group of habitat modules anywhere in your colony."
+      },
+      "art": "mars_greenhouse.svg"
+    }
+  }
 }

@@ -30,5 +30,18 @@
     "handler": "starloom"
   },
   "effects": [],
-  "art": "the_starloom.svg"
+  "art": "the_starloom.svg",
+  "themes": {
+    "mars": {
+      "name": {
+        "de": "Der Sternenwebstuhl",
+        "en": "The Starloom"
+      },
+      "text": {
+        "de": "Punkte nach Reihenfolge der Kolonie-Fertigstellung: 1.→6, 2.→3, 3.→2, danach 0. Gleiche Runde = gleicher Rang.",
+        "en": "Scores by colony-completion order: 1st→6, 2nd→3, 3rd→2, 4th+→0."
+      },
+      "art": "mars_the_starloom.svg"
+    }
+  }
 }

@@ -30,5 +30,18 @@
     "vp": 3
   },
   "effects": [],
-  "art": "cottage.svg"
+  "art": "cottage.svg",
+  "themes": {
+    "mars": {
+      "name": {
+        "de": "Habitat",
+        "en": "Habitat"
+      },
+      "text": {
+        "de": "3 Punkte, wenn dieses Habitat versorgt ist. Rote Module versorgen Habitate.",
+        "en": "3 points if this habitat is supplied."
+      },
+      "art": "mars_cottage.svg"
+    }
+  }
 }

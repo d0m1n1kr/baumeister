@@ -37,5 +37,18 @@
     "handler": "skyBaths"
   },
   "effects": [],
-  "art": "the_sky_baths.svg"
+  "art": "the_sky_baths.svg",
+  "themes": {
+    "mars": {
+      "name": {
+        "de": "Die Thermalkuppeln",
+        "en": "The Thermal Domes"
+      },
+      "text": {
+        "de": "2 Punkte für jeden Modultyp dieser Partie, der in deiner Kolonie fehlt.",
+        "en": "2 points for each module type missing from your colony."
+      },
+      "art": "mars_the_sky_baths.svg"
+    }
+  }
 }

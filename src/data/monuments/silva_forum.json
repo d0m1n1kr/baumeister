@@ -35,5 +35,18 @@
     "vp": 1
   },
   "effects": [],
-  "art": "silva_forum.svg"
+  "art": "silva_forum.svg",
+  "themes": {
+    "mars": {
+      "name": {
+        "de": "Silva-Biosphäre",
+        "en": "Silva Biosphere"
+      },
+      "text": {
+        "de": "1 Punkt, plus 1 Punkt für jedes Modul deiner größten zusammenhängenden Gruppe gleicher Module.",
+        "en": "1 point, plus 1 point per module in your largest contiguous group of same-type modules."
+      },
+      "art": "mars_silva_forum.svg"
+    }
+  }
 }

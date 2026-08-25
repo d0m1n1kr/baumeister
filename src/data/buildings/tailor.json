@@ -35,5 +35,18 @@
     "base": 1
   },
   "effects": [],
-  "art": "tailor.svg"
+  "art": "tailor.svg",
+  "themes": {
+    "mars": {
+      "name": {
+        "de": "Werkstatt",
+        "en": "Workshop"
+      },
+      "text": {
+        "de": "1 Punkt, plus 1 Punkt für jedes gelbe Modul auf den 4 Mittelfeldern deiner Kolonie.",
+        "en": "1 point, plus 1 point for each yellow module in the 4 center squares."
+      },
+      "art": "mars_tailor.svg"
+    }
+  }
 }

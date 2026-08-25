@@ -32,5 +32,18 @@
   "effects": [
     "cathedral"
   ],
-  "art": "cathedral_of_caterina.svg"
+  "art": "cathedral_of_caterina.svg",
+  "themes": {
+    "mars": {
+      "name": {
+        "de": "Caterina-Solarturm",
+        "en": "Caterina Solar Spire"
+      },
+      "text": {
+        "de": "2 Punkte. Leere Felder deiner Kolonie zählen 0 statt −1 Punkt.",
+        "en": "2 points. Your empty squares are worth 0 instead of −1 point."
+      },
+      "art": "mars_cathedral_of_caterina.svg"
+    }
+  }
 }

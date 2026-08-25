@@ -39,5 +39,18 @@
   "effects": [
     "architectsGuild"
   ],
-  "art": "architects_guild.svg"
+  "art": "architects_guild.svg",
+  "themes": {
+    "mars": {
+      "name": {
+        "de": "Ingenieursgilde",
+        "en": "Engineers' Guild"
+      },
+      "text": {
+        "de": "1 Punkt. Beim Bau: Ersetze bis zu 2 Module deiner Kolonie durch beliebige andere Modultypen aus dem Vorrat (keine Monumente).",
+        "en": "1 point. On construction, replace up to 2 modules in your colony with other module types from the supply."
+      },
+      "art": "mars_architects_guild.svg"
+    }
+  }
 }

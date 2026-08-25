@@ -30,5 +30,18 @@
     "vp": 3
   },
   "effects": [],
-  "art": "inn.svg"
+  "art": "inn.svg",
+  "themes": {
+    "mars": {
+      "name": {
+        "de": "Gästemodul",
+        "en": "Guest Quarters"
+      },
+      "text": {
+        "de": "3 Punkte, wenn kein weiteres Gästemodul in derselben Zeile oder Spalte steht.",
+        "en": "3 points if not in a row or column with another Guest Quarters."
+      },
+      "art": "mars_inn.svg"
+    }
+  }
 }

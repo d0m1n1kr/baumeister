@@ -34,5 +34,18 @@
     "vp": 4
   },
   "effects": [],
-  "art": "temple.svg"
+  "art": "temple.svg",
+  "themes": {
+    "mars": {
+      "name": {
+        "de": "Observatorium",
+        "en": "Observatory"
+      },
+      "text": {
+        "de": "4 Punkte, wenn das Observatorium an mindestens 2 versorgte Habitate angrenzt.",
+        "en": "4 points if adjacent to at least 2 supplied habitats."
+      },
+      "art": "mars_temple.svg"
+    }
+  }
 }

@@ -40,5 +40,18 @@
     "vp": 3
   },
   "effects": [],
-  "art": "bakery.svg"
+  "art": "bakery.svg",
+  "themes": {
+    "mars": {
+      "name": {
+        "de": "Kantine",
+        "en": "Canteen"
+      },
+      "text": {
+        "de": "3 Punkte, wenn die Kantine an ein rotes oder schwarzes Modul angrenzt.",
+        "en": "3 points if adjacent to a red or black module."
+      },
+      "art": "mars_bakery.svg"
+    }
+  }
 }

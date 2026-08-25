@@ -34,5 +34,18 @@
   "effects": [
     "groveUniversity"
   ],
-  "art": "grove_university.svg"
+  "art": "grove_university.svg",
+  "themes": {
+    "mars": {
+      "name": {
+        "de": "Mars-Universität",
+        "en": "Mars University"
+      },
+      "text": {
+        "de": "3 Punkte. Beim Bau: Platziere sofort ein Modul aus dem Vorrat auf einem freien Feld deiner Kolonie.",
+        "en": "3 points. On construction, immediately place a module from the supply on an empty square."
+      },
+      "art": "mars_grove_university.svg"
+    }
+  }
 }

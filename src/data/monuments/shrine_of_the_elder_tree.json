@@ -32,5 +32,18 @@
     "handler": "shrine"
   },
   "effects": [],
-  "art": "shrine_of_the_elder_tree.svg"
+  "art": "shrine_of_the_elder_tree.svg",
+  "themes": {
+    "mars": {
+      "name": {
+        "de": "Denkmal des Ersten Setzlings",
+        "en": "Shrine of the First Seedling"
+      },
+      "text": {
+        "de": "Punkte nach Zahl der Module in deiner Kolonie beim Bau des Denkmals: 1→1 … 5→5, 6+→8.",
+        "en": "Scores by number of modules in your colony when constructed: 1→1 … 5→5, 6+→8."
+      },
+      "art": "mars_shrine_of_the_elder_tree.svg"
+    }
+  }
 }

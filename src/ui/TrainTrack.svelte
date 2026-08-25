@@ -316,4 +316,47 @@
     border-radius: 10px 10px 4px 4px;
     z-index: 2;
   }
+
+  /* ---------- Theme: Mars-Kolonie — Verbindungsrohr statt Gleis ---------- */
+  /* Glasrohr mit Ringsegmenten */
+  :global([data-theme='mars']) .track {
+    background:
+      repeating-linear-gradient(90deg, #6f8fae 0 3px, transparent 3px 26px) center / 100% 10px,
+      linear-gradient(#7ea4c4 0 2px, rgba(168, 203, 232, 0.35) 2px 8px, #7ea4c4 8px 10px);
+    border-radius: 5px;
+    opacity: 0.9;
+  }
+  /* Transportkapsel statt Lok: gezeichnet, kein Emoji */
+  :global([data-theme='mars']) .loco {
+    font-size: 0;
+    width: 30px;
+    height: 17px;
+    margin-bottom: 1px;
+    background: linear-gradient(#eef3f8, #9fb0c1);
+    border: 2px solid #3b3327;
+    border-radius: 4px 12px 12px 4px;
+    position: relative;
+  }
+  :global([data-theme='mars']) .loco::after {
+    content: '';
+    position: absolute;
+    right: 5px;
+    top: 4px;
+    width: 7px;
+    height: 5px;
+    border-radius: 3px;
+    background: #35608c;
+  }
+  /* Frachtpods: durchsichtig, die Ladung schwebt sichtbar darin */
+  :global([data-theme='mars']) .car {
+    background: rgba(168, 203, 232, 0.28);
+    border-color: #6f8fae;
+    border-radius: 8px;
+  }
+  /* Schleusen statt Tunnelportale */
+  :global([data-theme='mars']) .tunnel,
+  :global([data-theme='mars']) .portal {
+    background: #4a3227;
+    border-color: #8a5a3e;
+  }
 </style>

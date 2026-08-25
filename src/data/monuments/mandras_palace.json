@@ -31,5 +31,18 @@
     "handler": "mandras"
   },
   "effects": [],
-  "art": "mandras_palace.svg"
+  "art": "mandras_palace.svg",
+  "themes": {
+    "mars": {
+      "name": {
+        "de": "Mandras-Station",
+        "en": "Mandras Station"
+      },
+      "text": {
+        "de": "2 Punkte für jeden einzigartigen angrenzenden Modultyp.",
+        "en": "2 points for each unique adjacent module type."
+      },
+      "art": "mars_mandras_palace.svg"
+    }
+  }
 }

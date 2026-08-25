@@ -33,5 +33,18 @@
   "effects": [
     "buildAnywhereAll"
   ],
-  "art": "obelisk_of_the_crescent.svg"
+  "art": "obelisk_of_the_crescent.svg",
+  "themes": {
+    "mars": {
+      "name": {
+        "de": "Obelisk der Monde",
+        "en": "Obelisk of the Moons"
+      },
+      "text": {
+        "de": "Alle deine künftigen Module dürfen auf einem beliebigen freien Feld gebaut werden.",
+        "en": "You may place all future modules on any empty square."
+      },
+      "art": "mars_obelisk_of_the_crescent.svg"
+    }
+  }
 }

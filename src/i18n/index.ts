@@ -5,6 +5,7 @@
 // Spielstand und Mehrgeräte-Sitzung überleben den Reload ohnehin.
 
 import type { CardDef } from '../engine/types';
+import { theme, themedResourceNames } from '../theme';
 import { de } from './de';
 import { en } from './en';
 import { fr } from './fr';
@@ -63,6 +64,13 @@ if (typeof document !== 'undefined') {
   document.documentElement.lang = lang;
 }
 
+// Theme-Überlagerung: Ressourcen heißen im Mars-Theme anders (gleiche IDs
+// und Farben) — einmalige Überlagerung hält alle Aufrufstellen unverändert.
+{
+  const themed = themedResourceNames(lang);
+  if (themed) t.resourceNames = { ...t.resourceNames, ...themed };
+}
+
 /** Umschalter: Wahl speichern und mit der neuen Sprache neu laden. */
 export function setLanguage(code: string): void {
   if (!(code in TRANSLATIONS)) return;
@@ -74,13 +82,17 @@ export function setLanguage(code: string): void {
   location.reload();
 }
 
-/** Kartenname in der aktiven Sprache (Fallback: Englisch → Deutsch). */
+/** Kartenname in der aktiven Sprache (Theme zuerst; Fallback: Englisch → Deutsch). */
 export function cardName(card: CardDef): string {
+  const th = theme !== 'classic' ? card.themes?.[theme]?.name : undefined;
+  if (th) return th[lang] ?? th.en ?? th.de;
   return card.name[lang] ?? card.name.en ?? card.name.de;
 }
 
-/** Kartentext in der aktiven Sprache (Fallback: Englisch → Deutsch). */
+/** Kartentext in der aktiven Sprache (Theme zuerst; Fallback: Englisch → Deutsch). */
 export function cardText(card: CardDef): string {
+  const th = theme !== 'classic' ? card.themes?.[theme]?.text : undefined;
+  if (th) return th[lang] ?? th.en ?? th.de;
   return card.text[lang] ?? card.text.en ?? card.text.de;
 }
 

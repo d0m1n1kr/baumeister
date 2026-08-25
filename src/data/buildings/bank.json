@@ -35,5 +35,18 @@
   "effects": [
     "bank"
   ],
-  "art": "bank.svg"
+  "art": "bank.svg",
+  "themes": {
+    "mars": {
+      "name": {
+        "de": "Energiespeicher",
+        "en": "Power Vault"
+      },
+      "text": {
+        "de": "4 Punkte. Beim Bau: Lege 1 Material darauf, das auf keinem anderen deiner Energiespeicher liegt. Dieses Material darfst du als Baumeister nie ansagen.",
+        "en": "4 points. On construction, place a resource not on any of your other Power Vaults; you may never name that resource as Master Builder."
+      },
+      "art": "mars_bank.svg"
+    }
+  }
 }

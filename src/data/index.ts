@@ -2,6 +2,7 @@
 
 import type { CardDef, Catalog } from '../engine/types';
 import { buildCatalog } from '../engine/registry';
+import { theme } from '../theme';
 
 const buildingModules = import.meta.glob('./buildings/*.json', { eager: true });
 const monumentModules = import.meta.glob('./monuments/*.json', { eager: true });
@@ -21,5 +22,7 @@ export const artBySvgName: Record<string, string> = Object.fromEntries(
 );
 
 export function artFor(card: CardDef): string | undefined {
+  const themedArt = theme !== 'classic' ? card.themes?.[theme]?.art : undefined;
+  if (themedArt && artBySvgName[themedArt]) return artBySvgName[themedArt];
   return card.art ? artBySvgName[card.art] : undefined;
 }

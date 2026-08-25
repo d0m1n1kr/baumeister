@@ -34,5 +34,18 @@
     "vpEach": 1
   },
   "effects": [],
-  "art": "cloister.svg"
+  "art": "cloister.svg",
+  "themes": {
+    "mars": {
+      "name": {
+        "de": "Kryolabor",
+        "en": "Cryo Lab"
+      },
+      "text": {
+        "de": "1 Punkt für jedes orange Modul in einer Ecke deiner Kolonie.",
+        "en": "1 point for each orange module in a corner of your colony."
+      },
+      "art": "mars_cloister.svg"
+    }
+  }
 }

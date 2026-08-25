@@ -5,6 +5,7 @@
 // uns immer aus einer Nutzer-Geste kommt).
 
 import type { Resource } from '../engine/types';
+import { theme } from '../theme';
 
 const SOUND_KEY = 'tinytowns.sound';
 
@@ -101,16 +102,31 @@ const EFFECTS = {
   gameOver(): void {
     for (const [i, f] of [523, 659, 784, 1047].entries()) tone(i * 0.1, f, 0.25, 'triangle', 0.55);
   },
-  /** Eisenbahn: rhythmisches Schnaufen während der Fahrt (~2,5 s). */
+  /** Eisenbahn: Fahrgeräusch — klassisch Schnaufen, auf dem Mars ein
+   *  gleitendes Rohr-Whoosh (~2,5 s). */
   trainMove(): void {
+    if (theme === 'mars') {
+      tone(0, 65, 2.2, 'sine', 0.3); // tiefes Rohr-Brummen
+      for (let i = 0; i < 8; i++) {
+        tone(i * 0.28, 1250 - i * 95, 0.22, 'sine', 0.08); // gleitendes Zischen
+      }
+      return;
+    }
     for (let i = 0; i < 14; i++) {
       const t = i * 0.17;
       tone(t, 90 + (i % 2) * 14, 0.07, 'triangle', 0.5); // Tsch…
       tone(t + 0.02, 800, 0.03, 'square', 0.05);         // …ff (Dampf)
     }
   },
-  /** Eisenbahn: Horn (getragener Zweiklang) bei der Einfahrt in den Bahnhof. */
+  /** Eisenbahn: Einfahrt in den Bahnhof — klassisch Horn, auf dem Mars ein
+   *  Docking-Signal mit Verriegelungs-Klack. */
   trainHorn(): void {
+    if (theme === 'mars') {
+      tone(0, 880, 0.14, 'sine', 0.3);
+      tone(0.2, 660, 0.22, 'sine', 0.3);
+      tone(0.55, 120, 0.09, 'triangle', 0.7); // Klack der Verriegelung
+      return;
+    }
     tone(0, 233, 0.9, 'sawtooth', 0.18);
     tone(0, 311, 0.9, 'sawtooth', 0.16);
     tone(0, 466, 0.9, 'sine', 0.2);

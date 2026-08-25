@@ -4,6 +4,7 @@
   import { isValidRoomCode, normalizeRoomCode } from '../net/protocol';
   import { t, translateError } from '../i18n';
   import LanguagePicker from './LanguagePicker.svelte';
+  import ThemePicker from './ThemePicker.svelte';
   import HelpDialog from './HelpDialog.svelte';
   import QrScanner from './QrScanner.svelte';
 
@@ -73,7 +74,7 @@
 </script>
 
 <main>
-  <div class="langRow"><LanguagePicker /></div>
+  <div class="langRow"><ThemePicker /><LanguagePicker /></div>
   <h1>🏘 {t.joinTitle}</h1>
 
   {#if session.role === 'guest' && session.status !== 'error'}
@@ -147,7 +148,7 @@
 {/if}
 
 <style>
-  .langRow { align-self: flex-end; display: flex; justify-content: flex-end; width: 100%; max-width: 420px; }
+  .langRow { align-self: flex-end; display: flex; gap: 8px; justify-content: flex-end; width: 100%; max-width: 420px; }
   main {
     height: 100%;
     display: flex;

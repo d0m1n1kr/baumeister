@@ -4,6 +4,9 @@ import type { Translation } from './index';
 
 export const it: Translation = {
   languageName: 'Italiano',
+  themeLabel: 'Tema',
+  themeClassic: 'Borgo nel bosco',
+  themeMars: 'Colonia marziana',
   language: 'Lingua',
   appTitle: 'Tiny Towns',
   newGame: 'Nuova partita',
