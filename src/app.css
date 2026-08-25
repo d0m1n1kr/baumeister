@@ -31,8 +31,12 @@
   --cat-black: #444a52;
   --cat-pink: #cd6f9c;
 
-  /* Home-Indicator-Bereich (iOS-PWA); im Browser 0 */
-  --safe-bottom: env(safe-area-inset-bottom, 0px);
+  /* Home-Indicator-Bereich (iOS-PWA); im Browser 0. GEDECKELT auf die von
+     Apple dokumentierten 34pt: Die installierte PWA meldet hier teils
+     deutlich mehr (gemessen ~89px auf einem iPhone mit Dynamic Island), und
+     jeder Pixel davon war unten ein toter Streifen. Mehr als der
+     Home-Indicator braucht niemand freizuhalten. */
+  --safe-bottom: min(env(safe-area-inset-bottom, 0px), 34px);
 }
 
 * { box-sizing: border-box; }
