@@ -129,7 +129,9 @@
           title={t.flipCards}
         >🔄</button>
       {/if}
-      <button class="abort" onpointerup={() => onabort?.()} title={t.abortGame}>✕</button>
+      <!-- Partie beenden: rot und voll deckend, damit man ihn überhaupt findet
+           (der Ton- und der Dreh-Knopf daneben bleiben dezent) -->
+      <button class="abort quit" onpointerup={() => onabort?.()} title={t.abortGame}>✕</button>
     </span>
     <span class="mb">{st.config.townHall ? '🏛' : '👑'} {st.players[st.masterBuilder].name}</span>
     {#if named}
@@ -213,6 +215,15 @@
     font-size: 11px;
     opacity: 0.55;
     line-height: 1;
+  }
+  .quit {
+    width: 24px;
+    height: 24px;
+    background: var(--danger);
+    border-color: rgba(0, 0, 0, 0.3);
+    color: #fff;
+    font-weight: 700;
+    opacity: 1;
   }
   .mb { color: var(--accent); font-weight: 700; }
   .trainInfo { display: flex; align-items: center; gap: 3px; }
