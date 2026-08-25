@@ -31,5 +31,18 @@
     "vp": 2
   },
   "effects": [],
-  "art": "fountain.svg"
+  "art": "fountain.svg",
+  "themes": {
+    "mars": {
+      "name": {
+        "de": "Wasseraufbereiter",
+        "en": "Water Reclaimer"
+      },
+      "text": {
+        "de": "2 Punkte, wenn der Wasseraufbereiter an mindestens ein anderes graues Modul angrenzt.",
+        "en": "2 points if adjacent to at least one other grey module."
+      },
+      "art": "mars_fountain.svg"
+    }
+  }
 }

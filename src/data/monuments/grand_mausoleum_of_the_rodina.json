@@ -31,5 +31,18 @@
   "effects": [
     "mausoleum"
   ],
-  "art": "grand_mausoleum_of_the_rodina.svg"
+  "art": "grand_mausoleum_of_the_rodina.svg",
+  "themes": {
+    "mars": {
+      "name": {
+        "de": "Gedenkstätte der Rodina",
+        "en": "Rodina Memorial"
+      },
+      "text": {
+        "de": "Deine unversorgten Habitate sind 3 Punkte wert (gilt nur für die Habitat-Wertung).",
+        "en": "Your unsupplied habitats are worth 3 points each (habitat scoring only)."
+      },
+      "art": "mars_grand_mausoleum_of_the_rodina.svg"
+    }
+  }
 }

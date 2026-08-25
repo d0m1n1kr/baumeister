@@ -4,6 +4,9 @@
 
 export const de = {
   languageName: 'Deutsch',
+  themeLabel: 'Thema',
+  themeClassic: 'Wald-Städtchen',
+  themeMars: 'Mars-Kolonie',
   language: 'Sprache',
   appTitle: 'Tiny Towns',
   newGame: 'Neues Spiel',

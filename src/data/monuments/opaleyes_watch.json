@@ -42,5 +42,18 @@
   "effects": [
     "opaleye"
   ],
-  "art": "opaleyes_watch.svg"
+  "art": "opaleyes_watch.svg",
+  "themes": {
+    "mars": {
+      "name": {
+        "de": "Opaleye-Radarwacht",
+        "en": "Opaleye Radar Watch"
+      },
+      "text": {
+        "de": "Beim Bau: Lege 3 verschiedene Module aus dem Vorrat hierauf. Baut dein linker oder rechter Nachbar eines dieser Module, nimm es und platziere es auf einem freien Feld.",
+        "en": "On construction, place 3 unique modules on this card. When a neighbor constructs one of those types, take it and place it on any empty square."
+      },
+      "art": "mars_opaleyes_watch.svg"
+    }
+  }
 }

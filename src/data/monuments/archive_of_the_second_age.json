@@ -30,5 +30,18 @@
     "handler": "archive"
   },
   "effects": [],
-  "art": "archive_of_the_second_age.svg"
+  "art": "archive_of_the_second_age.svg",
+  "themes": {
+    "mars": {
+      "name": {
+        "de": "Archiv der Ersten Landung",
+        "en": "Archive of the First Landing"
+      },
+      "text": {
+        "de": "1 Punkt für jeden einzigartigen Modultyp in deiner Kolonie (ohne Monumente).",
+        "en": "1 point for each unique module type in your colony (monuments excluded)."
+      },
+      "art": "mars_archive_of_the_second_age.svg"
+    }
+  }
 }

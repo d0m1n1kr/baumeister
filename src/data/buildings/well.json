@@ -27,5 +27,18 @@
     "vpEach": 1
   },
   "effects": [],
-  "art": "well.svg"
+  "art": "well.svg",
+  "themes": {
+    "mars": {
+      "name": {
+        "de": "Luftschleuse",
+        "en": "Airlock"
+      },
+      "text": {
+        "de": "1 Punkt für jedes angrenzende Habitat (versorgt oder nicht).",
+        "en": "1 point for each adjacent habitat."
+      },
+      "art": "mars_well.svg"
+    }
+  }
 }

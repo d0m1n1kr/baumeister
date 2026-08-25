@@ -10,6 +10,7 @@
   import { t } from '../i18n';
   import CreditsFooter from './CreditsFooter.svelte';
   import LanguagePicker from './LanguagePicker.svelte';
+  import ThemePicker from './ThemePicker.svelte';
   import HelpDialog from './HelpDialog.svelte';
 
   let { onjoin }: { onjoin: () => void } = $props();
@@ -114,7 +115,7 @@
 </script>
 
 <main>
-  <div class="langRow"><LanguagePicker /></div>
+  <div class="langRow"><ThemePicker /><LanguagePicker /></div>
   <h1>🏘 {t.appTitle}</h1>
   <section>
     <div class="field">
@@ -248,7 +249,7 @@
 {/if}
 
 <style>
-  .langRow { align-self: flex-end; display: flex; justify-content: flex-end; width: 100%; max-width: 520px; }
+  .langRow { align-self: flex-end; display: flex; gap: 8px; justify-content: flex-end; width: 100%; max-width: 520px; }
   main {
     height: 100%;
     display: flex;

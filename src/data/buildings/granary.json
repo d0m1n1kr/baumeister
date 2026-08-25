@@ -33,5 +33,18 @@
     "type": "none"
   },
   "effects": [],
-  "art": "granary.svg"
+  "art": "granary.svg",
+  "themes": {
+    "mars": {
+      "name": {
+        "de": "Nahrungsspeicher",
+        "en": "Food Silo"
+      },
+      "text": {
+        "de": "Versorgt alle Habitat-Module auf den 8 Feldern rund um den Nahrungsspeicher.",
+        "en": "Supplies all habitat modules in the 8 squares surrounding it."
+      },
+      "art": "mars_granary.svg"
+    }
+  }
 }

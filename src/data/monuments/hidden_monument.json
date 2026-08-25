@@ -4,14 +4,41 @@
   "kind": "monument",
   "category": "monument",
   "color": "pink",
-  "name": { "de": "Verdecktes Monument", "en": "Face-down Monument" },
+  "name": {
+    "de": "Verdecktes Monument",
+    "en": "Face-down Monument"
+  },
   "text": {
     "de": "Das Monument dieses Spielers ist geheim, bis es gebaut wird.",
     "en": "This player's monument stays secret until it is constructed."
   },
-  "pattern": [["glass", "glass"], ["glass", "glass"]],
+  "pattern": [
+    [
+      "glass",
+      "glass"
+    ],
+    [
+      "glass",
+      "glass"
+    ]
+  ],
   "features": [],
-  "scoring": { "type": "none" },
+  "scoring": {
+    "type": "none"
+  },
   "effects": [],
-  "art": "hidden_monument.svg"
+  "art": "hidden_monument.svg",
+  "themes": {
+    "mars": {
+      "name": {
+        "de": "Verdecktes Spezialmodul",
+        "en": "Face-down Special Module"
+      },
+      "text": {
+        "de": "Das Spezialmodul dieses Spielers ist geheim, bis es gebaut wird.",
+        "en": "This player's special module stays secret until it is constructed."
+      },
+      "art": "mars_hidden_monument.svg"
+    }
+  }
 }

@@ -28,5 +28,18 @@
     "bonusEach": 1
   },
   "effects": [],
-  "art": "feast_hall.svg"
+  "art": "feast_hall.svg",
+  "themes": {
+    "mars": {
+      "name": {
+        "de": "Mannschaftsmesse",
+        "en": "Crew Mess"
+      },
+      "text": {
+        "de": "2 Punkte je Mannschaftsmesse; 3 Punkte je Mannschaftsmesse, wenn du mehr davon hast als der Spieler rechts von dir.",
+        "en": "2 points each; 3 points each if you have more than the player on your right."
+      },
+      "art": "mars_feast_hall.svg"
+    }
+  }
 }

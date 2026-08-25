@@ -33,5 +33,18 @@
     "vpEach": 1
   },
   "effects": [],
-  "art": "theater.svg"
+  "art": "theater.svg",
+  "themes": {
+    "mars": {
+      "name": {
+        "de": "Kontrollturm",
+        "en": "Control Tower"
+      },
+      "text": {
+        "de": "1 Punkt für jeden anderen Modultyp in derselben Zeile und Spalte wie der Kontrollturm.",
+        "en": "1 point for each other unique module type in its row and column."
+      },
+      "art": "mars_theater.svg"
+    }
+  }
 }

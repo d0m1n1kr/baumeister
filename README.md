@@ -22,6 +22,14 @@ their own device.
     (sources in `schema.md`).
   - *Tiny Trees* — seed tokens: building over a seed grants a free resource; as the
     last empty square, the seed becomes a tree (2 points).
+- **Themes (per device):** the classic forest town or a **Mars colony** — same
+  rules, different world. All base-game cards get Mars names, rule texts, and
+  artwork (Habitat, Hydroponics, Airlock, Tube Station, …), resources become
+  regolith/iron/titanium/food/ice (same colors), the boards turn to regolith,
+  and the railway becomes a **transit tube** with airlocks and a cargo capsule.
+  Since the game state is theme-agnostic, players in one multi-device game can
+  each use their own theme. Switch via the 🎨 picker; Fortune keeps its classic
+  look for now.
 - **8 languages:** German, English, French, Spanish, Italian, Dutch, Portuguese,
   Polish — auto-selected from the browser language, overridable via the 🌐 switcher
   (setup and join screens). All rule error messages are translated too; card texts

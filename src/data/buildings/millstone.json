@@ -34,5 +34,18 @@
     "vp": 2
   },
   "effects": [],
-  "art": "millstone.svg"
+  "art": "millstone.svg",
+  "themes": {
+    "mars": {
+      "name": {
+        "de": "Erzmühle",
+        "en": "Ore Mill"
+      },
+      "text": {
+        "de": "2 Punkte, wenn die Erzmühle an ein rotes oder gelbes Modul angrenzt.",
+        "en": "2 points if adjacent to a red or yellow module."
+      },
+      "art": "mars_millstone.svg"
+    }
+  }
 }

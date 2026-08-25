@@ -29,5 +29,18 @@
   "effects": [
     "trainStation"
   ],
-  "art": "train_station.svg"
+  "art": "train_station.svg",
+  "themes": {
+    "mars": {
+      "name": {
+        "de": "Rohrbahnhof",
+        "en": "Tube Station"
+      },
+      "text": {
+        "de": "2 Punkte. Muss an der Röhre liegen (unterste Reihe). Hält die Kapsel in deiner Kolonie, darfst du das erhaltene Material statt zu platzieren in einen freien Frachtpod verladen — oder gegen den Inhalt eines Pods tauschen.",
+        "en": "2 points. Must sit on the tube (bottom row). When the capsule stops in your colony, you may load the received resource into an empty cargo pod instead of placing it — or swap it for a pod's contents."
+      },
+      "art": "mars_train_station.svg"
+    }
+  }
 }

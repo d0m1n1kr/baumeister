@@ -37,5 +37,18 @@
   "effects": [
     "factory"
   ],
-  "art": "factory.svg"
+  "art": "factory.svg",
+  "themes": {
+    "mars": {
+      "name": {
+        "de": "Raffinerie",
+        "en": "Refinery"
+      },
+      "text": {
+        "de": "Beim Bau: Lege 1 Material auf die Raffinerie. Sagt ein anderer Spieler dieses Material an, darfst du stattdessen ein beliebiges Material nehmen.",
+        "en": "On construction, place 1 resource on it. When another player names that resource, you may take a different resource instead."
+      },
+      "art": "mars_factory.svg"
+    }
+  }
 }

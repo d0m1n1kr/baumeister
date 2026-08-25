@@ -34,5 +34,18 @@
   "effects": [
     "tradingPost"
   ],
-  "art": "trading_post.svg"
+  "art": "trading_post.svg",
+  "themes": {
+    "mars": {
+      "name": {
+        "de": "Versorgungsstation",
+        "en": "Supply Post"
+      },
+      "text": {
+        "de": "1 Punkt. Zählt beim Bauen als beliebiges Material und wird dabei nicht entfernt. Mindestens 1 echtes Material ist nötig.",
+        "en": "1 point. Counts as a wild resource for construction and is not removed when used; at least 1 real resource is required."
+      },
+      "art": "mars_trading_post.svg"
+    }
+  }
 }

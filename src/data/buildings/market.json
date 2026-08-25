@@ -32,5 +32,18 @@
     "vpEach": 1
   },
   "effects": [],
-  "art": "market.svg"
+  "art": "market.svg",
+  "themes": {
+    "mars": {
+      "name": {
+        "de": "Handelsplattform",
+        "en": "Trade Platform"
+      },
+      "text": {
+        "de": "1 Punkt für jede Handelsplattform in derselben Zeile und Spalte (diese einmal mitgezählt).",
+        "en": "1 point for each Trade Platform in the same row and column (counting itself once)."
+      },
+      "art": "mars_market.svg"
+    }
+  }
 }

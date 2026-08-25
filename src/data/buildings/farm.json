@@ -33,5 +33,18 @@
     "type": "none"
   },
   "effects": [],
-  "art": "farm.svg"
+  "art": "farm.svg",
+  "themes": {
+    "mars": {
+      "name": {
+        "de": "Hydrokultur",
+        "en": "Hydroponics"
+      },
+      "text": {
+        "de": "Versorgt 4 Habitat-Module, egal wo sie in deiner Kolonie stehen.",
+        "en": "Supplies 4 habitat modules anywhere in your colony."
+      },
+      "art": "mars_farm.svg"
+    }
+  }
 }

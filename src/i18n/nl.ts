@@ -4,6 +4,9 @@ import type { Translation } from './index';
 
 export const nl: Translation = {
   languageName: 'Nederlands',
+  themeLabel: 'Thema',
+  themeClassic: 'Bosstadje',
+  themeMars: 'Marskolonie',
   language: 'Taal',
   appTitle: 'Tiny Towns',
   newGame: 'Nieuw spel',

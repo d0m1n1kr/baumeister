@@ -162,8 +162,8 @@
     grid-template-columns: repeat(4, 1fr);
     grid-template-rows: repeat(4, 1fr);
     gap: 4px;
-    background: #33445a;
-    border: 3px solid #46586f;
+    background: var(--board-bg);
+    border: 3px solid var(--board-border);
     border-radius: 10px;
     padding: 5px;
     width: 100%;
@@ -172,7 +172,7 @@
   }
   .cell {
     position: relative;
-    background: #d8cdb4;
+    background: var(--cell);
     border-radius: 5px;
     display: grid;
     place-items: center;
@@ -240,7 +240,7 @@
     position: absolute;
     inset: 0;
     border-radius: 5px;
-    background: color-mix(in srgb, var(--cat) 34%, #f2ead8);
+    background: color-mix(in srgb, var(--cat) 34%, var(--card-paper));
     border-bottom: 4px solid var(--cat);
     display: grid;
     place-items: center;

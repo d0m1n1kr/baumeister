@@ -31,5 +31,18 @@
     "vpEach": 1
   },
   "effects": [],
-  "art": "chapel.svg"
+  "art": "chapel.svg",
+  "themes": {
+    "mars": {
+      "name": {
+        "de": "Labor",
+        "en": "Laboratory"
+      },
+      "text": {
+        "de": "1 Punkt für jedes versorgte Habitat in deiner Kolonie.",
+        "en": "1 point for each supplied habitat in your colony."
+      },
+      "art": "mars_chapel.svg"
+    }
+  }
 }
