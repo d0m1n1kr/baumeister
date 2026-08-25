@@ -42,28 +42,12 @@
   --safe-raw-bottom: env(safe-area-inset-bottom, 0px);
 }
 
-/* Installierte PWA, deren Layout-Viewport kleiner ist als die Web-View
-   (am iPhone 812 statt 874, siehe src/ui/viewport.ts): Der Home-Indicator
-   liegt dann UNTERHALB des Viewports — sein Rand muss nicht freigehalten
-   werden, sonst bleibt unten doppelt Platz. */
-html[data-cover] { --safe-bottom: 0px; }
-
-/* Nur solange die Messanzeige offen ist: html/body dürfen die volle
-   Web-View-Höhe nutzen, damit der Versuchsbalken unterhalb des
-   Layout-Viewports überhaupt liegen kann (siehe LayoutProbe.svelte). */
-html.probeBand, html.probeBand body { height: 100vh; }
-.probeBandMark {
-  position: absolute;
-  left: 0;
-  right: 0;
-  z-index: 300;
-  display: grid;
-  place-items: center;
-  font-family: ui-monospace, monospace;
-  font-size: 11px;
-  color: #04212b;
-  background: repeating-linear-gradient(45deg, #29e0ff, #29e0ff 8px, #0aa8c4 8px, #0aa8c4 16px);
-}
+/* Installierte PWA mit viewport-fit=cover (siehe src/ui/viewport.ts):
+   html/body dürfen die volle Web-View-Höhe nutzen. Mit height:100% blieben sie
+   am kleinen Viewport (am iPhone 812 statt 874) — die fehlenden 62 px lagen
+   unten brach, und fixierte Elemente wurden dort nicht gezeichnet. */
+html[data-cover],
+html[data-cover] body { height: 100vh; }
 
 * { box-sizing: border-box; }
 
