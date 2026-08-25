@@ -68,6 +68,7 @@ export const en: Translation = {
   decline: 'Decline',
 
   expansions: 'Expansions',
+  coinIcon: '🪙',
   coins: 'Coins',
   coinSwap: 'Coin: different resource',
   coinSwapHint: 'Pay 1 coin and take any other resource',

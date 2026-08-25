@@ -35,5 +35,18 @@
   "effects": [
     "museum"
   ],
-  "art": "museum.svg"
+  "art": "museum.svg",
+  "themes": {
+    "mars": {
+      "name": {
+        "de": "Kolonie-Museum",
+        "en": "Colony Museum"
+      },
+      "text": {
+        "de": "Beim Bau: Lege 2 Materialien auf das Kolonie-Museum. Sagt ein anderer Spieler ein Material an, das auf dem Museum liegt, darfst du es statt zu platzieren in den Vorrat zurückgeben → +1 Energiezelle (1×/Runde).",
+        "en": "When constructed, place 2 resources on the Colony Museum. When another player names a resource on the Museum, instead of placing that resource you may return it to the supply and gain 1 power cell (once per round)."
+      },
+      "art": "mars_museum.svg"
+    }
+  }
 }

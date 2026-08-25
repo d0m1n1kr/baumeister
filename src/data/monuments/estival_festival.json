@@ -36,5 +36,18 @@
     "coinValue2",
     "coinSlot"
   ],
-  "art": "estival_festival.svg"
+  "art": "estival_festival.svg",
+  "themes": {
+    "mars": {
+      "name": {
+        "de": "Estival-Lichtfest",
+        "en": "Estival Festival of Light"
+      },
+      "text": {
+        "de": "4 Punkte. Der Bau kostet zusätzlich 2 Energiezellen. Am Spielende sind deine Energiezellen 2 statt 1 Punkt wert.",
+        "en": "4 points. Construction costs 2 power cells. At game end your power cells are worth 2 points each."
+      },
+      "art": "mars_estival_festival.svg"
+    }
+  }
 }

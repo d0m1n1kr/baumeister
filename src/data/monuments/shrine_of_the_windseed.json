@@ -33,5 +33,18 @@
     "windseedCoins",
     "coinSlot"
   ],
-  "art": "shrine_of_the_windseed.svg"
+  "art": "shrine_of_the_windseed.svg",
+  "themes": {
+    "mars": {
+      "name": {
+        "de": "Denkmal des Sonnenwinds",
+        "en": "Shrine of the Solar Wind"
+      },
+      "text": {
+        "de": "Beim Bau: +1 Energiezelle für jedes Modul des Modultyps, den du am häufigsten in deiner Kolonie hast.",
+        "en": "When constructed, gain 1 power cell for each module of the type you have the most of in your colony."
+      },
+      "art": "mars_shrine_of_the_windseed.svg"
+    }
+  }
 }

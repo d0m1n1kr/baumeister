@@ -30,5 +30,18 @@
   "effects": [
     "gamblersDen"
   ],
-  "art": "gamblers_den.svg"
+  "art": "gamblers_den.svg",
+  "themes": {
+    "mars": {
+      "name": {
+        "de": "Kasinokuppel",
+        "en": "Casino Dome"
+      },
+      "text": {
+        "de": "2 Punkte. Beim Bau: Hast du genau 1 Energiezelle, erhältst du 2 Energiezellen dazu.",
+        "en": "2 points. On construct: gain 2 power cells if you have exactly 1 power cell."
+      },
+      "art": "mars_gamblers_den.svg"
+    }
+  }
 }

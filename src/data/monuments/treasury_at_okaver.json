@@ -38,5 +38,18 @@
   "effects": [
     "okaverCottage"
   ],
-  "art": "treasury_at_okaver.svg"
+  "art": "treasury_at_okaver.svg",
+  "themes": {
+    "mars": {
+      "name": {
+        "de": "Das Energiedepot von Okaver",
+        "en": "The Okaver Power Depot"
+      },
+      "text": {
+        "de": "1 Punkt je angrenzendem Habitat. Immer wenn du deinen Akku auf 4 Energiezellen füllst, darfst du ein Habitat auf einem beliebigen leeren Feld deiner Kolonie bauen.",
+        "en": "1 point for each adjacent habitat. Whenever you fill your battery to 4 power cells, you may construct a habitat on any empty square in your colony."
+      },
+      "art": "mars_treasury_at_okaver.svg"
+    }
+  }
 }

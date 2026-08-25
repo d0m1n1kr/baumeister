@@ -39,5 +39,18 @@
     "grottoCoins",
     "coinSlot"
   ],
-  "art": "caterinas_grotto.svg"
+  "art": "caterinas_grotto.svg",
+  "themes": {
+    "mars": {
+      "name": {
+        "de": "Caterinas Lavahöhle",
+        "en": "Caterina's Lava Cave"
+      },
+      "text": {
+        "de": "2 Punkte. Beim Bau: Lege 1 Energiezelle auf jedes der 4 Mittelfelder — bebaute Felder bringen die Zelle sofort. Ein späteres Modul auf einem Zellenfeld bringt dessen Zelle. Übrige Zellen verfallen am Ende.",
+        "en": "2 points. On construct: place 1 power cell on each of the 4 center squares; occupied squares yield their cell immediately. Constructing on a cell square gains that cell. Leftover cells are removed at game end."
+      },
+      "art": "mars_caterinas_grotto.svg"
+    }
+  }
 }

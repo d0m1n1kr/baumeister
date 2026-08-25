@@ -39,5 +39,18 @@
   "effects": [
     "southernSemaphore"
   ],
-  "art": "southern_semaphore.svg"
+  "art": "southern_semaphore.svg",
+  "themes": {
+    "mars": {
+      "name": {
+        "de": "Südlicher Funkturm",
+        "en": "Southern Relay"
+      },
+      "text": {
+        "de": "1 Punkt. Sagt ein anderer Spieler ein Material an, darfst du sofort 1 zusätzliches Material desselben Typs platzieren — dafür +1 Energiezelle. Energiezellen können keines der beiden Materialien tauschen.",
+        "en": "1 point. When another player names a resource you may immediately place an additional resource of the same type; if you do, gain 1 power cell. Power cells cannot be spent to change either resource."
+      },
+      "art": "mars_southern_semaphore.svg"
+    }
+  }
 }

@@ -28,5 +28,18 @@
   "effects": [
     "statueCoins"
   ],
-  "art": "statue.svg"
+  "art": "statue.svg",
+  "themes": {
+    "mars": {
+      "name": {
+        "de": "Gründerstatue",
+        "en": "Founder's Statue"
+      },
+      "text": {
+        "de": "Beim Bau: +1 Energiezelle für jeden Modultyp, von dem du mindestens 3 Exemplare hast.",
+        "en": "On construct: gain 1 power cell per module type of which you have 3+."
+      },
+      "art": "mars_statue.svg"
+    }
+  }
 }

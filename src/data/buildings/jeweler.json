@@ -35,5 +35,18 @@
   "effects": [
     "jewelerToll"
   ],
-  "art": "jeweler.svg"
+  "art": "jeweler.svg",
+  "themes": {
+    "mars": {
+      "name": {
+        "de": "Kristallschleiferei",
+        "en": "Crystal Cutter"
+      },
+      "text": {
+        "de": "4 Punkte. Beim Bau: Zahle 1 Energiezelle — kannst du nicht, erhalten alle anderen Spieler 1 Energiezelle.",
+        "en": "4 points. On construct: pay 1 power cell; if you cannot, every other player gains 1 power cell."
+      },
+      "art": "mars_jeweler.svg"
+    }
+  }
 }

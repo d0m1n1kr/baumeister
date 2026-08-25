@@ -2,6 +2,7 @@
   import type { Square } from '../engine/types';
   import { catalog, artFor } from '../data';
   import { CATEGORY_CSS, RESOURCE_CSS } from './helpers';
+  import { t } from '../i18n';
 
   /** Fliegendes Material beim Bauen (rein dekorativ). */
   type Ghost = { id: number; col: number; row: number; dx: number; dy: number; color: string };
@@ -141,7 +142,7 @@
       {:else if sq.resource}
         <span class="res" style="background: {RESOURCE_CSS[sq.resource]}"></span>
       {/if}
-      {#if sq.coin}<span class="coinMark">🪙</span>{/if}
+      {#if sq.coin}<span class="coinMark">{t.coinIcon}</span>{/if}
       {#if seed === i && !sq.building}<span class="seedMark">🌱</span>{/if}
     </div>
   {/each}

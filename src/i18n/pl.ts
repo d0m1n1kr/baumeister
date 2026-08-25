@@ -68,6 +68,7 @@ export const pl: Translation = {
   decline: 'Odrzuć',
 
   expansions: 'Dodatki',
+  coinIcon: '🪙',
   coins: 'Monety',
   coinSwap: 'Moneta: inny surowiec',
   coinSwapHint: 'Zapłać 1 monetę i weź dowolny inny surowiec',

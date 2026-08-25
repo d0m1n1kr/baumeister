@@ -32,5 +32,18 @@
     "promenadeCoins",
     "coinSlot"
   ],
-  "art": "petal_promenade.svg"
+  "art": "petal_promenade.svg",
+  "themes": {
+    "mars": {
+      "name": {
+        "de": "Die Kuppelpromenade",
+        "en": "The Dome Promenade"
+      },
+      "text": {
+        "de": "3 Punkte. Beim Bau: Lege 1 Energiezelle auf 3 leere Felder. Die nächsten 3 fremd angesagten Materialien MÜSSEN auf diese Felder — jede Platzierung bringt die Zelle. Eigene Ansagen dürfen nicht auf Zellenfelder.",
+        "en": "3 points. On construct: place 1 power cell on 3 empty squares. The next 3 resources named by other players must be placed on those squares; gain each cell when you place a resource there. You may not place resources you name on cell squares."
+      },
+      "art": "mars_petal_promenade.svg"
+    }
+  }
 }

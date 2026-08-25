@@ -22,7 +22,7 @@
   <header>
     <span class="dot" class:off={offline}></span>
     <span class="name">{isMB ? (st.config.townHall ? '🏛 ' : '👑 ') : ''}{p.name}</span>
-    {#if st.config.systems.coins}<span class="coins">🪙 {p.coins}</span>{/if}
+    {#if st.config.systems.coins}<span class="coins">{t.coinIcon} {p.coins}</span>{/if}
   </header>
   <BoardGrid player={player} board={p.board} />
   <footer>

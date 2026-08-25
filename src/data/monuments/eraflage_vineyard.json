@@ -33,5 +33,18 @@
   "effects": [
     "fedMonument"
   ],
-  "art": "eraflage_vineyard.svg"
+  "art": "eraflage_vineyard.svg",
+  "themes": {
+    "mars": {
+      "name": {
+        "de": "Eraflage-Gewächsstation",
+        "en": "Eraflage Growhouse"
+      },
+      "text": {
+        "de": "9 Punkte, wenn versorgt. −2 Punkte je einzigartigem Modultyp in seiner Zeile und Spalte (zählt sich selbst nicht).",
+        "en": "9 points if supplied. −2 points for each unique module type in the same row and column (does not count itself)."
+      },
+      "art": "mars_eraflage_vineyard.svg"
+    }
+  }
 }

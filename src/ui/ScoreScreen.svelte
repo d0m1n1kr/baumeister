@@ -97,7 +97,7 @@
         </tr>
         {#if st.config.systems.coins}
           <tr>
-            <td class="cardName">🪙 {t.coins}</td>
+            <td class="cardName">{t.coinIcon} {t.coins}</td>
             {#each scores as s}
               <td>{s.coins ? `+${s.coins.points} (${s.coins.count}×)` : '—'}</td>
             {/each}

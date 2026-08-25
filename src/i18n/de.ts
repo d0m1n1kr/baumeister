@@ -68,6 +68,7 @@ export const de = {
   decline: 'Ablehnen',
 
   expansions: 'Erweiterungen',
+  coinIcon: '🪙',
   coins: 'Münzen',
   coinSwap: 'Münze: anderes Material',
   coinSwapHint: 'Zahle 1 Münze und nimm ein beliebiges anderes Material',

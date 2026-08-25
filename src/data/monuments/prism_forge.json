@@ -34,5 +34,18 @@
   "effects": [
     "prismForge"
   ],
-  "art": "prism_forge.svg"
+  "art": "prism_forge.svg",
+  "themes": {
+    "mars": {
+      "name": {
+        "de": "Die Prismenschmiede",
+        "en": "The Prism Forge"
+      },
+      "text": {
+        "de": "1 Punkt. Du darfst in derselben Runde 2 einzigartige Module mit überlappenden Baumustern bauen — die gemeinsamen Materialien zählen für beide.",
+        "en": "1 point. You may construct 2 unique modules using overlapping layouts in the same round."
+      },
+      "art": "mars_prism_forge.svg"
+    }
+  }
 }

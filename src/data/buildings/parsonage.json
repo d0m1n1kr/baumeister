@@ -38,5 +38,18 @@
   "effects": [
     "parsonageCheck"
   ],
-  "art": "parsonage.svg"
+  "art": "parsonage.svg",
+  "themes": {
+    "mars": {
+      "name": {
+        "de": "Verwalterbüro",
+        "en": "Administrator's Office"
+      },
+      "text": {
+        "de": "4 Punkte, wenn an ein versorgtes Habitat angrenzend. Beim Bau: Hast du nicht GENAU 1 Energiezelle je Habitat in deiner Kolonie, verlierst du alle Energiezellen.",
+        "en": "4 points if adjacent to a supplied habitat. On construct: you must have exactly 1 power cell per habitat in your colony, or you lose all power cells."
+      },
+      "art": "mars_parsonage.svg"
+    }
+  }
 }

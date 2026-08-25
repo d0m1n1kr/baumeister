@@ -36,5 +36,18 @@
   "effects": [
     "teahouseCoins"
   ],
-  "art": "teahouse.svg"
+  "art": "teahouse.svg",
+  "themes": {
+    "mars": {
+      "name": {
+        "de": "Teekuppel",
+        "en": "Tea Dome"
+      },
+      "text": {
+        "de": "1 Punkt. Beim Bau: +1 Energiezelle je einzigartigem Modultyp in seiner Zeile ODER Spalte (nicht beide, max. 3).",
+        "en": "1 point. On construct: gain 1 power cell for each unique module type in the same row or column (not both, max 3)."
+      },
+      "art": "mars_teahouse.svg"
+    }
+  }
 }

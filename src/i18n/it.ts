@@ -68,6 +68,7 @@ export const it: Translation = {
   decline: 'Rifiuta',
 
   expansions: 'Espansioni',
+  coinIcon: '🪙',
   coins: 'Monete',
   coinSwap: 'Moneta: altra risorsa',
   coinSwapHint: 'Paga 1 moneta e prendi qualsiasi altra risorsa',

@@ -36,5 +36,18 @@
   "effects": [
     "hollowHill"
   ],
-  "art": "hollow_hill.svg"
+  "art": "hollow_hill.svg",
+  "themes": {
+    "mars": {
+      "name": {
+        "de": "Hohlkrater",
+        "en": "Hollow Crater"
+      },
+      "text": {
+        "de": "7 Punkte. −2 Punkte für jede Energiezelle, die du nach dem Bau ausgibst, um Materialien zu tauschen.",
+        "en": "7 points. −2 points for each power cell you spend to change resources after constructing Hollow Crater."
+      },
+      "art": "mars_hollow_hill.svg"
+    }
+  }
 }
