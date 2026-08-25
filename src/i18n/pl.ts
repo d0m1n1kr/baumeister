@@ -266,7 +266,6 @@ export const pl: Translation = {
     hintStart: 'Rozpocznij partię nauki',
     gotIt: 'Rozumiem',
     hideTips: 'Ukryj wskazówki',
-    resetTips: 'Pokaż objaśnienia od nowa',
     multiplayer: 'Przy kilku graczach',
     suggestion: 'Podpowiedź',
     suggestCompletes: (card: string) => `zaznaczone pole — dzięki temu ${card} jest gotowy`,

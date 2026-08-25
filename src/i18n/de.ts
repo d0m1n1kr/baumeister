@@ -267,7 +267,6 @@ export const de = {
     hintStart: 'Lernspiel starten',
     gotIt: 'Verstanden',
     hideTips: 'Tipps aus',
-    resetTips: 'Erklärungen zurücksetzen',
     multiplayer: 'Mit mehreren Spielern',
     suggestion: 'Vorschlag',
     suggestCompletes: (card: string) => `markiertes Feld — damit ist ${card} vollständig`,

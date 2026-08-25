@@ -68,9 +68,15 @@ export const learn = {
     return ctx ? pickStep(ctx, seen) : null;
   },
 
+  /**
+   * Ein-/Ausschalten. Einschalten heißt „erklär es mir": Die Merkliste der
+   * weggetippten Blasen wird geleert — sonst bliebe ein neues Lernspiel stumm,
+   * weil man die Blasen in einer FRÜHEREN Partie schon weggetippt hat.
+   */
   set(on: boolean): void {
     enabled = on;
     store(KEY, on ? '1' : '0');
+    if (on) this.resetSeen();
   },
 
   toggle(): boolean {
@@ -96,11 +102,7 @@ export const learn = {
     store(SEEN_KEY, JSON.stringify(seen));
   },
 
-  get anyDismissed(): boolean {
-    return seen.length > 0;
-  },
-
-  /** Alle Erklärungen wieder von vorn. */
+  /** Alle Erklärungen wieder von vorn (gilt nur für die laufende Partie). */
   resetSeen(): void {
     seen = [];
     store(SEEN_KEY, '[]');

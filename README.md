@@ -102,8 +102,9 @@ device (the host runs the engine and broadcasts it).
   suggested square is highlighted with its reason ("2 of 3 for the Farm"); the
   advice comes from a pure analyser (`src/engine/advice.ts`) that reuses the
   pattern matcher, so it never proposes an illegal move — and stays silent when
-  it has nothing useful to say. Bubbles are dismissed one at a time and
-  remembered per device; the final screen sums up the multiplayer differences.
+  it has nothing useful to say. Bubbles are dismissed one at a time and stay
+  away for the rest of that game — every new learning game explains again; the
+  final screen sums up the multiplayer differences.
 - **Two ways to play:**
   - *On one device* (default, unchanged): taking turns around the same tablet,
     **fully offline**.

@@ -187,7 +187,21 @@ async function run(browser, label, viewport) {
   }
   if (!built) fail(`${label}: in 10 Runden kein Bau möglich — Vorschläge greifen nicht`);
 
-  // 5) Schalter in der Kartenleiste schaltet die Blasen ab
+  // 5) Ein NEUES Lernspiel erklärt wieder von vorn — die Blasen dieser Partie
+  //    sind alle weggetippt, das darf die nächste Partie nicht stumm machen.
+  await page.locator('.strip .quit').click();
+  await page.locator('.scrim button', { hasText: 'Partie beenden' }).click();
+  await page.locator('section button.big').waitFor({ timeout: 5000 });
+  await page.locator('.seg button', { hasText: '1' }).first().click();
+  await page.locator('.seg button', { hasText: 'Lernspiel' }).click();
+  await page.locator('section button.big').click();
+  await page.locator('.bubble.ready').waitFor({ timeout: 8000 });
+  if (!(await bubbleTitle(page))?.includes('4')) {
+    fail(`${label}: neues Lernspiel bleibt stumm (${await bubbleTitle(page)})`);
+  }
+  console.log(`✓ ${label}: ein neues Lernspiel erklärt wieder von vorn`);
+
+  // 6) Schalter in der Kartenleiste schaltet die Blasen ab
   await page.locator('.aliceBtn', { hasText: '🎓' }).click();
   if ((await page.locator('.bubble').count()) !== 0) fail(`${label}: 🎓-Schalter wirkt nicht`);
   await page.locator('.aliceBtn', { hasText: '🎓' }).click();

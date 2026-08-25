@@ -266,7 +266,6 @@ export const en: Translation = {
     hintStart: 'Start a learning game',
     gotIt: 'Got it',
     hideTips: 'Tips off',
-    resetTips: 'Show explanations again',
     multiplayer: 'With several players',
     suggestion: 'Suggestion',
     suggestCompletes: (card: string) => `the marked square — that completes ${card}`,
