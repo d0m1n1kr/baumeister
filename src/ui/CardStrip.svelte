@@ -9,6 +9,7 @@
   import CardOverlay from './CardOverlay.svelte';
   import { sfx } from './sound';
   import { learn } from './learn.svelte';
+  import LayoutProbe from './LayoutProbe.svelte';
 
   let {
     onabort,
@@ -105,6 +106,18 @@
     return () => mq.removeEventListener('change', update);
   });
 
+  // Messanzeige: langer Druck (600 ms) auf die Rundenanzeige. Versteckt,
+  // weil sie nur zur Fehlersuche an echten Geräten da ist.
+  let probe = $state(false);
+  let probeTimer: ReturnType<typeof setTimeout> | undefined;
+  function probeDown() {
+    clearTimeout(probeTimer);
+    probeTimer = setTimeout(() => (probe = true), 600);
+  }
+  function probeUp() {
+    clearTimeout(probeTimer);
+  }
+
   function open(card: CardDef, e: PointerEvent) {
     // Am Spieltisch zum antippenden Spieler drehen (obere Hälfte = 180°);
     // in der Solo-Ansicht schaut nur einer aufs Gerät — immer aufrecht.
@@ -114,7 +127,15 @@
 
 <div class="strip" class:horizontal class:soloStrip={solo}>
   <div class="info">
-    <span class="round">
+    <span
+      class="round"
+      role="button"
+      tabindex="-1"
+      onpointerdown={probeDown}
+      onpointerup={probeUp}
+      onpointercancel={probeUp}
+      onpointerleave={probeUp}
+    >
       {t.round} {Math.max(1, st.round)}
       <button
         class="abort"
@@ -182,6 +203,10 @@
 
 {#if overlay}
   <CardOverlay card={overlay.card} rotation={overlay.rotation} onclose={() => (overlay = null)} />
+{/if}
+
+{#if probe}
+  <LayoutProbe onclose={() => (probe = false)} />
 {/if}
 
 <style>
