@@ -194,11 +194,12 @@ try {
   await insetPage.close();
 
   // ---------- Installierte iOS-PWA ----------
-  // Nachgebildet wird die am Gerät gemessene Lage: Bildschirm 874, gemeldeter
-  // Viewport 812, oberer Inset 62. Die Hülle bleibt am Viewport (alles darunter
-  // zeichnet die Plattform nicht), und alle Bedienelemente müssen hineinpassen.
+  // Nachgebildet wird die Lage am Gerät (iPhone mit Dynamic Island): Bildschirm
+  // und Viewport 874, oberer Inset 62, unterer 34. Erwartet wird, dass html,
+  // Hülle und Spieltisch die volle Höhe nutzen und alle Bedienelemente
+  // hineinpassen — ohne Scrollen.
   const pwaContext = await browser.newContext({
-    viewport: { width: 402, height: 812 },
+    viewport: { width: 402, height: 874 },
     screen: { width: 402, height: 874 },
     hasTouch: true,
     locale: 'de-DE'
@@ -250,6 +251,15 @@ try {
   // Am Handy muss das Panel ohne Scrollen reichen — sonst ist der letzte Knopf
   // (Monument) unerreichbar
   await pwaPage.locator('.aliceBtn').first().click(); // Alice-Modus: mehr Kartenhöhe
+  await pwaPage.locator('.aliceBtn', { hasText: '🎓' }).click(); // Lernmodus: Vorschlagszeile
+  await pwaPage.locator('.panel button', { hasText: 'Monument wählen' }).click();
+  await pwaPage.locator('.pick .pickCard button.primary').first().click();
+  await pwaPage.locator('.picker.offer').waitFor({ timeout: 5000 });
+  await pwaPage.locator('.picker.offer .offerChip').first().click();
+  while (await pwaPage.locator('.bubble button.primary').count()) {
+    await pwaPage.locator('.bubble button.primary').click(); // Blasen wegtippen
+    await pwaPage.waitForTimeout(120);
+  }
   await pwaPage.waitForTimeout(150);
   const fit = await pwaPage.evaluate(() => {
     const panel = document.querySelector('.panel');

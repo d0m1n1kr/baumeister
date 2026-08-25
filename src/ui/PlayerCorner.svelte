@@ -1061,7 +1061,7 @@
     .corner.wide header { justify-content: center; }
     /* Solo: das einzige Brett darf den Platz nutzen */
     .corner.soloCorner .boardWrap {
-      width: min(26vh, 70vw);
+      width: min(30vh, 76vw);
     }
     /* Platz für Gleis und Zug an der Brett-Unterkante — nur im Eisenbahn-Modus,
        sonst waren es 26 px, die den Knöpfen darunter fehlten */

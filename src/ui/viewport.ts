@@ -38,23 +38,3 @@ export function markCoverViewport(): void {
   if (probeHeight('var(--safe-raw-top)') > 0) document.documentElement.dataset.cover = '';
   else delete document.documentElement.dataset.cover;
 }
-
-/** Lage des Viewports auf dem Bildschirm — für die Messanzeige. */
-export function viewportFacts(): string[] {
-  const vv = window.visualViewport;
-  return [
-    `screen ${screen.width}×${screen.height} dpr ${window.devicePixelRatio}`,
-    `inner ${innerWidth}×${innerHeight} outer ${outerWidth}×${outerHeight}`,
-    `screenX ${window.screenX} screenY ${window.screenY} client ${document.documentElement.clientHeight}`,
-    vv
-      ? `visual ${Math.round(vv.width)}×${Math.round(vv.height)} offTop ${Math.round(vv.offsetTop)}`
-      : 'visual —',
-    `inset oben ${probeHeight('var(--safe-raw-top)')} unten roh ${probeHeight(
-      'var(--safe-raw-bottom)'
-    )} genutzt ${probeHeight('var(--safe-bottom)')}`,
-    `vh ${probeHeight('100vh')} svh ${probeHeight('100svh')} lvh ${probeHeight(
-      '100lvh'
-    )} dvh ${probeHeight('100dvh')}`,
-    `cover ${document.documentElement.dataset.cover !== undefined}`
-  ];
-}

@@ -37,9 +37,10 @@
      jeder Pixel davon war unten ein toter Streifen. Mehr als der
      Home-Indicator braucht niemand freizuhalten. */
   --safe-bottom: min(env(safe-area-inset-bottom, 0px), 34px);
-  /* Nur für die Messanzeige (LayoutProbe): die ungedeckelten Rohwerte */
+  /* Rohwert des oberen Insets: Daran erkennt viewport.ts die installierte PWA
+     mit viewport-fit=cover (im Browser ist er 0). Als Variable, weil env() nur
+     über eine Messung lesbar ist. */
   --safe-raw-top: env(safe-area-inset-top, 0px);
-  --safe-raw-bottom: env(safe-area-inset-bottom, 0px);
 }
 
 /* Installierte PWA mit viewport-fit=cover (siehe src/ui/viewport.ts):
