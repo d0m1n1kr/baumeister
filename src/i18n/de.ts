@@ -377,5 +377,7 @@ export const de = {
   updateAvailable: 'Neue Version verfügbar',
   updateNow: 'Aktualisieren',
   updateLater: 'Später',
+  updateCheck: 'Nach Update suchen',
+  updateCurrent: 'aktuell',
   offlineReady: 'Bereit für Offline-Spiel'
 };

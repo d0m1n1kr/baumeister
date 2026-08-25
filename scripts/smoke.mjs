@@ -79,6 +79,15 @@ try {
   page.on('pageerror', (e) => fail(`Seitenfehler: ${e.message}`));
   await page.goto(BASE_URL);
 
+  // Der Versionsstempel im Fußbereich ist der Ausweg aus einem Tab, der auf
+  // seiner alten Fassung sitzen bleibt: Antippen prüft von Hand nach.
+  const stamp = page.locator('footer button.stamp');
+  await stamp.waitFor({ timeout: 5000 });
+  if (!(await stamp.textContent()).includes('v')) fail('Versionsstempel zeigt keine Version');
+  await stamp.dispatchEvent('pointerup');
+  await page.locator('footer button.stamp', { hasText: 'aktuell' }).waitFor({ timeout: 8000 });
+  console.log('✓ Update-Prüfung von Hand über den Versionsstempel');
+
   // Setup: 2 Spieler, ohne Monumente, mit Fortune-Erweiterung
   await page.locator('.seg button', { hasText: '2' }).click();
   await page.locator('.toggle input[type="checkbox"]').first().click();
