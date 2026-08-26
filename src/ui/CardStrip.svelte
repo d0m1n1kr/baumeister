@@ -130,7 +130,10 @@
         >🔄</button>
       {/if}
     </span>
-    <span class="mb">{st.config.townHall ? '🏛' : '👑'} {st.players[st.masterBuilder].name}</span>
+    {#if !solo}
+      <!-- Im Solo steht derselbe Name schon über dem Brett -->
+      <span class="mb">{st.config.townHall ? '🏛' : '👑'} {st.players[st.masterBuilder].name}</span>
+    {/if}
     {#if named}
       <span class="named">
         <span class="dot" style="background: {RESOURCE_CSS[named]}"></span>
@@ -308,7 +311,8 @@
     }
     .strip.soloStrip.horizontal .cards {
       flex-wrap: wrap;
-      justify-content: center;
+      /* linksbündig: eine zentrierte letzte Reihe liest sich als Versatz */
+      justify-content: flex-start;
       row-gap: 5px;
       overflow: visible;
       touch-action: auto;
@@ -338,7 +342,7 @@
   @media (orientation: portrait) and (min-height: 900px) {
     .strip.horizontal .cards:not(.alice) {
       flex-wrap: wrap;
-      justify-content: center;
+      justify-content: flex-start;
       row-gap: 6px;
       overflow: visible;
     }

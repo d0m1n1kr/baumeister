@@ -2,7 +2,7 @@
   import { cardName, cardText } from '../i18n';
   import type { CardDef } from '../engine/types';
   import { artFor } from '../data';
-  import { CATEGORY_CSS, FEATURE_ICONS } from './helpers';
+  import { CATEGORY_CSS, FEATURE_ICONS, FEATURE_KEY } from './helpers';
   import PatternGrid from './PatternGrid.svelte';
   import { t } from '../i18n';
 
@@ -24,7 +24,7 @@
     onpointerup={(e) => e.stopPropagation()}
   >
     <div class="bar"></div>
-    <button class="flip" title="Zum Gegenüber drehen" onpointerup={() => (flip += 180)}>⟳</button>
+    <button class="flip" title={t.flipToOpponent} onpointerup={() => (flip += 180)}>⟳</button>
     <h2>{cardName(card)}</h2>
     <div class="row">
       <span class="art">{@html artFor(card) ?? ''}</span>
@@ -33,7 +33,7 @@
     <p>{cardText(card)}</p>
     <div class="feats">
       {#each card.features as f}
-        <span>{FEATURE_ICONS[f]?.icon} {FEATURE_ICONS[f]?.title}</span>
+        <span>{FEATURE_ICONS[f]} {t.features[FEATURE_KEY[f]]}</span>
       {/each}
     </div>
     <button class="primary" onpointerup={onclose}>{t.close}</button>

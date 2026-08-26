@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { t } from '../i18n';
   // Die QR-Bibliothek wird nur in der Lobby gebraucht und daher erst dort
   // nachgeladen — der Ein-Gerät-Modus lädt sie nie.
   let { text, size = 200 }: { text: string; size?: number } = $props();
@@ -33,7 +34,7 @@
     width={size}
     height={size}
     role="img"
-    aria-label="QR-Code zum Beitreten"
+    aria-label={t.qrLabel}
   >
     <rect x="-2" y="-2" width={modules.count + 4} height={modules.count + 4} fill="#fff" />
     {#each modules.cells as cell}

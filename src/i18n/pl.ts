@@ -21,6 +21,33 @@ export const pl: Translation = {
 
   masterBuilder: 'Mistrz budowniczy',
   pickResource: 'Wybierz surowiec',
+  /* Erklärungen der Effektzeichen auf den Karten. Vorher standen sie hart
+     auf Deutsch in helpers.ts — sieben von acht Sprachen lasen Deutsch. */
+  features: {
+    feedable: 'Musi być wyżywiony',
+    feeds: 'Żywi chatki',
+    adjacency: 'Liczy się sąsiedztwo',
+    noAdjacency: 'Unikaj określonych sąsiadów',
+    rowCol: 'Liczą się wiersz i kolumna',
+    corners: 'Liczą się narożniki',
+    center: 'Liczy się centrum',
+    countTable: 'Punkty według liczby',
+    holdsResource: 'Przechowuje surowiec',
+    wildResource: 'Surowiec dowolny',
+    interactive: 'Efekt ciągły',
+    onConstruct: 'Efekt przy budowie',
+    placementOverride: 'Dowolne umieszczenie',
+    negativeVp: 'Możliwe punkty ujemne',
+    vsNeighbor: 'Porównanie z sąsiadem',
+    townSnapshot: 'Liczy się stan przy budowie',
+    finishOrder: 'Kolejność ukończenia',
+    emptyOk: 'Puste pola dozwolone',
+    uniqueTypes: 'Liczą się różne typy',
+    coins: 'Efekt monety'
+  } as Record<string, string>,
+  unverified: 'Szczegóły karty niesprawdzone',
+  flipToOpponent: 'Obróć w stronę przeciwnika',
+
   resourceNames: {
     wood: 'Drewno',
     brick: 'Cegła',
@@ -156,6 +183,7 @@ export const pl: Translation = {
   joinCode: 'Kod pokoju',
   yourName: 'Twoje imię',
   joinButton: 'Dołącz',
+  qrLabel: 'Kod QR, aby dołączyć',
   scanButton: 'Skanuj kod QR',
   scanTitle: 'Skanuj kod QR',
   scanPrompt: 'Pokaż kamerze kod QR gospodarza',
