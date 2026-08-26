@@ -3,6 +3,7 @@
   import { codeFromScan, selectedTransport, joinCodeFromUrl, clearJoinHash, signalingStatus } from '../net';
   import { isValidRoomCode, normalizeRoomCode } from '../net/protocol';
   import { t, translateError } from '../i18n';
+  import { loadNames, saveNames } from '../store/playerNames';
   import LanguagePicker from './LanguagePicker.svelte';
   import ThemePicker from './ThemePicker.svelte';
   import HelpDialog from './HelpDialog.svelte';
@@ -18,7 +19,9 @@
   // svelte-ignore state_referenced_locally
   let code = $state(joinCodeFromUrl() ?? initialCode ?? '');
   // svelte-ignore state_referenced_locally
-  let name = $state(initialName ?? '');
+  // Fällt auf den gemerkten Namen dieses Geräts zurück, wenn keine Sitzung
+  // mehr da ist — dasselbe Anliegen wie im Startbildschirm: nicht neu tippen.
+  let name = $state(initialName ?? loadNames()[0] ?? '');
   let busy = $state(false);
   let showHelp = $state(false);
   let scanning = $state(false);
@@ -57,6 +60,10 @@
     busy = true;
     session.clearError();
     try {
+      // Der eigene Name gehört auf Platz 1 dieses Geräts
+      const merken = loadNames();
+      merken[0] = name.trim();
+      saveNames(merken);
       await session.join(normalizeRoomCode(code), name.trim(), selectedTransport());
       clearJoinHash();
     } catch {
@@ -126,7 +133,14 @@
         </label>
         <label>
           <span>{t.yourName}</span>
-          <input type="text" maxlength="14" bind:value={name} placeholder={t.yourName} />
+          <span class="nameField">
+            <input type="text" maxlength="14" bind:value={name} placeholder={t.yourName} />
+            {#if name}
+              <button class="clearName iconBtn" title={t.clearName} onpointerup={() => (name = '')}>
+                ✕
+              </button>
+            {/if}
+          </span>
         </label>
 
         {#if scanError && !scanning}<div class="error">{scanError}</div>{/if}
@@ -200,6 +214,20 @@
     border: 1px solid rgba(255, 255, 255, 0.15);
     border-radius: var(--r-md);
     padding: 10px;
+  }
+  /* Namensfeld mit Löschknopf im Feld — wie im Startbildschirm */
+  .nameField { position: relative; display: flex; min-width: 0; }
+  .nameField input { flex: 1; padding-right: 46px; }
+  .clearName {
+    position: absolute;
+    top: 0;
+    right: 0;
+    height: 100%;
+    background: none;
+    border: none;
+    color: var(--text-dim);
+    font-size: var(--fs-sm);
+    border-radius: var(--r-md);
   }
   .codeRow { display: flex; gap: 8px; align-items: stretch; }
   .codeInput {

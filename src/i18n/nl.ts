@@ -13,6 +13,7 @@ export const nl: Translation = {
   newGame: 'Nieuw spel',
   resumeGame: 'Verdergaan',
   players: 'Spelers',
+  clearName: 'Naam wissen',
   playerName: 'Naam',
   corner: 'Hoek',
   useMonuments: 'Met monumenten spelen',

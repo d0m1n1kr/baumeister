@@ -160,6 +160,57 @@ try {
   }
   console.log('✓ Spielfläche: Bretter nutzen ihre Zelle, Reihen stehen deckungsgleich, nichts abgeschnitten');
 
+  // Gemerkte Spielernamen: einmal tippen, beim nächsten Start wieder da — und
+  // das ✕ im Feld löscht einen einzelnen Namen wieder weg.
+  {
+    const ctx = await browser.newContext({ viewport: { width: 402, height: 874 }, locale: 'de-DE' });
+    const np = await ctx.newPage();
+    np.on('pageerror', (e) => fail(`Namen: Seitenfehler: ${e.message}`));
+    await np.goto(BASE_URL);
+    await np.locator('#splash').waitFor({ state: 'detached', timeout: 10000 });
+
+    // Beim ersten Start sind die Felder leer, der Standardname steht als Hinweis
+    const felder = np.locator('.players .nameField input');
+    if ((await felder.first().inputValue()) !== '') fail('Namen: Feld beim ersten Start nicht leer');
+    if ((await felder.first().getAttribute('placeholder')) !== 'Spieler 1') {
+      fail('Namen: Standardname fehlt als Hinweis im leeren Feld');
+    }
+    await felder.nth(0).fill('Anna');
+    await felder.nth(1).fill('Bert');
+    await np.locator('.bar button.big').click();
+    await np.locator('.board').first().waitFor({ timeout: 5000 });
+    // Die Namen stehen an den Brettern
+    const amBrett = await np.locator('.corner .pname').allTextContents();
+    if (!amBrett.some((x) => x.includes('Anna'))) fail(`Namen: „Anna" fehlt am Brett (${amBrett})`);
+
+    // Partie beenden und neu anfangen: die Namen sind wieder da
+    await np.locator('.strip .quit').click();
+    await np.locator('.scrim button', { hasText: 'Partie beenden' }).click();
+    await np.locator('.bar button.big').waitFor({ timeout: 5000 });
+    if ((await felder.nth(0).inputValue()) !== 'Anna') fail('Namen: nach der Partie nicht gemerkt');
+
+    // Auch über einen Neustart der App hinweg
+    await np.reload();
+    await np.locator('#splash').waitFor({ state: 'detached', timeout: 10000 });
+    const nachReload = np.locator('.players .nameField input');
+    if ((await nachReload.nth(0).inputValue()) !== 'Anna') fail('Namen: nach Reload nicht gemerkt');
+    if ((await nachReload.nth(1).inputValue()) !== 'Bert') fail('Namen: zweiter Name nach Reload weg');
+
+    // ✕ löscht genau diesen einen Namen
+    await np.locator('.players .nameField').nth(0).locator('.clearName').dispatchEvent('pointerup');
+    if ((await nachReload.nth(0).inputValue()) !== '') fail('Namen: ✕ löscht nicht');
+    if ((await nachReload.nth(1).inputValue()) !== 'Bert') fail('Namen: ✕ löscht den falschen Namen mit');
+    // Und ohne Namen greift wieder der Standard
+    await np.locator('.bar button.big').click();
+    await np.locator('.board').first().waitFor({ timeout: 5000 });
+    const wieder = await np.locator('.corner .pname').allTextContents();
+    if (!wieder.some((x) => x.includes('Spieler 1'))) {
+      fail(`Namen: ohne Eingabe fehlt der Standardname (${wieder})`);
+    }
+    await ctx.close();
+    console.log('✓ Spielernamen: gemerkt über Partie und Neustart, ✕ löscht einzeln');
+  }
+
   // Trefflächen: Jedes Bedienelement muss mindestens 44×44 groß sein — als
   // Element oder, bei Textlinks, über die vergrößerte Trefffläche (.tapArea).
   // Ausgenommen sind NAMENTLICH die dichten Raster, die von Natur aus anders

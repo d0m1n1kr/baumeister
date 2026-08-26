@@ -1,6 +1,7 @@
 <script lang="ts">
   import { game } from '../store/gameStore.svelte';
   import { buildGameConfig, todayId } from '../store/newGameConfig';
+  import { loadNames, saveNames } from '../store/playerNames';
   import { SETS } from '../data/sets';
   import { sortPlayersClockwise } from '../engine/registry';
   import { session } from '../net/session.svelte';
@@ -26,7 +27,9 @@
   };
 
   let count = $state(4);
-  let names = $state([1, 2, 3, 4].map((n) => t.defaultPlayer(n)));
+  // Leer heißt „Standardname". Vorher stand der Standardname als Wert im Feld
+  // und musste erst weggelöscht werden, bevor man den eigenen tippen konnte.
+  let names = $state(loadNames());
   let corners = $state([...DEFAULT_CORNERS[4]]);
   let useMonuments = $state(true);
   let cavernRule = $state(false);
@@ -112,6 +115,7 @@
 
   function start() {
     try {
+      saveNames(names);
       // Der Lernmodus ist eine Anzeige-Präferenz dieses Geräts, kein Spielstand
       learn.set(solo && soloMode === 'learn');
       game.start(
@@ -149,6 +153,7 @@
     busy = true;
     error = '';
     try {
+      saveNames(names);
       session.setup = { sets: activeSets(), useMonuments, cavern: cavernRule, townHall, train };
       await session.openRoom(makeRoomCode(), seats, selectedTransport());
     } catch (e) {
@@ -267,13 +272,22 @@
         <div class="stack players" style="grid-template-columns: {rowColumns}">
           {#each Array.from({ length: count }) as _, i}
             <div class="playerRow">
-              <input
-                type="text"
-                bind:value={names[i]}
-                placeholder={`${t.playerName} ${i + 1}`}
-                maxlength="14"
-                disabled={multiDevice && remote[i]}
-              />
+              <span class="nameField">
+                <input
+                  type="text"
+                  bind:value={names[i]}
+                  placeholder={t.defaultPlayer(i + 1)}
+                  maxlength="14"
+                  disabled={multiDevice && remote[i]}
+                />
+                {#if names[i] && !(multiDevice && remote[i])}
+                  <button
+                    class="clearName iconBtn"
+                    title={t.clearName}
+                    onpointerup={() => (names[i] = '')}
+                  >✕</button>
+                {/if}
+              </span>
               {#if !solo}
                 <select
                   value={corners[i]}
@@ -468,6 +482,21 @@
   .sharedDay { color: var(--accent); }
   .hint { margin: 0; font-size: var(--fs-xs); color: var(--text-dim); line-height: 1.4; }
 
+  /* Namensfeld mit Löschknopf: Der Knopf liegt IM Feld, damit die Spalte
+     ihre Breite behält und die Zeilen weiter untereinander stehen. */
+  .nameField { position: relative; display: flex; min-width: 0; }
+  .nameField input { padding-right: 46px; }
+  .clearName {
+    position: absolute;
+    top: 0;
+    right: 0;
+    height: 100%;
+    background: none;
+    border: none;
+    color: var(--text-dim);
+    font-size: var(--fs-sm);
+    border-radius: var(--r-md);
+  }
   .playerRow input {
     flex: 1;
     font: inherit;
