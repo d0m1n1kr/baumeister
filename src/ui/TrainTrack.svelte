@@ -1,8 +1,8 @@
 <script lang="ts">
   // Eisenbahn: EINE durchgehende Strecke je Brettreihe, exakt auf Höhe der
-  // Brett-Unterkanten (aus dem echten Layout gemessen), vom linken bis zum
-  // rechten Bildschirmrand — mit Tunnelportalen an den Enden. Steht die
-  // vertikale Kartenleiste im Weg, fährt der Zug hinter ihr durch einen Tunnel.
+  // Brett-Unterkanten (aus dem echten Layout gemessen), so weit, wie die Reihe
+  // Städte hat — mit Tunnelportalen an den Enden. Steht die vertikale
+  // Kartenleiste im Weg, fährt der Zug hinter ihr durch einen Tunnel.
   // Der Zug (3 Waggons HINTER der Lok) ist samt Beladung immer sichtbar und
   // parkt unter der Stadt, bei der er gerade hält. Rein aus Zustands-Diffs
   // abgeleitet — identisch am Einzelgerät, beim Host und bei Gästen.
@@ -16,9 +16,15 @@
 
   type Edge = 'bottom' | 'top';
   type Spot = { edge: Edge; x: number };
+  /** Eine Strecke: Höhe in px, waagerechter Bereich in % der Bildschirmbreite. */
+  interface Rail {
+    y: number;
+    from: number;
+    to: number;
+  }
   interface Layout {
-    /** y-Position (px) der Strecke je Brettreihe (nur vorhandene Reihen). */
-    tracks: Partial<Record<Edge, number>>;
+    /** Die Strecke je Brettreihe (nur vorhandene Reihen). */
+    tracks: Partial<Record<Edge, Rail>>;
     /** Parkposition je Spieler: unter der Mitte seines Bretts. */
     slots: Record<number, Spot>;
     /** Vertikale Kartenleiste: x-Bereich (%) — dort fährt der Zug durch den Tunnel. */
@@ -39,8 +45,19 @@
       return;
     }
     const vw = window.innerWidth;
-    const vh = window.innerHeight;
-    const rows: Record<Edge, number[]> = { bottom: [], top: [] };
+    // Vertikale Kartenleiste als Hindernis (die horizontale liegt nie im Weg).
+    // Sie wird zuerst gemessen: Sie teilt den Bildschirm, und erst dadurch
+    // steht fest, auf welcher Seite ein Brett liegt.
+    let strip: Layout['strip'] = null;
+    const stripEl = document.querySelector('.strip:not(.horizontal)');
+    if (stripEl) {
+      const r = stripEl.getBoundingClientRect();
+      if (r.height > r.width) strip = { l: (r.left / vw) * 100, r: (r.right / vw) * 100 };
+    }
+    const rows: Record<Edge, { y: number[]; left: boolean; right: boolean }> = {
+      bottom: { y: [], left: false, right: false },
+      top: { y: [], left: false, right: false }
+    };
     const slots: Record<number, Spot> = {};
     for (const el of els) {
       const r = el.getBoundingClientRect();
@@ -48,21 +65,27 @@
       // Die Kante meldet das Brett selbst (aus seiner Rotation abgeleitet):
       // gedrehte Bretter der Gegenseite haben ihre „Unterkante" oben.
       const edge: Edge = el.dataset.trackEdge === 'top' ? 'top' : 'bottom';
-      rows[edge].push(edge === 'top' ? r.top : r.bottom);
-      slots[Number(el.dataset.track)] = { edge, x: ((r.left + r.width / 2) / vw) * 100 };
+      const x = ((r.left + r.width / 2) / vw) * 100;
+      rows[edge].y.push(edge === 'top' ? r.top : r.bottom);
+      if (!strip || x <= strip.l) rows[edge].left = true;
+      if (strip && x > strip.l) rows[edge].right = true;
+      slots[Number(el.dataset.track)] = { edge, x };
     }
-    const tracks: Partial<Record<Edge, number>> = {};
+    const tracks: Partial<Record<Edge, Rail>> = {};
     for (const edge of ['bottom', 'top'] as Edge[]) {
-      if (rows[edge].length) {
-        tracks[edge] = rows[edge].reduce((a, b) => a + b, 0) / rows[edge].length;
-      }
-    }
-    // Vertikale Kartenleiste als Hindernis (die horizontale liegt nie im Weg)
-    let strip: Layout['strip'] = null;
-    const stripEl = document.querySelector('.strip:not(.horizontal)');
-    if (stripEl) {
-      const r = stripEl.getBoundingClientRect();
-      if (r.height > r.width) strip = { l: (r.left / vw) * 100, r: (r.right / vw) * 100 };
+      const row = rows[edge];
+      if (row.y.length === 0) continue;
+      // Die ÄUSSERSTE Kante der Reihe, nicht der Mittelwert: Bretter einer
+      // Reihe sollten gleich groß sein (panelReserve stimmt die Panelhöhe ab),
+      // aber falls sie es einmal nicht sind, liegt die Strecke außen bündig am
+      // größten Brett statt quer über allen.
+      const y = edge === 'top' ? Math.min(...row.y) : Math.max(...row.y);
+      // Nur so weit, wie die Reihe Städte hat: Am Handy im Querformat stehen
+      // die zwei Bretter NEBENeinander. Eine Strecke über die ganze Breite lief
+      // dort quer durch das Brett des anderen Spielers.
+      const from = strip && !row.left ? strip.r : 0;
+      const to = strip && !row.right ? strip.l : 100;
+      tracks[edge] = { y, from, to };
     }
     layout = { tracks, slots, strip };
   }
@@ -90,8 +113,18 @@
     typeof matchMedia !== 'undefined' && matchMedia('(prefers-reduced-motion: reduce)').matches;
 
   // Fahrtrichtung ist immer „vorwärts": unten links → rechts, oben rechts → links.
-  const EXIT_X = { bottom: 106, top: -6 } as const;
-  const ENTRY_X = { bottom: -6, top: 106 } as const;
+  // Ein- und Ausfahrt liegen an den Enden der eigenen Strecke — das ist der
+  // Bildschirmrand, wo sie hinreicht, sonst das Portal an der Kartenleiste.
+  const exitX = (edge: Edge) => {
+    const r = layout?.tracks[edge];
+    if (!r) return edge === 'bottom' ? 106 : -6;
+    return edge === 'bottom' ? r.to + 6 : r.from - 6;
+  };
+  const entryX = (edge: Edge) => {
+    const r = layout?.tracks[edge];
+    if (!r) return edge === 'bottom' ? -6 : 106;
+    return edge === 'bottom' ? r.from - 6 : r.to + 6;
+  };
 
   let driving = $state<{ edge: Edge; x: number; dur: number; shown: boolean } | null>(null);
   let runId = 0;
@@ -116,7 +149,7 @@
     } else {
       // In den vorderen Tunnel ausfahren …
       if (from) {
-        const exit = EXIT_X[from.edge];
+        const exit = exitX(from.edge);
         driving = { edge: from.edge, x: from.x, dur: 0, shown: true };
         await sleep(30);
         if (my !== runId) return;
@@ -129,7 +162,7 @@
       if (my !== runId) return;
       // … und aus dem Einfahrtstunnel der Zielstrecke wieder herein
       if (to) {
-        const entry = ENTRY_X[to.edge];
+        const entry = entryX(to.edge);
         driving = { edge: to.edge, x: entry, dur: 0, shown: false };
         await sleep(30);
         if (my !== runId) return;
@@ -158,12 +191,12 @@
     const s = st?.train ? slotFor(st.train.pos) : null;
     return s ? { ...s, dur: 0, shown: true } : null;
   });
-  const trackY = $derived(spot ? layout?.tracks[spot.edge] : undefined);
+  const trackY = $derived(spot ? layout?.tracks[spot.edge]?.y : undefined);
 
   const trackList = $derived(
     (['bottom', 'top'] as Edge[]).flatMap((e) => {
-      const y = layout?.tracks[e];
-      return y != null ? [{ edge: e, y }] : [];
+      const r = layout?.tracks[e];
+      return r ? [{ edge: e, ...r }] : [];
     })
   );
 
@@ -209,19 +242,34 @@
 
 <div class="layer" aria-hidden="true">
   {#each trackList as tr (tr.edge)}
-    {#if layout?.strip}
+    {#if layout?.strip && tr.from < layout.strip.l && tr.to > layout.strip.r}
       {@const strip = layout.strip}
-      <!-- Gleise enden an den Tunnelportalen der Kartenleiste — dahinter
-           verläuft die Strecke unsichtbar „durch den Berg" -->
+      <!-- Städte auf beiden Seiten: Die Gleise enden an den Tunnelportalen der
+           Kartenleiste — dahinter verläuft die Strecke unsichtbar „durch den
+           Berg" -->
       <div class="track" style="top: {tr.y - 5}px; left: 0; width: {strip.l}%"></div>
       <div class="track" style="top: {tr.y - 5}px; left: {strip.r}%; right: 0"></div>
       <div class="portal" style="left: calc({strip.l}% - 12px); top: {tr.y - 17}px"></div>
       <div class="portal" style="left: calc({strip.r}% - 2px); top: {tr.y - 17}px"></div>
     {:else}
-      <div class="track" style="top: {tr.y - 5}px; left: 0; right: 0"></div>
+      <div
+        class="track"
+        style="top: {tr.y - 5}px; left: {tr.from}%; width: {tr.to - tr.from}%"
+      ></div>
+      {#if layout?.strip && tr.to <= layout.strip.l}
+        <div class="portal" style="left: calc({tr.to}% - 12px); top: {tr.y - 17}px"></div>
+      {/if}
+      {#if layout?.strip && tr.from >= layout.strip.r}
+        <div class="portal" style="left: calc({tr.from}% - 2px); top: {tr.y - 17}px"></div>
+      {/if}
     {/if}
-    <div class="tunnel left" class:up={tr.edge === 'top'} style="top: {tr.y - 20}px"></div>
-    <div class="tunnel right" class:up={tr.edge === 'top'} style="top: {tr.y - 20}px"></div>
+    <!-- Tunnel nur da, wo die Strecke den Bildschirmrand erreicht -->
+    {#if tr.from <= 0}
+      <div class="tunnel left" class:up={tr.edge === 'top'} style="top: {tr.y - 20}px"></div>
+    {/if}
+    {#if tr.to >= 100}
+      <div class="tunnel right" class:up={tr.edge === 'top'} style="top: {tr.y - 20}px"></div>
+    {/if}
   {/each}
 
   {#if st?.train && spot && trackY != null}
