@@ -13,6 +13,7 @@ export const en: Translation = {
   newGame: 'New game',
   resumeGame: 'Resume',
   players: 'Players',
+  clearName: 'Clear name',
   playerName: 'Name',
   corner: 'Corner',
   useMonuments: 'Play with monuments',

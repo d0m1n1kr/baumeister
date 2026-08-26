@@ -13,6 +13,7 @@ export const pl: Translation = {
   newGame: 'Nowa gra',
   resumeGame: 'Kontynuuj',
   players: 'Gracze',
+  clearName: 'Usuń imię',
   playerName: 'Imię',
   corner: 'Róg',
   useMonuments: 'Graj z monumentami',

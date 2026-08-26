@@ -13,6 +13,7 @@ export const de = {
   newGame: 'Neues Spiel',
   resumeGame: 'Weiterspielen',
   players: 'Spieler',
+  clearName: 'Namen löschen',
   playerName: 'Name',
   corner: 'Ecke',
   useMonuments: 'Mit Monumenten spielen',
