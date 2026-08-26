@@ -49,7 +49,7 @@ try {
   // Host: 2 Spieler, Platz 2 auf eigenem Gerät, ohne Monumente
   await host.locator('.seg button', { hasText: '2' }).click();
   await host.locator('.toggle input[type="checkbox"]').first().click(); // Monumente aus
-  await host.locator('.modeRow button', { hasText: 'Mit eigenen Geräten' }).click();
+  await host.locator('.seg button', { hasText: 'Mit eigenen Geräten' }).click();
   await host.locator('button', { hasText: 'Raum öffnen' }).click();
 
   const code = (await host.locator('.value').first().textContent())?.trim();
