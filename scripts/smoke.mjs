@@ -102,8 +102,7 @@ try {
     p2.on('pageerror', (e) => fail(`Startbildschirm ${label}: Seitenfehler: ${e.message}`));
     await p2.goto(BASE_URL);
     await p2.locator('#splash').waitFor({ state: 'detached', timeout: 10000 });
-    await p2.locator('.seg button', { hasText: 'Mit eigenen' }).click(); // längste Zeilen
-    const geo = await p2.evaluate(() => {
+    const measure = () => p2.evaluate(() => {
       const x = (el) => Math.round(el.getBoundingClientRect().left);
       const wOf = (el) => Math.round(el.getBoundingClientRect().width);
       const start = document.querySelector('.bar button.big').getBoundingClientRect();
@@ -113,27 +112,51 @@ try {
         widths: [...card.querySelectorAll('.optText')].map(wOf)
       }));
       const col = (sel) => [...document.querySelectorAll(`.players ${sel}`)].map(x);
+      const byRow = new Map();
+      for (const el of document.querySelectorAll('.players > *')) {
+        const top = Math.round(el.getBoundingClientRect().top);
+        byRow.set(top, (byRow.get(top) ?? 0) + 1);
+      }
       return {
         start: { top: Math.round(start.top), bottom: Math.round(start.bottom) },
         vh: innerHeight,
         cards,
         inputs: col('input'),
         selects: col('select'),
-        devices: col('.deviceToggle')
+        devices: col('.deviceToggle'),
+        rows: [...byRow.entries()].sort((a, b) => a[0] - b[0]).map(([, n]) => n)
       };
     });
-    if (geo.start.top < 0 || geo.start.bottom > geo.vh) {
-      fail(`Startbildschirm ${label}: Start-Knopf nicht sichtbar (${geo.start.top}–${geo.start.bottom} in ${geo.vh})`);
-    }
-    for (const card of geo.cards) {
-      const same = (xs) => xs.length === 0 || xs.every((v) => v === xs[0]);
-      if (!same(card.names)) fail(`Startbildschirm ${label}: Options-Titel nicht bündig (${card.names})`);
-      if (!same(card.descs)) fail(`Startbildschirm ${label}: Beschreibungen nicht bündig (${card.descs})`);
-      if (!same(card.widths)) fail(`Startbildschirm ${label}: Optionen unterschiedlich breit (${card.widths})`);
-    }
-    for (const [what, xs] of [['Namen', geo.inputs], ['Ecken', geo.selects], ['Geräte', geo.devices]]) {
-      if (xs.length && !xs.every((v) => v === xs[0])) {
-        fail(`Startbildschirm ${label}: Spalte „${what}" nicht ausgerichtet (${xs})`);
+    // Alle drei Zeilenformen: nur Name (Solo), Name + Ecke, Name + Ecke + Gerät.
+    // Das Raster muss in jeder davon genauso viele Spalten haben, wie die Zeile
+    // Felder rendert — sonst rutscht die nächste Zeile in die freien Spalten.
+    const forms = [
+      ['4 Spieler', async () => {}],
+      ['eigene Geräte', async () => p2.locator('.seg button', { hasText: 'Mit eigenen' }).click()],
+      ['Solo', async () => p2.locator('.seg button', { hasText: '1' }).first().click()]
+    ];
+    for (const [form, setup] of forms) {
+      await setup();
+      const geo = await measure();
+      const where = `${label}/${form}`;
+      if (geo.start.top < 0 || geo.start.bottom > geo.vh) {
+        fail(`Startbildschirm ${where}: Start-Knopf nicht sichtbar (${geo.start.top}–${geo.start.bottom} in ${geo.vh})`);
+      }
+      for (const card of geo.cards) {
+        const same = (xs) => xs.length === 0 || xs.every((v) => v === xs[0]);
+        if (!same(card.names)) fail(`Startbildschirm ${where}: Options-Titel nicht bündig (${card.names})`);
+        if (!same(card.descs)) fail(`Startbildschirm ${where}: Beschreibungen nicht bündig (${card.descs})`);
+        if (!same(card.widths)) fail(`Startbildschirm ${where}: Optionen unterschiedlich breit (${card.widths})`);
+      }
+      for (const [what, xs] of [['Namen', geo.inputs], ['Ecken', geo.selects], ['Geräte', geo.devices]]) {
+        if (xs.length && !xs.every((v) => v === xs[0])) {
+          fail(`Startbildschirm ${where}: Spalte „${what}" nicht ausgerichtet (${xs})`);
+        }
+      }
+      // Zeilenweise Vollständigkeit: Jede Zeile muss auf derselben Höhe stehen
+      // wie ihre Nachbarfelder — versetzte Felder fallen so sofort auf.
+      if (geo.rows.some((r) => r.length !== geo.rows[0].length)) {
+        fail(`Startbildschirm ${where}: Spielerzeilen unterschiedlich besetzt (${JSON.stringify(geo.rows)})`);
       }
     }
     await ctx.close();

@@ -36,6 +36,12 @@
   let soloMode = $state<'free' | 'daily' | 'learn'>(learn.enabled ? 'learn' : 'free');
   const daily = $derived(soloMode === 'daily');
   const solo = $derived(count === 1);
+  // Die Spielerzeilen teilen sich ein Raster. Es muss genau so viele Spalten
+  // haben, wie eine Zeile Elemente rendert — sonst rutschen die Felder der
+  // nächsten Zeile in die freien Spalten der vorigen.
+  const rowColumns = $derived(
+    ['minmax(0, 1fr)', !solo ? 'auto' : '', multiDevice ? 'auto' : ''].filter(Boolean).join(' ')
+  );
   let remote = $state([false, true, true, true]);
   let error = $state('');
   let busy = $state(false);
@@ -211,7 +217,7 @@
           {/if}
         </div>
 
-        <div class="stack players">
+        <div class="stack players" style="grid-template-columns: {rowColumns}">
           {#each Array.from({ length: count }) as _, i}
             <div class="playerRow">
               <input
@@ -400,8 +406,7 @@
      stehen damit in jeder Zeile exakt untereinander — unabhängig davon, wie
      lang die einzelnen Beschriftungen sind. */
   .players {
-    display: grid;
-    grid-template-columns: minmax(0, 1fr) auto auto;
+    display: grid; /* Spaltenzahl kommt aus rowColumns */
     gap: 8px 10px;
     align-items: center;
   }
