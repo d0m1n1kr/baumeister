@@ -9,6 +9,7 @@
   import type { CardDef, Resource } from '../engine/types';
   import { cornerRotation, resLabel, RESOURCE_CSS } from './helpers';
   import { sfx } from './sound';
+  import { panelReserve } from './panelReserve.svelte';
   import { learn } from './learn.svelte';
   import { cardName, cardText, t, translateError } from '../i18n';
   import BoardGrid from './BoardGrid.svelte';
@@ -497,7 +498,7 @@
     </div>
     </div>
 
-    <div class="panel">
+    <div class="panel" data-panel style="--panelReserve: {panelReserve.px}px">
       {#if !canControl}
         <!-- Fremder Platz (Host-Tischansicht): nur Status, keine Bedienung -->
         <span class="status">
@@ -1044,7 +1045,12 @@
   .corner:not(.wide) .row { flex-direction: column; align-items: center; gap: 6px; }
   .corner:not(.wide) .row::before { display: none; }
   .corner:not(.wide) .boardArea { flex: 1 1 auto; width: 100%; align-self: center; }
-  .corner:not(.wide) .panel { flex: 0 1 auto; align-items: center; width: 100%; }
+  /* Alle Panels reservieren gleich viel Höhe (siehe panelReserve.svelte.ts) —
+     sonst ist das Brett des Baumeisters kleiner als die der anderen und das
+     Gleis passt zu keinem von beiden. Wo das Panel den Restplatz per flex: 1
+     ohnehin gleich teilt (Handy hoch), wird die Reservierung unten auf 0
+     zurückgesetzt. */
+  .corner:not(.wide) .panel { flex: 0 1 auto; align-items: center; width: 100%; min-height: var(--panelReserve, 0px); }
   /* boardArea misst den Platz, der dem Brett in seiner Zelle bleibt; boardWrap
      ist das exakte Quadrat darin. Vorher war die Brettgröße viewport-relativ
      und nutzte nur 56 % des Quadranten — egal wie groß die Zelle war. */
@@ -1091,7 +1097,7 @@
     .boardArea { flex: 1 1 auto; width: 100%; align-self: center; }
     /* In der Spalte wäre die 360px-Basis eine HÖHE und würde dem Brett den
        ganzen Platz nehmen — zurück auf Inhaltshöhe. */
-    .corner.wide .panel { align-items: center; width: 100%; flex: 0 1 auto; }
+    .corner.wide .panel { align-items: center; width: 100%; flex: 0 1 auto; min-height: var(--panelReserve, 0px); }
   }
   .corner.wide header { justify-content: center; }
   @media (max-width: 700px) {
@@ -1103,7 +1109,7 @@
     /* align-self: flex-start (oben andocken) gilt nur im Zeilen-Layout —
        im Spalten-Layout würde es das Brett nach links statt mittig setzen */
     .corner.wide .boardArea { width: 100%; }
-    .corner.wide .panel { align-items: center; width: 100%; flex: 0 1 auto; }
+    .corner.wide .panel { align-items: center; width: 100%; flex: 0 1 auto; min-height: var(--panelReserve, 0px); }
     /* Solo: Das Panel nimmt nur, was es braucht — der Rest gehört dem Brett.
        Mit flex:1 auf beiden teilten sie sich den Platz, und das Brett blieb
        klein, obwohl unter dem einzigen Knopf 200 px frei standen. */

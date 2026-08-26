@@ -160,6 +160,92 @@ try {
   }
   console.log('✓ Spielfläche: Bretter nutzen ihre Zelle, Reihen stehen deckungsgleich, nichts abgeschnitten');
 
+  // ---------- Gleise: liegen sie an den Brettkanten? ----------
+  // Das Gleis ist EINE Linie je Brettreihe. Sind die Bretter einer Reihe
+  // unterschiedlich groß, passt es zu keinem: Es lag entweder quer über beiden
+  // (Mittelwert der Kanten) oder 75 px neben dem kleineren (Außenkante).
+  // Gemessen wird deshalb in ZWEI Zuständen: vor dem Ansagen trägt nur der
+  // Baumeister den Materialwähler — genau dann gingen die Bretter auseinander.
+  for (const [label, w, h, players] of [
+    ['Tablet quer 4 Spieler', 1180, 820, 4],
+    ['Handy hoch 4 Spieler', 402, 874, 4],
+    ['Handy quer 2 Spieler', 874, 402, 2]
+  ]) {
+    const ctx = await browser.newContext({ viewport: { width: w, height: h }, locale: 'de-DE' });
+    const gp = await ctx.newPage();
+    gp.on('pageerror', (e) => fail(`Gleise ${label}: Seitenfehler: ${e.message}`));
+    await gp.goto(BASE_URL);
+    await gp.locator('#splash').waitFor({ state: 'detached', timeout: 10000 });
+    await gp.locator('.seg button', { hasText: String(players) }).first().click();
+    await gp.locator('.opt input[type="checkbox"]').first().click(); // ohne Monumente
+    await gp.locator('.opt', { hasText: 'Eisenbahn' }).locator('input').click();
+    await gp.locator('.bar button.big').click();
+    await gp.locator('.picker').first().waitFor({ timeout: 5000 });
+    const messen = async (wann) => {
+      await gp.waitForTimeout(700); // Messtakt von Gleis und Panelhöhe abwarten
+      const g = await gp.evaluate(() => {
+        const bretter = [...document.querySelectorAll('[data-track]')].map((el) => {
+          const r = el.getBoundingClientRect();
+          return {
+            kante: el.dataset.trackEdge === 'top' ? 'top' : 'bottom',
+            oben: r.top,
+            unten: r.bottom,
+            links: r.left,
+            rechts: r.right
+          };
+        });
+        const gleise = [...document.querySelectorAll('.track')].map((el) => {
+          const r = el.getBoundingClientRect();
+          return { y: r.top + r.height / 2, l: r.left, r: r.right };
+        });
+        // Nur Gleise, die waagerecht überhaupt über dem Brett liegen
+        const ueber = (br) => gleise.filter((g) => g.r > br.links + 2 && g.l < br.rechts - 2);
+        // 1. Bretter einer Reihe müssen gleich groß sein (gleiche Kantenhöhe)
+        let spanne = 0;
+        for (const kante of ['top', 'bottom']) {
+          const ys = bretter
+            .filter((b) => b.kante === kante)
+            .map((b) => (kante === 'top' ? b.oben : b.unten));
+          if (ys.length > 1) spanne = Math.max(spanne, Math.max(...ys) - Math.min(...ys));
+        }
+        // 2. Kein Gleis darf INNEN durch ein Brett laufen
+        let schnitt = 0;
+        for (const br of bretter) {
+          for (const g of ueber(br)) {
+            schnitt = Math.max(schnitt, Math.min(g.y - br.oben, br.unten - g.y));
+          }
+        }
+        // 3. Jedes Brett braucht sein Gleis an der eigenen Kante
+        let abstand = 0;
+        for (const br of bretter) {
+          const kante = br.kante === 'top' ? br.oben : br.unten;
+          const nah = ueber(br).map((g) => Math.abs(g.y - kante));
+          abstand = Math.max(abstand, nah.length ? Math.min(...nah) : 999);
+        }
+        return {
+          spanne: Math.round(spanne),
+          schnitt: Math.round(schnitt),
+          abstand: Math.round(abstand),
+          bretter: bretter.length,
+          gleise: gleise.length
+        };
+      });
+      if (g.bretter !== players) fail(`Gleise ${label} (${wann}): ${g.bretter} Bretter gemessen`);
+      if (g.gleise === 0) fail(`Gleise ${label} (${wann}): keine Strecke gezeichnet`);
+      if (g.spanne > 2) {
+        fail(`Gleise ${label} (${wann}): Bretter einer Reihe ${g.spanne}px unterschiedlich hoch`);
+      }
+      if (g.schnitt > 6) fail(`Gleise ${label} (${wann}): Gleis läuft ${g.schnitt}px im Brett`);
+      if (g.abstand > 6) fail(`Gleise ${label} (${wann}): Gleis liegt ${g.abstand}px neben der Kante`);
+    };
+    await messen('vor dem Ansagen');
+    await gp.locator('.picker .chip, .picker .offerChip').first().click();
+    await gp.locator('.pendingWrap').first().waitFor({ timeout: 5000 });
+    await messen('mit Marke im Panel');
+    await ctx.close();
+  }
+  console.log('✓ Gleise: an der Brettkante, in keinem Brett — auch während der Ansage');
+
   // Gemerkte Spielernamen: einmal tippen, beim nächsten Start wieder da — und
   // das ✕ im Feld löscht einen einzelnen Namen wieder weg.
   {
