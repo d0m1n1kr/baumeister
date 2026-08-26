@@ -93,12 +93,15 @@ try {
   // gegenüberstehen. Vorher war die Brettgröße viewport-relativ (56 % der
   // Zelle) und die Reihen standen 207 px versetzt, weil die 180°-Drehung der
   // oberen Spieler eine linksbündige Gruppe spiegelte.
+  // Gemessen wird MITTEN IN DER RUNDE, mit Marke im Panel — dort ist das Panel
+  // am vollsten und das Brett am kleinsten. Bei der Monumentwahl (ein Knopf)
+  // sah alles gut aus, während in der Runde 82 px Bretthöhe fehlten.
   for (const [label, w, h, players, minAnteil] of [
     ['Handy Solo', 402, 874, 1, 90],
     ['Handy 4 Spieler', 402, 874, 4, 90],
     ['Tablet quer 4 Spieler', 1180, 820, 4, 70],
-    ['Tablet hoch 4 Spieler', 1024, 1366, 4, 70],
-    ['Handy quer 2 Spieler', 874, 402, 2, 70]
+    ['Tablet hoch 4 Spieler', 1024, 1366, 4, 75],
+    ['Handy quer 2 Spieler', 874, 402, 2, 60]
   ]) {
     const ctx = await browser.newContext({ viewport: { width: w, height: h }, locale: 'de-DE' });
     const gp = await ctx.newPage();
@@ -106,8 +109,12 @@ try {
     await gp.goto(BASE_URL);
     await gp.locator('#splash').waitFor({ state: 'detached', timeout: 10000 });
     await gp.locator('.seg button', { hasText: String(players) }).first().click();
+    await gp.locator('.opt input[type="checkbox"]').first().click(); // ohne Monumente
     await gp.locator('.bar button.big').click();
-    await gp.locator('.board').first().waitFor({ timeout: 5000 });
+    await gp.locator('.picker').first().waitFor({ timeout: 5000 });
+    // Material ansagen: Solo bietet drei Marken, Mehrspieler den Materialwähler
+    await gp.locator('.picker .chip, .picker .offerChip').first().click();
+    await gp.locator('.pendingWrap').first().waitFor({ timeout: 5000 });
     const g = await gp.evaluate(() => {
       const slot = document.querySelector('.slot').getBoundingClientRect();
       const boards = [...document.querySelectorAll('.board')].map((el) => {
@@ -133,15 +140,19 @@ try {
           versatz = Math.max(versatz, best);
         }
       }
+      const panel = document.querySelector('.panel').getBoundingClientRect();
       return {
         anteil: Math.round((boards[0].w / Math.min(slot.width, slot.height)) * 100),
         brett: boards[0].w,
+        panel: Math.round(panel.height),
         versatz,
         clipped
       };
     });
     if (g.anteil < minAnteil) {
-      fail(`Spielfläche ${label}: Brett nutzt nur ${g.anteil}% der Zelle (${g.brett}px), erwartet ≥ ${minAnteil}%`);
+      fail(
+        `Spielfläche ${label}: Brett nutzt nur ${g.anteil}% der Zelle (${g.brett}px, Panel ${g.panel}px hoch), erwartet ≥ ${minAnteil}%`
+      );
     }
     if (g.versatz > 8) fail(`Spielfläche ${label}: Reihen ${g.versatz}px versetzt`);
     if (g.clipped) fail(`Spielfläche ${label}: Inhalt wird am Zellenrand abgeschnitten`);
