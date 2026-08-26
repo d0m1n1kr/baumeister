@@ -68,6 +68,14 @@ export const de = {
   accept: 'Annehmen',
   decline: 'Ablehnen',
 
+  install: {
+    title: 'Als App installieren',
+    text: 'Startet ohne Browserleiste und funktioniert offline.',
+    action: 'Installieren',
+    how: 'Wie?',
+    iosStep1: 'Unten auf Teilen tippen',
+    iosStep2: 'Dann „Zum Home-Bildschirm"'
+  },
   setupGame: 'Partie',
   setupRules: 'Regeln & Varianten',
   expansions: 'Erweiterungen',

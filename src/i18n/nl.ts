@@ -68,6 +68,14 @@ export const nl: Translation = {
   accept: 'Accepteren',
   decline: 'Afwijzen',
 
+  install: {
+    title: 'Als app installeren',
+    text: 'Start zonder browserbalk en werkt offline.',
+    action: 'Installeren',
+    how: 'Hoe?',
+    iosStep1: 'Tik onderaan op Deel',
+    iosStep2: 'Dan „Zet op beginscherm"'
+  },
   setupGame: 'Spel',
   setupRules: 'Regels en varianten',
   expansions: 'Uitbreidingen',

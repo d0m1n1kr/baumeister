@@ -68,6 +68,14 @@ export const pl: Translation = {
   accept: 'Przyjmij',
   decline: 'Odrzuć',
 
+  install: {
+    title: 'Zainstaluj jako aplikację',
+    text: 'Uruchamia się bez paska przeglądarki i działa offline.',
+    action: 'Zainstaluj',
+    how: 'Jak?',
+    iosStep1: 'Dotknij Udostępnij na dole',
+    iosStep2: 'Potem „Do ekranu początkowego"'
+  },
   setupGame: 'Rozgrywka',
   setupRules: 'Zasady i warianty',
   expansions: 'Dodatki',

@@ -163,6 +163,78 @@ try {
   }
   console.log('✓ Startbildschirm: Start-Knopf sichtbar, Optionen und Spielerzeilen bündig');
 
+  // Installations-Hinweis: Auf iOS gibt es keine Schnittstelle dafür, also muss
+  // dort eine Anleitung erscheinen — und einmal weggeklickt bleibt sie weg.
+  {
+    const iosCtx = await browser.newContext({
+      viewport: { width: 402, height: 874 },
+      userAgent: 'Mozilla/5.0 (iPhone; CPU iPhone OS 17_5 like Mac OS X) AppleWebKit/605.1.15',
+      hasTouch: true,
+      locale: 'de-DE'
+    });
+    const ios = await iosCtx.newPage();
+    ios.on('pageerror', (e) => fail(`Installation: Seitenfehler: ${e.message}`));
+    await ios.goto(BASE_URL);
+    await ios.locator('#splash').waitFor({ state: 'detached', timeout: 10000 });
+    const banner = ios.locator('.installHint');
+    await banner.waitFor({ timeout: 5000 });
+    // Auf iOS führt kein Dialog zum Ziel: Der Knopf klappt die Schritte auf.
+    if ((await ios.locator('.installSteps').count()) !== 0) fail('Installation: Schritte schon offen');
+    await banner.locator('.installGo').dispatchEvent('pointerup');
+    await ios.locator('.installSteps li').first().waitFor({ timeout: 3000 });
+    const steps = await ios.locator('.installSteps li').count();
+    if (steps !== 2) fail(`Installation: ${steps} Schritte statt 2`);
+    // Der Hinweis darf den Start-Knopf nicht verdrängen
+    const startBox = await ios.locator('.bar button.big').boundingBox();
+    if (startBox.y + startBox.height > 874) fail('Installation: Start-Knopf aus dem Bild geschoben');
+    await banner.locator('.hintClose').dispatchEvent('pointerup');
+    if ((await banner.count()) !== 0) fail('Installation: ✕ blendet den Hinweis nicht aus');
+    await ios.reload();
+    await ios.locator('#splash').waitFor({ state: 'detached', timeout: 10000 });
+    if ((await ios.locator('.installHint').count()) !== 0) {
+      fail('Installation: weggeklickter Hinweis kommt wieder');
+    }
+    console.log('✓ Installation: iOS-Anleitung mit 2 Schritten, weggeklickt bleibt weg');
+    await iosCtx.close();
+  }
+
+  // Gegenprobe: Ohne iOS und ohne Chromium-Ereignis (das kommt im Test nicht)
+  // darf gar kein Hinweis stehen — sonst wäre er ein Fehlalarm am Rechner.
+  {
+    const plain = await browser.newPage({ viewport: { width: 1180, height: 820 }, locale: 'de-DE' });
+    await plain.goto(BASE_URL);
+    await plain.locator('#splash').waitFor({ state: 'detached', timeout: 10000 });
+    if ((await plain.locator('.installHint').count()) !== 0) {
+      fail('Installation: Hinweis erscheint, obwohl kein Weg zum Installieren offensteht');
+    }
+    console.log('✓ Installation: kein Hinweis, wo es keinen Weg gibt');
+
+    // Chromium-Weg: Das echte `beforeinstallprompt` feuert nur unter Bedingungen,
+    // die sich im Test nicht herstellen lassen (installierbare Herkunft,
+    // Nutzerinteraktion). Ein nachgebautes Ereignis prüft aber genau das, was
+    // hier unser Code ist: merken, anbieten, abspielen, danach verschwinden.
+    await plain.evaluate(() => {
+      const e = new Event('beforeinstallprompt');
+      e.prompt = () => {
+        window.__installPrompted = true;
+        return Promise.resolve();
+      };
+      window.dispatchEvent(e);
+    });
+    const offer = plain.locator('.installHint .installGo');
+    await offer.waitFor({ timeout: 3000 });
+    const label = (await offer.textContent()).trim();
+    if (label !== 'Installieren') fail(`Installation: Chromium-Knopf heißt „${label}"`);
+    if ((await plain.locator('.installSteps').count()) !== 0) {
+      fail('Installation: Chromium zeigt die iOS-Anleitung');
+    }
+    await offer.dispatchEvent('pointerup');
+    await plain.waitForFunction(() => window.__installPrompted === true, null, { timeout: 3000 });
+    await plain.locator('.installHint').waitFor({ state: 'detached', timeout: 3000 });
+    console.log('✓ Installation: Chromium-Dialog wird angeboten, abgespielt und danach still');
+    await plain.close();
+  }
+
   // Setup: 2 Spieler, ohne Monumente, mit Fortune-Erweiterung
   await page.locator('.seg button', { hasText: '2' }).click();
   await page.locator('.toggle input[type="checkbox"]').first().click();
