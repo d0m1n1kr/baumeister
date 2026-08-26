@@ -198,7 +198,14 @@ try {
     // navigator.share gibt es im Testbrowser nicht — einsetzen und mitschneiden
     await sp.addInitScript(() => {
       window.__shared = null;
-      navigator.share = (d) => { window.__shared = d; return Promise.resolve(); };
+      navigator.canShare = (d) => !!d.files;
+      navigator.share = (d) => {
+        window.__shared = {
+          text: d.text,
+          files: (d.files ?? []).map((f) => ({ name: f.name, type: f.type, size: f.size }))
+        };
+        return Promise.resolve();
+      };
     });
     await sp.goto(BASE_URL);
     await sp.locator('#splash').waitFor({ state: 'detached', timeout: 10000 });
@@ -217,8 +224,10 @@ try {
     const shareBtn = sp.locator('button', { hasText: 'Ergebnis teilen' });
     await shareBtn.waitFor({ timeout: 5000 });
     await shareBtn.dispatchEvent('pointerup');
+    // Das Bild entsteht asynchron (Canvas → PNG), also auf den Aufruf warten
+    await sp.waitForFunction(() => window.__shared !== null, { timeout: 8000 })
+      .catch(() => fail('Teilen: navigator.share wurde nicht aufgerufen'));
     const shared = await sp.evaluate(() => window.__shared);
-    if (!shared) fail('Teilen: navigator.share wurde nicht aufgerufen');
     const today = await sp.evaluate(() => {
       const d = new Date();
       return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
@@ -228,6 +237,34 @@ try {
     if (!shared.text.includes(`#daily=${today}`)) fail(`Teilen: Link fehlt (${shared.text})`);
     if (/[🟩🟫🟥⬜]/u.test(shared.text)) fail('Teilen: Text verrät das Brett-Layout');
     console.log('✓ Ergebnis teilen: Rang, Punkte und Tages-Link im Teilen-Dialog');
+
+    // Bild: Wo der Browser Dateien teilen kann, muss ein PNG mitgehen.
+    const img = shared.files?.[0];
+    if (!img) fail('Teilen: kein Bild im Teilen-Dialog');
+    if (img.type !== 'image/png') fail(`Teilen: Bild ist kein PNG (${img.type})`);
+    if (img.size < 5000) fail(`Teilen: Bild verdächtig klein (${img.size} Bytes)`);
+    console.log(`✓ Ergebnis teilen: Bild geht mit (${Math.round(img.size / 1024)} KB PNG)`);
+
+    // Ohne Datei-Unterstützung darf nichts abbrechen — dann nur Text.
+    const tp = await ctx.newPage();
+    await tp.addInitScript(() => {
+      window.__shared = null;
+      navigator.canShare = () => false;
+      navigator.share = (d) => {
+        window.__shared = { text: d.text, files: (d.files ?? []).length };
+        return Promise.resolve();
+      };
+    });
+    await tp.goto(BASE_URL);
+    await tp.locator('#splash').waitFor({ state: 'detached', timeout: 10000 });
+    await tp.locator('button', { hasText: 'Weiterspielen' }).click();
+    await tp.locator('button', { hasText: 'Ergebnis teilen' }).dispatchEvent('pointerup');
+    await tp.waitForFunction(() => window.__shared !== null, { timeout: 8000 });
+    const textOnly = await tp.evaluate(() => window.__shared);
+    if (textOnly.files !== 0) fail('Teilen: Bild trotz fehlender Datei-Unterstützung');
+    if (!textOnly.text.includes(today)) fail('Teilen: Text-Rückfall unvollständig');
+    console.log('✓ Ohne Datei-Unterstützung fällt das Teilen sauber auf Text zurück');
+    await tp.close();
 
     // Empfängerseite: Der Link wählt Solo + genau diesen Tag vor
     const link = shared.text.split('\n').pop().trim();

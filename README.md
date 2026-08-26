@@ -94,12 +94,14 @@ device (the host runs the engine and broadcasts it).
   chosen and rotates face-down to the bottom. With the official rank table
   (up to "Master Architect"), a per-device highscore list, and a **daily challenge**
   (fixed date seed — the same cards worldwide, scores comparable).
-- **Share your result:** the score screen offers a share button for solo games —
-  native share sheet where the browser has one (iOS, Android, Safari), clipboard
-  everywhere else. For a daily challenge the text carries a `#daily=<date>` link
+- **Share your result:** the score screen offers a share button for solo games.
+  Where the browser can share files (iOS 15+, Chromium on Android) a 1080×1080
+  score card is rendered on a canvas and goes along with the text, painted in the
+  theme you are playing; otherwise it is text only, via the native share sheet or
+  the clipboard. For a daily challenge the text carries a `#daily=<date>` link
   that opens exactly that day's setup on the other device, so the scores really
-  are comparable. The board layout is deliberately left out: with an identical
-  setup it would be the solution.
+  are comparable. The board layout is deliberately left out of both text and
+  image: with an identical setup it would be the solution.
 - **Learning mode (🎓, solo):** a guided game for newcomers. Instruction bubbles
   walk through every phase — monument draft, deck pick, placing, marking a
   pattern, choosing the spot, ending the round, finishing the town — and each one
