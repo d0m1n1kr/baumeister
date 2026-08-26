@@ -95,7 +95,7 @@
   }
   .dialog {
     background: var(--bg-panel);
-    border-radius: 14px;
+    border-radius: var(--r-lg);
     padding: 16px;
     display: flex;
     flex-direction: column;
@@ -103,14 +103,14 @@
     align-items: center;
     width: min(380px, 94vw);
   }
-  h3 { margin: 0; font-size: 16px; }
+  h3 { margin: 0; font-size: var(--fs-md); }
   video {
     width: 100%;
     aspect-ratio: 1;
     object-fit: cover;
-    border-radius: 10px;
+    border-radius: var(--r-md);
     background: #000;
   }
-  .hint { margin: 0; font-size: 12px; color: var(--text-dim); text-align: center; }
-  .error { margin: 0; font-size: 13px; color: var(--danger); text-align: center; }
+  .hint { margin: 0; font-size: var(--fs-sm); color: var(--text-dim); text-align: center; }
+  .error { margin: 0; font-size: var(--fs-sm); color: var(--danger); text-align: center; }
 </style>

@@ -22,15 +22,15 @@
     display: inline-flex;
     align-items: center;
     gap: 4px;
-    font-size: 14px;
+    font-size: var(--fs-md);
     color: var(--muted, #889);
   }
   select {
     background: transparent;
     color: inherit;
     border: 1px solid rgba(128, 128, 128, 0.35);
-    border-radius: 8px;
+    border-radius: var(--r-md);
     padding: 4px 6px;
-    font-size: 13px;
+    font-size: var(--fs-sm);
   }
 </style>

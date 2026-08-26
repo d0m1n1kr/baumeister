@@ -45,6 +45,6 @@
 {/if}
 
 <style>
-  svg { border-radius: 8px; display: block; }
-  .placeholder { background: rgba(255, 255, 255, 0.08); border-radius: 8px; }
+  svg { border-radius: var(--r-md); display: block; }
+  .placeholder { background: rgba(255, 255, 255, 0.08); border-radius: var(--r-md); }
 </style>

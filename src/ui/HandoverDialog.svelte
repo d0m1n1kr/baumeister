@@ -74,7 +74,7 @@
   }
   .dialog {
     background: var(--bg-panel);
-    border-radius: 14px;
+    border-radius: var(--r-lg);
     padding: 18px;
     display: flex;
     flex-direction: column;
@@ -84,19 +84,19 @@
     overflow-y: auto;
     touch-action: pan-y;
   }
-  h3 { margin: 0; font-size: 17px; text-align: center; }
+  h3 { margin: 0; font-size: var(--fs-lg); text-align: center; }
   .code { display: flex; align-items: center; gap: 14px; justify-content: center; }
   .codeText { display: flex; flex-direction: column; gap: 3px; }
-  .label { font-size: 11px; color: var(--text-dim); }
-  .value { font-size: 26px; font-weight: 800; letter-spacing: 4px; }
-  .hint { margin: 0; font-size: 12px; color: var(--text-dim); text-align: center; }
+  .label { font-size: var(--fs-xs); color: var(--text-dim); }
+  .value { font-size: var(--fs-xl); font-weight: 800; letter-spacing: 4px; }
+  .hint { margin: 0; font-size: var(--fs-sm); color: var(--text-dim); text-align: center; }
   .seats { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 8px; }
-  .seats li { display: flex; align-items: center; gap: 8px; font-size: 13px; flex-wrap: wrap; }
+  .seats li { display: flex; align-items: center; gap: 8px; font-size: var(--fs-sm); flex-wrap: wrap; }
   .seats .name { font-weight: 700; }
   .seats .state { color: var(--text-dim); margin-right: auto; }
-  .seats button { font-size: 11px; padding: 4px 8px; }
+  .seats button { font-size: var(--fs-xs); padding: 4px 8px; }
   .dot { width: 9px; height: 9px; border-radius: 50%; background: var(--text-dim); flex-shrink: 0; }
   .dot.on { background: var(--ok); }
-  .relayLine { margin: 0; font-size: 11px; color: var(--text-dim); text-align: center; }
+  .relayLine { margin: 0; font-size: var(--fs-xs); color: var(--text-dim); text-align: center; }
   .relayLine.bad { color: var(--danger); font-weight: 700; }
 </style>

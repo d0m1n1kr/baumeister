@@ -19,6 +19,6 @@
 
 <style>
   .pgrid { display: grid; gap: 2px; width: max-content; }
-  .pcell { border-radius: 2px; border: 1px solid rgba(0, 0, 0, 0.35); }
+  .pcell { border-radius: var(--r-sm); border: 1px solid rgba(0, 0, 0, 0.35); }
   .pcell.empty { border: 1px dashed rgba(0, 0, 0, 0.15); background: transparent; }
 </style>

@@ -42,11 +42,11 @@
     gap: 10px;
     background: var(--bg-panel);
     border: 1px solid var(--accent);
-    border-radius: 12px;
+    border-radius: var(--r-md);
     padding: 8px 14px;
     box-shadow: 0 6px 24px rgba(0, 0, 0, 0.5);
     z-index: 200;
-    font-size: 14px;
+    font-size: var(--fs-md);
   }
-  .banner button { font-size: 13px; padding: 6px 12px; }
+  .banner button { font-size: var(--fs-sm); padding: 6px 12px; }
 </style>

@@ -51,10 +51,10 @@
   .mini.offline { opacity: 0.5; }
   .takeover {
     pointer-events: auto; /* Ausnahme vom nicht-interaktiven Brett */
-    font-size: 10px;
+    font-size: var(--fs-xs);
     padding: 4px 6px;
   }
-  header { display: flex; align-items: center; gap: 5px; font-size: 11px; min-width: 0; }
+  header { display: flex; align-items: center; gap: 5px; font-size: var(--fs-xs); min-width: 0; }
   .dot { width: 7px; height: 7px; border-radius: 50%; background: var(--ok); flex-shrink: 0; }
   .dot.off { background: var(--text-dim); }
   .name {
@@ -64,5 +64,5 @@
     text-overflow: ellipsis;
   }
   .coins { margin-left: auto; color: var(--accent); }
-  footer { font-size: 10px; color: var(--text-dim); min-height: 12px; text-align: center; }
+  footer { font-size: var(--fs-xs); color: var(--text-dim); min-height: 12px; text-align: center; }
 </style>

@@ -44,7 +44,7 @@
   }
   .box {
     background: var(--bg-panel);
-    border-radius: 14px;
+    border-radius: var(--r-lg);
     padding: 20px 24px;
     width: min(360px, 78vw);
     display: flex;
@@ -52,7 +52,7 @@
     gap: 12px;
     box-shadow: 0 8px 40px rgba(0, 0, 0, 0.6);
   }
-  h3 { margin: 0; font-size: 19px; }
+  h3 { margin: 0; font-size: var(--fs-lg); }
   p { margin: 0; color: var(--text-dim); line-height: 1.4; }
   .buttons { display: flex; justify-content: flex-end; gap: 10px; }
 </style>

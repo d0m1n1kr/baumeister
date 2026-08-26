@@ -139,7 +139,7 @@
     width: min(280px, calc(100vw - 16px));
     background: var(--bg-panel);
     border: 1px solid var(--accent);
-    border-radius: 12px;
+    border-radius: var(--r-md);
     box-shadow: 0 6px 20px rgba(0, 0, 0, 0.45);
     padding: 9px 11px;
     display: flex;
@@ -155,11 +155,11 @@
     .bubble.ready { animation: bubbleIn 200ms ease-out; }
   }
   @keyframes bubbleIn { from { opacity: 0; translate: 0 6px; } }
-  .title { font-size: 13px; font-weight: 700; color: var(--accent); }
-  .body { margin: 0; font-size: 12px; line-height: 1.4; }
+  .title { font-size: var(--fs-sm); font-weight: 700; color: var(--accent); }
+  .body { margin: 0; font-size: var(--fs-sm); line-height: 1.4; }
   .mp {
     margin: 0;
-    font-size: 11px;
+    font-size: var(--fs-xs);
     line-height: 1.4;
     color: var(--text-dim);
     border-top: 1px solid rgba(255, 255, 255, 0.12);
@@ -168,14 +168,14 @@
   .mpLabel { font-weight: 700; }
   .row { display: flex; gap: 6px; justify-content: flex-end; }
   .row button, .link { pointer-events: auto; }
-  .row button { font-size: 12px; padding: 5px 10px; }
-  .off { opacity: 0.7; font-size: 11px; }
+  .row button { font-size: var(--fs-sm); padding: 5px 10px; }
+  .off { opacity: 0.7; font-size: var(--fs-xs); }
   .link {
     align-self: flex-start;
     background: none;
     border: none;
     padding: 0;
-    font-size: 11px;
+    font-size: var(--fs-xs);
     color: var(--text-dim);
     text-decoration: underline;
   }
