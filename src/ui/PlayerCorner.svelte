@@ -474,6 +474,10 @@
   </header>
 
   <div class="row" data-learn={solo ? 'play' : undefined}>
+    <!-- boardArea misst den Restplatz, boardWrap bleibt exakt quadratisch:
+         Overlays (Gleis, Lern-Puls) liegen weiter am Brettrand, nicht am
+         Rand eines gestreckten Kastens. -->
+    <div class="boardArea">
     <div class="boardWrap">
       <BoardGrid
         {player}
@@ -490,6 +494,7 @@
       {#if mode === 'target'}<div class="hint">{t.chooseBuildTarget}</div>
       {:else if mode === 'grovePlace' || mode === 'claimPlace'}<div class="hint">{t.choosePlacement}</div>
       {:else if mode === 'guildPick' && guildSquare === null}<div class="hint">{t.guildPickBuilding}</div>{/if}
+    </div>
     </div>
 
     <div class="panel">
@@ -1033,35 +1038,93 @@
   .prismToggle input { width: 16px; height: 16px; }
 
   .row { display: flex; gap: 10px; flex: 1; min-height: 0; }
+  /* Eckplätze (3–4 Spieler): Panel unter das Brett. Nebeneinander passen sie
+     nicht mehr in den Quadranten, sobald das Brett ihn ausnutzt — der Knopf
+     „Monument wählen" wurde am Zellenrand abgeschnitten. */
+  .corner:not(.wide) .row { flex-direction: column; align-items: center; gap: 6px; }
+  .corner:not(.wide) .row::before { display: none; }
+  .corner:not(.wide) .boardArea { flex: 1 1 auto; width: 100%; align-self: center; }
+  .corner:not(.wide) .panel { flex: 0 1 auto; align-items: center; width: 100%; }
+  /* boardArea misst den Platz, der dem Brett in seiner Zelle bleibt; boardWrap
+     ist das exakte Quadrat darin. Vorher war die Brettgröße viewport-relativ
+     und nutzte nur 56 % des Quadranten — egal wie groß die Zelle war. */
+  .boardArea {
+    flex: 0 1 auto;
+    min-width: 0;
+    min-height: 0;
+    display: grid;
+    place-items: center;
+    container-type: size;
+    align-self: stretch;
+    width: min(46vw, 46vh);
+  }
+  .corner.wide .boardArea { width: min(60vw, 60vh); }
   .boardWrap {
     position: relative;
-    width: min(34vh, 24vw);
+    width: min(100cqw, 100cqh);
     flex-shrink: 0;
-    align-self: flex-start;
   }
-  .corner.wide .boardWrap { width: min(32vh, 44vw); }
-  /* Handy quer: Bretter stehen nebeneinander — die Höhe ist der Maßstab */
-  @media (orientation: landscape) and (max-height: 540px) {
-    .corner.wide .boardWrap { width: min(58vh, 34vw); }
-    .corner.wide .row { flex-direction: column; align-items: center; gap: 4px; }
-    .corner.wide .panel { align-items: center; width: 100%; flex: 0 1 auto; }
-  }
-  .corner.wide .row { justify-content: center; }
+  /* Das BRETT muss mittig stehen, nicht die Gruppe aus Brett und Panel: Die
+     oberen Spieler sind um 180° gedreht, eine mittige Gruppe spiegelt die
+     Brettposition darin trotzdem. Gemessen standen obere und untere Reihe
+     dadurch 207 px versetzt. Ein Ausgleichsraum links, so breit wie das Panel
+     rechts, stellt das Brett in die Mitte — und gespiegelt bleibt es dort. */
+  .row::before { content: ''; flex: 1 1 0; }
+  .row { justify-content: center; }
   /* Panel nicht auf volle Restbreite strecken, damit die Gruppe mittig sitzt */
   .corner.wide .panel { flex: 0 1 360px; }
+  /* Der Ausgleichsraum spiegelt das Panel exakt — gleiche Basis, gleiches
+     Schrumpfen. Sonst schöbe er das Brett aus der Mitte, statt es zu halten. */
+  .corner.wide .row::before { flex: 0 1 360px; }
+
+  /* Ohne Container-Queries (Safari < 16) bleiben die bisherigen Maße */
+  @supports not (container-type: size) {
+    .boardArea { display: contents; }
+    .boardWrap { width: min(34vh, 24vw); align-self: flex-start; }
+    .corner.wide .boardWrap { width: min(32vh, 44vw); }
+  }
+  /* Handy quer: Bretter stehen nebeneinander — die Höhe ist der Maßstab */
+  @media (orientation: landscape) and (max-height: 540px) {
+    .corner.wide .boardArea { width: 100%; }
+    .corner.wide .row { flex-direction: column; align-items: center; gap: 4px; }
+    .row::before { display: none; }
+    .boardArea { flex: 1 1 auto; width: 100%; align-self: center; }
+    /* In der Spalte wäre die 360px-Basis eine HÖHE und würde dem Brett den
+       ganzen Platz nehmen — zurück auf Inhaltshöhe. */
+    .corner.wide .panel { align-items: center; width: 100%; flex: 0 1 auto; }
+  }
   .corner.wide header { justify-content: center; }
   @media (max-width: 700px) {
     .corner { padding: 4px; gap: 4px; }
     /* 2 Spieler am Handy: Brett mittig, Panel darunter */
     .corner.wide .row { flex-direction: column; align-items: center; gap: 4px; }
+    .row::before { display: none; }
+    .boardArea { flex: 1 1 auto; width: 100%; align-self: center; }
     /* align-self: flex-start (oben andocken) gilt nur im Zeilen-Layout —
        im Spalten-Layout würde es das Brett nach links statt mittig setzen */
-    .corner.wide .boardWrap { width: min(26vh, 60vw); align-self: center; }
-    .corner.wide .panel { align-items: center; width: 100%; flex: 1; }
+    .corner.wide .boardArea { width: 100%; }
+    .corner.wide .panel { align-items: center; width: 100%; flex: 0 1 auto; }
+    /* Solo: Das Panel nimmt nur, was es braucht — der Rest gehört dem Brett.
+       Mit flex:1 auf beiden teilten sie sich den Platz, und das Brett blieb
+       klein, obwohl unter dem einzigen Knopf 200 px frei standen. */
+    .corner.soloCorner .panel { flex: 0 1 auto; min-height: 0; overflow-y: auto; }
     .corner.wide header { justify-content: center; }
-    /* Solo: das einzige Brett darf den Platz nutzen */
-    .corner.soloCorner .boardWrap {
-      width: min(30vh, 76vw);
+    /* Solo: Das Brett nimmt den Platz, der nach dem Panel übrig ist — statt
+       einer festen Viewport-Größe, die weder mitwächst noch zurückweicht.
+       Vorher blieben unter dem Brett 384 px ungenutzt, und sobald die Knöpfe
+       auf Fingergröße wuchsen, lief das Panel über. */
+    .corner.soloCorner .boardArea {
+      flex: 1 1 auto;
+      min-height: 0;
+      width: 100%;
+      display: grid;
+      place-items: center;
+      container-type: size;
+    }
+    .corner.soloCorner .boardWrap { width: min(100cqw, 100cqh); }
+    /* Ohne Container-Queries (Safari < 16) bleibt es beim bisherigen Maß */
+    @supports not (container-type: size) {
+      .corner.soloCorner .boardWrap { width: min(30vh, 76vw); }
     }
     /* Platz für Gleis und Zug an der Brett-Unterkante — nur im Eisenbahn-Modus,
        sonst waren es 26 px, die den Knöpfen darunter fehlten */
@@ -1071,10 +1134,12 @@
     /* 3–4 Spieler am Handy: Die Eckzellen sind zu schmal für Brett + Knöpfe
        nebeneinander — die Knöpfe ragten aus dem Bild. Panel unters Brett. */
     .corner:not(.wide) .row { flex-direction: column; align-items: center; gap: 4px; }
-    .corner:not(.wide) .boardWrap { width: min(24vh, 38vw); align-self: center; }
+    .row::before { display: none; }
+    .boardArea { flex: 1 1 auto; width: 100%; align-self: center; }
+    .corner:not(.wide) .boardArea { width: 100%; }
     .corner:not(.wide) .panel { align-items: center; width: 100%; flex: 1; min-height: 0; overflow-y: auto; }
     .corner:not(.wide) header { justify-content: center; }
-    .boardWrap { width: min(26vh, 40vw); }
+
     .panel button { font-size: 12px; padding: 6px 9px; }
     .chip { min-width: 46px; height: 46px; border-radius: 23px; padding: 0 8px; }
   }

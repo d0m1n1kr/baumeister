@@ -88,6 +88,119 @@ try {
   await page.locator('footer button.stamp', { hasText: 'aktuell' }).waitFor({ timeout: 8000 });
   console.log('✓ Update-Prüfung von Hand über den Versionsstempel');
 
+  // Fläche und Symmetrie im Spiel: Das Brett muss seine Zelle wirklich nutzen,
+  // und die Bretter der oberen und unteren Reihe müssen sich deckungsgleich
+  // gegenüberstehen. Vorher war die Brettgröße viewport-relativ (56 % der
+  // Zelle) und die Reihen standen 207 px versetzt, weil die 180°-Drehung der
+  // oberen Spieler eine linksbündige Gruppe spiegelte.
+  for (const [label, w, h, players, minAnteil] of [
+    ['Handy Solo', 402, 874, 1, 90],
+    ['Handy 4 Spieler', 402, 874, 4, 90],
+    ['Tablet quer 4 Spieler', 1180, 820, 4, 70],
+    ['Tablet hoch 4 Spieler', 1024, 1366, 4, 70],
+    ['Handy quer 2 Spieler', 874, 402, 2, 70]
+  ]) {
+    const ctx = await browser.newContext({ viewport: { width: w, height: h }, locale: 'de-DE' });
+    const gp = await ctx.newPage();
+    gp.on('pageerror', (e) => fail(`Spielfläche ${label}: Seitenfehler: ${e.message}`));
+    await gp.goto(BASE_URL);
+    await gp.locator('#splash').waitFor({ state: 'detached', timeout: 10000 });
+    await gp.locator('.seg button', { hasText: String(players) }).first().click();
+    await gp.locator('.bar button.big').click();
+    await gp.locator('.board').first().waitFor({ timeout: 5000 });
+    const g = await gp.evaluate(() => {
+      const slot = document.querySelector('.slot').getBoundingClientRect();
+      const boards = [...document.querySelectorAll('.board')].map((el) => {
+        const r = el.getBoundingClientRect();
+        return { cx: Math.round(r.x + r.width / 2), cy: Math.round(r.y + r.height / 2), w: Math.round(r.width) };
+      });
+      // Nichts darf am Zellenrand abgeschnitten werden
+      const clipped = [...document.querySelectorAll('.corner')].some(
+        (c) => c.scrollWidth - c.clientWidth > 1 || c.scrollHeight - c.clientHeight > 1
+      );
+      // Punktsymmetrie um die Bildmitte: Die Sitzordnung dreht die Bretter
+      // gegenüberliegender Spieler um 180°, also muss zu jedem Brett ein
+      // gespiegeltes gehören. Das gilt für alle Anordnungen — Quadranten,
+      // übereinander und (quer am Handy) nebeneinander.
+      let versatz = 0;
+      if (boards.length > 1) {
+        for (const b of boards) {
+          const zx = innerWidth - b.cx;
+          const zy = innerHeight - b.cy;
+          const best = Math.min(
+            ...boards.map((o) => Math.max(Math.abs(o.cx - zx), Math.abs(o.cy - zy)))
+          );
+          versatz = Math.max(versatz, best);
+        }
+      }
+      return {
+        anteil: Math.round((boards[0].w / Math.min(slot.width, slot.height)) * 100),
+        brett: boards[0].w,
+        versatz,
+        clipped
+      };
+    });
+    if (g.anteil < minAnteil) {
+      fail(`Spielfläche ${label}: Brett nutzt nur ${g.anteil}% der Zelle (${g.brett}px), erwartet ≥ ${minAnteil}%`);
+    }
+    if (g.versatz > 8) fail(`Spielfläche ${label}: Reihen ${g.versatz}px versetzt`);
+    if (g.clipped) fail(`Spielfläche ${label}: Inhalt wird am Zellenrand abgeschnitten`);
+    await ctx.close();
+  }
+  console.log('✓ Spielfläche: Bretter nutzen ihre Zelle, Reihen stehen deckungsgleich, nichts abgeschnitten');
+
+  // Trefflächen: Jedes Bedienelement muss mindestens 44×44 groß sein — als
+  // Element oder, bei Textlinks, über die vergrößerte Trefffläche (.tapArea).
+  // Ausgenommen sind NAMENTLICH die dichten Raster, die von Natur aus anders
+  // funktionieren: Karten der Auslage und Brettfelder (letztere sind ohnehin
+  // keine <button>). Keine Ausnahme wegen „ist eben klein".
+  {
+    const TAP = 44;
+    const EXEMPT = ['mini', 'cardBtn', 'chip', 'square'];
+    const probe = async (pg, wo) => {
+      const bad = await pg.evaluate(({ TAP, EXEMPT }) => {
+        const out = [];
+        for (const el of document.querySelectorAll('button, select')) {
+          if (el.offsetParent === null) continue;
+          const cls = [...el.classList];
+          if (cls.some((c) => EXEMPT.includes(c))) continue;
+          if (el.closest('.cards, .board')) continue;
+          const r = el.getBoundingClientRect();
+          // .tapArea vergrößert nur die Trefffläche — dann zählt das ::after
+          // (inset: -16px in app.css, also 32 px in jeder Achse)
+          const grow = cls.includes('tapArea') ? 32 : 0;
+          const w = r.width + grow;
+          const h = r.height + grow;
+          if (w + 0.5 < TAP || h + 0.5 < TAP) {
+            out.push(`${cls.join('.') || el.tagName}(${(el.textContent || '').trim().slice(0, 14)}) ${Math.round(w)}×${Math.round(h)}`);
+          }
+        }
+        return out;
+      }, { TAP, EXEMPT });
+      if (bad.length) fail(`Trefflächen ${wo}: zu klein — ${bad.join(', ')}`);
+    };
+
+    const ctx = await browser.newContext({ viewport: { width: 402, height: 874 }, locale: 'de-DE' });
+    const tp = await ctx.newPage();
+    tp.on('pageerror', (e) => fail(`Trefflächen: Seitenfehler: ${e.message}`));
+    await tp.goto(BASE_URL);
+    await tp.locator('#splash').waitFor({ state: 'detached', timeout: 10000 });
+    await probe(tp, 'Startbildschirm');
+    await tp.locator('.seg button', { hasText: 'Mit eigenen' }).click();
+    await probe(tp, 'Startbildschirm (eigene Geräte)');
+    await tp.locator('button', { hasText: 'Partie beitreten' }).click();
+    await probe(tp, 'Beitritt');
+    // Der Beitritt ist ein Zustand, keine Navigation — zurück per Neuladen
+    await tp.reload();
+    await tp.locator('#splash').waitFor({ state: 'detached', timeout: 10000 });
+    await tp.locator('.seg button', { hasText: '1' }).first().click();
+    await tp.locator('.bar button.big').click();
+    await tp.locator('.board').waitFor({ timeout: 5000 });
+    await probe(tp, 'Spiel (Solo)');
+    await ctx.close();
+    console.log('✓ Trefflächen: alle Bedienelemente mindestens 44×44');
+  }
+
   // Startbildschirm: Der Start-Knopf muss auf jedem Gerät sichtbar sein, und
   // die Optionen müssen in einem gemeinsamen Raster stehen — Titel und
   // Beschreibung bündig, Spielerzeilen spaltenweise ausgerichtet.

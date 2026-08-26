@@ -36,6 +36,10 @@
      deutlich mehr (gemessen ~89px auf einem iPhone mit Dynamic Island), und
      jeder Pixel davon war unten ein toter Streifen. Mehr als der
      Home-Indicator braucht niemand freizuhalten. */
+  /* Mindestgröße für alles, was mit dem Finger getroffen wird (Apple: 44pt).
+     Gemessen lagen die Bedienelemente vorher zwischen 12 und 36 px. */
+  --tap: 44px;
+
   --safe-bottom: min(env(safe-area-inset-bottom, 0px), 34px);
   /* Rohwert des oberen Insets: Daran erkennt viewport.ts die installierte PWA
      mit viewport-fit=cover (im Browser ist er 0). Als Variable, weil env() nur
@@ -90,7 +94,8 @@ html, body {
   padding-right: env(safe-area-inset-right, 0px);
 }
 
-button {
+button,
+select {
   font: inherit;
   color: inherit;
   background: var(--bg-panel);
@@ -98,8 +103,31 @@ button {
   border-radius: 10px;
   padding: 0.5em 1em;
   cursor: pointer;
+  /* Eine Regel statt Einzelfällen. Brettfelder sind <div role="button"> und
+     bleiben davon unberührt; die Karten der Auslage sind ohnehin größer. */
+  min-height: var(--tap);
 }
 button:disabled { opacity: 0.4; cursor: default; }
+
+/* Icon-Knöpfe sind auch in der Breite Trefffläche, nicht nur in der Höhe. */
+button.iconBtn { min-width: var(--tap); padding: 0; }
+
+/* EINZIGE zugelassene Abweichung: Textlinks und kleine Schließen-Kreuze sollen
+   klein AUSSEHEN. Dann wächst nicht das Element, sondern nur seine Trefffläche —
+   sichtbar bleibt alles gleich. 2×16 px reichen auch dem kleinsten Element
+   (Versionsstempel, 12 px hoch) auf die geforderten 44. Wer diesen Wert ändert,
+   muss die Prüfung in scripts/smoke.mjs mitziehen. */
+.tapArea {
+  position: relative;
+  min-height: 0;
+  min-width: 0;
+  padding: 0;
+}
+.tapArea::after {
+  content: '';
+  position: absolute;
+  inset: -16px;
+}
 
 /* ---------- Theme: Drachenreich ----------
    Zauberwald bei Nacht: tiefes Violett, Pergament-Felder, Gold als Akzent. */

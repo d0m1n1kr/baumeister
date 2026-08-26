@@ -9,10 +9,10 @@
 
 <footer>
   {#if updater.waiting}
-    <button class="update" onpointerup={() => updater.apply()}>⬆ {t.updateNow} (v{version})</button>
+    <button class="update tapArea" onpointerup={() => updater.apply()}>⬆ {t.updateNow} (v{version})</button>
   {:else}
     <button
-      class="stamp"
+      class="stamp tapArea"
       title={t.updateCheck}
       disabled={updater.checking}
       onpointerup={() => updater.check()}

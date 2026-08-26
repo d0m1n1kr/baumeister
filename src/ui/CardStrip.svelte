@@ -117,21 +117,18 @@
     <span class="round">
       {t.round} {Math.max(1, st.round)}
       <button
-        class="abort"
+        class="abort iconBtn"
         onpointerup={() => (soundOn = sfx.toggle())}
         title={soundOn ? t.soundOff : t.soundOn}
       >{soundOn ? '🔊' : '🔇'}</button>
       {#if !solo}
         <button
-          class="abort"
+          class="abort iconBtn"
           class:flipActive={flipped}
           onpointerup={toggleFlip}
           title={t.flipCards}
         >🔄</button>
       {/if}
-      <!-- Partie beenden: rot und voll deckend, damit man ihn überhaupt findet
-           (der Ton- und der Dreh-Knopf daneben bleiben dezent) -->
-      <button class="abort quit" onpointerup={() => onabort?.()} title={t.abortGame}>✕</button>
     </span>
     <span class="mb">{st.config.townHall ? '🏛' : '👑'} {st.players[st.masterBuilder].name}</span>
     {#if named}
@@ -165,6 +162,9 @@
         </button>
       {/if}
     {/if}
+    <!-- Partie beenden: rot, damit man ihn findet — aber am äußeren Rand der
+         Kopfzeile, nicht neben dem Spielernamen. -->
+    <button class="abort quit iconBtn" onpointerup={() => onabort?.()} title={t.abortGame}>✕</button>
   </div>
   <div class="cards" class:alice={aliceOn} class:flipped={flipped && !solo} class:many={cardIds.length > 8}>
     {#each cardIds as id}
@@ -206,19 +206,21 @@
     padding-bottom: 2px;
     border-bottom: 1px solid rgba(255, 255, 255, 0.1);
   }
-  .round { display: flex; align-items: center; gap: 8px; }
+  .round { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; justify-content: center; }
+  /* Volle Trefffläche, Glyphe bleibt klein — vorher 22×22 bzw. 24×24 */
   .abort {
-    width: 22px;
-    height: 22px;
+    width: var(--tap);
+    height: var(--tap);
     border-radius: 50%;
     padding: 0;
-    font-size: 11px;
+    font-size: 15px;
     opacity: 0.55;
     line-height: 1;
   }
   .quit {
-    width: 24px;
-    height: 24px;
+    order: 99; /* immer zuletzt, egal wie die Kopfzeile umbricht */
+    margin-left: auto;
+    align-self: flex-end;
     background: var(--danger);
     border-color: rgba(0, 0, 0, 0.3);
     color: #fff;
@@ -345,8 +347,11 @@
   /* Alice-Modus: Karten samt Beschreibung dauerhaft offen (Einzelansicht) */
   .aliceBtn {
     font-size: 11px;
-    padding: 3px 8px;
+    padding: 3px 10px;
     opacity: 0.7;
+    /* Am Handy bleibt nur das Symbol übrig — dann trägt die Breite die
+       Trefffläche, nicht die Beschriftung. */
+    min-width: var(--tap);
   }
   /* Am Handy bleibt nur das Symbol — die Zeile ist dort knapp */
   @media (max-width: 720px), (max-height: 540px) {
