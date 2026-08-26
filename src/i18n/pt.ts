@@ -21,6 +21,33 @@ export const pt: Translation = {
 
   masterBuilder: 'Mestre construtor',
   pickResource: 'Escolhe um recurso',
+  /* Erklärungen der Effektzeichen auf den Karten. Vorher standen sie hart
+     auf Deutsch in helpers.ts — sieben von acht Sprachen lasen Deutsch. */
+  features: {
+    feedable: 'Precisa de ser alimentado',
+    feeds: 'Alimenta cabanas',
+    adjacency: 'A vizinhança conta',
+    noAdjacency: 'Evitar certos vizinhos',
+    rowCol: 'Linha e coluna contam',
+    corners: 'Os cantos contam',
+    center: 'O centro conta',
+    countTable: 'Pontos conforme a quantidade',
+    holdsResource: 'Guarda um material',
+    wildResource: 'Material coringa',
+    interactive: 'Efeito contínuo',
+    onConstruct: 'Efeito ao construir',
+    placementOverride: 'Colocação livre',
+    negativeVp: 'Pode dar pontos negativos',
+    vsNeighbor: 'Comparado com o vizinho',
+    townSnapshot: 'Conta no momento da construção',
+    finishOrder: 'Ordem de conclusão',
+    emptyOk: 'Casas vazias permitidas',
+    uniqueTypes: 'Contam tipos diferentes',
+    coins: 'Efeito de moeda'
+  } as Record<string, string>,
+  unverified: 'Detalhes da carta não verificados',
+  flipToOpponent: 'Virar para o adversário',
+
   resourceNames: {
     wood: 'Madeira',
     brick: 'Tijolo',
@@ -156,6 +183,7 @@ export const pt: Translation = {
   joinCode: 'Código da sala',
   yourName: 'O teu nome',
   joinButton: 'Entrar',
+  qrLabel: 'Código QR para entrar',
   scanButton: 'Ler código QR',
   scanTitle: 'Ler código QR',
   scanPrompt: 'Aponta a câmara para o código QR do anfitrião',

@@ -21,6 +21,33 @@ export const nl: Translation = {
 
   masterBuilder: 'Meesterbouwer',
   pickResource: 'Kies een grondstof',
+  /* Erklärungen der Effektzeichen auf den Karten. Vorher standen sie hart
+     auf Deutsch in helpers.ts — sieben von acht Sprachen lasen Deutsch. */
+  features: {
+    feedable: 'Moet gevoed worden',
+    feeds: 'Voedt huisjes',
+    adjacency: 'Aangrenzing telt',
+    noAdjacency: 'Bepaalde buren vermijden',
+    rowCol: 'Rij en kolom tellen',
+    corners: 'Hoeken tellen',
+    center: 'Het midden telt',
+    countTable: 'Punten naar aantal',
+    holdsResource: 'Slaat materiaal op',
+    wildResource: 'Jokermateriaal',
+    interactive: 'Doorlopend effect',
+    onConstruct: 'Effect bij bouwen',
+    placementOverride: 'Vrije plaatsing',
+    negativeVp: 'Minpunten mogelijk',
+    vsNeighbor: 'Vergeleken met buur',
+    townSnapshot: 'Telt op het moment van bouwen',
+    finishOrder: 'Volgorde van voltooiing',
+    emptyOk: 'Lege vakjes toegestaan',
+    uniqueTypes: 'Verschillende soorten tellen',
+    coins: 'Munteffect'
+  } as Record<string, string>,
+  unverified: 'Kaartdetails niet gecontroleerd',
+  flipToOpponent: 'Naar de tegenstander draaien',
+
   resourceNames: {
     wood: 'Hout',
     brick: 'Baksteen',
@@ -156,6 +183,7 @@ export const nl: Translation = {
   joinCode: 'Kamercode',
   yourName: 'Je naam',
   joinButton: 'Meedoen',
+  qrLabel: 'QR-code om mee te doen',
   scanButton: 'QR-code scannen',
   scanTitle: 'QR-code scannen',
   scanPrompt: 'Houd de QR-code van de host voor de camera',

@@ -21,6 +21,33 @@ export const fr: Translation = {
 
   masterBuilder: 'Maître bâtisseur',
   pickResource: 'Choisis une ressource',
+  /* Erklärungen der Effektzeichen auf den Karten. Vorher standen sie hart
+     auf Deutsch in helpers.ts — sieben von acht Sprachen lasen Deutsch. */
+  features: {
+    feedable: 'Doit être nourri',
+    feeds: 'Nourrit les chaumières',
+    adjacency: 'Le voisinage compte',
+    noAdjacency: 'Éviter certains voisins',
+    rowCol: 'Ligne et colonne comptent',
+    corners: 'Les coins comptent',
+    center: 'Le centre compte',
+    countTable: 'Points selon le nombre',
+    holdsResource: 'Stocke une ressource',
+    wildResource: 'Ressource joker',
+    interactive: 'Effet permanent',
+    onConstruct: 'Effet à la construction',
+    placementOverride: 'Placement libre',
+    negativeVp: 'Points négatifs possibles',
+    vsNeighbor: 'Comparé au voisin',
+    townSnapshot: 'Compte au moment de la construction',
+    finishOrder: 'Ordre d’achèvement',
+    emptyOk: 'Cases vides autorisées',
+    uniqueTypes: 'Types distincts comptés',
+    coins: 'Effet de pièce'
+  } as Record<string, string>,
+  unverified: 'Détails de la carte non vérifiés',
+  flipToOpponent: 'Tourner vers l’adversaire',
+
   resourceNames: {
     wood: 'Bois',
     brick: 'Brique',
@@ -156,6 +183,7 @@ export const fr: Translation = {
   joinCode: 'Code du salon',
   yourName: 'Ton nom',
   joinButton: 'Rejoindre',
+  qrLabel: 'QR code pour rejoindre',
   scanButton: 'Scanner le code QR',
   scanTitle: 'Scanner le code QR',
   scanPrompt: 'Présente le code QR de l’hôte devant la caméra',

@@ -21,6 +21,33 @@ export const it: Translation = {
 
   masterBuilder: 'Capomastro',
   pickResource: 'Scegli una risorsa',
+  /* Erklärungen der Effektzeichen auf den Karten. Vorher standen sie hart
+     auf Deutsch in helpers.ts — sieben von acht Sprachen lasen Deutsch. */
+  features: {
+    feedable: 'Deve essere nutrito',
+    feeds: 'Nutre le casette',
+    adjacency: 'Conta l’adiacenza',
+    noAdjacency: 'Evitare certi vicini',
+    rowCol: 'Contano riga e colonna',
+    corners: 'Contano gli angoli',
+    center: 'Conta il centro',
+    countTable: 'Punti in base al numero',
+    holdsResource: 'Conserva un materiale',
+    wildResource: 'Materiale jolly',
+    interactive: 'Effetto continuo',
+    onConstruct: 'Effetto alla costruzione',
+    placementOverride: 'Piazzamento libero',
+    negativeVp: 'Punti negativi possibili',
+    vsNeighbor: 'Confronto con il vicino',
+    townSnapshot: 'Conta al momento della costruzione',
+    finishOrder: 'Ordine di completamento',
+    emptyOk: 'Caselle vuote ammesse',
+    uniqueTypes: 'Contano i tipi diversi',
+    coins: 'Effetto moneta'
+  } as Record<string, string>,
+  unverified: 'Dettagli della carta non verificati',
+  flipToOpponent: 'Ruota verso l’avversario',
+
   resourceNames: {
     wood: 'Legno',
     brick: 'Mattone',
@@ -156,6 +183,7 @@ export const it: Translation = {
   joinCode: 'Codice stanza',
   yourName: 'Il tuo nome',
   joinButton: 'Entra',
+  qrLabel: 'Codice QR per partecipare',
   scanButton: 'Scansiona codice QR',
   scanTitle: 'Scansiona codice QR',
   scanPrompt: 'Inquadra il codice QR dell’host con la fotocamera',

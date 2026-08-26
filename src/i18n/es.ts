@@ -21,6 +21,33 @@ export const es: Translation = {
 
   masterBuilder: 'Maestro constructor',
   pickResource: 'Elige un recurso',
+  /* Erklärungen der Effektzeichen auf den Karten. Vorher standen sie hart
+     auf Deutsch in helpers.ts — sieben von acht Sprachen lasen Deutsch. */
+  features: {
+    feedable: 'Debe alimentarse',
+    feeds: 'Alimenta cabañas',
+    adjacency: 'La adyacencia cuenta',
+    noAdjacency: 'Evitar ciertos vecinos',
+    rowCol: 'Cuentan fila y columna',
+    corners: 'Cuentan las esquinas',
+    center: 'Cuenta el centro',
+    countTable: 'Puntos según la cantidad',
+    holdsResource: 'Almacena un material',
+    wildResource: 'Material comodín',
+    interactive: 'Efecto continuo',
+    onConstruct: 'Efecto al construir',
+    placementOverride: 'Colocación libre',
+    negativeVp: 'Puede dar puntos negativos',
+    vsNeighbor: 'Comparado con el vecino',
+    townSnapshot: 'Cuenta al momento de construir',
+    finishOrder: 'Orden de finalización',
+    emptyOk: 'Se permiten casillas vacías',
+    uniqueTypes: 'Cuentan tipos distintos',
+    coins: 'Efecto de moneda'
+  } as Record<string, string>,
+  unverified: 'Detalles de la carta sin verificar',
+  flipToOpponent: 'Girar hacia el rival',
+
   resourceNames: {
     wood: 'Madera',
     brick: 'Ladrillo',
@@ -156,6 +183,7 @@ export const es: Translation = {
   joinCode: 'Código de sala',
   yourName: 'Tu nombre',
   joinButton: 'Unirse',
+  qrLabel: 'Código QR para unirse',
   scanButton: 'Escanear código QR',
   scanTitle: 'Escanear código QR',
   scanPrompt: 'Muestra el código QR del anfitrión ante la cámara',

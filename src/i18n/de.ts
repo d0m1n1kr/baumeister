@@ -21,6 +21,33 @@ export const de = {
 
   masterBuilder: 'Baumeister',
   pickResource: 'Wähle ein Baumaterial',
+  /* Erklärungen der Effektzeichen auf den Karten. Vorher standen sie hart
+     auf Deutsch in helpers.ts — sieben von acht Sprachen lasen Deutsch. */
+  features: {
+    feedable: 'Muss gefüttert werden',
+    feeds: 'Füttert Hütten',
+    adjacency: 'Nachbarschaft zählt',
+    noAdjacency: 'Bestimmte Nachbarn vermeiden',
+    rowCol: 'Zeile & Spalte zählen',
+    corners: 'Ecken zählen',
+    center: 'Zentrum zählt',
+    countTable: 'Punkte nach Anzahl',
+    holdsResource: 'Lagert Material',
+    wildResource: 'Joker-Material',
+    interactive: 'Laufender Effekt',
+    onConstruct: 'Effekt beim Bau',
+    placementOverride: 'Freie Platzwahl',
+    negativeVp: 'Minuspunkte möglich',
+    vsNeighbor: 'Vergleich mit Nachbar',
+    townSnapshot: 'Zeitpunkt des Baus zählt',
+    finishOrder: 'Fertigstellungs-Reihenfolge',
+    emptyOk: 'Leere Felder erlaubt',
+    uniqueTypes: 'Verschiedene Typen zählen',
+    coins: 'Münz-Effekt'
+  } as Record<string, string>,
+  unverified: 'Kartendetails nicht verifiziert',
+  flipToOpponent: 'Zum Gegenüber drehen',
+
   resourceNames: {
     wood: 'Holz',
     brick: 'Ziegel',
@@ -156,6 +183,7 @@ export const de = {
   joinCode: 'Raum-Code',
   yourName: 'Dein Name',
   joinButton: 'Beitreten',
+  qrLabel: 'QR-Code zum Beitreten',
   scanButton: 'QR-Code scannen',
   scanTitle: 'QR-Code scannen',
   scanPrompt: 'Den QR-Code des Hosts vor die Kamera halten',

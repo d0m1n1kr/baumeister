@@ -21,27 +21,56 @@ export const CATEGORY_CSS: Record<CardColor, string> = {
   pink: 'var(--cat-pink)'
 };
 
-export const FEATURE_ICONS: Record<FeatureId, { icon: string; title: string }> = {
-  feedable: { icon: '🍽', title: 'Muss gefüttert werden' },
-  feeds: { icon: '🌾', title: 'Füttert Hütten' },
-  adjacency: { icon: '↔', title: 'Nachbarschaft zählt' },
-  'no-adjacency': { icon: '⊘', title: 'Bestimmte Nachbarn vermeiden' },
-  'row-col': { icon: '✚', title: 'Zeile & Spalte zählen' },
-  corners: { icon: '◰', title: 'Ecken zählen' },
-  center: { icon: '▣', title: 'Zentrum zählt' },
-  'count-table': { icon: 'Σ', title: 'Punkte nach Anzahl' },
-  'holds-resource': { icon: '▦', title: 'Lagert Material' },
-  'wild-resource': { icon: '★', title: 'Joker-Material' },
-  interactive: { icon: '⚡', title: 'Laufender Effekt' },
-  'on-construct': { icon: '✦', title: 'Effekt beim Bau' },
-  'placement-override': { icon: '⊞', title: 'Freie Platzwahl' },
-  'negative-vp': { icon: '−', title: 'Minuspunkte möglich' },
-  'vs-neighbor': { icon: '⚔', title: 'Vergleich mit Nachbar' },
-  'town-snapshot': { icon: '⌛', title: 'Zeitpunkt des Baus zählt' },
-  'finish-order': { icon: '🏁', title: 'Fertigstellungs-Reihenfolge' },
-  'empty-ok': { icon: '◻', title: 'Leere Felder erlaubt' },
-  'unique-types': { icon: '❖', title: 'Verschiedene Typen zählen' },
-  coins: { icon: '🪙', title: 'Münz-Effekt' }
+/**
+ * Zeichen der Effekt-Hinweise auf den Karten. Die Erklärung dazu steht in den
+ * Sprachdateien (`t.features`) — vorher stand sie hier hart auf Deutsch und
+ * sieben von acht Sprachen zeigten deutschen Text.
+ */
+export const FEATURE_ICONS: Record<FeatureId, string> = {
+  feedable: '🍽',
+  feeds: '🌾',
+  adjacency: '↔',
+  'no-adjacency': '⊘',
+  'row-col': '✚',
+  corners: '◰',
+  center: '▣',
+  'count-table': 'Σ',
+  'holds-resource': '▦',
+  'wild-resource': '★',
+  interactive: '⚡',
+  'on-construct': '✦',
+  'placement-override': '⊞',
+  'negative-vp': '−',
+  'vs-neighbor': '⚔',
+  'town-snapshot': '⌛',
+  'finish-order': '🏁',
+  'empty-ok': '◻',
+  'unique-types': '❖',
+  coins: '🪙'
+};
+
+/** Schlüssel der Erklärung in `t.features` zu einer Kartenfähigkeit. */
+export const FEATURE_KEY: Record<FeatureId, string> = {
+  feedable: 'feedable',
+  feeds: 'feeds',
+  adjacency: 'adjacency',
+  'no-adjacency': 'noAdjacency',
+  'row-col': 'rowCol',
+  corners: 'corners',
+  center: 'center',
+  'count-table': 'countTable',
+  'holds-resource': 'holdsResource',
+  'wild-resource': 'wildResource',
+  interactive: 'interactive',
+  'on-construct': 'onConstruct',
+  'placement-override': 'placementOverride',
+  'negative-vp': 'negativeVp',
+  'vs-neighbor': 'vsNeighbor',
+  'town-snapshot': 'townSnapshot',
+  'finish-order': 'finishOrder',
+  'empty-ok': 'emptyOk',
+  'unique-types': 'uniqueTypes',
+  coins: 'coins'
 };
 
 /**

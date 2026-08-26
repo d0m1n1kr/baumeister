@@ -21,6 +21,33 @@ export const en: Translation = {
 
   masterBuilder: 'Master Builder',
   pickResource: 'Choose a resource',
+  /* Erklärungen der Effektzeichen auf den Karten. Vorher standen sie hart
+     auf Deutsch in helpers.ts — sieben von acht Sprachen lasen Deutsch. */
+  features: {
+    feedable: 'Must be fed',
+    feeds: 'Feeds cottages',
+    adjacency: 'Adjacency counts',
+    noAdjacency: 'Avoid certain neighbours',
+    rowCol: 'Row and column count',
+    corners: 'Corners count',
+    center: 'Centre counts',
+    countTable: 'Points by count',
+    holdsResource: 'Stores a resource',
+    wildResource: 'Wild resource',
+    interactive: 'Ongoing effect',
+    onConstruct: 'Effect when built',
+    placementOverride: 'Free placement',
+    negativeVp: 'Can score negative',
+    vsNeighbor: 'Compared with neighbour',
+    townSnapshot: 'Counts at time of building',
+    finishOrder: 'Order of completion',
+    emptyOk: 'Empty squares allowed',
+    uniqueTypes: 'Distinct types count',
+    coins: 'Coin effect'
+  } as Record<string, string>,
+  unverified: 'Card details unverified',
+  flipToOpponent: 'Turn towards the opponent',
+
   resourceNames: {
     wood: 'Wood',
     brick: 'Brick',
@@ -156,6 +183,7 @@ export const en: Translation = {
   joinCode: 'Room code',
   yourName: 'Your name',
   joinButton: 'Join',
+  qrLabel: 'QR code to join',
   scanButton: 'Scan QR code',
   scanTitle: 'Scan QR code',
   scanPrompt: 'Hold the host’s QR code in front of the camera',

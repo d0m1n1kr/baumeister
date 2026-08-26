@@ -1,8 +1,8 @@
 <script lang="ts">
-  import { cardName } from '../i18n';
+  import { cardName, t } from '../i18n';
   import type { CardDef } from '../engine/types';
   import { artFor } from '../data';
-  import { CATEGORY_CSS, FEATURE_ICONS } from './helpers';
+  import { CATEGORY_CSS, FEATURE_ICONS, FEATURE_KEY } from './helpers';
   import PatternGrid from './PatternGrid.svelte';
 
   let {
@@ -35,10 +35,10 @@
   </span>
   <span class="feats">
     {#each card.features as f}
-      <span title={FEATURE_ICONS[f]?.title}>{FEATURE_ICONS[f]?.icon}</span>
+      <span title={t.features[FEATURE_KEY[f]]}>{FEATURE_ICONS[f]}</span>
     {/each}
     {#if card.unverified}
-      <span title="Kartendetails nicht verifiziert — Korrekturen siehe src/data/schema.md">⚠</span>
+      <span title={t.unverified}>⚠</span>
     {/if}
   </span>
   {#if description}<span class="desc">{description}</span>{/if}

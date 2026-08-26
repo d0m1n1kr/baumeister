@@ -24,6 +24,8 @@ export interface Palette {
   text: string;
   dim: string;
   accent: string;
+  /** Schriftfamilie der App — aus dem DOM gelesen, nicht hier festgelegt. */
+  font: string;
 }
 
 /** Wörter auf Zeilen umbrechen. `measure` liefert die Breite eines Textes. */
@@ -71,7 +73,7 @@ export function buildingLines(
   return [];
 }
 
-/** Farben des gerade aktiven Themes, damit die Karte zum Spiel passt. */
+/** Farben und Schrift des gerade aktiven Themes, damit die Karte zum Spiel passt. */
 export function readPalette(el: Element): Palette {
   const css = getComputedStyle(el);
   const pick = (name: string, fallback: string) =>
@@ -81,13 +83,17 @@ export function readPalette(el: Element): Palette {
     panel: pick('--bg-panel', '#2a3a4d'),
     text: pick('--text', '#e8eef5'),
     dim: pick('--text-dim', '#9fb0c1'),
-    accent: pick('--accent', '#e8b84b')
+    accent: pick('--accent', '#e8b84b'),
+    // Eine Quelle statt zwei: Der Stack stand hier als eigene Konstante und
+    // konnte auf Android eine andere Schrift ergeben als die App selbst.
+    font: css.fontFamily || FALLBACK_FONT
   };
 }
 
-const FONT = "system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif";
+const FALLBACK_FONT = "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif";
 
 export function drawScoreCard(canvas: HTMLCanvasElement, info: CardInfo, p: Palette): void {
+  const FONT = p.font || FALLBACK_FONT;
   const ctx = canvas.getContext('2d');
   if (!ctx) throw new Error('kein 2D-Kontext');
   canvas.width = CARD_SIZE;
