@@ -182,23 +182,23 @@
   }
   .scroll > :first-child { margin-top: auto; }
   .scroll > :last-child { margin-bottom: auto; }
-  h1 { margin: 0; font-size: 26px; }
+  h1 { margin: 0; font-size: var(--fs-xl); }
   .form, .status {
     background: var(--bg-panel);
-    border-radius: 14px;
+    border-radius: var(--r-lg);
     padding: 20px;
     display: flex;
     flex-direction: column;
     gap: 14px;
     width: min(360px, 90vw);
   }
-  label { display: flex; flex-direction: column; gap: 5px; font-size: 13px; }
+  label { display: flex; flex-direction: column; gap: 5px; font-size: var(--fs-sm); }
   input {
     font: inherit;
     color: inherit;
     background: rgba(0, 0, 0, 0.25);
     border: 1px solid rgba(255, 255, 255, 0.15);
-    border-radius: 8px;
+    border-radius: var(--r-md);
     padding: 10px;
   }
   .codeRow { display: flex; gap: 8px; align-items: stretch; }
@@ -207,18 +207,18 @@
     min-width: 0;
     text-transform: uppercase;
     letter-spacing: 6px;
-    font-size: 22px;
+    font-size: var(--fs-xl);
     text-align: center;
   }
-  .scanBtn { font-size: 20px; padding: 0 14px; }
+  .scanBtn { font-size: var(--fs-lg); padding: 0 14px; }
   .seats { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 6px; }
-  .seats li { display: flex; align-items: center; gap: 8px; font-size: 14px; }
+  .seats li { display: flex; align-items: center; gap: 8px; font-size: var(--fs-md); }
   .seats li.me { color: var(--accent); font-weight: 700; }
   .dot { width: 9px; height: 9px; border-radius: 50%; background: var(--text-dim); }
   .dot.on { background: var(--ok); }
   .status p { margin: 0; color: var(--text-dim); text-align: center; }
-  .relays { font-size: 11px; }
+  .relays { font-size: var(--fs-xs); }
   .relays.bad { color: var(--danger); }
   .actions { display: flex; justify-content: flex-end; gap: 10px; }
-  .error { background: var(--danger); color: #fff; font-size: 13px; padding: 8px 10px; border-radius: 8px; }
+  .error { background: var(--danger); color: #fff; font-size: var(--fs-sm); padding: 8px 10px; border-radius: var(--r-md); }
 </style>

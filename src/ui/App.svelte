@@ -222,9 +222,9 @@
     justify-content: center;
     gap: 26px;
   }
-  h1 { margin: 0; font-size: 34px; }
+  h1 { margin: 0; font-size: var(--fs-2xl); }
   .buttons { display: flex; flex-direction: column; gap: 12px; width: 240px; }
-  .big { font-size: 17px; padding: 12px; }
+  .big { font-size: var(--fs-lg); padding: 12px; }
   .fatal {
     position: fixed;
     bottom: 12px;
@@ -232,7 +232,7 @@
     transform: translateX(-50%);
     background: var(--danger);
     padding: 8px 14px;
-    border-radius: 8px;
-    font-size: 13px;
+    border-radius: var(--r-md);
+    font-size: var(--fs-sm);
   }
 </style>

@@ -103,9 +103,9 @@
     left: 50%;
     transform: translateX(-50%);
     background: var(--danger);
-    font-size: 12px;
+    font-size: var(--fs-sm);
     padding: 5px 12px;
-    border-radius: 999px;
+    border-radius: var(--r-pill);
     z-index: 50;
   }
   .ghost {

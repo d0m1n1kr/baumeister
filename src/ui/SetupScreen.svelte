@@ -426,7 +426,7 @@
      Einstellungen noch etwas zu sehen ist. */
   @media (max-height: 560px) {
     .scroll { gap: 10px; }
-    h1 { font-size: 22px; }
+    h1 { font-size: var(--fs-xl); }
   }
 
   .card {
@@ -435,12 +435,12 @@
     gap: 12px;
     background: var(--bg-panel);
     padding: 18px 20px 20px;
-    border-radius: 16px;
+    border-radius: var(--r-lg);
     min-width: 0;
   }
   h2 {
     margin: 0;
-    font-size: 12px;
+    font-size: var(--fs-sm);
     font-weight: 700;
     letter-spacing: 0.08em;
     text-transform: uppercase;
@@ -463,10 +463,10 @@
   .seg { display: flex; gap: 6px; }
   .row .seg button { width: 46px; }
   /* Modus-Knöpfe teilen sich die Zeile gleichmäßig, statt den Titel zu quetschen */
-  .seg.spread button { flex: 1 1 0; min-width: 0; font-size: 13px; padding: 8px 6px; }
+  .seg.spread button { flex: 1 1 0; min-width: 0; font-size: var(--fs-sm); padding: 8px 6px; }
 
   .sharedDay { color: var(--accent); }
-  .hint { margin: 0; font-size: 11px; color: var(--text-dim); line-height: 1.4; }
+  .hint { margin: 0; font-size: var(--fs-xs); color: var(--text-dim); line-height: 1.4; }
 
   .playerRow input {
     flex: 1;
@@ -474,7 +474,7 @@
     color: inherit;
     background: rgba(0, 0, 0, 0.25);
     border: 1px solid rgba(255, 255, 255, 0.15);
-    border-radius: 8px;
+    border-radius: var(--r-md);
     padding: 8px 10px;
     min-width: 0;
   }
@@ -483,11 +483,11 @@
     color: inherit;
     background: var(--bg);
     border: 1px solid rgba(255, 255, 255, 0.15);
-    border-radius: 8px;
+    border-radius: var(--r-md);
     padding: 8px;
   }
   .playerRow input:disabled { opacity: 0.45; }
-  .deviceToggle { font-size: 11px; padding: 6px 8px; white-space: nowrap; width: 100%; }
+  .deviceToggle { font-size: var(--fs-xs); padding: 6px 8px; white-space: nowrap; width: 100%; }
   .deviceToggle.remote { border-color: var(--accent); color: var(--accent); }
 
   /* Einheitliches Raster für jeden Schalter */
@@ -503,7 +503,7 @@
   .opt input { width: 22px; height: 22px; margin: 0; }
   .optText { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
   .optName { font-weight: 600; line-height: 1.25; }
-  .optDesc { font-size: 11px; color: var(--text-dim); line-height: 1.35; }
+  .optDesc { font-size: var(--fs-xs); color: var(--text-dim); line-height: 1.35; }
 
   .expansions {
     display: flex;
@@ -512,7 +512,7 @@
     border-top: 1px solid rgba(255, 255, 255, 0.12);
     padding-top: 12px;
   }
-  .expTitle { font-size: 12px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--text-dim); }
+  .expTitle { font-size: var(--fs-sm); font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--text-dim); }
 
   .bar {
     flex-shrink: 0;
@@ -525,19 +525,19 @@
     border-top: 1px solid rgba(255, 255, 255, 0.1);
     box-shadow: 0 -6px 18px rgba(0, 0, 0, 0.35);
   }
-  .big { font-size: 17px; padding: 12px; width: min(420px, 100%); }
+  .big { font-size: var(--fs-lg); padding: 12px; width: min(420px, 100%); }
   .barLinks { display: flex; align-items: center; gap: 14px; }
-  .error { color: var(--danger); font-size: 13px; text-align: center; }
+  .error { color: var(--danger); font-size: var(--fs-sm); text-align: center; }
 
   .link {
     background: none;
     border: none;
     color: var(--text-dim);
-    font-size: 12px;
+    font-size: var(--fs-sm);
     padding: 0;
     text-decoration: underline;
   }
-  .helpLink { font-size: 12px; padding: 0 0 0 8px; }
+  .helpLink { font-size: var(--fs-sm); padding: 0 0 0 8px; }
 
   /* Hinweis auf den Lernmodus (nur bis zum ersten Wegklicken) */
   .learnHint {
@@ -549,12 +549,12 @@
     width: min(420px, 100%);
     background: var(--bg-panel);
     border: 1px solid var(--accent);
-    border-radius: 14px;
+    border-radius: var(--r-lg);
     padding: 14px 18px;
   }
-  .hintTitle { font-size: 14px; font-weight: 700; color: var(--accent); }
-  .hintText { margin: 0; font-size: 12px; line-height: 1.45; color: var(--text-dim); padding-right: 22px; }
-  .hintStart { font-size: 13px; padding: 8px 14px; }
+  .hintTitle { font-size: var(--fs-md); font-weight: 700; color: var(--accent); }
+  .hintText { margin: 0; font-size: var(--fs-sm); line-height: 1.45; color: var(--text-dim); padding-right: 22px; }
+  .hintStart { font-size: var(--fs-sm); padding: 8px 14px; }
   .hintClose {
     position: absolute;
     top: 6px;
@@ -563,7 +563,7 @@
     height: 24px;
     padding: 0;
     border-radius: 50%;
-    font-size: 12px;
+    font-size: var(--fs-sm);
     line-height: 1;
     opacity: 0.6;
   }
@@ -597,18 +597,18 @@
     width: min(420px, 100%);
     background: var(--bg-panel);
     border: 1px dashed rgba(255, 255, 255, 0.28);
-    border-radius: 14px;
+    border-radius: var(--r-lg);
     padding: 12px 40px 12px 16px;
   }
   .installText { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
-  .installTitle { font-size: 13px; font-weight: 700; }
-  .installSub { font-size: 11px; color: var(--text-dim); line-height: 1.35; }
-  .installGo { font-size: 12px; padding: 7px 12px; white-space: nowrap; }
+  .installTitle { font-size: var(--fs-sm); font-weight: 700; }
+  .installSub { font-size: var(--fs-xs); color: var(--text-dim); line-height: 1.35; }
+  .installGo { font-size: var(--fs-sm); padding: 7px 12px; white-space: nowrap; }
   .installSteps {
     grid-column: 1 / -1;
     margin: 0;
     padding-left: 20px;
-    font-size: 11px;
+    font-size: var(--fs-xs);
     color: var(--text-dim);
     line-height: 1.6;
   }

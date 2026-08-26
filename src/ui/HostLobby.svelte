@@ -74,21 +74,21 @@
     overflow-y: auto;
     touch-action: pan-y;
   }
-  h1 { margin: 0; font-size: 24px; }
+  h1 { margin: 0; font-size: var(--fs-xl); }
   .code {
     display: flex;
     align-items: center;
     gap: 20px;
     background: var(--bg-panel);
     padding: 16px 20px;
-    border-radius: 14px;
+    border-radius: var(--r-lg);
     flex-wrap: wrap;
     justify-content: center;
   }
   .codeText { display: flex; flex-direction: column; gap: 4px; }
-  .label { font-size: 12px; color: var(--text-dim); }
-  .value { font-size: 34px; font-weight: 700; letter-spacing: 4px; color: var(--accent); }
-  .hint { font-size: 12px; color: var(--text-dim); max-width: 220px; }
+  .label { font-size: var(--fs-sm); color: var(--text-dim); }
+  .value { font-size: var(--fs-2xl); font-weight: 700; letter-spacing: 4px; color: var(--accent); }
+  .hint { font-size: var(--fs-sm); color: var(--text-dim); max-width: 220px; }
   .seats {
     list-style: none;
     margin: 0;
@@ -103,7 +103,7 @@
     align-items: center;
     gap: 10px;
     background: rgba(255, 255, 255, 0.05);
-    border-radius: 10px;
+    border-radius: var(--r-md);
     padding: 8px 12px;
   }
   .dot {
@@ -115,11 +115,11 @@
   }
   .dot.on { background: var(--ok); }
   .name { flex: 1; font-weight: 600; }
-  .state { font-size: 12px; color: var(--text-dim); }
-  .seats button { font-size: 12px; padding: 4px 8px; }
-  .note { margin: 0; font-size: 12px; color: var(--text-dim); text-align: center; }
+  .state { font-size: var(--fs-sm); color: var(--text-dim); }
+  .seats button { font-size: var(--fs-sm); padding: 4px 8px; }
+  .note { margin: 0; font-size: var(--fs-sm); color: var(--text-dim); text-align: center; }
   .actions { display: flex; gap: 10px; }
-  .actions button { font-size: 16px; padding: 10px 18px; }
-  .relayLine { margin: 0; font-size: 11px; color: var(--text-dim); text-align: center; }
+  .actions button { font-size: var(--fs-md); padding: 10px 18px; }
+  .relayLine { margin: 0; font-size: var(--fs-xs); color: var(--text-dim); text-align: center; }
   .relayLine.bad { color: var(--danger); font-weight: 700; }
 </style>

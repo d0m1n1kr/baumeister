@@ -274,11 +274,11 @@
      Räder liegen nach der Drehung an der Box-Oberkante, also Box an die Linie */
   .train.onTop { rotate: 180deg; translate: -50% -9px; }
   .hiddenTrain { visibility: hidden; }
-  .loco { font-size: 30px; line-height: 1; transform: scaleX(-1); }
+  .loco { font-size: var(--fs-2xl); line-height: 1; transform: scaleX(-1); }
   .car {
     width: 24px;
     height: 16px;
-    border-radius: 4px 4px 2px 2px;
+    border-radius: var(--r-sm) 4px 2px 2px;
     background: #6b4a35;
     border: 2px solid #3b3327;
     display: grid;
@@ -299,10 +299,10 @@
     height: 40px;
     background: #2c3a4d;
     border: 3px solid #46586f;
-    border-radius: 22px 22px 6px 6px;
+    border-radius: var(--r-pill) 22px 6px 6px;
     z-index: 2;
   }
-  .tunnel.up { border-radius: 6px 6px 22px 22px; }
+  .tunnel.up { border-radius: var(--r-sm) 6px 22px 22px; }
   .tunnel.left { left: -8px; }
   .tunnel.right { right: -8px; }
 
@@ -313,7 +313,7 @@
     height: 34px;
     background: #2c3a4d;
     border: 3px solid #46586f;
-    border-radius: 10px 10px 4px 4px;
+    border-radius: var(--r-md) 10px 4px 4px;
     z-index: 2;
   }
 
@@ -323,7 +323,7 @@
     background:
       repeating-linear-gradient(90deg, #6f8fae 0 3px, transparent 3px 26px) center / 100% 10px,
       linear-gradient(#7ea4c4 0 2px, rgba(168, 203, 232, 0.35) 2px 8px, #7ea4c4 8px 10px);
-    border-radius: 5px;
+    border-radius: var(--r-sm);
     opacity: 0.9;
   }
   /* Transportkapsel statt Lok: gezeichnet, kein Emoji */
@@ -334,7 +334,7 @@
     margin-bottom: 1px;
     background: linear-gradient(#eef3f8, #9fb0c1);
     border: 2px solid #3b3327;
-    border-radius: 4px 12px 12px 4px;
+    border-radius: var(--r-sm) 12px 12px 4px;
     position: relative;
   }
   :global([data-theme='mars']) .loco::after {
@@ -344,14 +344,14 @@
     top: 4px;
     width: 7px;
     height: 5px;
-    border-radius: 3px;
+    border-radius: var(--r-sm);
     background: #35608c;
   }
   /* Frachtpods: durchsichtig, die Ladung schwebt sichtbar darin */
   :global([data-theme='mars']) .car {
     background: rgba(168, 203, 232, 0.28);
     border-color: #6f8fae;
-    border-radius: 8px;
+    border-radius: var(--r-md);
   }
   /* Schleusen statt Tunnelportale */
   :global([data-theme='mars']) .tunnel,
@@ -377,7 +377,7 @@
     position: relative;
     background: linear-gradient(#7e9d55, #4c6b34);
     border: 2px solid #2f2418;
-    border-radius: 14px 6px 10px 4px;
+    border-radius: var(--r-lg) 6px 10px 4px;
   }
   /* Schnauze + Auge + Flügel */
   :global([data-theme='fantasy']) .loco::before {
@@ -389,7 +389,7 @@
     height: 9px;
     background: #7e9d55;
     border: 2px solid #2f2418;
-    border-radius: 6px 2px 2px 6px;
+    border-radius: var(--r-sm) 2px 2px 6px;
   }
   :global([data-theme='fantasy']) .loco::after {
     content: '';
@@ -400,19 +400,19 @@
     height: 12px;
     background: #8e6bc4;
     border: 2px solid #2f2418;
-    border-radius: 10px 10px 2px 2px;
+    border-radius: var(--r-md) 10px 2px 2px;
   }
   /* Traglasten: Netze unter dem Drachen */
   :global([data-theme='fantasy']) .car {
     background: rgba(163, 112, 63, 0.5);
     border-color: #6b4a2f;
-    border-radius: 3px 3px 9px 9px;
+    border-radius: var(--r-sm) 3px 9px 9px;
   }
   /* Wolkenbänke statt Tunnelportale */
   :global([data-theme='fantasy']) .tunnel,
   :global([data-theme='fantasy']) .portal {
     background: #4b4270;
     border-color: #6f639b;
-    border-radius: 999px 999px 40% 40%;
+    border-radius: var(--r-pill) 999px 40% 40%;
   }
 </style>

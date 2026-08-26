@@ -169,7 +169,7 @@
     gap: 4px;
     background: var(--board-bg);
     border: 3px solid var(--board-border);
-    border-radius: 10px;
+    border-radius: var(--r-md);
     padding: 5px;
     width: 100%;
     aspect-ratio: 1;
@@ -178,7 +178,7 @@
   .cell {
     position: relative;
     background: var(--cell);
-    border-radius: 5px;
+    border-radius: var(--r-sm);
     display: grid;
     place-items: center;
     overflow: visible;
@@ -251,7 +251,7 @@
   .building {
     position: absolute;
     inset: 0;
-    border-radius: 5px;
+    border-radius: var(--r-sm);
     background: color-mix(in srgb, var(--cat) 34%, var(--card-paper));
     border-bottom: 4px solid var(--cat);
     display: grid;
@@ -276,13 +276,13 @@
   .marked { position: absolute; top: 2px; right: 2px; }
   .bond { position: absolute; top: 2px; left: 2px; }
   .stored { position: absolute; bottom: 2px; left: 2px; display: flex; gap: 2px; }
-  .coinMark { position: absolute; top: 1px; right: 2px; font-size: 12px; }
-  .seedMark { position: absolute; bottom: 1px; left: 2px; font-size: 12px; }
+  .coinMark { position: absolute; top: 1px; right: 2px; font-size: var(--fs-sm); }
+  .seedMark { position: absolute; bottom: 1px; left: 2px; font-size: var(--fs-sm); }
   .stockCount {
     position: absolute;
     bottom: 1px;
     right: 3px;
-    font-size: 10px;
+    font-size: var(--fs-xs);
     font-weight: 700;
     color: var(--ink);
   }

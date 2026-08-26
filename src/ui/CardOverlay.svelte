@@ -53,7 +53,7 @@
     position: relative;
     background: var(--bg-card);
     color: var(--paper-ink);
-    border-radius: 16px;
+    border-radius: var(--r-lg);
     padding: 22px 26px 18px;
     width: min(420px, 80vw);
     max-height: 85vh;
@@ -68,7 +68,7 @@
     position: absolute;
     inset: 0 0 auto 0;
     height: 12px;
-    border-radius: 16px 16px 0 0;
+    border-radius: var(--r-lg) 16px 0 0;
     background: var(--cat);
   }
   .big { transition: transform 0.25s ease; }
@@ -80,15 +80,15 @@
     height: 40px;
     border-radius: 50%;
     padding: 0;
-    font-size: 19px;
+    font-size: var(--fs-lg);
     background: rgba(0, 0, 0, 0.08);
     color: var(--paper-ink);
     border: 1px solid rgba(0, 0, 0, 0.2);
   }
-  h2 { margin: 6px 0 0; font-size: 24px; }
+  h2 { margin: 6px 0 0; font-size: var(--fs-xl); }
   .row { display: flex; align-items: center; gap: 22px; }
   .art { width: 84px; height: 84px; }
   .art :global(svg) { width: 100%; height: 100%; }
-  p { margin: 0; font-size: 16px; line-height: 1.45; text-align: center; }
-  .feats { display: flex; flex-wrap: wrap; gap: 6px 14px; font-size: 12px; opacity: 0.85; justify-content: center; }
+  p { margin: 0; font-size: var(--fs-md); line-height: 1.45; text-align: center; }
+  .feats { display: flex; flex-wrap: wrap; gap: 6px 14px; font-size: var(--fs-sm); opacity: 0.85; justify-content: center; }
 </style>

@@ -26,7 +26,7 @@
 
 <style>
   footer {
-    font-size: 11px;
+    font-size: var(--fs-xs);
     color: var(--text-dim);
     opacity: 0.75;
     text-align: center;

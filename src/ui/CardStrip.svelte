@@ -201,7 +201,7 @@
     flex-direction: column;
     gap: 2px;
     align-items: center;
-    font-size: 11px;
+    font-size: var(--fs-xs);
     color: var(--text-dim);
     padding-bottom: 2px;
     border-bottom: 1px solid rgba(255, 255, 255, 0.1);
@@ -213,7 +213,7 @@
     height: var(--tap);
     border-radius: 50%;
     padding: 0;
-    font-size: 15px;
+    font-size: var(--fs-md);
     opacity: 0.55;
     line-height: 1;
   }
@@ -232,12 +232,12 @@
   .wagon {
     width: 11px;
     height: 9px;
-    border-radius: 2px;
+    border-radius: var(--r-sm);
     border: 1px solid rgba(255, 255, 255, 0.4);
     background: rgba(255, 255, 255, 0.08);
     display: inline-block;
   }
-  .trainWhere { font-size: 10px; color: var(--text-dim); text-align: center; }
+  .trainWhere { font-size: var(--fs-xs); color: var(--text-dim); text-align: center; }
   /* Am Handy: Der geparkte Zug auf den Gleisen zeigt die Position bereits —
      die Textzeile ist dort verzichtbar und die Leiste bleibt kompakt */
   @media (max-width: 700px), (max-height: 540px) {
@@ -346,7 +346,7 @@
 
   /* Alice-Modus: Karten samt Beschreibung dauerhaft offen (Einzelansicht) */
   .aliceBtn {
-    font-size: 11px;
+    font-size: var(--fs-xs);
     padding: 3px 10px;
     opacity: 0.7;
     /* Am Handy bleibt nur das Symbol übrig — dann trägt die Breite die

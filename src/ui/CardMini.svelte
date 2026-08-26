@@ -56,7 +56,7 @@
     background: var(--bg-card);
     color: var(--paper-ink);
     border: none;
-    border-radius: 8px;
+    border-radius: var(--r-md);
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
     width: 100%;
     min-width: 0;
@@ -65,11 +65,11 @@
     position: absolute;
     inset: 0 0 auto 0;
     height: 6px;
-    border-radius: 8px 8px 0 0;
+    border-radius: var(--r-md) 8px 0 0;
     background: var(--cat);
   }
   .name {
-    font-size: 11px;
+    font-size: var(--fs-xs);
     font-weight: 700;
     margin-top: 4px;
     white-space: nowrap;
@@ -77,16 +77,16 @@
     text-overflow: ellipsis;
     max-width: 100%;
   }
-  .compact .name { font-size: 10px; }
+  .compact .name { font-size: var(--fs-xs); }
   .compact { padding: 4px 5px 3px; gap: 2px; }
-  .compact .feats { font-size: 9px; min-height: 9px; }
+  .compact .feats { font-size: var(--fs-xs); min-height: 9px; }
   .body { display: flex; align-items: center; gap: 6px; }
   .art { width: 30px; height: 30px; display: block; }
   .compact .art { width: 24px; height: 24px; }
   .art :global(svg) { width: 100%; height: 100%; display: block; }
-  .feats { display: flex; gap: 4px; font-size: 10px; line-height: 1; min-height: 11px; }
+  .feats { display: flex; gap: 4px; font-size: var(--fs-xs); line-height: 1; min-height: 11px; }
   .desc {
-    font-size: 10px;
+    font-size: var(--fs-xs);
     line-height: 1.3;
     text-align: left;
     color: var(--paper-ink);
@@ -99,9 +99,9 @@
     right: -6px;
     background: var(--accent);
     color: var(--ink);
-    font-size: 10px;
+    font-size: var(--fs-xs);
     font-weight: 700;
-    border-radius: 999px;
+    border-radius: var(--r-pill);
     padding: 2px 6px;
   }
 </style>

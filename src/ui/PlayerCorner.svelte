@@ -1010,20 +1010,20 @@
     height: 100%;
   }
   header { display: flex; align-items: center; gap: 10px; min-height: 22px; }
-  .pname { font-weight: 700; font-size: 15px; }
+  .pname { font-weight: 700; font-size: var(--fs-md); }
   .pname.mb { color: var(--accent); }
-  .status { font-size: 12px; color: var(--text-dim); }
+  .status { font-size: var(--fs-sm); color: var(--text-dim); }
   .status.done { color: var(--ok); font-weight: 700; }
   .chest { display: flex; gap: 2px; }
   .chest .slot {
     width: 18px;
     height: 18px;
-    border-radius: 4px;
+    border-radius: var(--r-sm);
     border: 1px solid rgba(255, 255, 255, 0.25);
     background: rgba(0, 0, 0, 0.25);
     display: grid;
     place-items: center;
-    font-size: 11px;
+    font-size: var(--fs-xs);
     line-height: 1;
   }
   .chest .slot.filled { border-color: var(--accent); }
@@ -1031,7 +1031,7 @@
     display: flex;
     align-items: center;
     gap: 6px;
-    font-size: 12px;
+    font-size: var(--fs-sm);
     color: var(--text-dim);
     cursor: pointer;
   }
@@ -1140,8 +1140,8 @@
     .corner:not(.wide) .panel { align-items: center; width: 100%; flex: 1; min-height: 0; overflow-y: auto; }
     .corner:not(.wide) header { justify-content: center; }
 
-    .panel button { font-size: 12px; padding: 6px 9px; }
-    .chip { min-width: 46px; height: 46px; border-radius: 23px; padding: 0 8px; }
+    .panel button { font-size: var(--fs-sm); padding: 6px 9px; }
+    .chip { min-width: 46px; height: 46px; border-radius: var(--r-pill); padding: 0 8px; }
   }
   .hint {
     position: absolute;
@@ -1149,7 +1149,7 @@
     right: 0;
     bottom: -20px;
     text-align: center;
-    font-size: 12px;
+    font-size: var(--fs-sm);
     color: var(--accent);
   }
   .panel {
@@ -1162,7 +1162,7 @@
     overflow-y: auto;
     touch-action: pan-y;
   }
-  .panel button { font-size: 13px; padding: 7px 12px; }
+  .panel button { font-size: var(--fs-sm); padding: 7px 12px; }
 
   .pendingWrap { display: flex; flex-direction: column; gap: 6px; align-items: flex-start; }
 
@@ -1173,9 +1173,9 @@
     gap: 4px;
     padding: 6px 8px;
     border: 1px dashed var(--accent);
-    border-radius: 10px;
+    border-radius: var(--r-md);
   }
-  .trainLabel { font-size: 12px; font-weight: 700; color: var(--accent); }
+  .trainLabel { font-size: var(--fs-sm); font-weight: 700; color: var(--accent); }
   .trainActions { display: flex; flex-wrap: wrap; gap: 6px; }
   .wagonBtn { display: inline-flex; align-items: center; gap: 4px; }
   .dotBig {
@@ -1185,9 +1185,9 @@
     border: 1.5px solid rgba(0, 0, 0, 0.4);
     display: inline-block;
   }
-  .pendingLabel { font-size: 11px; color: var(--text-dim); }
+  .pendingLabel { font-size: var(--fs-xs); color: var(--text-dim); }
   /* Lernmodus: Zugvorschlag und der Knopf, der als Nächstes dran ist */
-  .learnTip { font-size: 11px; line-height: 1.35; color: var(--accent); }
+  .learnTip { font-size: var(--fs-xs); line-height: 1.35; color: var(--accent); }
   @media (prefers-reduced-motion: no-preference) {
     .panel button.learnPoint { animation: learnPoint 1.4s ease-in-out infinite; }
   }
@@ -1196,13 +1196,13 @@
     0%, 100% { box-shadow: 0 0 0 0 rgba(232, 184, 75, 0.5); }
     50% { box-shadow: 0 0 0 5px rgba(232, 184, 75, 0); }
   }
-  .moveHint { font-size: 11px; color: var(--text-dim); }
+  .moveHint { font-size: var(--fs-xs); color: var(--text-dim); }
   .chip {
     /* Kreis bei kurzen Namen, Kapsel bei langen — der Text bleibt einzeilig */
     min-width: 56px;
     height: 56px;
     padding: 0 10px;
-    border-radius: 28px;
+    border-radius: var(--r-pill);
     border: 3px solid rgba(255, 255, 255, 0.5);
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
     display: grid;
@@ -1222,11 +1222,11 @@
     gap: 8px;
     background: rgba(255, 255, 255, 0.06);
     border: 1px solid var(--accent);
-    border-radius: 10px;
+    border-radius: var(--r-md);
     padding: 10px;
     width: 100%;
   }
-  .choiceTitle { font-size: 12px; font-weight: 700; color: var(--accent); }
+  .choiceTitle { font-size: var(--fs-sm); font-weight: 700; color: var(--accent); }
   .btnRow { display: flex; gap: 8px; }
 
   .monBack {
@@ -1235,18 +1235,18 @@
     gap: 8px;
     background: repeating-linear-gradient(45deg, #5a4a6f, #5a4a6f 6px, #514263 6px, #514263 12px);
     border: 2px solid #7a6890;
-    border-radius: 8px;
+    border-radius: var(--r-md);
     padding: 8px 12px;
   }
-  .monLabel { font-size: 12px; }
-  .monBuilt { font-size: 12px; background: rgba(205, 111, 156, 0.2); border-color: var(--cat-pink); }
+  .monLabel { font-size: var(--fs-sm); }
+  .monBuilt { font-size: var(--fs-sm); background: rgba(205, 111, 156, 0.2); border-color: var(--cat-pink); }
 
   .error {
     background: var(--danger);
     color: #fff;
-    font-size: 12px;
+    font-size: var(--fs-sm);
     padding: 6px 10px;
-    border-radius: 8px;
+    border-radius: var(--r-md);
     max-width: 100%;
   }
 
@@ -1260,7 +1260,7 @@
   }
   .pick {
     background: var(--bg-panel);
-    border-radius: 14px;
+    border-radius: var(--r-lg);
     padding: 18px;
     display: flex;
     flex-direction: column;
@@ -1281,25 +1281,25 @@
     gap: 8px;
     align-items: center;
     background: rgba(255, 255, 255, 0.05);
-    border-radius: 10px;
+    border-radius: var(--r-md);
     padding: 10px;
   }
   @media (max-width: 700px) {
     /* Handy: Monumente untereinander statt nebeneinander */
     .pickRow { flex-direction: column; }
   }
-  .pickText { font-size: 12px; color: var(--text-dim); margin: 0; text-align: center; }
+  .pickText { font-size: var(--fs-sm); color: var(--text-dim); margin: 0; text-align: center; }
   .offer { display: flex; gap: 10px; justify-content: center; }
   .offerChip {
     /* Kreis bei kurzen Namen, Kapsel bei langen — der Text bleibt einzeilig */
     min-width: 56px;
     height: 56px;
-    border-radius: 28px;
+    border-radius: var(--r-pill);
     border: 2px solid rgba(0, 0, 0, 0.35);
     display: grid;
     place-items: center;
     padding: 0 10px;
     line-height: 1;
   }
-  .deckCount { font-size: 11px; color: var(--text-dim); }
+  .deckCount { font-size: var(--fs-xs); color: var(--text-dim); }
 </style>

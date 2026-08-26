@@ -71,7 +71,7 @@
   }
   .dialog {
     background: var(--bg-panel);
-    border-radius: 14px;
+    border-radius: var(--r-lg);
     padding: 18px 20px;
     display: flex;
     flex-direction: column;
@@ -81,10 +81,10 @@
     overflow-y: auto;
     touch-action: pan-y;
   }
-  h3 { margin: 0 0 2px; font-size: 17px; text-align: center; }
-  h4 { margin: 6px 0 0; font-size: 13px; color: var(--accent); }
+  h3 { margin: 0 0 2px; font-size: var(--fs-lg); text-align: center; }
+  h4 { margin: 6px 0 0; font-size: var(--fs-sm); color: var(--accent); }
   ol { margin: 2px 0; padding-left: 20px; display: flex; flex-direction: column; gap: 5px; }
-  li { font-size: 13px; line-height: 1.45; }
-  .note { margin: 4px 0 2px; font-size: 12px; color: var(--text-dim); line-height: 1.4; }
+  li { font-size: var(--fs-sm); line-height: 1.45; }
+  .note { margin: 4px 0 2px; font-size: var(--fs-sm); color: var(--text-dim); line-height: 1.4; }
   button { margin-top: 6px; }
 </style>

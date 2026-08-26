@@ -78,7 +78,7 @@
     position: fixed;
     top: calc(6px + env(safe-area-inset-top, 0px));
     right: calc(6px + env(safe-area-inset-right, 0px));
-    font-size: 11px;
+    font-size: var(--fs-xs);
     padding: 5px 9px;
     opacity: 0.7;
     z-index: 60;

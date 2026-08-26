@@ -29,14 +29,14 @@
 
 <style>
   .picker { display: flex; flex-direction: column; gap: 6px; align-items: center; }
-  .label { font-size: 13px; font-weight: 600; color: var(--accent); }
+  .label { font-size: var(--fs-sm); font-weight: 600; color: var(--accent); }
   .row { display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; }
   .chip {
     /* Kreis bei kurzen Namen, Kapsel bei langen — der Text bleibt einzeilig */
     min-width: 54px;
     height: 54px;
     padding: 0 9px;
-    border-radius: 27px;
+    border-radius: var(--r-pill);
     border: 2px solid rgba(0, 0, 0, 0.35);
     display: grid;
     place-items: center;

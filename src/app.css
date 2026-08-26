@@ -40,6 +40,27 @@
      Gemessen lagen die Bedienelemente vorher zwischen 12 und 36 px. */
   --tap: 44px;
 
+  /* Schriftmaßstab: sechs Stufen. Vorher standen 18 verschiedene Werte im
+     Code, zehn davon zwischen 8 und 17 px — Unterschiede, die zu klein waren,
+     um etwas zu bedeuten, aber groß genug, um unruhig zu wirken. Wer eine
+     Zwischenstufe braucht, hat ein zu enges Layout, keine zu große Schrift. */
+  --fs-xs: 11px;
+  --fs-sm: 13px;
+  --fs-md: 15px;
+  --fs-lg: 18px;
+  --fs-xl: 24px;
+  --fs-2xl: 34px;
+
+  /* Eckenradien: vier Stufen, jede mit einer Aufgabe. Vorher waren es 15. */
+  --r-sm: 4px;    /* Marken, Chips, kleine Flächen */
+  --r-md: 10px;   /* Steuerelemente */
+  --r-lg: 16px;   /* Flächen und Karten */
+  --r-pill: 999px;
+
+  /* Gemeinsames Spaltenmaß für gestapelte Flächen. Auf dem Ergebnis-Screen
+     standen sonst drei Blöcke mit drei Breiten übereinander. */
+  --col: min(420px, 100%);
+
   --safe-bottom: min(env(safe-area-inset-bottom, 0px), 34px);
   /* Rohwert des oberen Insets: Daran erkennt viewport.ts die installierte PWA
      mit viewport-fit=cover (im Browser ist er 0). Als Variable, weil env() nur
@@ -100,7 +121,7 @@ select {
   color: inherit;
   background: var(--bg-panel);
   border: 1px solid rgba(255, 255, 255, 0.15);
-  border-radius: 10px;
+  border-radius: var(--r-md);
   padding: 0.5em 1em;
   cursor: pointer;
   /* Eine Regel statt Einzelfällen. Brettfelder sind <div role="button"> und
@@ -161,7 +182,7 @@ button.iconBtn { min-width: var(--tap); padding: 0; }
    dieselben Marken zeichnen (Materialwahl, Solo-Auslage, Chip, Dialoge). */
 .resLabel {
   padding: 0 1px;
-  font-size: 10px;
+  font-size: var(--fs-xs);
   font-weight: 700;
   line-height: 1.1;
   text-align: center;
