@@ -1152,19 +1152,40 @@
     font-size: var(--fs-sm);
     color: var(--accent);
   }
+  /* Das Panel legt seine Knöpfe NEBENeinander, nicht untereinander. Es sitzt
+     unter dem Brett, also ist jede Panel-Zeile Höhe, die dem Brett fehlt: In
+     der Runde schrumpfte das Brett dadurch von 316 auf 234 px. Was eine eigene
+     Zeile braucht (Sätze, eigene Raster), sagt es unten selbst. */
   .panel {
     display: flex;
-    flex-direction: column;
+    flex-flow: row wrap;
     gap: 8px;
     flex: 1;
     min-width: 0;
-    align-items: flex-start;
+    align-items: center;
+    justify-content: center;
     overflow-y: auto;
     touch-action: pan-y;
   }
+  /* Ganze Sätze und eigene Raster nehmen die Zeile für sich */
+  .panel > .picker,
+  .panel > .matches,
+  .panel > .learnTip,
+  .panel > .moveHint,
+  .panel > .status,
+  .panel > .choiceTitle { flex: 1 0 100%; text-align: center; }
   .panel button { font-size: var(--fs-sm); padding: 7px 12px; }
 
-  .pendingWrap { display: flex; flex-direction: column; gap: 6px; align-items: flex-start; }
+  /* Beschriftung, Marke und Zusatzknöpfe in einer Zeile — die Marke ist 46 px
+     hoch, die Beschriftung 16: gestapelt kostete das 74 px Bretthöhe. */
+  .pendingWrap {
+    display: flex;
+    flex-flow: row wrap;
+    gap: 6px 8px;
+    align-items: center;
+    justify-content: center;
+  }
+  .pendingWrap .trainStop { flex: 1 0 100%; }
 
   /* Eisenbahn: Halt am Bahnhof */
   .trainStop {
