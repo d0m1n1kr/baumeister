@@ -99,7 +99,11 @@ try {
   for (const [label, w, h, players, minAnteil] of [
     ['Handy Solo', 402, 874, 1, 90],
     ['Handy 4 Spieler', 402, 874, 4, 90],
-    ['Tablet quer 4 Spieler', 1180, 820, 4, 70],
+    // 66 statt 70: Das Brett folgt nicht mehr dem gerade leersten Panel,
+    // sondern hält die Größe, die zum vollsten Panel dieser Partie passt
+    // (panelReserve). Das kostet hier ein paar Prozent — dafür springt es
+    // nicht bei jedem Phasenwechsel.
+    ['Tablet quer 4 Spieler', 1180, 820, 4, 66],
     ['Tablet hoch 4 Spieler', 1024, 1366, 4, 75],
     ['Handy quer 2 Spieler', 874, 402, 2, 60]
   ]) {

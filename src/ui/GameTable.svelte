@@ -36,11 +36,13 @@
     panelReserve.measure();
   });
   $effect(() => {
-    const on = () => panelReserve.measure();
-    window.addEventListener('resize', on);
-    const timer = setInterval(on, 500);
+    // Resize heißt neuer Rahmen: Die Höchstmarke des alten Layouts gilt nicht.
+    const onResize = () => panelReserve.measure(true);
+    const onTick = () => panelReserve.measure();
+    window.addEventListener('resize', onResize);
+    const timer = setInterval(onTick, 500);
     return () => {
-      window.removeEventListener('resize', on);
+      window.removeEventListener('resize', onResize);
       clearInterval(timer);
       // Beim Wechsel in die Einzelansicht misst niemand mehr nach — ein alter
       // Wert wäre dort eine Reservierung ohne Grund.
