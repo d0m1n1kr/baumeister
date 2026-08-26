@@ -489,10 +489,13 @@ try {
     const shareBtn = sp.locator('button', { hasText: 'Ergebnis teilen' });
     await shareBtn.waitFor({ timeout: 5000 });
     await shareBtn.dispatchEvent('pointerup');
-    // Das Bild entsteht asynchron (Canvas → PNG), also auf den Aufruf warten
     await sp.waitForFunction(() => window.__shared !== null, { timeout: 8000 })
       .catch(() => fail('Teilen: navigator.share wurde nicht aufgerufen'));
     const shared = await sp.evaluate(() => window.__shared);
+    // Der Text-Knopf teilt NUR Text. Das ist keine Sparsamkeit: iOS wirft beim
+    // Teilen mit Datei den Text weg — wer den Text will, muss ihn ohne Bild
+    // bekommen können.
+    if (shared.files.length > 0) fail('Teilen: Text-Knopf hängt ein Bild an (iOS verliert dann den Text)');
     const today = await sp.evaluate(() => {
       const d = new Date();
       return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
@@ -503,12 +506,22 @@ try {
     if (/[🟩🟫🟥⬜]/u.test(shared.text)) fail('Teilen: Text verrät das Brett-Layout');
     console.log('✓ Ergebnis teilen: Rang, Punkte und Tages-Link im Teilen-Dialog');
 
-    // Bild: Wo der Browser Dateien teilen kann, muss ein PNG mitgehen.
-    const img = shared.files?.[0];
+    // Bild: Wo der Browser Dateien teilen kann, gibt es dafür einen eigenen
+    // Knopf — und der muss ein PNG samt Text mitgeben.
+    await sp.evaluate(() => (window.__shared = null));
+    const imgBtn = sp.locator('button', { hasText: 'Als Bild teilen' });
+    if ((await imgBtn.count()) === 0) fail('Teilen: kein Knopf „Als Bild teilen"');
+    await imgBtn.dispatchEvent('pointerup');
+    // Das Bild entsteht asynchron (Canvas → PNG), also auf den Aufruf warten
+    await sp.waitForFunction(() => window.__shared !== null, { timeout: 8000 })
+      .catch(() => fail('Teilen: Bild-Knopf hat nicht geteilt'));
+    const withImg = await sp.evaluate(() => window.__shared);
+    const img = withImg.files?.[0];
     if (!img) fail('Teilen: kein Bild im Teilen-Dialog');
     if (img.type !== 'image/png') fail(`Teilen: Bild ist kein PNG (${img.type})`);
     if (img.size < 5000) fail(`Teilen: Bild verdächtig klein (${img.size} Bytes)`);
-    console.log(`✓ Ergebnis teilen: Bild geht mit (${Math.round(img.size / 1024)} KB PNG)`);
+    if (!withImg.text?.includes(today)) fail('Teilen: Bild-Weg ohne Text');
+    console.log(`✓ Ergebnis teilen: Text ohne Bild, Bild auf eigenem Knopf (${Math.round(img.size / 1024)} KB PNG)`);
 
     // Ohne Datei-Unterstützung darf nichts abbrechen — dann nur Text.
     const tp = await ctx.newPage();
@@ -523,12 +536,16 @@ try {
     await tp.goto(BASE_URL);
     await tp.locator('#splash').waitFor({ state: 'detached', timeout: 10000 });
     await tp.locator('button', { hasText: 'Weiterspielen' }).click();
+    // Wo keine Datei geteilt werden kann, darf der Bild-Knopf gar nicht stehen
+    if (await tp.locator('button', { hasText: 'Als Bild teilen' }).count()) {
+      fail('Teilen: Bild-Knopf trotz fehlender Datei-Unterstützung');
+    }
     await tp.locator('button', { hasText: 'Ergebnis teilen' }).dispatchEvent('pointerup');
     await tp.waitForFunction(() => window.__shared !== null, { timeout: 8000 });
     const textOnly = await tp.evaluate(() => window.__shared);
     if (textOnly.files !== 0) fail('Teilen: Bild trotz fehlender Datei-Unterstützung');
     if (!textOnly.text.includes(today)) fail('Teilen: Text-Rückfall unvollständig');
-    console.log('✓ Ohne Datei-Unterstützung fällt das Teilen sauber auf Text zurück');
+    console.log('✓ Ohne Datei-Unterstützung: kein Bild-Knopf, Text-Rückfall steht');
     await tp.close();
 
     // Empfängerseite: Der Link wählt Solo + genau diesen Tag vor
@@ -553,6 +570,64 @@ try {
     console.log('✓ Geteilter Link wählt Solo und die Tages-Challenge vor');
     await ctx.close();
   }
+
+  // ---------- Endwertung: passt sie ins Bild? ----------
+  // Die Wertungstabelle stand in einer 420er-Spalte, egal wie groß der Schirm
+  // war: Bei vier Spielern war sie 475 px breit und musste seitlich gescrollt
+  // werden, während auf dem Tablet links und rechts 300 px leer blieben.
+  for (const [label, w, h, players] of [
+    ['Tablet quer', 1180, 820, 4],
+    ['Tablet hoch', 1024, 1366, 4],
+    ['Handy', 402, 874, 4]
+  ]) {
+    const ctx = await browser.newContext({ viewport: { width: w, height: h }, locale: 'de-DE' });
+    const wp = await ctx.newPage();
+    wp.on('pageerror', (e) => fail(`Endwertung ${label}: Seitenfehler: ${e.message}`));
+    await wp.goto(BASE_URL);
+    await wp.locator('#splash').waitFor({ state: 'detached', timeout: 10000 });
+    await wp.locator('.seg button', { hasText: String(players) }).first().click();
+    await wp.locator('.opt', { hasText: 'Fortune' }).locator('input').click();
+    await wp.locator('.bar button.big').click();
+    await wp.waitForTimeout(300);
+    // Durchspielen wäre lang: Wertung direkt aufrufen, Bretter voll bauen —
+    // erst dann hat die Tabelle so viele Zeilen und Namen wie in echt.
+    await wp.evaluate(() => {
+      const st = JSON.parse(localStorage.getItem('tinytowns.save.v1'));
+      st.phase = { t: 'gameOver' };
+      const karten = st.config.activeCards;
+      for (const p of st.players) {
+        p.board = p.board.map((_, i) => ({ building: { card: karten[i % karten.length] } }));
+      }
+      localStorage.setItem('tinytowns.save.v1', JSON.stringify(st));
+    });
+    await wp.reload();
+    await wp.locator('#splash').waitFor({ state: 'detached', timeout: 10000 });
+    await wp.locator('button', { hasText: 'Weiterspielen' }).click();
+    await wp.locator('.tableWrap').waitFor({ timeout: 5000 });
+    await wp.waitForTimeout(200);
+    const g = await wp.evaluate(() => {
+      const tw = document.querySelector('.tableWrap');
+      const main = document.querySelector('main');
+      const breit = (sel) => {
+        const el = document.querySelector(sel);
+        return el ? Math.round(el.getBoundingClientRect().width) : null;
+      };
+      return {
+        quer: tw.scrollWidth - tw.clientWidth,
+        hoch: main.scrollHeight - main.clientHeight,
+        tabelle: breit('.tableWrap'),
+        knoepfe: breit('.actions')
+      };
+    });
+    if (g.quer > 1) fail(`Endwertung ${label}: Tabelle muss ${g.quer}px seitlich gescrollt werden`);
+    if (g.hoch > 1) fail(`Endwertung ${label}: Wertung passt ${g.hoch}px nicht in die Höhe`);
+    // Flächen untereinander gleich breit — sonst steht die Wertung als Treppe
+    if (Math.abs(g.tabelle - g.knoepfe) > 1) {
+      fail(`Endwertung ${label}: Tabelle ${g.tabelle}px, Knopfzeile ${g.knoepfe}px`);
+    }
+    await ctx.close();
+  }
+  console.log('✓ Endwertung: nichts zu scrollen, Flächen gleich breit (Handy und Tablet)');
 
   // Installations-Hinweis: Auf iOS gibt es keine Schnittstelle dafür, also muss
   // dort eine Anleitung erscheinen — und einmal weggeklickt bleibt sie weg.

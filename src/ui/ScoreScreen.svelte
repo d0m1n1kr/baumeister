@@ -7,7 +7,7 @@
   import { addHighscore, highscores, type HighscoreEntry } from '../store/highscore';
   import { cardName, t } from '../i18n';
   import { learn } from './learn.svelte';
-  import { dailyUrl, shareImageOrText, shareText } from './share';
+  import { canShareImages, dailyUrl, shareImageOrText, shareOrCopy, shareText } from './share';
   import { readPalette, scoreCardBlob } from './scoreCard';
 
   const st = $derived(game.state!);
@@ -76,8 +76,12 @@
   });
 
   let sharing = $state(false);
+  // Bild-Knopf nur, wo Dateien überhaupt geteilt werden können. Zwei Knöpfe,
+  // weil iOS beim Teilen mit Datei den Text unterwegs wegwirft: So entscheidet
+  // der Spieler, was beim Empfänger ankommt, statt es zu erfahren.
+  const canImage = canShareImages();
 
-  async function shareResult() {
+  async function shareResult(withImage: boolean) {
     if (sharing) return;
     sharing = true;
     try {
@@ -94,21 +98,26 @@
         buildings: builtCounts,
         url
       });
-      // Bild nur, wo es der Browser überhaupt teilen kann — sonst wäre die
-      // Arbeit umsonst. shareImageOrText fällt selbst auf Text zurück.
-      const blob = await scoreCardBlob(
-        {
-          title: t.appTitle,
-          subtitle,
-          rank,
-          score: `${soloScore} ${t.points}`,
-          buildings: builtCounts,
-          footer: url.replace(/^https?:\/\//, '')
-        },
-        readPalette(document.documentElement)
-      );
-      const file = blob ? new File([blob], 'tiny-towns.png', { type: 'image/png' }) : null;
-      const { via } = await shareImageOrText(file, text, t.appTitle);
+      let via: 'shared' | 'copied' | 'failed';
+      if (withImage) {
+        // Bild nur, wo es der Browser überhaupt teilen kann — sonst wäre die
+        // Arbeit umsonst. shareImageOrText fällt selbst auf Text zurück.
+        const blob = await scoreCardBlob(
+          {
+            title: t.appTitle,
+            subtitle,
+            rank,
+            score: `${soloScore} ${t.points}`,
+            buildings: builtCounts,
+            footer: url.replace(/^https?:\/\//, '')
+          },
+          readPalette(document.documentElement)
+        );
+        const file = blob ? new File([blob], 'tiny-towns.png', { type: 'image/png' }) : null;
+        ({ via } = await shareImageOrText(file, text, t.appTitle));
+      } else {
+        ({ via } = await shareOrCopy(text, t.appTitle));
+      }
       shareNote = via === 'copied' ? t.shareCopied : via === 'failed' ? t.shareFailed : '';
       if (shareNote) setTimeout(() => (shareNote = ''), 4000);
     } finally {
@@ -205,7 +214,14 @@
 
   <div class="actions">
     {#if solo}
-      <button class="share" disabled={sharing} onpointerup={shareResult}>↗ {t.shareButton}</button>
+      <button class="share" disabled={sharing} onpointerup={() => shareResult(false)}>
+        ↗ {t.shareButton}
+      </button>
+      {#if canImage}
+        <button class="share" disabled={sharing} onpointerup={() => shareResult(true)}>
+          🖼 {t.shareImageButton}
+        </button>
+      {/if}
     {/if}
     <button class="primary big" onpointerup={() => game.reset({ keepSave: session.role === 'guest' })}>{t.playAgain}</button>
   </div>
@@ -230,6 +246,13 @@
   main > :first-child { margin-top: auto; }
   main > :last-child { margin-bottom: auto; }
   h1 { margin: 0; }
+  /* Ab Tablet-Breite ist die 420er-Spalte zu schmal: Die Wertungstabelle mit
+     vier Spielern ist 475 px breit und musste seitlich gescrollt werden,
+     während links und rechts 300 px leer blieben. Eine Stufe breiter — und
+     alle Flächen bleiben untereinander gleich breit. */
+  @media (min-width: 700px) {
+    main { --col: min(560px, 100%); }
+  }
   .actions {
     display: flex;
     align-items: center;
@@ -244,13 +267,33 @@
   .tableWrap {
     overflow: auto;
     max-height: 60vh;
-    width: var(--col);
+    /* So breit wie die Tabelle, mindestens wie die anderen Flächen. Sprengt
+       eine Wertung auch das (sehr lange Kartennamen, viele Spieler), bleibt
+       das Scrollen als letzter Ausweg — aber erst dann. */
+    width: fit-content;
+    min-width: var(--col);
+    max-width: min(940px, 100%);
     background: var(--bg-panel);
     border-radius: var(--r-lg);
     padding: 8px 14px;
   }
-  table { border-collapse: collapse; font-size: var(--fs-md); }
+  /* Die Tabelle nimmt die Fläche ein, statt als kleine Insel in der Mitte zu
+     stehen: Kartenname links, Punkte rechts — wie eine Rechnung. */
+  table { border-collapse: collapse; font-size: var(--fs-md); width: 100%; }
   th, td { padding: 5px 14px; text-align: right; white-space: nowrap; }
+  /* Am Handy ist die Spalte alles, was da ist: engere Zellen und eine Stufe
+     kleinere Schrift bringen die Wertung ohne seitliches Scrollen unter. */
+  @media (max-width: 700px) {
+    /* Jeder Pixel Rand fehlt der Tabelle — am Handy ist sie das Enge. */
+    main { padding: 20px 12px; padding-bottom: calc(20px + var(--safe-bottom)); }
+    table { font-size: var(--fs-sm); }
+    th, td { padding: 5px 5px; }
+    .tableWrap { padding: 8px; }
+    /* Lange Kartennamen dürfen umbrechen, notfalls im Wort — eine Zeile mehr
+       ist besser als eine Tabelle, die seitlich aus dem Bild läuft. Die
+       Zahlenspalten bleiben unteilbar, sie tragen das Ergebnis. */
+    .cardName { white-space: normal; overflow-wrap: anywhere; hyphens: auto; }
+  }
   th { color: var(--accent); }
   .cardName { text-align: left; color: var(--text-dim); }
   .totals td { border-top: 2px solid rgba(255, 255, 255, 0.25); font-weight: 700; font-size: var(--fs-md); }

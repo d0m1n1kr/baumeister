@@ -138,6 +138,7 @@ export const fr: Translation = {
   scoreFed: 'chaumières nourries',
   winner: 'Vainqueur',
   shareButton: 'Partager le résultat',
+  shareImageButton: 'Partager en image',
   shareCopied: 'Copié dans le presse-papiers',
   shareFailed: 'Le partage a échoué',
   playAgain: 'Rejouer',

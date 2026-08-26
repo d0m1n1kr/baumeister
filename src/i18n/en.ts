@@ -138,6 +138,7 @@ export const en: Translation = {
   scoreFed: 'fed cottages',
   winner: 'Winner',
   shareButton: 'Share result',
+  shareImageButton: 'Share as image',
   shareCopied: 'Copied to clipboard',
   shareFailed: 'Sharing did not work',
   playAgain: 'Play again',
