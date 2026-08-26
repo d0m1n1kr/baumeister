@@ -109,6 +109,9 @@ export const fr: Translation = {
   scoreTotal: 'Total',
   scoreFed: 'chaumières nourries',
   winner: 'Vainqueur',
+  shareButton: 'Partager le résultat',
+  shareCopied: 'Copié dans le presse-papiers',
+  shareFailed: 'Le partage a échoué',
   playAgain: 'Rejouer',
 
   aliceMode: 'Mode Alice',

@@ -109,6 +109,9 @@ export const nl: Translation = {
   scoreTotal: 'Totaal',
   scoreFed: 'gevoede huisjes',
   winner: 'Winnaar',
+  shareButton: 'Resultaat delen',
+  shareCopied: 'Naar klembord gekopieerd',
+  shareFailed: 'Delen is niet gelukt',
   playAgain: 'Nog een keer',
 
   aliceMode: 'Alice-modus',

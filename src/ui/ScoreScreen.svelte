@@ -7,6 +7,7 @@
   import { addHighscore, highscores, type HighscoreEntry } from '../store/highscore';
   import { cardName, t } from '../i18n';
   import { learn } from './learn.svelte';
+  import { dailyUrl, shareOrCopy, shareText } from './share';
 
   const st = $derived(game.state!);
   const scores = $derived(scoreGame(st, catalog));
@@ -57,6 +58,38 @@
     }
     list = highscores();
   });
+
+  // Teilen: Rang, Punkte und — bei der Tages-Challenge — ein Link auf genau
+  // diesen Tag, damit der Empfänger dieselbe Auslage bekommt. Das Brett bleibt
+  // draußen: Bei gleicher Auslage wäre es die Lösung.
+  let shareNote = $state('');
+  const builtCounts = $derived.by(() => {
+    const counts = new Map<string, number>();
+    for (const sq of st.players[0]?.board ?? []) {
+      const id = sq.building?.card;
+      if (id) counts.set(id, (counts.get(id) ?? 0) + 1);
+    }
+    return [...counts.entries()]
+      .sort((a, b) => b[1] - a[1] || cardName(catalog[a[0]]).localeCompare(cardName(catalog[b[0]])))
+      .map(([id, count]) => ({ name: cardName(catalog[id]), count }));
+  });
+
+  async function shareResult() {
+    const href = location.href;
+    const text = shareText({
+      title: t.appTitle,
+      rank,
+      score: soloScore,
+      points: t.points,
+      dailyId: st.config.dailyId,
+      dailyLabel: t.soloDaily,
+      buildings: builtCounts,
+      url: st.config.dailyId ? dailyUrl(st.config.dailyId, href) : href
+    });
+    const { via } = await shareOrCopy(text, t.appTitle);
+    shareNote = via === 'copied' ? t.shareCopied : via === 'failed' ? t.shareFailed : '';
+    if (shareNote) setTimeout(() => (shareNote = ''), 4000);
+  }
 </script>
 
 <main>
@@ -145,7 +178,13 @@
     </div>
   {/if}
 
-  <button class="primary big" onpointerup={() => game.reset({ keepSave: session.role === 'guest' })}>{t.playAgain}</button>
+  <div class="actions">
+    {#if solo}
+      <button class="share" onpointerup={shareResult}>↗ {t.shareButton}</button>
+    {/if}
+    <button class="primary big" onpointerup={() => game.reset({ keepSave: session.role === 'guest' })}>{t.playAgain}</button>
+  </div>
+  {#if shareNote}<p class="shareNote">{shareNote}</p>{/if}
 </main>
 
 <style>
@@ -166,6 +205,9 @@
   main > :first-child { margin-top: auto; }
   main > :last-child { margin-bottom: auto; }
   h1 { margin: 0; }
+  .actions { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; justify-content: center; }
+  .share { font-size: 15px; padding: 12px 16px; }
+  .shareNote { margin: -8px 0 0; font-size: 12px; color: var(--text-dim); }
   .winner { margin: 0; font-size: 18px; color: var(--accent); }
   .tableWrap {
     overflow: auto;

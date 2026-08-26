@@ -188,6 +188,70 @@ try {
   }
   console.log('✓ Thema und Sprache sitzen auf beiden Einstiegs-Screens oben rechts');
 
+  // Ergebnis teilen: Der Knopf muss den Teilen-Dialog mit Rang, Punkten und
+  // einem Link auf GENAU diesen Tag füttern — und der Link muss beim Empfänger
+  // dieselbe Tages-Challenge vorwählen.
+  {
+    const ctx = await browser.newContext({ viewport: { width: 402, height: 874 }, locale: 'de-DE' });
+    const sp = await ctx.newPage();
+    sp.on('pageerror', (e) => fail(`Teilen: Seitenfehler: ${e.message}`));
+    // navigator.share gibt es im Testbrowser nicht — einsetzen und mitschneiden
+    await sp.addInitScript(() => {
+      window.__shared = null;
+      navigator.share = (d) => { window.__shared = d; return Promise.resolve(); };
+    });
+    await sp.goto(BASE_URL);
+    await sp.locator('#splash').waitFor({ state: 'detached', timeout: 10000 });
+    await sp.locator('.seg button', { hasText: '1' }).first().click();
+    await sp.locator('.seg button', { hasText: 'Tages-Challenge' }).click();
+    await sp.locator('.bar button.big').click();
+    // Solo bis zum Ende durchspielen wäre lang — die Wertung direkt aufrufen
+    await sp.evaluate(() => {
+      const st = JSON.parse(localStorage.getItem('tinytowns.save.v1'));
+      st.phase = { t: 'gameOver' };
+      localStorage.setItem('tinytowns.save.v1', JSON.stringify(st));
+    });
+    await sp.reload();
+    await sp.locator('#splash').waitFor({ state: 'detached', timeout: 10000 });
+    await sp.locator('button', { hasText: 'Weiterspielen' }).click();
+    const shareBtn = sp.locator('button', { hasText: 'Ergebnis teilen' });
+    await shareBtn.waitFor({ timeout: 5000 });
+    await shareBtn.dispatchEvent('pointerup');
+    const shared = await sp.evaluate(() => window.__shared);
+    if (!shared) fail('Teilen: navigator.share wurde nicht aufgerufen');
+    const today = await sp.evaluate(() => {
+      const d = new Date();
+      return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+    });
+    if (!shared.text.includes(today)) fail(`Teilen: Datum fehlt im Text (${shared.text})`);
+    if (!shared.text.includes('Punkte')) fail(`Teilen: Punkte fehlen (${shared.text})`);
+    if (!shared.text.includes(`#daily=${today}`)) fail(`Teilen: Link fehlt (${shared.text})`);
+    if (/[🟩🟫🟥⬜]/u.test(shared.text)) fail('Teilen: Text verrät das Brett-Layout');
+    console.log('✓ Ergebnis teilen: Rang, Punkte und Tages-Link im Teilen-Dialog');
+
+    // Empfängerseite: Der Link wählt Solo + genau diesen Tag vor
+    const link = shared.text.split('\n').pop().trim();
+    const rp = await ctx.newPage();
+    rp.on('pageerror', (e) => fail(`Geteilter Link: Seitenfehler: ${e.message}`));
+    await rp.goto(link);
+    await rp.locator('#splash').waitFor({ state: 'detached', timeout: 10000 });
+    // Bei laufendem Spielstand kommt erst der Weiterspielen-Bildschirm; die
+    // Vorauswahl greift, sobald der Startbildschirm erscheint.
+    const fresh = rp.locator('button', { hasText: 'Neues Spiel' });
+    if (await fresh.count()) await fresh.click();
+    await rp.locator('.bar button.big').waitFor({ timeout: 5000 });
+    const picked = await rp.evaluate(() => {
+      const on = [...document.querySelectorAll('.seg button.primary')].map((b) => b.textContent.trim());
+      return on;
+    });
+    if (!picked.includes('1')) fail(`Geteilter Link: Solo nicht vorgewählt (${picked})`);
+    if (!picked.some((p) => p.includes('Tages-Challenge'))) {
+      fail(`Geteilter Link: Tages-Challenge nicht vorgewählt (${picked})`);
+    }
+    console.log('✓ Geteilter Link wählt Solo und die Tages-Challenge vor');
+    await ctx.close();
+  }
+
   // Installations-Hinweis: Auf iOS gibt es keine Schnittstelle dafür, also muss
   // dort eine Anleitung erscheinen — und einmal weggeklickt bleibt sie weg.
   {

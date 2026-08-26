@@ -13,12 +13,16 @@
   import UpdateBanner from './UpdateBanner.svelte';
   import CreditsFooter from './CreditsFooter.svelte';
   import { sfx } from './sound';
+  import { dailyIdFromHash } from './share';
   import type { GameState } from '../engine/types';
 
   let showResume = $state(game.hasSave());
   let urlJoin = $state(joinCodeFromUrl());
   let joining = $state(joinCodeFromUrl() !== null);
   let setupError = $state('');
+  // Geteilter Tages-Challenge-Link: Der Startbildschirm wählt dann genau
+  // diesen Tag vor, damit beide Seiten dieselbe Auslage spielen.
+  let urlDaily = $state(dailyIdFromHash(location.hash));
 
   // Unterbrochene Mehrgeräte-Sitzung (Reload, iOS-Tab-Rauswurf) wieder aufnehmen.
   // Ein Code in der Adresszeile ist dabei der stärkste Wunsch: Wer einen QR-Code
@@ -49,6 +53,7 @@
   // die laufende App genauso reagieren wie auf einen frischen Start.
   $effect(() => {
     const onHash = () => {
+      urlDaily = dailyIdFromHash(location.hash) ?? urlDaily;
       const code = joinCodeFromUrl();
       if (!code || code === session.roomCode) return; // kein/derselbe Raum
       if (session.role !== 'off') session.leave();
@@ -204,7 +209,7 @@
     <CreditsFooter />
   </main>
 {:else}
-  <SetupScreen onjoin={() => (joining = true)} />
+  <SetupScreen onjoin={() => (joining = true)} initialDaily={urlDaily} />
 {/if}
 
 <style>

@@ -109,6 +109,9 @@ export const de = {
   scoreTotal: 'Gesamt',
   scoreFed: 'gefütterte Hütten',
   winner: 'Gewinner',
+  shareButton: 'Ergebnis teilen',
+  shareCopied: 'In die Zwischenablage kopiert',
+  shareFailed: 'Teilen hat nicht geklappt',
   playAgain: 'Neue Partie',
 
   aliceMode: 'Alice-Modus',

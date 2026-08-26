@@ -109,6 +109,9 @@ export const es: Translation = {
   scoreTotal: 'Total',
   scoreFed: 'cabañas alimentadas',
   winner: 'Ganador',
+  shareButton: 'Compartir resultado',
+  shareCopied: 'Copiado al portapapeles',
+  shareFailed: 'No se pudo compartir',
   playAgain: 'Jugar otra vez',
 
   aliceMode: 'Modo Alice',

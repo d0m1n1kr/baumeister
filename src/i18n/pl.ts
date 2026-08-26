@@ -109,6 +109,9 @@ export const pl: Translation = {
   scoreTotal: 'Razem',
   scoreFed: 'nakarmione chaty',
   winner: 'Zwycięzca',
+  shareButton: 'Podziel się wynikiem',
+  shareCopied: 'Skopiowano do schowka',
+  shareFailed: 'Udostępnianie nie powiodło się',
   playAgain: 'Zagraj ponownie',
 
   aliceMode: 'Tryb Alice',
