@@ -68,6 +68,14 @@ export const en: Translation = {
   accept: 'Accept',
   decline: 'Decline',
 
+  install: {
+    title: 'Install as an app',
+    text: 'Starts without the browser bar and works offline.',
+    action: 'Install',
+    how: 'How?',
+    iosStep1: 'Tap Share at the bottom',
+    iosStep2: 'Then “Add to Home Screen”'
+  },
   setupGame: 'Game',
   setupRules: 'Rules & variants',
   expansions: 'Expansions',

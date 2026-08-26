@@ -68,6 +68,14 @@ export const fr: Translation = {
   accept: 'Accepter',
   decline: 'Refuser',
 
+  install: {
+    title: 'Installer comme application',
+    text: 'Démarre sans la barre du navigateur et fonctionne hors ligne.',
+    action: 'Installer',
+    how: 'Comment ?',
+    iosStep1: 'Touchez Partager en bas',
+    iosStep2: 'Puis « Sur l’écran d’accueil »'
+  },
   setupGame: 'Partie',
   setupRules: 'Règles et variantes',
   expansions: 'Extensions',

@@ -120,10 +120,13 @@ device (the host runs the engine and broadcasts it).
   strip, the choice is remembered per device.
 - **Persistence:** autosave to `localStorage` after every action, "Continue" after reload.
 - **PWA:** fully offline-capable (all assets are precached on first visit; game
-  logic and game state live entirely in the client) — installable on tablets and
-  phones via "Add to Home Screen". The app checks for new versions on start, on
-  returning to the app, and every 15 minutes, offering an update via banner; the
-  running game survives the update.
+  logic and game state live entirely in the client). The start screen offers to
+  install the app: on Chromium the system dialog via `beforeinstallprompt`, on
+  iOS/iPadOS — where WebKit provides no such interface — a two-step guide to
+  "Add to Home Screen". The hint stays away once dismissed and never shows in an
+  already installed app. The app checks for new versions on start, on returning
+  to the app, and every 15 minutes, offering an update via banner; the running
+  game survives the update.
 
 ## Development
 

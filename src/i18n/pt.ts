@@ -68,6 +68,14 @@ export const pt: Translation = {
   accept: 'Aceitar',
   decline: 'Recusar',
 
+  install: {
+    title: 'Instalar como app',
+    text: 'Abre sem a barra do navegador e funciona offline.',
+    action: 'Instalar',
+    how: 'Como?',
+    iosStep1: 'Toque em Partilhar em baixo',
+    iosStep2: 'Depois «Adicionar ao ecrã principal»'
+  },
   setupGame: 'Partida',
   setupRules: 'Regras e variantes',
   expansions: 'Expansões',

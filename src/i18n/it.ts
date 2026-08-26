@@ -68,6 +68,14 @@ export const it: Translation = {
   accept: 'Accetta',
   decline: 'Rifiuta',
 
+  install: {
+    title: 'Installa come app',
+    text: 'Si apre senza la barra del browser e funziona offline.',
+    action: 'Installa',
+    how: 'Come?',
+    iosStep1: 'Tocca Condividi in basso',
+    iosStep2: 'Poi «Aggiungi a Home»'
+  },
   setupGame: 'Partita',
   setupRules: 'Regole e varianti',
   expansions: 'Espansioni',

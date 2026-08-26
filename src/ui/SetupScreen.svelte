@@ -13,6 +13,7 @@
   import ThemePicker from './ThemePicker.svelte';
   import HelpDialog from './HelpDialog.svelte';
   import { learn } from './learn.svelte';
+  import { install } from './install.svelte';
 
   let { onjoin }: { onjoin: () => void } = $props();
 
@@ -159,6 +160,37 @@
         <span class="hintTitle">🎓 {t.learn.hintTitle}</span>
         <p class="hintText">{t.learn.hintText}</p>
         <button class="primary hintStart" onpointerup={startLearning}>{t.learn.hintStart}</button>
+      </aside>
+    {/if}
+
+    {#if install.show}
+      <!-- Installieren: auf Chromium der Systemdialog, auf iOS eine Anleitung
+           (Apple bietet dafür keine Schnittstelle). Einmal weggeklickt bleibt
+           der Hinweis weg. -->
+      <aside class="installHint">
+        <button class="hintClose" title={t.close} onpointerup={() => install.dismiss()}>✕</button>
+        <span class="installText">
+          <span class="installTitle">📲 {t.install.title}</span>
+          <span class="installSub">{t.install.text}</span>
+        </span>
+        <button class="installGo" onpointerup={() => install.run()}>
+          {install.kind === 'ios' ? t.install.how : t.install.action}
+        </button>
+        {#if install.steps}
+          <ol class="installSteps">
+            <li>
+              {t.install.iosStep1}
+              <!-- Apples Teilen-Zeichen selbst gezeichnet: das Systemglyph aus
+                   der privaten Unicode-Fläche wird außerhalb von iOS zum
+                   Ersatzkästchen. -->
+              <svg class="shareIcon" viewBox="0 0 16 20" aria-hidden="true">
+                <path d="M8 1.5 L4.8 4.7 M8 1.5 L11.2 4.7 M8 1.5 V12" />
+                <path d="M3.5 8H2v10h12V8h-1.5" />
+              </svg>
+            </li>
+            <li>{t.install.iosStep2}</li>
+          </ol>
+        {/if}
       </aside>
     {/if}
 
@@ -534,5 +566,46 @@
   }
   @media (max-height: 560px) {
     .learnHint { padding: 10px 14px; }
+  }
+
+  /* Installations-Hinweis: dieselbe Breite wie die Karten, aber zurückhaltend
+     gezeichnet — er soll den Lernhinweis nicht überstrahlen. */
+  .installHint {
+    position: relative;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: center;
+    gap: 10px 14px;
+    width: min(420px, 100%);
+    background: var(--bg-panel);
+    border: 1px dashed rgba(255, 255, 255, 0.28);
+    border-radius: 14px;
+    padding: 12px 40px 12px 16px;
+  }
+  .installText { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+  .installTitle { font-size: 13px; font-weight: 700; }
+  .installSub { font-size: 11px; color: var(--text-dim); line-height: 1.35; }
+  .installGo { font-size: 12px; padding: 7px 12px; white-space: nowrap; }
+  .installSteps {
+    grid-column: 1 / -1;
+    margin: 0;
+    padding-left: 20px;
+    font-size: 11px;
+    color: var(--text-dim);
+    line-height: 1.6;
+  }
+  .shareIcon {
+    width: 0.75em;
+    height: 0.95em;
+    vertical-align: -0.15em;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.6;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+
+  @media (min-width: 720px) {
+    .installHint { width: min(854px, 100%); }
   }
 </style>

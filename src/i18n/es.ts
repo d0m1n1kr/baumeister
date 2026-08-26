@@ -68,6 +68,14 @@ export const es: Translation = {
   accept: 'Aceptar',
   decline: 'Rechazar',
 
+  install: {
+    title: 'Instalar como app',
+    text: 'Se abre sin la barra del navegador y funciona sin conexión.',
+    action: 'Instalar',
+    how: '¿Cómo?',
+    iosStep1: 'Toca Compartir abajo',
+    iosStep2: 'Luego «Añadir a inicio»'
+  },
   setupGame: 'Partida',
   setupRules: 'Reglas y variantes',
   expansions: 'Expansiones',
