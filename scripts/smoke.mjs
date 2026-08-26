@@ -163,6 +163,31 @@ try {
   }
   console.log('✓ Startbildschirm: Start-Knopf sichtbar, Optionen und Spielerzeilen bündig');
 
+  // Thema und Sprache gehören auf beiden Einstiegs-Screens in die obere Leiste
+  // am Bildschirmrand — nicht in die Bildmitte, wo sie mit dem zentrierten
+  // Inhalt wanderten.
+  for (const [label, open] of [
+    ['Startbildschirm', async (pg) => pg],
+    ['Beitritt', async (pg) => { await pg.locator('button', { hasText: 'Partie beitreten' }).click(); return pg; }]
+  ]) {
+    const ctx = await browser.newContext({ viewport: { width: 402, height: 874 }, locale: 'de-DE' });
+    const pg = await ctx.newPage();
+    pg.on('pageerror', (e) => fail(`${label}: Seitenfehler: ${e.message}`));
+    await pg.goto(BASE_URL);
+    await pg.locator('#splash').waitFor({ state: 'detached', timeout: 10000 });
+    await open(pg);
+    await pg.locator('.langRow').waitFor({ timeout: 5000 });
+    const head = await pg.evaluate(() => {
+      const row = document.querySelector('.langRow').getBoundingClientRect();
+      const last = document.querySelector('.langRow > *:last-child').getBoundingClientRect();
+      return { top: Math.round(row.top), right: Math.round(innerWidth - last.right) };
+    });
+    if (head.top > 40) fail(`${label}: Kopfzeile sitzt nicht oben (y=${head.top})`);
+    if (head.right > 40) fail(`${label}: Kopfzeile nicht am rechten Rand (${head.right}px Abstand)`);
+    await ctx.close();
+  }
+  console.log('✓ Thema und Sprache sitzen auf beiden Einstiegs-Screens oben rechts');
+
   // Installations-Hinweis: Auf iOS gibt es keine Schnittstelle dafür, also muss
   // dort eine Anleitung erscheinen — und einmal weggeklickt bleibt sie weg.
   {

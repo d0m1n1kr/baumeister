@@ -74,69 +74,74 @@
 </script>
 
 <main>
+  <!-- Kopfzeile bleibt oben stehen, wie im Startbildschirm — vorher wanderte
+       sie mit dem zentrierten Inhalt in die Bildmitte. -->
   <div class="langRow"><ThemePicker /><LanguagePicker /></div>
-  <h1>🏘 {t.joinTitle}</h1>
 
-  {#if session.role === 'guest' && session.status !== 'error'}
-    <section class="status">
-      {#if session.status === 'connecting'}
-        <p>{t.connecting}</p>
-        {#if relays}
-          <p class="relays" class:bad={relays.open === 0}>
-            {t.relayStatus(relays.open, relays.total)}
-          </p>
-        {/if}
-      {:else}
-        <p>{t.waitingForHost}</p>
-        <ul class="seats">
-          {#each seats as seat}
-            <li class:me={seat.index === session.mySeat}>
-              <span class="dot" class:on={seat.connected}></span>
-              <span>{seat.name}</span>
-            </li>
-          {/each}
-        </ul>
-      {/if}
-      <button onpointerup={leave}>{t.leaveRoom}</button>
-    </section>
-  {:else}
-    <section class="form">
-      <label>
-        <span>{t.joinCode}</span>
-        <div class="codeRow">
-          <input
-            class="codeInput"
-            type="text"
-            autocapitalize="characters"
-            autocomplete="off"
-            maxlength="7"
-            bind:value={code}
-            placeholder="ABC234"
-          />
-          {#if canScan}
-            <button class="scanBtn" title={t.scanButton} onpointerup={() => { scanError = ''; scanning = true; }}>
-              📷
-            </button>
+  <div class="scroll">
+    <h1>🏘 {t.joinTitle}</h1>
+
+    {#if session.role === 'guest' && session.status !== 'error'}
+      <section class="status">
+        {#if session.status === 'connecting'}
+          <p>{t.connecting}</p>
+          {#if relays}
+            <p class="relays" class:bad={relays.open === 0}>
+              {t.relayStatus(relays.open, relays.total)}
+            </p>
           {/if}
+        {:else}
+          <p>{t.waitingForHost}</p>
+          <ul class="seats">
+            {#each seats as seat}
+              <li class:me={seat.index === session.mySeat}>
+                <span class="dot" class:on={seat.connected}></span>
+                <span>{seat.name}</span>
+              </li>
+            {/each}
+          </ul>
+        {/if}
+        <button onpointerup={leave}>{t.leaveRoom}</button>
+      </section>
+    {:else}
+      <section class="form">
+        <label>
+          <span>{t.joinCode}</span>
+          <div class="codeRow">
+            <input
+              class="codeInput"
+              type="text"
+              autocapitalize="characters"
+              autocomplete="off"
+              maxlength="7"
+              bind:value={code}
+              placeholder="ABC234"
+            />
+            {#if canScan}
+              <button class="scanBtn" title={t.scanButton} onpointerup={() => { scanError = ''; scanning = true; }}>
+                📷
+              </button>
+            {/if}
+          </div>
+        </label>
+        <label>
+          <span>{t.yourName}</span>
+          <input type="text" maxlength="14" bind:value={name} placeholder={t.yourName} />
+        </label>
+
+        {#if scanError && !scanning}<div class="error">{scanError}</div>{/if}
+        {#if session.netError}<div class="error">{translateError(session.netError)}</div>{/if}
+
+        <div class="actions">
+          <button onpointerup={leave}>{t.cancel}</button>
+          <button class="primary" disabled={!ready || busy} onpointerup={join}>
+            {busy ? t.connecting : t.joinButton}
+          </button>
         </div>
-      </label>
-      <label>
-        <span>{t.yourName}</span>
-        <input type="text" maxlength="14" bind:value={name} placeholder={t.yourName} />
-      </label>
-
-      {#if scanError && !scanning}<div class="error">{scanError}</div>{/if}
-      {#if session.netError}<div class="error">{translateError(session.netError)}</div>{/if}
-
-      <div class="actions">
-        <button onpointerup={leave}>{t.cancel}</button>
-        <button class="primary" disabled={!ready || busy} onpointerup={join}>
-          {busy ? t.connecting : t.joinButton}
-        </button>
-      </div>
-      <button class="link" onpointerup={() => (showHelp = true)}>📖 {t.helpButton}</button>
-    </section>
-  {/if}
+        <button class="link" onpointerup={() => (showHelp = true)}>📖 {t.helpButton}</button>
+      </section>
+    {/if}
+  </div>
 </main>
 
 {#if showHelp}
@@ -148,9 +153,22 @@
 {/if}
 
 <style>
-  .langRow { align-self: flex-end; display: flex; gap: 8px; justify-content: flex-end; width: 100%; max-width: 420px; }
   main {
     height: 100%;
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+  }
+  .langRow {
+    flex-shrink: 0;
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+    padding: 8px 12px 0;
+  }
+  .scroll {
+    flex: 1;
+    min-height: 0;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -162,8 +180,8 @@
     overflow-y: auto;
     touch-action: pan-y;
   }
-  main > :first-child { margin-top: auto; }
-  main > :last-child { margin-bottom: auto; }
+  .scroll > :first-child { margin-top: auto; }
+  .scroll > :last-child { margin-bottom: auto; }
   h1 { margin: 0; font-size: 26px; }
   .form, .status {
     background: var(--bg-panel);
