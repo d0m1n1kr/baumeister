@@ -138,7 +138,7 @@
             {busy ? t.connecting : t.joinButton}
           </button>
         </div>
-        <button class="link" onpointerup={() => (showHelp = true)}>📖 {t.helpButton}</button>
+        <button class="link tapArea" onpointerup={() => (showHelp = true)}>📖 {t.helpButton}</button>
       </section>
     {/if}
   </div>

@@ -170,7 +170,7 @@
     {#if learn.showHint}
       <!-- Einstiegshilfe: einmal weggeklickt, kommt sie nicht wieder -->
       <aside class="learnHint">
-        <button class="hintClose" title={t.close} onpointerup={() => learn.dismissHint()}>✕</button>
+        <button class="hintClose tapArea" title={t.close} onpointerup={() => learn.dismissHint()}>✕</button>
         <span class="hintTitle">🎓 {t.learn.hintTitle}</span>
         <p class="hintText">{t.learn.hintText}</p>
         <button class="primary hintStart" onpointerup={startLearning}>{t.learn.hintStart}</button>
@@ -182,7 +182,7 @@
            (Apple bietet dafür keine Schnittstelle). Einmal weggeklickt bleibt
            der Hinweis weg. -->
       <aside class="installHint">
-        <button class="hintClose" title={t.close} onpointerup={() => install.dismiss()}>✕</button>
+        <button class="hintClose tapArea" title={t.close} onpointerup={() => install.dismiss()}>✕</button>
         <span class="installText">
           <span class="installTitle">📲 {t.install.title}</span>
           <span class="installSub">{t.install.text}</span>
@@ -242,7 +242,7 @@
               {#if soloMode === 'daily'}{t.soloDailyHint}{#if dailyDate !== todayId()}
             <strong class="sharedDay">📅 {dailyDate}</strong>{/if}{/if}
               {#if soloMode === 'learn'}{t.learn.setupHint}{/if}
-              <button class="link helpLink" onpointerup={() => (showHelp = true)}>
+              <button class="link helpLink tapArea" onpointerup={() => (showHelp = true)}>
                 📖 {t.helpButton}
               </button>
             </p>
@@ -257,7 +257,7 @@
             </div>
             <p class="hint">
               {multiDevice ? t.ownDevicesHint : t.oneDeviceHint}
-              <button class="link helpLink" onpointerup={() => (showHelp = true)}>
+              <button class="link helpLink tapArea" onpointerup={() => (showHelp = true)}>
                 📖 {t.helpButton}
               </button>
             </p>
@@ -362,7 +362,7 @@
       <button class="primary big" onpointerup={start}>{t.startGame}</button>
     {/if}
     <div class="barLinks">
-      <button class="link" onpointerup={onjoin}>{t.joinTitle} →</button>
+      <button class="link tapArea" onpointerup={onjoin}>{t.joinTitle} →</button>
       <CreditsFooter />
     </div>
   </div>
@@ -492,13 +492,15 @@
 
   /* Einheitliches Raster für jeden Schalter */
   .opt {
+    min-height: var(--tap);
+    align-content: center;
     display: grid;
-    grid-template-columns: 20px minmax(0, 1fr);
+    grid-template-columns: 22px minmax(0, 1fr);
     gap: 10px;
     align-items: start;
     cursor: pointer;
   }
-  .opt input { width: 20px; height: 20px; margin: 1px 0 0; }
+  .opt input { width: 22px; height: 22px; margin: 0; }
   .optText { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
   .optName { font-weight: 600; line-height: 1.25; }
   .optDesc { font-size: 11px; color: var(--text-dim); line-height: 1.35; }
