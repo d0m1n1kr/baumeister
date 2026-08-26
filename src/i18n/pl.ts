@@ -138,6 +138,7 @@ export const pl: Translation = {
   scoreFed: 'nakarmione chaty',
   winner: 'Zwycięzca',
   shareButton: 'Podziel się wynikiem',
+  shareImageButton: 'Udostępnij jako obraz',
   shareCopied: 'Skopiowano do schowka',
   shareFailed: 'Udostępnianie nie powiodło się',
   playAgain: 'Zagraj ponownie',

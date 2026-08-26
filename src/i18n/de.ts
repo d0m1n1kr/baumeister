@@ -138,6 +138,7 @@ export const de = {
   scoreFed: 'gefütterte Hütten',
   winner: 'Gewinner',
   shareButton: 'Ergebnis teilen',
+  shareImageButton: 'Als Bild teilen',
   shareCopied: 'In die Zwischenablage kopiert',
   shareFailed: 'Teilen hat nicht geklappt',
   playAgain: 'Neue Partie',

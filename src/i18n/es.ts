@@ -138,6 +138,7 @@ export const es: Translation = {
   scoreFed: 'cabañas alimentadas',
   winner: 'Ganador',
   shareButton: 'Compartir resultado',
+  shareImageButton: 'Compartir como imagen',
   shareCopied: 'Copiado al portapapeles',
   shareFailed: 'No se pudo compartir',
   playAgain: 'Jugar otra vez',

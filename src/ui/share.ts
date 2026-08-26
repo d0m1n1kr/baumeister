@@ -95,8 +95,27 @@ export function canShareImage(file: File): boolean {
 }
 
 /**
- * Erst mit Bild teilen, sonst auf Text zurückfallen. Der Text geht in beiden
- * Fällen mit — Ziele wie Nachrichten hängen ihn an das Bild an.
+ * Dasselbe, aber ohne fertiges Bild — für die Frage, ob der Bild-Knopf
+ * überhaupt angeboten werden soll. Ein leeres PNG genügt: `canShare` prüft den
+ * Typ, nicht den Inhalt.
+ */
+export function canShareImages(): boolean {
+  try {
+    return canShareImage(new File([new Uint8Array()], 'probe.png', { type: 'image/png' }));
+  } catch {
+    return false;
+  }
+}
+
+/**
+ * Erst mit Bild teilen, sonst auf Text zurückfallen.
+ *
+ * Der Text geht immer mit — ob er beim Empfänger ankommt, entscheidet aber das
+ * Betriebssystem: Auf iOS reicht Safari beim Teilen mit Datei nur das Bild an
+ * das Ziel weiter, der Text fällt unterwegs weg. Deshalb gibt es im Ergebnis
+ * zwei Knöpfe — Text und Bild —, statt zu hoffen, dass beides zusammen
+ * durchkommt. Alles Wichtige steht zusätzlich IM Bild (Rang, Punkte, Gebäude,
+ * Adresse), damit auch der Bild-Weg vollständig ist.
  */
 export async function shareImageOrText(
   file: File | null,
