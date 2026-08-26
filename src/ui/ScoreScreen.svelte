@@ -7,7 +7,8 @@
   import { addHighscore, highscores, type HighscoreEntry } from '../store/highscore';
   import { cardName, t } from '../i18n';
   import { learn } from './learn.svelte';
-  import { dailyUrl, shareOrCopy, shareText } from './share';
+  import { dailyUrl, shareImageOrText, shareText } from './share';
+  import { readPalette, scoreCardBlob } from './scoreCard';
 
   const st = $derived(game.state!);
   const scores = $derived(scoreGame(st, catalog));
@@ -74,21 +75,45 @@
       .map(([id, count]) => ({ name: cardName(catalog[id]), count }));
   });
 
+  let sharing = $state(false);
+
   async function shareResult() {
-    const href = location.href;
-    const text = shareText({
-      title: t.appTitle,
-      rank,
-      score: soloScore,
-      points: t.points,
-      dailyId: st.config.dailyId,
-      dailyLabel: t.soloDaily,
-      buildings: builtCounts,
-      url: st.config.dailyId ? dailyUrl(st.config.dailyId, href) : href
-    });
-    const { via } = await shareOrCopy(text, t.appTitle);
-    shareNote = via === 'copied' ? t.shareCopied : via === 'failed' ? t.shareFailed : '';
-    if (shareNote) setTimeout(() => (shareNote = ''), 4000);
+    if (sharing) return;
+    sharing = true;
+    try {
+      const href = location.href;
+      const url = st.config.dailyId ? dailyUrl(st.config.dailyId, href) : href;
+      const subtitle = st.config.dailyId ? `${t.soloDaily} ${st.config.dailyId}` : '';
+      const text = shareText({
+        title: t.appTitle,
+        rank,
+        score: soloScore,
+        points: t.points,
+        dailyId: st.config.dailyId,
+        dailyLabel: t.soloDaily,
+        buildings: builtCounts,
+        url
+      });
+      // Bild nur, wo es der Browser überhaupt teilen kann — sonst wäre die
+      // Arbeit umsonst. shareImageOrText fällt selbst auf Text zurück.
+      const blob = await scoreCardBlob(
+        {
+          title: t.appTitle,
+          subtitle,
+          rank,
+          score: `${soloScore} ${t.points}`,
+          buildings: builtCounts,
+          footer: url.replace(/^https?:\/\//, '')
+        },
+        readPalette(document.documentElement)
+      );
+      const file = blob ? new File([blob], 'tiny-towns.png', { type: 'image/png' }) : null;
+      const { via } = await shareImageOrText(file, text, t.appTitle);
+      shareNote = via === 'copied' ? t.shareCopied : via === 'failed' ? t.shareFailed : '';
+      if (shareNote) setTimeout(() => (shareNote = ''), 4000);
+    } finally {
+      sharing = false;
+    }
   }
 </script>
 
@@ -180,7 +205,7 @@
 
   <div class="actions">
     {#if solo}
-      <button class="share" onpointerup={shareResult}>↗ {t.shareButton}</button>
+      <button class="share" disabled={sharing} onpointerup={shareResult}>↗ {t.shareButton}</button>
     {/if}
     <button class="primary big" onpointerup={() => game.reset({ keepSave: session.role === 'guest' })}>{t.playAgain}</button>
   </div>

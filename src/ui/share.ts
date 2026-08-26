@@ -7,6 +7,8 @@
 export interface ShareResult {
   /** 'shared' = Teilen-Blatt, 'copied' = Zwischenablage, 'failed' = nichts ging */
   via: 'shared' | 'copied' | 'failed';
+  /** true, wenn das Bild mitgegangen ist */
+  withImage?: boolean;
 }
 
 export interface ShareInfo {
@@ -71,4 +73,48 @@ export async function shareOrCopy(text: string, title: string): Promise<ShareRes
   } catch {
     return { via: 'failed' };
   }
+}
+
+type FileShareNavigator = Navigator & {
+  share?: (d: ShareData) => Promise<void>;
+  canShare?: (d: ShareData) => boolean;
+};
+
+/**
+ * Kann dieser Browser Dateien teilen? Nur iOS 15+ und Chromium auf Android
+ * können das; überall sonst bleibt es beim Text.
+ */
+export function canShareImage(file: File): boolean {
+  const nav = navigator as FileShareNavigator;
+  if (typeof nav.share !== 'function' || typeof nav.canShare !== 'function') return false;
+  try {
+    return nav.canShare({ files: [file] });
+  } catch {
+    return false;
+  }
+}
+
+/**
+ * Erst mit Bild teilen, sonst auf Text zurückfallen. Der Text geht in beiden
+ * Fällen mit — Ziele wie Nachrichten hängen ihn an das Bild an.
+ */
+export async function shareImageOrText(
+  file: File | null,
+  text: string,
+  title: string
+): Promise<ShareResult> {
+  if (file && canShareImage(file)) {
+    const nav = navigator as FileShareNavigator;
+    try {
+      await nav.share!({ title, text, files: [file] });
+      return { via: 'shared', withImage: true };
+    } catch (e) {
+      // Abbruch durch den Nutzer ist erledigt, kein zweiter Versuch
+      if (e instanceof Error && e.name === 'AbortError') {
+        return { via: 'shared', withImage: true };
+      }
+      // alles andere: ohne Bild erneut versuchen
+    }
+  }
+  return { ...(await shareOrCopy(text, title)), withImage: false };
 }
