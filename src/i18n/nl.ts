@@ -68,6 +68,8 @@ export const nl: Translation = {
   accept: 'Accepteren',
   decline: 'Afwijzen',
 
+  setupGame: 'Spel',
+  setupRules: 'Regels en varianten',
   expansions: 'Uitbreidingen',
   coinIcon: '🪙',
   coins: 'Munten',

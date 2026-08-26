@@ -30,7 +30,6 @@
     color: var(--text-dim);
     opacity: 0.75;
     text-align: center;
-    padding-bottom: env(safe-area-inset-bottom, 0px);
   }
   .stamp,
   .update {

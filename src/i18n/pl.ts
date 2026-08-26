@@ -68,6 +68,8 @@ export const pl: Translation = {
   accept: 'Przyjmij',
   decline: 'Odrzuć',
 
+  setupGame: 'Rozgrywka',
+  setupRules: 'Zasady i warianty',
   expansions: 'Dodatki',
   coinIcon: '🪙',
   coins: 'Monety',

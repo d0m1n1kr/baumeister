@@ -88,6 +88,58 @@ try {
   await page.locator('footer button.stamp', { hasText: 'aktuell' }).waitFor({ timeout: 8000 });
   console.log('✓ Update-Prüfung von Hand über den Versionsstempel');
 
+  // Startbildschirm: Der Start-Knopf muss auf jedem Gerät sichtbar sein, und
+  // die Optionen müssen in einem gemeinsamen Raster stehen — Titel und
+  // Beschreibung bündig, Spielerzeilen spaltenweise ausgerichtet.
+  for (const [label, w, h] of [
+    ['Handy', 402, 874],
+    ['Handy quer', 874, 402],
+    ['Tablet', 1024, 1366],
+    ['Tablet quer', 1180, 820]
+  ]) {
+    const ctx = await browser.newContext({ viewport: { width: w, height: h }, locale: 'de-DE' });
+    const p2 = await ctx.newPage();
+    p2.on('pageerror', (e) => fail(`Startbildschirm ${label}: Seitenfehler: ${e.message}`));
+    await p2.goto(BASE_URL);
+    await p2.locator('#splash').waitFor({ state: 'detached', timeout: 10000 });
+    await p2.locator('.seg button', { hasText: 'Mit eigenen' }).click(); // längste Zeilen
+    const geo = await p2.evaluate(() => {
+      const x = (el) => Math.round(el.getBoundingClientRect().left);
+      const wOf = (el) => Math.round(el.getBoundingClientRect().width);
+      const start = document.querySelector('.bar button.big').getBoundingClientRect();
+      const cards = [...document.querySelectorAll('.card')].map((card) => ({
+        names: [...card.querySelectorAll('.optName')].map(x),
+        descs: [...card.querySelectorAll('.optDesc')].map(x),
+        widths: [...card.querySelectorAll('.optText')].map(wOf)
+      }));
+      const col = (sel) => [...document.querySelectorAll(`.players ${sel}`)].map(x);
+      return {
+        start: { top: Math.round(start.top), bottom: Math.round(start.bottom) },
+        vh: innerHeight,
+        cards,
+        inputs: col('input'),
+        selects: col('select'),
+        devices: col('.deviceToggle')
+      };
+    });
+    if (geo.start.top < 0 || geo.start.bottom > geo.vh) {
+      fail(`Startbildschirm ${label}: Start-Knopf nicht sichtbar (${geo.start.top}–${geo.start.bottom} in ${geo.vh})`);
+    }
+    for (const card of geo.cards) {
+      const same = (xs) => xs.length === 0 || xs.every((v) => v === xs[0]);
+      if (!same(card.names)) fail(`Startbildschirm ${label}: Options-Titel nicht bündig (${card.names})`);
+      if (!same(card.descs)) fail(`Startbildschirm ${label}: Beschreibungen nicht bündig (${card.descs})`);
+      if (!same(card.widths)) fail(`Startbildschirm ${label}: Optionen unterschiedlich breit (${card.widths})`);
+    }
+    for (const [what, xs] of [['Namen', geo.inputs], ['Ecken', geo.selects], ['Geräte', geo.devices]]) {
+      if (xs.length && !xs.every((v) => v === xs[0])) {
+        fail(`Startbildschirm ${label}: Spalte „${what}" nicht ausgerichtet (${xs})`);
+      }
+    }
+    await ctx.close();
+  }
+  console.log('✓ Startbildschirm: Start-Knopf sichtbar, Optionen und Spielerzeilen bündig');
+
   // Setup: 2 Spieler, ohne Monumente, mit Fortune-Erweiterung
   await page.locator('.seg button', { hasText: '2' }).click();
   await page.locator('.toggle input[type="checkbox"]').first().click();
@@ -179,7 +231,7 @@ try {
   });
   await insetPage.locator('#splash').waitFor({ state: 'detached', timeout: 10000 });
   await insetPage.locator('.seg button', { hasText: '1' }).first().click();
-  await insetPage.locator('section button.big').click();
+  await insetPage.locator('.bar button.big').click();
   await insetPage.locator('.boardWrap').waitFor({ timeout: 5000 });
   const layout = await insetPage.evaluate(() => {
     const rect = (sel) => {
@@ -227,7 +279,7 @@ try {
   await pwaPage.goto(BASE_URL);
   await pwaPage.locator('#splash').waitFor({ state: 'detached', timeout: 10000 });
   await pwaPage.locator('.seg button', { hasText: '1' }).first().click();
-  await pwaPage.locator('section button.big').click();
+  await pwaPage.locator('.bar button.big').click();
   await pwaPage.locator('.boardWrap').waitFor({ timeout: 5000 });
   const pwa = await pwaPage.evaluate(() => {
     const bottom = (sel) => {

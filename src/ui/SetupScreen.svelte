@@ -139,149 +139,180 @@
 </script>
 
 <main>
+  <!-- Kopfzeile bleibt oben stehen, damit sie auf hohen Geräten nicht
+       mitten im Bild schwebt. -->
   <div class="langRow"><ThemePicker /><LanguagePicker /></div>
-  <h1>🏘 {t.appTitle}</h1>
 
-  {#if learn.showHint}
-    <!-- Einstiegshilfe: einmal weggeklickt, kommt sie nicht wieder -->
-    <aside class="learnHint">
-      <button class="hintClose" title={t.close} onpointerup={() => learn.dismissHint()}>✕</button>
-      <span class="hintTitle">🎓 {t.learn.hintTitle}</span>
-      <p class="hintText">{t.learn.hintText}</p>
-      <button class="primary hintStart" onpointerup={startLearning}>{t.learn.hintStart}</button>
-    </aside>
-  {/if}
+  <div class="scroll">
+    <h1>🏘 {t.appTitle}</h1>
 
-  <section>
-    <div class="field">
-      <span class="label">{t.players}</span>
-      <div class="seg">
-        {#each [1, 2, 3, 4] as n}
-          <button class:primary={count === n} onpointerup={() => setCount(n)}>{n}</button>
-        {/each}
-      </div>
-    </div>
+    {#if learn.showHint}
+      <!-- Einstiegshilfe: einmal weggeklickt, kommt sie nicht wieder -->
+      <aside class="learnHint">
+        <button class="hintClose" title={t.close} onpointerup={() => learn.dismissHint()}>✕</button>
+        <span class="hintTitle">🎓 {t.learn.hintTitle}</span>
+        <p class="hintText">{t.learn.hintText}</p>
+        <button class="primary hintStart" onpointerup={startLearning}>{t.learn.hintStart}</button>
+      </aside>
+    {/if}
 
-    {#if solo}
-      <!-- Offizielle Solo-Variante: Material aus dem Kartendeck -->
-      <div class="field modeRow">
-        <span class="label">{t.soloMode}</span>
-        <div class="seg">
-          <button class:primary={soloMode === 'free'} onpointerup={() => setSoloMode('free')}>
-            {t.soloFree}
-          </button>
-          <button class:primary={soloMode === 'daily'} onpointerup={() => setSoloMode('daily')}>
-            📅 {t.soloDaily}
-          </button>
-          <button class:primary={soloMode === 'learn'} onpointerup={() => setSoloMode('learn')}>
-            🎓 {t.learn.setupOption}
-          </button>
+    <!-- Zwei Karten: „Wer spielt" links, „Wie wird gespielt" rechts. Auf
+         breiten Geräten nebeneinander, sonst untereinander. -->
+    <div class="cards">
+      <section class="card">
+        <h2>{t.setupGame}</h2>
+
+        <div class="row">
+          <span class="label">{t.players}</span>
+          <div class="seg">
+            {#each [1, 2, 3, 4] as n}
+              <button class:primary={count === n} onpointerup={() => setCount(n)}>{n}</button>
+            {/each}
+          </div>
         </div>
-      </div>
-      <p class="modeHint">
-        {#if soloMode === 'daily'}{t.soloDailyHint}{/if}
-        {#if soloMode === 'learn'}{t.learn.setupHint}{/if}
-        <button class="link helpLink" onpointerup={() => (showHelp = true)}>📖 {t.helpButton}</button>
-      </p>
-    {/if}
 
-    {#if !solo}
-    <div class="field modeRow">
-      <span class="label">{t.deviceMode}</span>
-      <div class="seg">
-        <button class:primary={!multiDevice} onpointerup={() => (multiDevice = false)}>
-          {t.oneDevice}
-        </button>
-        <button class:primary={multiDevice} onpointerup={() => (multiDevice = true)}>
-          {t.ownDevices}
-        </button>
-      </div>
-    </div>
-    <p class="modeHint">
-      {multiDevice ? t.ownDevicesHint : t.oneDeviceHint}
-      <button class="link helpLink" onpointerup={() => (showHelp = true)}>📖 {t.helpButton}</button>
-    </p>
-    {/if}
+        <div class="stack">
+          <span class="label">{solo ? t.soloMode : t.deviceMode}</span>
+          {#if solo}
+            <!-- Offizielle Solo-Variante: Material aus dem Kartendeck -->
+            <div class="seg spread">
+              <button class:primary={soloMode === 'free'} onpointerup={() => setSoloMode('free')}>
+                {t.soloFree}
+              </button>
+              <button class:primary={soloMode === 'daily'} onpointerup={() => setSoloMode('daily')}>
+                📅 {t.soloDaily}
+              </button>
+              <button class:primary={soloMode === 'learn'} onpointerup={() => setSoloMode('learn')}>
+                🎓 {t.learn.setupOption}
+              </button>
+            </div>
+            <p class="hint">
+              {#if soloMode === 'daily'}{t.soloDailyHint}{/if}
+              {#if soloMode === 'learn'}{t.learn.setupHint}{/if}
+              <button class="link helpLink" onpointerup={() => (showHelp = true)}>
+                📖 {t.helpButton}
+              </button>
+            </p>
+          {:else}
+            <div class="seg spread">
+              <button class:primary={!multiDevice} onpointerup={() => (multiDevice = false)}>
+                {t.oneDevice}
+              </button>
+              <button class:primary={multiDevice} onpointerup={() => (multiDevice = true)}>
+                {t.ownDevices}
+              </button>
+            </div>
+            <p class="hint">
+              {multiDevice ? t.ownDevicesHint : t.oneDeviceHint}
+              <button class="link helpLink" onpointerup={() => (showHelp = true)}>
+                📖 {t.helpButton}
+              </button>
+            </p>
+          {/if}
+        </div>
 
-    {#each Array.from({ length: count }) as _, i}
-      <div class="field playerRow">
-        <input
-          type="text"
-          bind:value={names[i]}
-          placeholder={`${t.playerName} ${i + 1}`}
-          maxlength="14"
-          disabled={multiDevice && remote[i]}
-        />
-        {#if !solo}
-        <select
-          value={corners[i]}
-          onchange={(e) => setCorner(i, Number((e.currentTarget as HTMLSelectElement).value))}
-        >
-          {#each [0, 1, 2, 3] as c}
-            <option value={c}>{t.cornerNames[c]}</option>
+        <div class="stack players">
+          {#each Array.from({ length: count }) as _, i}
+            <div class="playerRow">
+              <input
+                type="text"
+                bind:value={names[i]}
+                placeholder={`${t.playerName} ${i + 1}`}
+                maxlength="14"
+                disabled={multiDevice && remote[i]}
+              />
+              {#if !solo}
+                <select
+                  value={corners[i]}
+                  onchange={(e) => setCorner(i, Number((e.currentTarget as HTMLSelectElement).value))}
+                >
+                  {#each [0, 1, 2, 3] as c}
+                    <option value={c}>{t.cornerNames[c]}</option>
+                  {/each}
+                </select>
+              {/if}
+              {#if multiDevice}
+                <button
+                  class="deviceToggle"
+                  class:remote={remote[i]}
+                  onpointerup={() => (remote[i] = !remote[i])}
+                >
+                  {remote[i] ? `📱 ${t.seatOwnDevice}` : `🏠 ${t.seatHere}`}
+                </button>
+              {/if}
+            </div>
           {/each}
-        </select>
-        {/if}
-        {#if multiDevice}
-          <button
-            class="deviceToggle"
-            class:remote={remote[i]}
-            onpointerup={() => (remote[i] = !remote[i])}
-          >
-            {remote[i] ? `📱 ${t.seatOwnDevice}` : `🏠 ${t.seatHere}`}
-          </button>
-        {/if}
-      </div>
-    {/each}
+        </div>
+      </section>
 
-    <label class="field toggle">
-      <input type="checkbox" bind:checked={useMonuments} />
-      <span>{t.useMonuments}</span>
-    </label>
+      <section class="card">
+        <h2>{t.setupRules}</h2>
 
-    {#if !solo}
-      <label class="field toggle">
-        <input type="checkbox" bind:checked={townHall} />
-        <span>🏛 {t.townHallMode}</span>
-        <span class="expDesc">{t.townHallModeHint}</span>
-      </label>
-      <label class="expRow">
-        <input type="checkbox" bind:checked={train} />
-        <span>🚂 {t.trainMode}</span>
-        <span class="expDesc">{t.trainModeHint}</span>
-      </label>
-      <label class="field toggle">
-        <input type="checkbox" bind:checked={cavernRule} />
-        <span>{t.cavernRule}</span>
-        <span class="expDesc">{t.cavernRuleHint}</span>
-      </label>
-    {/if}
-
-    <div class="expansions">
-      <span class="expTitle">{t.expansions}</span>
-      {#each SETS.filter((s) => !s.core) as set}
-        <label class="field toggle expRow">
-          <input
-            type="checkbox"
-            checked={chosenSets.includes(set.id)}
-            onchange={() => toggleSet(set.id)}
-          />
-          <span class="expName">{t.sets[set.id]?.name ?? set.name}</span>
-          <span class="expDesc">{t.sets[set.id]?.description ?? set.description}</span>
+        <!-- Alle Schalter im selben Raster: Kästchen, Titel, Beschreibung
+             beginnen auf derselben Linie und sind gleich breit. -->
+        <label class="opt toggle">
+          <input type="checkbox" bind:checked={useMonuments} />
+          <span class="optText"><span class="optName">{t.useMonuments}</span></span>
         </label>
-      {/each}
-    </div>
 
+        {#if !solo}
+          <label class="opt toggle">
+            <input type="checkbox" bind:checked={townHall} />
+            <span class="optText">
+              <span class="optName">🏛 {t.townHallMode}</span>
+              <span class="optDesc">{t.townHallModeHint}</span>
+            </span>
+          </label>
+          <label class="opt toggle">
+            <input type="checkbox" bind:checked={train} />
+            <span class="optText">
+              <span class="optName">🚂 {t.trainMode}</span>
+              <span class="optDesc">{t.trainModeHint}</span>
+            </span>
+          </label>
+          <label class="opt toggle">
+            <input type="checkbox" bind:checked={cavernRule} />
+            <span class="optText">
+              <span class="optName">{t.cavernRule}</span>
+              <span class="optDesc">{t.cavernRuleHint}</span>
+            </span>
+          </label>
+        {/if}
+
+        <div class="expansions">
+          <span class="expTitle">{t.expansions}</span>
+          {#each SETS.filter((s) => !s.core) as set}
+            <label class="opt toggle expRow">
+              <input
+                type="checkbox"
+                checked={chosenSets.includes(set.id)}
+                onchange={() => toggleSet(set.id)}
+              />
+              <span class="optText">
+                <span class="optName">{t.sets[set.id]?.name ?? set.name}</span>
+                <span class="optDesc">{t.sets[set.id]?.description ?? set.description}</span>
+              </span>
+            </label>
+          {/each}
+        </div>
+      </section>
+    </div>
+  </div>
+
+  <!-- Startleiste: liegt außerhalb des scrollenden Bereichs und ist damit
+       auf jedem Gerät sichtbar, egal wie lang die Einstellungen werden. -->
+  <div class="bar">
     {#if error}<div class="error">{error}</div>{/if}
     {#if multiDevice}
       <button class="primary big" disabled={busy} onpointerup={openRoom}>{t.openRoom}</button>
     {:else}
       <button class="primary big" onpointerup={start}>{t.startGame}</button>
     {/if}
-  </section>
-
-  <button class="link" onpointerup={onjoin}>{t.joinTitle} →</button>
-  <CreditsFooter />
+    <div class="barLinks">
+      <button class="link" onpointerup={onjoin}>{t.joinTitle} →</button>
+      <CreditsFooter />
+    </div>
+  </div>
 </main>
 
 {#if showHelp}
@@ -292,36 +323,98 @@
 {/if}
 
 <style>
-  .langRow { align-self: flex-end; display: flex; gap: 8px; justify-content: flex-end; width: 100%; max-width: 520px; }
   main {
     height: 100%;
     display: flex;
     flex-direction: column;
-    align-items: center;
-    /* KEIN justify-content:center: zusammen mit overflow-y:auto würde
-       überlaufender Inhalt oben abgeschnitten (Handy quer). Auto-Margins
-       zentrieren, solange Platz ist, und scrollen sauber, wenn nicht. */
-    gap: 22px;
-    padding-bottom: var(--safe-bottom);
+    min-height: 0;
+  }
+  /* Nur dieser Teil scrollt — die Startleiste bleibt stehen. */
+  .scroll {
+    flex: 1;
+    min-height: 0;
     overflow-y: auto;
     touch-action: pan-y;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 16px;
+    padding: 8px 12px 16px;
   }
-  main > :first-child { margin-top: auto; }
-  main > :last-child { margin-bottom: auto; }
-  h1 { margin: 0; font-size: 34px; }
-  section {
+  /* Auto-Ränder zentrieren, solange Platz ist, und scrollen sauber, wenn nicht.
+     Mit justify-content:center würde überlaufender Inhalt oben abgeschnitten. */
+  .scroll > :first-child { margin-top: auto; }
+  .scroll > :last-child { margin-bottom: auto; }
+
+  .langRow {
+    flex-shrink: 0;
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+    padding: 8px 12px 0;
+  }
+  h1 { margin: 0; font-size: clamp(26px, 6vw, 34px); }
+
+  .cards {
+    display: grid;
+    grid-template-columns: minmax(0, 420px);
+    justify-content: center;
+    align-items: start;
+    gap: 14px;
+    width: 100%;
+  }
+  /* Ab dieser Breite passen zwei Spalten nebeneinander — auf dem Tablet
+     entfällt das Scrollen damit ganz, quer am Handy halbiert es die Länge.
+     Der Lernhinweis legt sich dann in eine Zeile, statt drei zu belegen. */
+  @media (min-width: 720px) {
+    .cards { grid-template-columns: repeat(2, minmax(0, 420px)); }
+  }
+  /* Quer am Handy ist Höhe knapp: Kopfbereich schrumpft, damit von den
+     Einstellungen noch etwas zu sehen ist. */
+  @media (max-height: 560px) {
+    .scroll { gap: 10px; }
+    h1 { font-size: 22px; }
+  }
+
+  .card {
     display: flex;
     flex-direction: column;
     gap: 12px;
     background: var(--bg-panel);
-    padding: 22px 26px;
+    padding: 18px 20px 20px;
     border-radius: 16px;
-    width: min(420px, 90vw);
+    min-width: 0;
   }
-  .field { display: flex; align-items: center; gap: 12px; }
+  h2 {
+    margin: 0;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--text-dim);
+  }
+
+  .row { display: flex; align-items: center; gap: 12px; }
+  .stack { display: flex; flex-direction: column; gap: 8px; }
+  /* Ein Raster über alle Spielerzeilen: Namensfeld, Ecke und Geräte-Knopf
+     stehen damit in jeder Zeile exakt untereinander — unabhängig davon, wie
+     lang die einzelnen Beschriftungen sind. */
+  .players {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto auto;
+    gap: 8px 10px;
+    align-items: center;
+  }
+  .playerRow { display: contents; }
   .label { flex: 1; }
+
   .seg { display: flex; gap: 6px; }
-  .seg button { width: 46px; }
+  .row .seg button { width: 46px; }
+  /* Modus-Knöpfe teilen sich die Zeile gleichmäßig, statt den Titel zu quetschen */
+  .seg.spread button { flex: 1 1 0; min-width: 0; font-size: 13px; padding: 8px 6px; }
+
+  .hint { margin: 0; font-size: 11px; color: var(--text-dim); line-height: 1.4; }
+
   .playerRow input {
     flex: 1;
     font: inherit;
@@ -340,32 +433,53 @@
     border-radius: 8px;
     padding: 8px;
   }
-  .toggle { cursor: pointer; }
-  .toggle input { width: 20px; height: 20px; flex-shrink: 0; }
+  .playerRow input:disabled { opacity: 0.45; }
+  .deviceToggle { font-size: 11px; padding: 6px 8px; white-space: nowrap; width: 100%; }
+  .deviceToggle.remote { border-color: var(--accent); color: var(--accent); }
+
+  /* Einheitliches Raster für jeden Schalter */
+  .opt {
+    display: grid;
+    grid-template-columns: 20px minmax(0, 1fr);
+    gap: 10px;
+    align-items: start;
+    cursor: pointer;
+  }
+  .opt input { width: 20px; height: 20px; margin: 1px 0 0; }
+  .optText { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+  .optName { font-weight: 600; line-height: 1.25; }
+  .optDesc { font-size: 11px; color: var(--text-dim); line-height: 1.35; }
+
   .expansions {
     display: flex;
     flex-direction: column;
-    gap: 8px;
+    gap: 10px;
     border-top: 1px solid rgba(255, 255, 255, 0.12);
-    padding-top: 10px;
+    padding-top: 12px;
   }
-  .expTitle { font-size: 13px; color: var(--text-dim); }
-  .expRow { align-items: flex-start; }
-  .expName { font-weight: 600; white-space: nowrap; }
-  .expDesc { font-size: 11px; color: var(--text-dim); line-height: 1.35; }
-  .big { font-size: 17px; padding: 12px; margin-top: 6px; }
-  .error { color: var(--danger); font-size: 13px; }
-  .modeRow { flex-wrap: wrap; }
-  .modeRow .seg button { width: auto; font-size: 13px; }
-  .modeHint { margin: -6px 0 0; font-size: 11px; color: var(--text-dim); line-height: 1.4; }
-  .deviceToggle { font-size: 11px; padding: 6px 8px; white-space: nowrap; }
-  .deviceToggle.remote { border-color: var(--accent); color: var(--accent); }
-  .playerRow input:disabled { opacity: 0.45; }
+  .expTitle { font-size: 12px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--text-dim); }
+
+  .bar {
+    flex-shrink: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    padding: 10px 12px var(--safe-bottom);
+    background: var(--bg-panel);
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 -6px 18px rgba(0, 0, 0, 0.35);
+  }
+  .big { font-size: 17px; padding: 12px; width: min(420px, 100%); }
+  .barLinks { display: flex; align-items: center; gap: 14px; }
+  .error { color: var(--danger); font-size: 13px; text-align: center; }
+
   .link {
     background: none;
     border: none;
     color: var(--text-dim);
-    font-size: 14px;
+    font-size: 12px;
+    padding: 0;
     text-decoration: underline;
   }
   .helpLink { font-size: 12px; padding: 0 0 0 8px; }
@@ -377,8 +491,7 @@
     flex-direction: column;
     gap: 6px;
     align-items: flex-start;
-    width: min(420px, 90vw);
-    margin-bottom: -8px; /* die Lücke zur Sektion bleibt wie ohne Hinweis */
+    width: min(420px, 100%);
     background: var(--bg-panel);
     border: 1px solid var(--accent);
     border-radius: 14px;
@@ -398,5 +511,23 @@
     font-size: 12px;
     line-height: 1;
     opacity: 0.6;
+  }
+
+  /* Auf breiten Geräten legt sich der Hinweis in eine Zeile und nimmt
+     dieselbe Breite ein wie die beiden Karten darunter. */
+  @media (min-width: 720px) {
+    .learnHint {
+      width: min(854px, 100%);
+      flex-direction: row;
+      align-items: center;
+      gap: 14px;
+      padding-right: 40px; /* Platz für das ✕ in der Ecke */
+    }
+    .hintTitle { white-space: nowrap; }
+    .hintText { flex: 1; padding-right: 0; }
+    .hintStart { flex-shrink: 0; }
+  }
+  @media (max-height: 560px) {
+    .learnHint { padding: 10px 14px; }
   }
 </style>

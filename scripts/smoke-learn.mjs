@@ -191,10 +191,10 @@ async function run(browser, label, viewport) {
   //    sind alle weggetippt, das darf die nächste Partie nicht stumm machen.
   await page.locator('.strip .quit').click();
   await page.locator('.scrim button', { hasText: 'Partie beenden' }).click();
-  await page.locator('section button.big').waitFor({ timeout: 5000 });
+  await page.locator('.bar button.big').waitFor({ timeout: 5000 });
   await page.locator('.seg button', { hasText: '1' }).first().click();
   await page.locator('.seg button', { hasText: 'Lernspiel' }).click();
-  await page.locator('section button.big').click();
+  await page.locator('.bar button.big').click();
   await page.locator('.bubble.ready').waitFor({ timeout: 8000 });
   if (!(await bubbleTitle(page))?.includes('4')) {
     fail(`${label}: neues Lernspiel bleibt stumm (${await bubbleTitle(page)})`);
@@ -238,9 +238,11 @@ async function hintChecks(browser) {
   await page.goto(BASE_URL);
   await page.locator('#splash').waitFor({ state: 'detached', timeout: 10000 });
   const hint = await page.locator('.learnHint').boundingBox();
-  const startBtn = await page.locator('section button.big').boundingBox();
+  const startBtn = await page.locator('.bar button.big').boundingBox();
   if (!hint || !startBtn) fail('Hinweis oder Start-Knopf fehlt am Handy');
   if (hint.y + hint.height > startBtn.y) fail('Hinweis überdeckt den Start-Knopf');
+  const vh = page.viewportSize().height;
+  if (startBtn.y + startBtn.height > vh) fail('Start-Knopf liegt unterhalb des Bildschirms');
   await page.locator('.hintClose').click();
   if ((await page.locator('.learnHint').count()) !== 0) fail('✕ blendet den Hinweis nicht aus');
   await page.reload();

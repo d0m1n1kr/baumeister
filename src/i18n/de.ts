@@ -68,6 +68,8 @@ export const de = {
   accept: 'Annehmen',
   decline: 'Ablehnen',
 
+  setupGame: 'Partie',
+  setupRules: 'Regeln & Varianten',
   expansions: 'Erweiterungen',
   coinIcon: '🪙',
   coins: 'Münzen',
