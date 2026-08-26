@@ -15,7 +15,8 @@
   import { learn } from './learn.svelte';
   import { install } from './install.svelte';
 
-  let { onjoin }: { onjoin: () => void } = $props();
+  let { onjoin, initialDaily = null }: { onjoin: () => void; initialDaily?: string | null } =
+    $props();
 
   const DEFAULT_CORNERS: Record<number, number[]> = {
     1: [0],
@@ -35,6 +36,9 @@
   let multiDevice = $state(false);
   // Solo: freies Spiel, Tages-Challenge oder Lernspiel (mit Erklärblasen).
   let soloMode = $state<'free' | 'daily' | 'learn'>(learn.enabled ? 'learn' : 'free');
+  // Aus einem geteilten Link kann auch ein vergangener Tag kommen — dann wird
+  // GENAU dieser gespielt, sonst ließe sich das Ergebnis nicht vergleichen.
+  const dailyDate = $derived(initialDaily ?? todayId());
   const daily = $derived(soloMode === 'daily');
   const solo = $derived(count === 1);
   // Die Spielerzeilen teilen sich ein Raster. Es muss genau so viele Spalten
@@ -47,6 +51,16 @@
   let error = $state('');
   let busy = $state(false);
   let showHelp = $state(false);
+
+  // Geteilter Tages-Challenge-Link: Solo mit genau diesem Tag vorwählen. Als
+  // Effekt und nicht als Anfangswert, weil iOS den Link gern im BEREITS
+  // offenen Tab öffnet — dann gibt es nur ein hashchange, kein Neuladen.
+  $effect(() => {
+    if (!initialDaily) return;
+    setCount(1);
+    soloMode = 'daily';
+    multiDevice = false;
+  });
 
   function toggleSet(id: string) {
     chosenSets = chosenSets.includes(id)
@@ -103,7 +117,7 @@
       game.start(
         buildGameConfig(currentPlayers(), activeSets(), useMonuments, !solo && cavernRule, {
           solo,
-          dailyId: solo && daily ? todayId() : undefined,
+          dailyId: solo && daily ? dailyDate : undefined,
           townHall: !solo && townHall,
           train
         })
@@ -225,7 +239,8 @@
               </button>
             </div>
             <p class="hint">
-              {#if soloMode === 'daily'}{t.soloDailyHint}{/if}
+              {#if soloMode === 'daily'}{t.soloDailyHint}{#if dailyDate !== todayId()}
+            <strong class="sharedDay">📅 {dailyDate}</strong>{/if}{/if}
               {#if soloMode === 'learn'}{t.learn.setupHint}{/if}
               <button class="link helpLink" onpointerup={() => (showHelp = true)}>
                 📖 {t.helpButton}
@@ -450,6 +465,7 @@
   /* Modus-Knöpfe teilen sich die Zeile gleichmäßig, statt den Titel zu quetschen */
   .seg.spread button { flex: 1 1 0; min-width: 0; font-size: 13px; padding: 8px 6px; }
 
+  .sharedDay { color: var(--accent); }
   .hint { margin: 0; font-size: 11px; color: var(--text-dim); line-height: 1.4; }
 
   .playerRow input {

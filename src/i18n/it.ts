@@ -109,6 +109,9 @@ export const it: Translation = {
   scoreTotal: 'Totale',
   scoreFed: 'capanne sfamate',
   winner: 'Vincitore',
+  shareButton: 'Condividi il risultato',
+  shareCopied: 'Copiato negli appunti',
+  shareFailed: 'Condivisione non riuscita',
   playAgain: 'Gioca ancora',
 
   aliceMode: 'Modalità Alice',

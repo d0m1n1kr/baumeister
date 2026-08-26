@@ -109,6 +109,9 @@ export const en: Translation = {
   scoreTotal: 'Total',
   scoreFed: 'fed cottages',
   winner: 'Winner',
+  shareButton: 'Share result',
+  shareCopied: 'Copied to clipboard',
+  shareFailed: 'Sharing did not work',
   playAgain: 'Play again',
 
   aliceMode: 'Alice mode',
