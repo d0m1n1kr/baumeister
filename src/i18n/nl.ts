@@ -216,6 +216,11 @@ export const nl: Translation = {
   soloDeckCount: (n: number) => `Trekstapel: ${n} kaarten`,
   soloDaily: 'Dagelijkse uitdaging',
   soloDailyHint: 'Vast dagtoeval — wereldwijd dezelfde kaarten en grondstoffen. Vergelijk je punten!',
+  terrain: {
+    river: 'Rivier',
+    mountain: 'Bergen',
+    lake: 'Meer'
+  },
   dailyPrevDay: 'Dag terug',
   dailyNextDay: 'Dag verder',
   dailyToday: 'vandaag',

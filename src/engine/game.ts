@@ -20,10 +20,10 @@ export function newGame(config: GameConfig): GameState {
     name: p.name,
     corner: p.corner,
     // Landpartie spielt auf 6×6, sonst klassisch 4×4
-    board: Array.from(
-      { length: (config.land ? 6 : BOARD_SIZE) ** 2 },
-      (): Square => ({})
-    ),
+    board: Array.from({ length: (config.land ? 6 : BOARD_SIZE) ** 2 }, (_, sq): Square => {
+      const t = config.terrain?.find((c) => c.square === sq);
+      return t ? { terrain: t.kind } : {};
+    }),
     monumentOptions: config.useMonuments ? [...config.monumentDeals[i]] : undefined,
     monument: undefined,
     pending: null,

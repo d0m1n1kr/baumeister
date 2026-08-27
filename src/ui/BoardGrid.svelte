@@ -1,6 +1,6 @@
 <script lang="ts">
   import type { Square } from '../engine/types';
-  import { catalog, artFor } from '../data';
+  import { catalog, artFor, artForTerrain } from '../data';
   import { CATEGORY_CSS, RESOURCE_CSS } from './helpers';
   import { t } from '../i18n';
 
@@ -110,6 +110,13 @@
 >
   {#each board as sq, i}
     {@const def = cardOf(sq)}
+    {#if sq.terrain}
+      <!-- Landschaft (Landpartie): unbebaubar — bewusst KEIN role/button und
+           kein data-square, damit weder Finger noch Tests hier ein Ziel sehen -->
+      <div class="cell terrainCell" title={t.terrain[sq.terrain]}>
+        <span class="tart">{@html artForTerrain(sq.terrain) ?? ''}</span>
+      </div>
+    {:else}
     <div
       class="cell"
       class:selected={selected.includes(i)}
@@ -153,6 +160,7 @@
       {#if sq.coin}<span class="coinMark">{t.coinIcon}</span>{/if}
       {#if seed === i && !sq.building}<span class="seedMark">🌱</span>{/if}
     </div>
+    {/if}
   {/each}
   {#each ghosts as g (g.id)}
     <span
@@ -263,6 +271,10 @@
   }
   .bart { width: 78%; height: 78%; }
   .bart :global(svg) { width: 100%; height: 100%; }
+  /* Landschaft füllt die ganze Zelle — sie ist Boden, kein Spielstein */
+  .terrainCell { overflow: hidden; }
+  .tart { width: 100%; height: 100%; display: block; }
+  .tart :global(svg) { width: 100%; height: 100%; display: block; border-radius: var(--r-sm); }
   .res {
     width: 46%;
     height: 46%;

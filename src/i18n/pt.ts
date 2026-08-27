@@ -216,6 +216,11 @@ export const pt: Translation = {
   soloDeckCount: (n: number) => `Baralho: ${n} cartas`,
   soloDaily: 'Desafio diário',
   soloDailyHint: 'Acaso fixo do dia — as mesmas cartas e recursos em todo o mundo. Compara os teus pontos!',
+  terrain: {
+    river: 'Rio',
+    mountain: 'Montanhas',
+    lake: 'Lago'
+  },
   dailyPrevDay: 'Dia anterior',
   dailyNextDay: 'Dia seguinte',
   dailyToday: 'hoje',

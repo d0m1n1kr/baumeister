@@ -276,6 +276,8 @@ export interface GameConfig {
   thSeed?: number;
   /** Landpartie: 6×6-Brett mit Landschaft (nur solo). */
   land?: boolean;
+  /** Landpartie: die Landschaftsfelder (aus dem Seed erzeugt, Teil des Setups). */
+  terrain?: { square: number; kind: TerrainKind }[];
   /** Tages-Challenge: Datum des festen Seeds (z. B. „2026-08-23"). */
   dailyId?: string;
   /** Eindeutige Partie-Kennung (Bestenliste: jede Partie zählt nur einmal). */

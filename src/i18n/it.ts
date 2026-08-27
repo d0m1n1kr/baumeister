@@ -216,6 +216,11 @@ export const it: Translation = {
   soloDeckCount: (n: number) => `Mazzo: ${n} carte`,
   soloDaily: 'Sfida del giorno',
   soloDailyHint: 'Caso fisso del giorno — le stesse carte e risorse in tutto il mondo. Confronta i punteggi!',
+  terrain: {
+    river: 'Fiume',
+    mountain: 'Montagne',
+    lake: 'Lago'
+  },
   dailyPrevDay: 'Giorno precedente',
   dailyNextDay: 'Giorno successivo',
   dailyToday: 'oggi',

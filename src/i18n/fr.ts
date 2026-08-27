@@ -216,6 +216,11 @@ export const fr: Translation = {
   soloDeckCount: (n: number) => `Pioche : ${n} cartes`,
   soloDaily: 'Défi du jour',
   soloDailyHint: 'Aléa fixe du jour — les mêmes cartes et ressources partout dans le monde. Compare tes scores !',
+  terrain: {
+    river: 'Rivière',
+    mountain: 'Montagnes',
+    lake: 'Lac'
+  },
   dailyPrevDay: 'Jour précédent',
   dailyNextDay: 'Jour suivant',
   dailyToday: 'aujourd’hui',
