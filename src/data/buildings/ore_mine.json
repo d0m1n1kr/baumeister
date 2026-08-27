@@ -1,0 +1,61 @@
+{
+  "id": "ore_mine",
+  "set": "landpartie",
+  "kind": "building",
+  "category": "factory",
+  "color": "black",
+  "name": {
+    "de": "Erzmine",
+    "en": "Ore Mine"
+  },
+  "text": {
+    "de": "3 Punkte je angrenzendem Berg-Feld.",
+    "en": "3 points per adjacent mountain square."
+  },
+  "pattern": [
+    [
+      "stone",
+      null
+    ],
+    [
+      "wood",
+      "stone"
+    ]
+  ],
+  "features": [
+    "adjacency"
+  ],
+  "scoring": {
+    "type": "perAdjacentTerrain",
+    "terrains": [
+      "mountain"
+    ],
+    "vpEach": 3
+  },
+  "effects": [],
+  "art": "ore_mine.svg",
+  "themes": {
+    "mars": {
+      "name": {
+        "de": "Bohrmine",
+        "en": "Drill Mine"
+      },
+      "text": {
+        "de": "3 Punkte je angrenzendem Kraterfeld.",
+        "en": "3 points per adjacent crater-field square."
+      },
+      "art": "mars_ore_mine.svg"
+    },
+    "fantasy": {
+      "name": {
+        "de": "Zwergenstollen",
+        "en": "Dwarven Digs"
+      },
+      "text": {
+        "de": "3 Punkte je angrenzendem Drachenfels-Feld.",
+        "en": "3 points per adjacent dragonspire square."
+      },
+      "art": "fantasy_ore_mine.svg"
+    }
+  }
+}

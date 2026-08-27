@@ -17,14 +17,14 @@ const FORBIDDEN: Record<string, { de: RegExp[]; en: RegExp[] }> = {
   }
 };
 
-/** Karten, die ein Theme abdecken muss (Basisspiel, interne, Fortune). */
+/** Karten, die ein Theme abdecken muss (Basisspiel, interne, Fortune, Landpartie). */
 const themed = allCards.filter(
-  (c) => c.set === 'base' || c.set === 'internal' || c.set === 'fortune'
+  (c) => c.set === 'base' || c.set === 'internal' || c.set === 'fortune' || c.set === 'landpartie'
 );
 
 describe.each(SKINNED_THEMES)('Theme "%s": Vollständigkeit', (id) => {
   it('deckt alle Karten ab (Name, Text, vorhandenes Artwork — de+en)', () => {
-    expect(themed.length).toBe(64);
+    expect(themed.length).toBe(70);
     for (const card of themed) {
       const th = card.themes?.[id];
       expect(th, `${card.id}: themes.${id} fehlt`).toBeTruthy();

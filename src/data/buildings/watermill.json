@@ -1,0 +1,58 @@
+{
+  "id": "watermill",
+  "set": "landpartie",
+  "kind": "building",
+  "category": "well",
+  "color": "grey",
+  "name": {
+    "de": "Wassermühle",
+    "en": "Watermill"
+  },
+  "text": {
+    "de": "4 Punkte, wenn die Wassermühle an den Fluss grenzt.",
+    "en": "4 points if the Watermill is adjacent to the river."
+  },
+  "pattern": [
+    [
+      "brick",
+      "wood",
+      "brick"
+    ]
+  ],
+  "features": [
+    "adjacency"
+  ],
+  "scoring": {
+    "type": "ifAdjacentTerrain",
+    "terrains": [
+      "river"
+    ],
+    "vp": 4
+  },
+  "effects": [],
+  "art": "watermill.svg",
+  "themes": {
+    "mars": {
+      "name": {
+        "de": "Staubturbine",
+        "en": "Dust Turbine"
+      },
+      "text": {
+        "de": "4 Punkte, wenn die Staubturbine an den Canyon grenzt.",
+        "en": "4 points if the Dust Turbine is adjacent to the canyon."
+      },
+      "art": "mars_watermill.svg"
+    },
+    "fantasy": {
+      "name": {
+        "de": "Nebelmühle",
+        "en": "Mistmill"
+      },
+      "text": {
+        "de": "4 Punkte, wenn die Nebelmühle an den Nebelfluss grenzt.",
+        "en": "4 points if the Mistmill is adjacent to the mistflow."
+      },
+      "art": "fantasy_watermill.svg"
+    }
+  }
+}

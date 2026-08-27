@@ -1,0 +1,57 @@
+{
+  "id": "fishermans_hut",
+  "set": "landpartie",
+  "kind": "building",
+  "category": "food",
+  "color": "red",
+  "name": {
+    "de": "Fischerhütte",
+    "en": "Fisherman's Hut"
+  },
+  "text": {
+    "de": "2 Punkte je angrenzendem See-Feld.",
+    "en": "2 points per adjacent lake square."
+  },
+  "pattern": [
+    [
+      "wood",
+      "glass"
+    ]
+  ],
+  "features": [
+    "adjacency"
+  ],
+  "scoring": {
+    "type": "perAdjacentTerrain",
+    "terrains": [
+      "lake"
+    ],
+    "vpEach": 2
+  },
+  "effects": [],
+  "art": "fishermans_hut.svg",
+  "themes": {
+    "mars": {
+      "name": {
+        "de": "Eisbohrstation",
+        "en": "Ice Drill"
+      },
+      "text": {
+        "de": "2 Punkte je angrenzendem Eissee-Feld.",
+        "en": "2 points per adjacent ice-lake square."
+      },
+      "art": "mars_fishermans_hut.svg"
+    },
+    "fantasy": {
+      "name": {
+        "de": "Fischerkate",
+        "en": "Fisher's Croft"
+      },
+      "text": {
+        "de": "2 Punkte je angrenzendem Zaubersee-Feld.",
+        "en": "2 points per adjacent spelllake square."
+      },
+      "art": "fantasy_fishermans_hut.svg"
+    }
+  }
+}

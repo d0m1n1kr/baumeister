@@ -15,7 +15,7 @@ und Effekt-Bausteine verwenden.
 | `category` | `cottage`, `food`, `well`, `chapel`, `theater`, `tavern`, `factory`, `monument` | Kategorie (pro Partie wird je Nicht-Monument-Kategorie 1 Karte gezogen) |
 | `color` | `blue`, `red`, `grey`, `orange`, `yellow`, `green`, `black`, `pink` | Farbgruppe (für Wertungs-Selektoren) |
 | `name`, `text` | `{ de: string, en?: string }` | Name und Regeltext (i18n) |
-| `pattern` | `(Ressource \| null)[][]` | Baumuster als Raster; Ressourcen: `wood`, `brick`, `stone`, `wheat`, `glass`. Rotation & Spiegelung erledigt die Engine. Max. 4×4. |
+| `pattern` | `(Ressource \| null)[][]` | Baumuster als Raster; Ressourcen: `wood`, `brick`, `stone`, `wheat`, `glass`. Rotation & Spiegelung erledigt die Engine. Max. 4×4 (das Landpartie-Brett ist 6×6, Muster bleiben klein). |
 | `features` | string[] | Symbole der Mini-Karte, siehe unten |
 | `feeding` | optional | Nur rote Karten: `{ "mode": "anywhere"\|"surrounding8"\|"rowAndColumn"\|"contiguousGroup"\|"rowOrColumnPerCoin"\|"adjacentPlusPerCoinPer2", "count"?: n }` |
 | `unverified` | optional bool | Kartentext/-muster nicht aus Primärquellen belegt (⚠ auf der Mini-Karte) |
@@ -40,6 +40,8 @@ und Effekt-Bausteine verwenden.
 - `ifAloneInRowAndCol` — `{ "target": SEL, "vp": n }`
 - `perOwnCountVsRightNeighbor` — `{ "baseEach": n, "bonusEach": n }`
 - `perStoredResource` — `{ "vpEach": n }` (z. B. Lagerhaus: −1)
+- `perAdjacentTerrain` — `{ "terrains": ["river"|"mountain"|"lake"…], "vpEach": n }` (Landpartie)
+- `ifAdjacentTerrain` — `{ "terrains": […], "vp": n }` (Landpartie)
 - `handler` — `{ "handler": "archive"\|"mandras"\|"skyBaths"\|"silva"\|"shrine"\|"starloom"\|"schoolhouse"\|"eraflage", "vp"?: n }`
 
 **Selektoren (SEL):** `"cottage"` (Hütten-Gebäude; Schloss Barrett zählt doppelt),
@@ -63,6 +65,9 @@ brauchen einen neuen Effekt-Handler dort.
 
 Sets werden in `src/data/sets.ts` registriert; Karten tragen das passende `set`-Feld
 und mischen sich beim Setup in die Kategorie-/Monument-Pools (`randomSetup`).
+Zwei Pseudo-Sets laufen daran vorbei: `internal` (Bahnhof, liegt im
+Eisenbahn-Modus als 8. Karte aus) und `landpartie` (Anlieger-Karten, davon
+werden im Landpartie-Modus 3 als Karten 8–10 gezogen; nie in Kategorie-Pools).
 Systeme: `coins` (Fortune: 1 Münze bei 2+ Bauten pro Runde, max. 4, Tausch gegen
 1 Münze außer als Baumeister, 1 SP je Münze am Ende) und `trees` (Tiny Trees:
 Samen-Phase, Gratis-Material beim Überbauen, Baum = 2 SP als einziges unbebautes Feld).

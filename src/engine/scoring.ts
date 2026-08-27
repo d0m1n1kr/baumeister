@@ -385,6 +385,24 @@ function scoreWithFeeding(
         addPoints(b.card, sum * spec.vpEach);
         break;
       }
+      case 'perAdjacentTerrain': {
+        // Landpartie: das Gebäude schaut auf die Landschaft nebenan
+        let sum = 0;
+        for (const n of neighbors4(b.square, size)) {
+          const tk = p.board[n].terrain;
+          if (tk && spec.terrains.includes(tk)) sum++;
+        }
+        addPoints(b.card, sum * spec.vpEach);
+        break;
+      }
+      case 'ifAdjacentTerrain': {
+        const hit = neighbors4(b.square, size).some((n) => {
+          const tk = p.board[n].terrain;
+          return !!tk && spec.terrains.includes(tk);
+        });
+        if (hit) addPoints(b.card, spec.vp);
+        break;
+      }
       case 'perInZone': {
         const zone = spec.zone === 'corners' ? cornerSquares(size) : centerSquares(size);
         let sum = 0;

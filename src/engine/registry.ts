@@ -1,6 +1,7 @@
 // Kartenkatalog: Validierung der JSON-Assets + zufälliges Partie-Setup.
 
 import type { CardDef, Catalog, Category, GameConfig, Resource } from './types';
+import { generateTerrain } from './terrain';
 
 export const CATEGORY_ORDER: Category[] = [
   'cottage', 'food', 'well', 'chapel', 'theater', 'tavern', 'factory'
@@ -98,7 +99,8 @@ export function randomSetup(
   systems: { coins?: boolean; trees?: boolean; cavern?: boolean } = {},
   solo = false,
   townHall = false,
-  train = false
+  train = false,
+  land = false
 ): GameConfig {
   // Spielerreihenfolge = Sitzreihenfolge im Uhrzeigersinn, damit der
   // Baumeister im Uhrzeigersinn weiterwandert.
@@ -133,7 +135,7 @@ export function randomSetup(
     for (let i = 0; i < players.length; i++) monumentDeals.push([]);
   }
 
-  return {
+  const config: GameConfig = {
     players,
     activeCards,
     monumentDeals,
@@ -163,6 +165,32 @@ export function randomSetup(
       train
     }
   };
+  // Landpartie: Landschaft würfeln und 3 Anlieger-Karten dazulegen. Bewusst
+  // NACH allen anderen Zügen: Der klassische Daily zieht in identischer
+  // Reihenfolge und bleibt byte-gleich (dailyGolden.test.ts wacht darüber).
+  if (land) {
+    config.land = true;
+    config.terrain = generateTerrain(rng);
+    const pool = shuffled(
+      Object.values(catalog).filter((d) => d.set === 'landpartie').map((d) => d.id),
+      rng
+    );
+    if (pool.length < 3) throw new AssetError('Zu wenige Landpartie-Karten');
+    config.activeCards = [...config.activeCards, ...pool.slice(0, 3).sort()];
+  }
+  return config;
+}
+
+/** Landpartie-Rangtabelle: gleiche Ränge, höhere Schwellen — auf ~25
+ *  bebaubaren Feldern (statt 16) fallen mehr Punkte an. Kein offizieller
+ *  Maßstab, kalibriert an Probepartien. */
+export function landRankIndex(score: number): number {
+  if (score >= 60) return 0;
+  if (score >= 50) return 1;
+  if (score >= 40) return 2;
+  if (score >= 28) return 3;
+  if (score >= 15) return 4;
+  return 5;
 }
 
 /** Offizielle Solo-Rangtabelle: Index (0 = bester Rang) für die i18n-Anzeige. */
@@ -187,9 +215,12 @@ export function soloRank(score: number): string {
 
 /** Deterministischer Seed für die Tages-Challenge: gleiches Datum = gleiche
  *  Karten und gleiches Deck, weltweit. */
-export function dailySeed(dailyId: string): number {
+export function dailySeed(dailyId: string, variant = ''): number {
   let h = 2166136261;
-  for (const c of `tiny-towns-${dailyId}`) {
+  // variant ('land') trennt die Seed-Stämme: Die Landpartie desselben Tages
+  // bekommt eine ANDERE Auslage als die klassische Challenge — sonst wäre die
+  // eine ein Spoiler der anderen.
+  for (const c of `tiny-towns-${variant}${dailyId}`) {
     h ^= c.charCodeAt(0);
     h = Math.imul(h, 16777619);
   }

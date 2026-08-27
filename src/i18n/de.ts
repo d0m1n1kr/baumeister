@@ -216,6 +216,10 @@ export const de = {
   soloDeckCount: (n: number) => `Nachziehstapel: ${n} Karten`,
   soloDaily: 'Tages-Challenge',
   soloDailyHint: 'Fester Zufall des Tages — weltweit dieselben Karten und Materialien. Vergleiche deine Punkte!',
+  soloLand: 'Landpartie (6×6)',
+  soloLandHint: 'Größeres Brett mit Fluss, Bergen und See — unbebaubar, aber Anlieger-Karten bringen dort Punkte.',
+  soloLandNoSets: 'Die Landpartie spielt pur: Basisspiel plus Anlieger-Karten, ohne Erweiterungen.',
+  landHighscores: 'Bestenliste Landpartie (dieses Gerät)',
   terrain: {
     river: 'Fluss',
     mountain: 'Berge',

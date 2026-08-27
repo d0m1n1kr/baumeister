@@ -3,7 +3,7 @@
   import { session } from '../net/session.svelte';
   import { catalog } from '../data';
   import { scoreGame } from '../engine/scoring';
-  import { soloRankIndex } from '../engine/registry';
+  import { landRankIndex, soloRankIndex } from '../engine/registry';
   import { addHighscore, highscores, type HighscoreEntry } from '../store/highscore';
   import { cardName, t } from '../i18n';
   import { learn } from './learn.svelte';
@@ -37,8 +37,10 @@
 
   // Solo: Rang bestimmen und Ergebnis genau EINMAL in die Bestenliste schreiben
   const solo = $derived(!!st.config.solo);
+  const land = $derived(!!st.config.land);
   const soloScore = $derived(scores[0]?.total ?? 0);
-  const rank = $derived(t.soloRanks[soloRankIndex(soloScore)]);
+  // Landpartie: gleiche Rangnamen, eigene Schwellen (mehr bebaubare Felder)
+  const rank = $derived(t.soloRanks[(land ? landRankIndex : soloRankIndex)(soloScore)]);
   let place = $state<number | null>(null);
   let list = $state<HighscoreEntry[]>([]);
   $effect(() => {
@@ -50,14 +52,15 @@
           score: soloScore,
           rank,
           date: new Date().toISOString().slice(0, 10),
-          dailyId: st.config.dailyId
+          dailyId: st.config.dailyId,
+          mode: land ? 'land' : undefined
         });
         localStorage.setItem('tinytowns.hsRecorded', id);
       }
     } catch {
       // privater Modus — dann ohne Bestenliste
     }
-    list = highscores();
+    list = highscores(land ? 'land' : 'classic');
   });
 
   // Teilen: Rang, Punkte und — bei der Tages-Challenge — ein Link auf genau
@@ -86,10 +89,13 @@
     sharing = true;
     try {
       const href = location.href;
-      const url = st.config.dailyId ? dailyUrl(st.config.dailyId, href) : href;
-      const subtitle = st.config.dailyId ? `${t.soloDaily} ${st.config.dailyId}` : '';
+      const url = st.config.dailyId ? dailyUrl(st.config.dailyId, href, land) : href;
+      const modeTag = land ? ` — 🏞 ${t.soloLand}` : '';
+      const subtitle =
+        (st.config.dailyId ? `${t.soloDaily} ${st.config.dailyId}` : '') +
+        (land ? (st.config.dailyId ? ' · ' : '') + `🏞 ${t.soloLand}` : '');
       const text = shareText({
-        title: t.appTitle,
+        title: t.appTitle + modeTag,
         rank,
         score: soloScore,
         points: t.points,
@@ -190,7 +196,7 @@
   </div>
   {#if solo && list.length > 0}
     <div class="hs">
-      <h2>{t.soloHighscores}</h2>
+      <h2>{land ? '🏞 ' : ''}{land ? t.landHighscores : t.soloHighscores}</h2>
       <ol>
         {#each list.slice(0, 5) as e, i}
           <li class:hit={place === i + 1}>

@@ -1,0 +1,58 @@
+{
+  "id": "boathouse",
+  "set": "landpartie",
+  "kind": "building",
+  "category": "tavern",
+  "color": "green",
+  "name": {
+    "de": "Bootshaus",
+    "en": "Boathouse"
+  },
+  "text": {
+    "de": "3 Punkte, wenn das Bootshaus an See oder Fluss grenzt.",
+    "en": "3 points if the Boathouse is adjacent to the lake or the river."
+  },
+  "pattern": [
+    [
+      "wood",
+      "brick"
+    ]
+  ],
+  "features": [
+    "adjacency"
+  ],
+  "scoring": {
+    "type": "ifAdjacentTerrain",
+    "terrains": [
+      "lake",
+      "river"
+    ],
+    "vp": 3
+  },
+  "effects": [],
+  "art": "boathouse.svg",
+  "themes": {
+    "mars": {
+      "name": {
+        "de": "Schleusendock",
+        "en": "Airlock Dock"
+      },
+      "text": {
+        "de": "3 Punkte, wenn das Schleusendock an Eissee oder Canyon grenzt.",
+        "en": "3 points if the Airlock Dock is adjacent to the ice lake or the canyon."
+      },
+      "art": "mars_boathouse.svg"
+    },
+    "fantasy": {
+      "name": {
+        "de": "Kahnschuppen",
+        "en": "Skiff Shed"
+      },
+      "text": {
+        "de": "3 Punkte, wenn der Kahnschuppen an Zaubersee oder Nebelfluss grenzt.",
+        "en": "3 points if the Skiff Shed is adjacent to the spelllake or the mistflow."
+      },
+      "art": "fantasy_boathouse.svg"
+    }
+  }
+}
