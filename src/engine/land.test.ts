@@ -4,18 +4,29 @@ import { describe, expect, it } from 'vitest';
 import { apply, newGame } from './game';
 import { scorePlayer } from './scoring';
 import { catalog, config, put, res } from './test-helpers';
+import { LAND_COLS } from './types';
 import type { GameState } from './types';
 
-/** Solo-Landpartie: 6×6 mit fester kleiner Landschaft für die Tests. */
+const FELDER = 5 * 6;
+/** Feld aus Zeile/Spalte — macht die Indizes im Test lesbar (5 Spalten!). */
+const at = (row: number, col: number) => row * LAND_COLS + col;
+
+/** Solo-Landpartie: 5×6 mit fester kleiner Landschaft für die Tests.
+ *  Fluss senkrecht in Spalte 2, Berg unten links, See oben rechts. */
+const FLUSS_OBEN = at(2, 2); // 12
+const FLUSS_UNTEN = at(3, 2); // 17
+const BERG = at(4, 0); // 20
+const SEE = at(0, 4); // 4
+
 function landGame(): GameState {
   const cfg = config(1, undefined, false);
   cfg.solo = true;
   cfg.land = true;
   cfg.terrain = [
-    { square: 14, kind: 'river' },
-    { square: 15, kind: 'river' },
-    { square: 21, kind: 'mountain' },
-    { square: 28, kind: 'lake' }
+    { square: FLUSS_OBEN, kind: 'river' },
+    { square: FLUSS_UNTEN, kind: 'river' },
+    { square: BERG, kind: 'mountain' },
+    { square: SEE, kind: 'lake' }
   ];
   const s = newGame(cfg);
   s.phase = { t: 'round', resource: 'wood' };
@@ -23,67 +34,73 @@ function landGame(): GameState {
 }
 
 describe('Landpartie: Brett und Landschaft', () => {
-  it('newGame legt die Landschaft aufs 36er-Brett', () => {
+  it('newGame legt die Landschaft aufs 5×6-Brett', () => {
     const s = landGame();
-    expect(s.players[0].board).toHaveLength(36);
-    expect(s.players[0].board[14].terrain).toBe('river');
-    expect(s.players[0].board[21].terrain).toBe('mountain');
+    expect(s.players[0].board).toHaveLength(FELDER);
+    expect(FELDER).toBe(30);
+    expect(s.players[0].board[FLUSS_OBEN].terrain).toBe('river');
+    expect(s.players[0].board[BERG].terrain).toBe('mountain');
     expect(s.players[0].board[0].terrain).toBeUndefined();
   });
 
   it('Material darf nicht auf Landschaft', () => {
     const s = landGame();
     s.players[0].pending = 'wood';
-    expect(() => apply(s, { t: 'placeResource', player: 0, square: 14 }, catalog))
+    expect(() => apply(s, { t: 'placeResource', player: 0, square: FLUSS_OBEN }, catalog))
       .toThrowError('Feld ist belegt');
     // daneben geht es
-    const ok = apply(s, { t: 'placeResource', player: 0, square: 13 }, catalog);
-    expect(ok.players[0].board[13].resource).toBe('wood');
+    const ok = apply(s, { t: 'placeResource', player: 0, square: at(2, 3) }, catalog);
+    expect(ok.players[0].board[at(2, 3)].resource).toBe('wood');
   });
 
   it('Material darf nicht AUF Landschaft verschoben werden', () => {
     const s = landGame();
     s.players[0].pending = 'wood';
     // moveResource verschiebt das zuletzt platzierte Material (placedSquare)
-    const placed = apply(s, { t: 'placeResource', player: 0, square: 13 }, catalog);
-    expect(() => apply(placed, { t: 'moveResource', player: 0, square: 15 }, catalog))
+    const placed = apply(s, { t: 'placeResource', player: 0, square: at(2, 3) }, catalog);
+    expect(() => apply(placed, { t: 'moveResource', player: 0, square: FLUSS_UNTEN }, catalog))
       .toThrowError('Feld ist belegt');
-    const moved = apply(placed, { t: 'moveResource', player: 0, square: 20 }, catalog);
-    expect(moved.players[0].board[20].resource).toBe('wood');
+    const moved = apply(placed, { t: 'moveResource', player: 0, square: at(3, 3) }, catalog);
+    expect(moved.players[0].board[at(3, 3)].resource).toBe('wood');
   });
 
   it('eine Auswahl mit Landschaftsfeld matcht nie ein Muster', () => {
-    // Hütte: [[null, wheat], [brick, glass]]. Auf 6×6 liegt der Block
-    // 8/13/14 vertikal-benachbart (8=(1,2), 13=(2,1), 14=(2,2)) — 14 ist Fluss.
+    // Hütte: [[null, wheat], [brick, glass]] — der Winkel eines 2×2-Blocks.
+    // Hier liegt seine untere rechte Ecke auf dem Fluss (2,2).
     const s = landGame();
-    res(s, 0, 8, 'wheat');
-    res(s, 0, 13, 'brick');
-    // Auswahl mit dem Terrainfeld 14: kein Material darauf → Muster passt nie
+    res(s, 0, at(1, 2), 'wheat');
+    res(s, 0, at(2, 1), 'brick');
     expect(() =>
-      apply(s, { t: 'build', player: 0, squares: [8, 13, 14], card: 'cottage', target: 8 }, catalog)
+      apply(
+        s,
+        { t: 'build', player: 0, squares: [at(1, 2), at(2, 1), FLUSS_OBEN], card: 'cottage', target: at(1, 2) },
+        catalog
+      )
     ).toThrowError('Auswahl entspricht nicht dem Baumuster');
-    // Zur Gegenprobe derselbe Winkel ohne Terrain: 2=(0,2), 7=(1,1), 8=(1,2)
+    // Gegenprobe: derselbe Winkel eine Zeile höher, ohne Landschaft
     const clean = landGame();
-    res(clean, 0, 2, 'wheat');
-    res(clean, 0, 7, 'brick');
-    res(clean, 0, 8, 'glass');
+    res(clean, 0, at(0, 1), 'wheat');
+    res(clean, 0, at(1, 0), 'brick');
+    res(clean, 0, at(1, 1), 'glass');
     const built = apply(
-      clean, { t: 'build', player: 0, squares: [2, 7, 8], card: 'cottage', target: 8 }, catalog
+      clean,
+      { t: 'build', player: 0, squares: [at(0, 1), at(1, 0), at(1, 1)], card: 'cottage', target: at(1, 1) },
+      catalog
     );
-    expect(built.players[0].board[8].building?.card).toBe('cottage');
+    expect(built.players[0].board[at(1, 1)].building?.card).toBe('cottage');
   });
 
   it('Leerfeld-Strafe ignoriert Landschaft', () => {
     const s = landGame();
     const score = scorePlayer(s, 0, catalog);
-    // 36 Felder − 4 Landschaft = 32 leere; Landschaft kostet nichts
-    expect(score.emptySquares).toBe(32);
-    expect(score.emptyPenalty).toBe(-32);
+    // 30 Felder − 4 Landschaft = 26 leere; Landschaft kostet nichts
+    expect(score.emptySquares).toBe(FELDER - 4);
+    expect(score.emptyPenalty).toBe(-(FELDER - 4));
   });
 
   it('Stadt fertig: Landschaft zählt nicht als freies Feld', () => {
     const s = landGame();
-    for (let i = 0; i < 36; i++) {
+    for (let i = 0; i < FELDER; i++) {
       if (!s.players[0].board[i].terrain) put(s, 0, i, 'cottage');
     }
     const done = apply(s, { t: 'declareComplete', player: 0 }, catalog);
@@ -96,34 +113,35 @@ describe('Landpartie: Brett und Landschaft', () => {
     const cfg = config(1, ['cottage', 'farm', 'well', 'chapel', 'theater', 'tavern', 'shed'], false);
     cfg.solo = true;
     cfg.land = true;
-    cfg.terrain = [{ square: 14, kind: 'river' }];
+    cfg.terrain = [{ square: FLUSS_OBEN, kind: 'river' }];
     const s = newGame(cfg);
     s.phase = { t: 'round', resource: 'wood' };
     expect((catalog['shed'].effects ?? []).includes('buildAnywhereSelf')).toBe(true);
     res(s, 0, 0, 'wood');
     res(s, 0, 1, 'stone');
     expect(() =>
-      apply(s, { t: 'build', player: 0, squares: [0, 1], card: 'shed', target: 14 }, catalog)
+      apply(s, { t: 'build', player: 0, squares: [0, 1], card: 'shed', target: FLUSS_OBEN }, catalog)
     ).toThrowError('Bauplatz ist nicht frei');
     // auf ein normales freies Feld geht es
-    const ok = apply(s, { t: 'build', player: 0, squares: [0, 1], card: 'shed', target: 20 }, catalog);
-    expect(ok.players[0].board[20].building?.card).toBe('shed');
+    const ziel = at(4, 4);
+    const ok = apply(s, { t: 'build', player: 0, squares: [0, 1], card: 'shed', target: ziel }, catalog);
+    expect(ok.players[0].board[ziel].building?.card).toBe('shed');
   });
 });
 
 describe('Landpartie: Wertung bleibt schnell', () => {
-  it('volles 6×6 mit vielen Hütten und Bauernhöfen wertet unter 200 ms', () => {
+  it('volles 5×6 mit vielen Hütten und Bauernhöfen wertet unter 200 ms', () => {
     const cfg = config(1, undefined, false);
     cfg.solo = true;
     cfg.land = true;
     cfg.terrain = [
-      { square: 14, kind: 'river' }, { square: 15, kind: 'river' },
-      { square: 21, kind: 'mountain' }, { square: 28, kind: 'lake' }
+      { square: FLUSS_OBEN, kind: 'river' }, { square: FLUSS_UNTEN, kind: 'river' },
+      { square: BERG, kind: 'mountain' }, { square: SEE, kind: 'lake' }
     ];
     const s = newGame(cfg);
     // Schlimmster Fall für den Fütterungs-Resolver: viele Hütten, mehrere Farmen
     let i = 0;
-    for (let sq = 0; sq < 36; sq++) {
+    for (let sq = 0; sq < FELDER; sq++) {
       if (s.players[0].board[sq].terrain) continue;
       put(s, 0, sq, i % 4 === 3 ? 'farm' : 'cottage');
       i++;
@@ -176,14 +194,15 @@ describe('Landpartie: Setup und Wertungs-Bausteine', () => {
     const cfg = config(1, undefined, false);
     cfg.solo = true;
     cfg.land = true;
-    // Erzmine auf Feld 8: Nachbarn 2 (oben), 7 (links), 9 (rechts), 14 (unten)
+    // Erzmine mittig auf (1,2); ihre vier Nachbarn sind (0,2), (2,2), (1,1), (1,3)
+    const mine = at(1, 2);
     cfg.terrain = [
-      { square: 2, kind: 'mountain' },
-      { square: 7, kind: 'mountain' },
-      { square: 9, kind: 'lake' }
+      { square: at(0, 2), kind: 'mountain' },
+      { square: at(1, 1), kind: 'mountain' },
+      { square: at(1, 3), kind: 'lake' }
     ];
     const s = newGame(cfg);
-    put(s, 0, 8, 'ore_mine');
+    put(s, 0, mine, 'ore_mine');
     const score = scorePlayer(s, 0, catalog);
     const line = score.lines.find((l) => l.card === 'ore_mine')!;
     expect(line.points).toBe(6); // 2 Berge × 3, der See zählt nicht
@@ -193,10 +212,11 @@ describe('Landpartie: Setup und Wertungs-Bausteine', () => {
     const cfg = config(1, undefined, false);
     cfg.solo = true;
     cfg.land = true;
-    cfg.terrain = [{ square: 9, kind: 'lake' }, { square: 30, kind: 'river' }];
+    // See oben rechts, Fluss ganz unten links — bewusst weit auseinander
+    cfg.terrain = [{ square: at(0, 4), kind: 'lake' }, { square: at(5, 0), kind: 'river' }];
     const s = newGame(cfg);
-    put(s, 0, 8, 'boathouse');   // grenzt an den See (9)
-    put(s, 0, 5, 'watermill');   // grenzt an nichts Passendes
+    put(s, 0, at(1, 4), 'boathouse'); // direkt unter dem See
+    put(s, 0, at(2, 2), 'watermill'); // grenzt an nichts Passendes
     const score = scorePlayer(s, 0, catalog);
     expect(score.lines.find((l) => l.card === 'boathouse')!.points).toBe(3);
     expect(score.lines.find((l) => l.card === 'watermill')!.points).toBe(0);

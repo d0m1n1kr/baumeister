@@ -1,5 +1,6 @@
 <script lang="ts">
   import type { Square } from '../engine/types';
+  import { dimsOf } from '../engine/types';
   import { catalog, artFor, artForTerrain } from '../data';
   import { CATEGORY_CSS, RESOURCE_CSS } from './helpers';
   import { t } from '../i18n';
@@ -47,8 +48,9 @@
   // Reload) gibt es kein Vorher-Brett, also auch keine Animation.
   const reduceMotion =
     typeof matchMedia !== 'undefined' && matchMedia('(prefers-reduced-motion: reduce)').matches;
-  // Kantenlänge des KONKRETEN Bretts: klassisch 4, Landpartie 6.
-  const size = $derived(Math.round(Math.sqrt(board.length)));
+  // Maße des KONKRETEN Bretts: klassisch 4×4, Landpartie 5×6 (hochkant).
+  // Aus der Feldzahl abgeleitet — dieselbe Quelle wie in der Engine (dimsOf).
+  const dims = $derived(dimsOf(board));
 
   let prevBoard: { card: string | null; resource: string | null }[] | null = null;
   let fresh = $state<Record<number, 'build' | 'monument'>>({});
@@ -85,10 +87,10 @@
       if (lost && !snap[i].resource && !builtAt.includes(i)) {
         spawned.push({
           id: ghostSeq++,
-          col: i % size,
-          row: Math.floor(i / size),
-          dx: (target % size - i % size) * 100,
-          dy: (Math.floor(target / size) - Math.floor(i / size)) * 100,
+          col: i % dims.cols,
+          row: Math.floor(i / dims.cols),
+          dx: ((target % dims.cols) - (i % dims.cols)) * 100,
+          dy: (Math.floor(target / dims.cols) - Math.floor(i / dims.cols)) * 100,
           color: RESOURCE_CSS[lost as keyof typeof RESOURCE_CSS]
         });
       }
@@ -104,7 +106,7 @@
 
 <div
   class="board"
-  style="--n: {size}"
+  style="--cols: {dims.cols}; --rows: {dims.rows}"
   data-track={trackEdge ? player : undefined}
   data-track-edge={trackEdge ?? undefined}
 >
@@ -165,7 +167,7 @@
   {#each ghosts as g (g.id)}
     <span
       class="ghost"
-      style="left: {(g.col * 100) / size}%; top: {(g.row * 100) / size}%; --dx: {g.dx}%; --dy: {g.dy}%"
+      style="left: {(g.col * 100) / dims.cols}%; top: {(g.row * 100) / dims.rows}%; --dx: {g.dx}%; --dy: {g.dy}%"
     >
       <span class="ghostDot" style="background: {g.color}"></span>
     </span>
@@ -176,15 +178,17 @@
   .board {
     position: relative; /* Bezugsrahmen für die fliegenden Material-Geister */
     display: grid;
-    grid-template-columns: repeat(var(--n, 4), 1fr);
-    grid-template-rows: repeat(var(--n, 4), 1fr);
+    grid-template-columns: repeat(var(--cols, 4), 1fr);
+    grid-template-rows: repeat(var(--rows, 4), 1fr);
     gap: 4px;
     background: var(--board-bg);
     border: 3px solid var(--board-border);
     border-radius: var(--r-md);
     padding: 5px;
     width: 100%;
-    aspect-ratio: 1;
+    /* Nicht mehr zwingend quadratisch: Die Landpartie ist 5 breit und 6 hoch,
+       die Zellen sollen trotzdem Quadrate bleiben. */
+    aspect-ratio: var(--cols, 4) / var(--rows, 4);
     touch-action: none;
   }
   .cell {
@@ -237,8 +241,8 @@
      exakte Zellenkoordinaten. */
   .ghost {
     position: absolute;
-    width: calc(100% / var(--n, 4));
-    height: calc(100% / var(--n, 4));
+    width: calc(100% / var(--cols, 4));
+    height: calc(100% / var(--rows, 4));
     display: grid;
     place-items: center;
     pointer-events: none;

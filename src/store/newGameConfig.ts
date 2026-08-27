@@ -17,7 +17,7 @@ export function buildGameConfig(
     dailyId?: string;
     townHall?: boolean;
     train?: boolean;
-    /** Landpartie: 6×6 mit Landschaft und Anlieger-Karten (nur solo). */
+    /** Landpartie: 5×6 mit Landschaft und Anlieger-Karten (nur solo). */
     land?: boolean;
   } = {}
 ): GameConfig {

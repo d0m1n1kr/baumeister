@@ -4,7 +4,7 @@
 // vorbeigeht (Bahnhof-Strecke, Münzkosten und Co. sind mitgeprüft).
 
 import { buildCell, cachedOrientations } from './patterns';
-import { boardSizeOf, rowOf } from './types';
+import { dimsOf, rowOf } from './types';
 import type { CardDef, Catalog, GameState, PlayerState, Resource, Square } from './types';
 
 /** Eine mögliche Lage eines Baumusters auf dem Brett. */
@@ -77,15 +77,15 @@ function hasStation(p: PlayerState, catalog: Catalog): boolean {
  */
 export function placements(board: Square[], catalog: Catalog, cards: string[]): Placement[] {
   const out: Placement[] = [];
-  const n = boardSizeOf(board);
+  const { cols, rows } = dimsOf(board);
   for (const card of cards) {
     const def = catalog[card];
     if (!def) continue;
     for (const o of cachedOrientations(card, def.pattern)) {
       const h = o.length, w = o[0].length;
-      for (let r = 0; r + h <= n; r++) {
-        for (let c = 0; c + w <= n; c++) {
-          const found = layAt(o, r, c, board, catalog, card, n);
+      for (let r = 0; r + h <= rows; r++) {
+        for (let c = 0; c + w <= cols; c++) {
+          const found = layAt(o, r, c, board, catalog, card, cols);
           if (found) out.push(found);
         }
       }
@@ -96,7 +96,7 @@ export function placements(board: Square[], catalog: Catalog, cards: string[]): 
 
 function layAt(
   o: (Resource | null)[][], rOff: number, cOff: number,
-  board: Square[], catalog: Catalog, card: string, n: number
+  board: Square[], catalog: Catalog, card: string, cols: number
 ): Placement | null {
   const cells: number[] = [];
   const missing: { square: number; resource: Resource }[] = [];
@@ -106,7 +106,7 @@ function layAt(
     for (let c = 0; c < o[0].length; c++) {
       const want = o[r][c];
       if (want === null) continue;
-      const idx = (rOff + r) * n + (cOff + c);
+      const idx = (rOff + r) * cols + (cOff + c);
       const sq = board[idx];
       cells.push(idx);
       if (sq.resource && sq.building) return null; // Bondmaker-Material: nie verbaubar
@@ -203,12 +203,12 @@ export function suggestBuild(
     if (resourceSquares.length === 0) continue;
     const effects = catalog[pl.card].effects ?? [];
     // Bahnhof: der Bauplatz muss in der untersten Reihe liegen (an der Strecke)
-    const n = boardSizeOf(p.board);
+    const { cols, rows } = dimsOf(p.board);
     const free = effects.includes('buildAnywhereSelf') || anywhere
       ? p.board.map((sq, i) => (!sq.building && !sq.terrain && (!sq.resource || resourceSquares.includes(i)) ? i : -1)).filter((i) => i >= 0)
       : resourceSquares;
     const targets = effects.includes('trainStation')
-      ? free.filter((i) => rowOf(i, n) === n - 1)
+      ? free.filter((i) => rowOf(i, cols) === rows - 1)
       : free;
     if (targets.length === 0) continue;
     if (

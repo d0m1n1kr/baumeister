@@ -148,15 +148,35 @@ export type Catalog = Record<string, CardDef>;
 
 // ---------- Spielzustand ----------
 
-/** Klassische Brettgröße. Die Landpartie spielt auf 6×6 — überall dort, wo es
- *  auf die Größe ankommt, gilt deshalb die des konkreten Bretts (boardSizeOf),
- *  und diese Konstante ist nur noch der Default. */
+/** Klassisches Brett: 4×4. Überall, wo es auf die Maße ankommt, gelten die des
+ *  konkreten Bretts (dimsOf) — diese Konstante ist nur noch der Default. */
 export const BOARD_SIZE = 4;
 export const NUM_SQUARES = BOARD_SIZE * BOARD_SIZE;
 
-/** Kantenlänge eines konkreten Bretts — selbstbeschreibend aus der Feldzahl,
- *  damit alte Spielstände ohne Migrationsfeld weiterlaufen. */
-export const boardSizeOf = (board: unknown[]): number => Math.round(Math.sqrt(board.length));
+/** Landpartie: 5 breit, 6 hoch — hochkant, wie ein Telefon in der Hand.
+ *  30 Felder minus Landschaft lassen etwas mehr Platz als die klassischen 16. */
+export const LAND_COLS = 5;
+export const LAND_ROWS = 6;
+
+export interface Dims {
+  cols: number;
+  rows: number;
+}
+
+/**
+ * Maße eines konkreten Bretts.
+ *
+ * Aus der Feldzahl abgeleitet statt gespeichert: Damit ist jeder Spielstand
+ * selbstbeschreibend, alte laufen ohne Migrationsfeld weiter, und keine
+ * Funktion kann die Maße „vergessen" durchzureichen — was stillschweigend
+ * falsche Nachbarschaften und damit falsche Punkte ergäbe. Die Feldzahl ist
+ * eindeutig: 16 = klassisch, 30 = Landpartie.
+ */
+export function dimsOf(board: unknown[]): Dims {
+  if (board.length === LAND_COLS * LAND_ROWS) return { cols: LAND_COLS, rows: LAND_ROWS };
+  const n = Math.round(Math.sqrt(board.length));
+  return { cols: n, rows: n };
+}
 
 export interface PlacedBuilding {
   card: string;
@@ -278,7 +298,7 @@ export interface GameConfig {
   townHallDeck?: Resource[];
   /** Rathaus: Seed für deterministische Neumischungen des Abwurfstapels. */
   thSeed?: number;
-  /** Landpartie: 6×6-Brett mit Landschaft (nur solo). */
+  /** Landpartie: 5×6-Brett mit Landschaft (nur solo). */
   land?: boolean;
   /** Landpartie: die Landschaftsfelder (aus dem Seed erzeugt, Teil des Setups). */
   terrain?: { square: number; kind: TerrainKind }[];
@@ -376,43 +396,51 @@ export interface PlayerScore {
 
 // ---------- Hilfsfunktionen ----------
 
-// Alle Geometrie-Helfer nehmen die Kantenlänge als letzten Parameter mit
-// Default BOARD_SIZE: Bestehende Aufrufer (und Tests) bleiben wortgleich
-// gültig, und die Landpartie reicht ihre 6 durch.
-export const idx = (row: number, col: number, n = BOARD_SIZE): number => row * n + col;
-export const rowOf = (i: number, n = BOARD_SIZE): number => Math.floor(i / n);
-export const colOf = (i: number, n = BOARD_SIZE): number => i % n;
+// Die Geometrie-Helfer nehmen die Maße als letzte Parameter, mit Default 4×4:
+// Bestehende Aufrufer (und Tests) bleiben wortgleich gültig. Für Index und
+// Zeile/Spalte genügt die SPALTENZAHL — nur wer an den unteren Rand stößt
+// (Nachbarn, Zonen), braucht auch die Zeilenzahl.
+export const idx = (row: number, col: number, cols = BOARD_SIZE): number => row * cols + col;
+export const rowOf = (i: number, cols = BOARD_SIZE): number => Math.floor(i / cols);
+export const colOf = (i: number, cols = BOARD_SIZE): number => i % cols;
 
 /** Orthogonale Nachbarn eines Feldes. */
-export function neighbors4(i: number, n = BOARD_SIZE): number[] {
-  const r = rowOf(i, n), c = colOf(i, n), out: number[] = [];
-  if (r > 0) out.push(idx(r - 1, c, n));
-  if (r < n - 1) out.push(idx(r + 1, c, n));
-  if (c > 0) out.push(idx(r, c - 1, n));
-  if (c < n - 1) out.push(idx(r, c + 1, n));
+export function neighbors4(i: number, cols = BOARD_SIZE, rows = cols): number[] {
+  const r = rowOf(i, cols), c = colOf(i, cols), out: number[] = [];
+  if (r > 0) out.push(idx(r - 1, c, cols));
+  if (r < rows - 1) out.push(idx(r + 1, c, cols));
+  if (c > 0) out.push(idx(r, c - 1, cols));
+  if (c < cols - 1) out.push(idx(r, c + 1, cols));
   return out;
 }
 
 /** Alle 8 umliegenden Felder. */
-export function neighbors8(i: number, n = BOARD_SIZE): number[] {
-  const r = rowOf(i, n), c = colOf(i, n), out: number[] = [];
+export function neighbors8(i: number, cols = BOARD_SIZE, rows = cols): number[] {
+  const r = rowOf(i, cols), c = colOf(i, cols), out: number[] = [];
   for (let dr = -1; dr <= 1; dr++)
     for (let dc = -1; dc <= 1; dc++) {
       if (dr === 0 && dc === 0) continue;
       const nr = r + dr, nc = c + dc;
-      if (nr >= 0 && nr < n && nc >= 0 && nc < n) out.push(idx(nr, nc, n));
+      if (nr >= 0 && nr < rows && nc >= 0 && nc < cols) out.push(idx(nr, nc, cols));
     }
   return out;
 }
 
 /** Die vier Eckfelder (Kloster). */
-export const cornerSquares = (n = BOARD_SIZE): number[] =>
-  [idx(0, 0, n), idx(0, n - 1, n), idx(n - 1, 0, n), idx(n - 1, n - 1, n)];
-/** Die vier Mittelfelder (Schneiderei, Grotte) — bei gerader Kantenlänge
- *  das exakte Zentrum, klassisch [5, 6, 9, 10]. */
-export function centerSquares(n = BOARD_SIZE): number[] {
-  const a = Math.floor((n - 1) / 2), b = Math.ceil((n - 1) / 2);
-  return [idx(a, a, n), idx(a, b, n), idx(b, a, n), idx(b, b, n)].filter(
-    (v, i, arr) => arr.indexOf(v) === i
-  );
+export const cornerSquares = (cols = BOARD_SIZE, rows = cols): number[] => [
+  idx(0, 0, cols),
+  idx(0, cols - 1, cols),
+  idx(rows - 1, 0, cols),
+  idx(rows - 1, cols - 1, cols)
+];
+
+/** Die vier Mittelfelder (Schneiderei, Grotte) — bei gerader Kantenzahl das
+ *  exakte Zentrum, klassisch [5, 6, 9, 10]. Bei ungerader Zahl fallen Felder
+ *  zusammen; dann bleiben entsprechend weniger übrig. */
+export function centerSquares(cols = BOARD_SIZE, rows = cols): number[] {
+  const r1 = Math.floor((rows - 1) / 2), r2 = Math.ceil((rows - 1) / 2);
+  const c1 = Math.floor((cols - 1) / 2), c2 = Math.ceil((cols - 1) / 2);
+  return [
+    idx(r1, c1, cols), idx(r1, c2, cols), idx(r2, c1, cols), idx(r2, c2, cols)
+  ].filter((v, i, arr) => arr.indexOf(v) === i);
 }

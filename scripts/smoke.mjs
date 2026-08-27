@@ -797,7 +797,7 @@ try {
     await ctx.close();
   }
 
-  // ---------- Landpartie: 6×6, Landschaft, Anlieger-Karten ----------
+  // ---------- Landpartie: 5×6, Landschaft, Anlieger-Karten ----------
   // Der Modus lebt von zwei Zusagen: Landschaft ist NIE bespielbar, und die
   // Tages-Challenge erzeugt aus dem Datum weltweit dieselbe Karte.
   {
@@ -828,7 +828,7 @@ try {
     lp.on('pageerror', (e) => fail(`Landpartie: Seitenfehler: ${e.message}`));
     const a = await starte(lp);
     if (!a.land) fail('Landpartie: Modus kam nicht im Spielstand an');
-    if (a.zellen !== 36) fail(`Landpartie: ${a.zellen} Zellen statt 36`);
+    if (a.zellen !== 30) fail(`Landpartie: ${a.zellen} Zellen statt 30`);
     if (a.terrainZellen < 9 || a.terrainZellen > 13) {
       fail(`Landpartie: ${a.terrainZellen} Landschaftsfelder (erwartet 9–13)`);
     }
@@ -841,7 +841,7 @@ try {
     const tSquare = a.terrain[0].square;
     const frei = await lp.evaluate((t) => {
       const st = JSON.parse(localStorage.getItem('tinytowns.save.v1'));
-      for (let i = 0; i < 36; i++) {
+      for (let i = 0; i < 30; i++) {
         if (!st.config.terrain.some((c) => c.square === i)) return i;
       }
       return -1;
@@ -869,7 +869,7 @@ try {
     }
     await ctx2.close();
     await ctx.close();
-    console.log('✓ Landpartie: 36 Felder, Landschaft gesperrt, 10 Karten, Tageskarte deterministisch');
+    console.log('✓ Landpartie: 30 Felder (5×6), Landschaft gesperrt, 10 Karten, Tageskarte deterministisch');
   }
 
   // Manifest: Ohne id/scope/start_url kann Chrome einen geteilten Link nicht an

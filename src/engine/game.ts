@@ -3,7 +3,10 @@
 import type {
   Action, Catalog, GameConfig, GameState, PendingChoice, PlayerState, Resource, Square
 } from './types';
-import { BOARD_SIZE, COIN_CAP, boardSizeOf, centerSquares, colOf, isFreeSquare, rowOf } from './types';
+import {
+  BOARD_SIZE, COIN_CAP, LAND_COLS, LAND_ROWS,
+  centerSquares, colOf, dimsOf, isFreeSquare, rowOf
+} from './types';
 import { matchesPattern } from './patterns';
 import { mulberry32, shuffled } from './registry';
 
@@ -19,8 +22,8 @@ export function newGame(config: GameConfig): GameState {
   const players: PlayerState[] = config.players.map((p, i) => ({
     name: p.name,
     corner: p.corner,
-    // Landpartie spielt auf 6×6, sonst klassisch 4×4
-    board: Array.from({ length: (config.land ? 6 : BOARD_SIZE) ** 2 }, (_, sq): Square => {
+    // Landpartie spielt auf 5×6 (hochkant), sonst klassisch 4×4
+    board: Array.from({ length: config.land ? LAND_COLS * LAND_ROWS : BOARD_SIZE ** 2 }, (_, sq): Square => {
       const t = config.terrain?.find((c) => c.square === sq);
       return t ? { terrain: t.kind } : {};
     }),
@@ -674,7 +677,8 @@ function build(
   // (die Gleise verlaufen an der untersten Reihe jeder Stadt)
   if (effects.includes('trainStation')) {
     if (hasStation(p, catalog)) fail('Nur ein Bahnhof pro Stadt');
-    if (rowOf(target, boardSizeOf(p.board)) !== boardSizeOf(p.board) - 1) {
+    const dims = dimsOf(p.board);
+    if (rowOf(target, dims.cols) !== dims.rows - 1) {
       fail('Der Bahnhof muss an der Strecke liegen (unterste Reihe)');
     }
   }
@@ -808,8 +812,8 @@ function placeBuildingByEffect(
   // Eisenbahn: auch per Effekt kein zweiter Bahnhof und nur an der Strecke
   if ((catalog[card]?.effects ?? []).includes('trainStation')) {
     if (hasStation(p, catalog)) fail('Nur ein Bahnhof pro Stadt');
-    const n = boardSizeOf(p.board);
-    if (rowOf(target, n) !== n - 1) {
+    const { cols, rows } = dimsOf(p.board);
+    if (rowOf(target, cols) !== rows - 1) {
       fail('Der Bahnhof muss an der Strecke liegen (unterste Reihe)');
     }
   }
@@ -854,13 +858,13 @@ function applyCoinEffects(
 
   if (effects.includes('teahouseCoins')) {
     // +1 Münze je Gebäudetyp in Zeile ODER Spalte (bessere Achse), selbst ausgenommen, max 3
-    const n = boardSizeOf(p.board);
-    const row = rowOf(target, n), col = colOf(target, n);
+    const { cols } = dimsOf(p.board);
+    const row = rowOf(target, cols), col = colOf(target, cols);
     const rowTypes = new Set<string>(), colTypes = new Set<string>();
     p.board.forEach((sq, i) => {
       if (!sq.building || i === target) return;
-      if (rowOf(i, n) === row) rowTypes.add(sq.building.card);
-      if (colOf(i, n) === col) colTypes.add(sq.building.card);
+      if (rowOf(i, cols) === row) rowTypes.add(sq.building.card);
+      if (colOf(i, cols) === col) colTypes.add(sq.building.card);
     });
     gainCoins(p, Math.min(3, Math.max(rowTypes.size, colTypes.size)), catalog);
   }
@@ -886,7 +890,7 @@ function applyCoinEffects(
   }
 
   if (effects.includes('grottoCoins')) {
-    for (const c of centerSquares(boardSizeOf(p.board))) {
+    for (const c of centerSquares(dimsOf(p.board).cols, dimsOf(p.board).rows)) {
       const sq = p.board[c];
       if (sq.building) gainCoins(p, 1, catalog); // bebaut (inkl. Grotto selbst) → sofort
       else if (!sq.coin) sq.coin = true;         // Münze teilt sich das Feld ggf. mit Material
