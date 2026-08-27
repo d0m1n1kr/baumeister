@@ -928,17 +928,95 @@ try {
         if (Math.abs(b.h / b.w - 6 / 5) > 0.05) fail(`${wo}: Brettform ${b.w}×${b.h} ist nicht 5:6`);
       }
       if (g.clipped) fail(`${wo}: Inhalt wird am Zellenrand abgeschnitten`);
-      // Landpartie spielt pur: keine Erweiterungen, keine Zusatzmodi
+      // Ohne angehaktes Zusatzhäkchen bleibt es pur: 7 + 3 Anlieger, sonst nichts.
+      // (Erweiterungen SIND hier wählbar — das prüft der Block darunter.)
       if (g.karten !== 10) fail(`${wo}: ${g.karten} Karten statt 10`);
       if (JSON.stringify(g.erweiterungen) !== JSON.stringify(['base'])) {
-        fail(`${wo}: Erweiterungen aktiv (${g.erweiterungen})`);
+        fail(`${wo}: Erweiterungen aktiv, obwohl nichts angehakt war (${g.erweiterungen})`);
       }
       for (const [name, an] of Object.entries(g.systeme)) {
-        if (an) fail(`${wo}: System „${name}" ist an, die Landpartie spielt pur`);
+        if (an) fail(`${wo}: System „${name}" ist an, obwohl nichts angehakt war`);
       }
       await mctx.close();
     }
-    console.log('✓ Landpartie mehrspielerfähig: dieselbe Landschaft für alle, gleich große Bretter, pur');
+    console.log('✓ Landpartie: Standard bleibt pur, dieselbe Landschaft für alle, gleich große Bretter');
+
+    // Die Landpartie ist nur ein anderes Brett: Erweiterungen, Rathaus,
+    // Eisenbahn und Höhle gelten dort genauso. Geprüft wird, dass die Häkchen
+    // wirklich in der Partie ankommen — und dass der Bahnhof baubar bleibt:
+    // Die Landschaft darf die unterste Reihe (die Strecke) nicht zulegen.
+    {
+      const kctx = await browser.newContext({ viewport: { width: 1180, height: 820 }, locale: 'de-DE' });
+      const kp = await kctx.newPage();
+      kp.on('pageerror', (e) => fail(`Landpartie+Erweiterungen: Seitenfehler: ${e.message}`));
+      await kp.goto(BASE_URL);
+      await kp.locator('#splash').waitFor({ state: 'detached', timeout: 10000 });
+      const neu3 = kp.locator('button', { hasText: 'Neues Spiel' });
+      if (await neu3.count()) await neu3.click();
+      await kp.locator('.seg button', { hasText: '2' }).first().click();
+      await kp.locator('.landOpt input').check();
+      // Alle Schalter müssen bei aktiver Landpartie noch da sein
+      for (const name of ['Rathaus-Modus', 'Eisenbahn-Modus', 'Höhlen-Regel', 'Fortune']) {
+        const opt = kp.locator('.opt', { hasText: name });
+        if ((await opt.count()) === 0) fail(`Landpartie+Erweiterungen: „${name}" fehlt im Setup`);
+        await opt.locator('input').first().check();
+      }
+      await kp.locator('.bar button.big').click();
+      await kp.locator('.board').first().waitFor({ timeout: 8000 });
+      await kp.waitForTimeout(700); // Messtakt der Gleise abwarten
+      const k = await kp.evaluate(() => {
+        const st = JSON.parse(localStorage.getItem('tinytowns.save.v1'));
+        const bretter = [...document.querySelectorAll('[data-track]')].map((el) => {
+          const r = el.getBoundingClientRect();
+          return {
+            kante: el.dataset.trackEdge === 'top' ? 'top' : 'bottom',
+            oben: r.top, unten: r.bottom, links: r.left, rechts: r.right
+          };
+        });
+        const gleise = [...document.querySelectorAll('.track')].map((el) => {
+          const r = el.getBoundingClientRect();
+          return { y: r.top + r.height / 2, l: r.left, r: r.right };
+        });
+        let schnitt = 0;
+        for (const br of bretter) {
+          for (const g of gleise.filter((g) => g.r > br.links + 2 && g.l < br.rechts - 2)) {
+            schnitt = Math.max(schnitt, Math.min(g.y - br.oben, br.unten - g.y));
+          }
+        }
+        return {
+          felder: st.players[0].board.length,
+          land: st.config.land === true,
+          karten: st.config.activeCards.length,
+          bahnhof: st.config.activeCards.includes('train_station'),
+          sets: st.config.sets,
+          systeme: st.config.systems,
+          rathaus: st.config.townHall === true,
+          landschaft: st.players[0].board.map((sq) => !!sq.terrain),
+          gleise: gleise.length,
+          schnitt: Math.round(schnitt)
+        };
+      });
+      const wo2 = 'Landpartie+Erweiterungen';
+      if (!k.land || k.felder !== 30) fail(`${wo2}: ${k.felder} Felder, land=${k.land}`);
+      // 7 Kategorien + Bahnhof + 3 Anlieger
+      if (k.karten !== 11) fail(`${wo2}: ${k.karten} Karten statt 11`);
+      if (!k.bahnhof) fail(`${wo2}: der Bahnhof liegt nicht aus`);
+      if (!k.sets.includes('fortune')) fail(`${wo2}: Fortune kam nicht in der Partie an`);
+      if (!k.systeme.coins) fail(`${wo2}: Münzen sind aus`);
+      if (!k.systeme.train) fail(`${wo2}: die Eisenbahn ist aus`);
+      if (!k.systeme.cavern) fail(`${wo2}: die Höhlen-Regel ist aus`);
+      if (!k.rathaus) fail(`${wo2}: das Rathaus ist aus`);
+      if (k.gleise === 0) fail(`${wo2}: keine Strecke gezeichnet`);
+      if (k.schnitt > 6) fail(`${wo2}: Gleis läuft ${k.schnitt}px im Brett`);
+      // Bahnhof (Muster 1×3, drehbar) braucht Platz in der untersten Reihe
+      const frei = (row, col) => !k.landschaft[row * 5 + col];
+      let platz = false;
+      for (let c = 0; c + 3 <= 5; c++) if (frei(5, c) && frei(5, c + 1) && frei(5, c + 2)) platz = true;
+      for (let c = 0; c < 5; c++) if (frei(5, c) && frei(4, c) && frei(3, c)) platz = true;
+      if (!platz) fail(`${wo2}: die Landschaft lässt keinen Platz für den Bahnhof an der Strecke`);
+      await kctx.close();
+      console.log('✓ Landpartie mit Erweiterungen, Rathaus, Höhle und Eisenbahn — Bahnhof baubar');
+    }
 
     // Grenze am Handy: Zu drei oder vier an EINEM Telefon wäre das 5×6-Brett
     // unbedienbar (gemessen 23 px je Feld). Der Schalter verschwindet dort —

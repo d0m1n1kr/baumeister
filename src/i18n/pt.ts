@@ -218,7 +218,6 @@ export const pt: Translation = {
   soloDailyHint: 'Acaso fixo do dia — as mesmas cartas e recursos em todo o mundo. Compara os teus pontos!',
   landMode: 'Campo (5×6)',
   landModeHint: 'Tabuleiro maior com rio, montanhas e lago — não edificáveis, mas as cartas ribeirinhas pontuam ao lado.',
-  landNoSets: 'O campo joga-se puro: jogo base mais cartas de terreno, sem expansões.',
   landPhoneLimit: 'No telemóvel, no máximo 2 jogadores num dispositivo — as casas ficariam demasiado pequenas. Com dispositivos próprios funciona com qualquer número.',
   landHighscores: 'Recordes do campo (este aparelho)',
   terrain: {

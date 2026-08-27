@@ -892,6 +892,9 @@ function applyCoinEffects(
   if (effects.includes('grottoCoins')) {
     for (const c of centerSquares(dimsOf(p.board).cols, dimsOf(p.board).rows)) {
       const sq = p.board[c];
+      // Landschaft (Landpartie) übergehen: Dort wird nie gebaut, eine Münze
+      // darauf könnte niemand jemals einsammeln.
+      if (sq.terrain) continue;
       if (sq.building) gainCoins(p, 1, catalog); // bebaut (inkl. Grotto selbst) → sofort
       else if (!sq.coin) sq.coin = true;         // Münze teilt sich das Feld ggf. mit Material
     }

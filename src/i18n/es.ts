@@ -218,7 +218,6 @@ export const es: Translation = {
   soloDailyHint: 'Azar fijo del día — las mismas cartas y recursos en todo el mundo. ¡Compara tus puntos!',
   landMode: 'Campiña (5×6)',
   landModeHint: 'Tablero más grande con río, montañas y lago — no edificables, pero las cartas ribereñas puntúan junto a ellos.',
-  landNoSets: 'La campiña se juega pura: juego base más cartas de terreno, sin expansiones.',
   landPhoneLimit: 'En el móvil, máximo 2 jugadores en un dispositivo: las casillas serían demasiado pequeñas. Con dispositivos propios funciona con cualquier número.',
   landHighscores: 'Récords de campiña (este dispositivo)',
   terrain: {

@@ -119,12 +119,44 @@ function hasMonumentWindow(blockedSet: Set<number>, cols: number, rows: number):
   return false;
 }
 
-function isValid(cells: TerrainCell[], cols: number, rows: number): boolean {
+/**
+ * Gibt es einen Bauplatz für den Bahnhof? Er muss in der untersten Reihe
+ * liegen (dort verläuft die Strecke) und braucht sein 1×3-Muster — drehbar,
+ * also drei freie Felder nebeneinander in der letzten Reihe oder drei
+ * übereinander, deren unterstes in der letzten Reihe liegt.
+ *
+ * Ohne diese Prüfung könnte die Landschaft die ganze unterste Reihe zulegen:
+ * Der Bahnhof wäre dann unbaubar und die Eisenbahn in dieser Partie eine
+ * Auslage-Karte ohne Funktion.
+ */
+function hasTrackWindow(blockedSet: Set<number>, cols: number, rows: number): boolean {
+  const frei = (r: number, c: number) => !blockedSet.has(idx(r, c, cols));
+  for (let c = 0; c + 3 <= cols; c++) {
+    if (frei(rows - 1, c) && frei(rows - 1, c + 1) && frei(rows - 1, c + 2)) return true;
+  }
+  if (rows >= 3) {
+    for (let c = 0; c < cols; c++) {
+      if (frei(rows - 1, c) && frei(rows - 2, c) && frei(rows - 3, c)) return true;
+    }
+  }
+  return false;
+}
+
+export interface TerrainOptions {
+  /** Eisenbahn im Spiel: die unterste Reihe muss den Bahnhof tragen können. */
+  track?: boolean;
+}
+
+function isValid(
+  cells: TerrainCell[], cols: number, rows: number, opts: TerrainOptions
+): boolean {
   const blockedSet = new Set(cells.map((c) => c.square));
   // Keine zu kleinen eingeschlossenen Flächen
   if (regions(blockedSet, cols, rows).some((r) => r.length < MIN_REGION)) return false;
   // Das größte Basis-Monument muss baubar bleiben
   if (!hasMonumentWindow(blockedSet, cols, rows)) return false;
+  // Eisenbahn: der Bahnhof braucht einen Platz an der Strecke
+  if (opts.track && !hasTrackWindow(blockedSet, cols, rows)) return false;
   // Höchstens 2 Ecken belegt (Kloster bleibt spielbar)
   const corners = [
     idx(0, 0, cols), idx(0, cols - 1, cols),
@@ -156,9 +188,14 @@ export const FALLBACK_TERRAIN: TerrainCell[] = [
  * Kante (5–7 Felder), ein Bergzug (2–3), ein See (2–3) — zusammen 9–13
  * Felder. Von 30 Feldern bleiben damit 17–21 bebaubare: etwas mehr als die
  * klassischen 16, aber nicht so viel, dass eine Partie zäh wird.
+ *
+ * `opts.track` fordert zusätzlich einen Bauplatz für den Bahnhof. Die Option
+ * verschiebt den RNG-Lauf (verworfene Versuche ziehen weiter), also sehen
+ * Partien mit Eisenbahn eine andere Landschaft als pure mit demselben Seed —
+ * pure Landschaften bleiben davon unberührt (Golden-Test).
  */
 export function generateTerrain(
-  rng: Rng, cols = LAND_COLS, rows = LAND_ROWS
+  rng: Rng, cols = LAND_COLS, rows = LAND_ROWS, opts: TerrainOptions = {}
 ): TerrainCell[] {
   for (let attempt = 0; attempt < MAX_ATTEMPTS; attempt++) {
     const river = riverWalk(rng, cols, rows);
@@ -181,7 +218,7 @@ export function generateTerrain(
       ...mountains.map((square) => ({ square, kind: 'mountain' as const })),
       ...lake.map((square) => ({ square, kind: 'lake' as const }))
     ];
-    if (isValid(cells, cols, rows)) return cells;
+    if (isValid(cells, cols, rows, opts)) return cells;
   }
   return FALLBACK_TERRAIN;
 }
