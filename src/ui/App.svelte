@@ -13,7 +13,7 @@
   import UpdateBanner from './UpdateBanner.svelte';
   import CreditsFooter from './CreditsFooter.svelte';
   import { sfx } from './sound';
-  import { dailyIdFromHash } from './share';
+  import { dailyIdFromHash, hashWithoutDaily, type DailyLink } from './share';
   import type { GameState } from '../engine/types';
 
   let showResume = $state(game.hasSave());
@@ -22,7 +22,20 @@
   let setupError = $state('');
   // Geteilter Tages-Challenge-Link: Der Startbildschirm wählt dann genau
   // diesen Tag vor, damit beide Seiten dieselbe Auslage spielen.
-  let urlDaily = $state(dailyIdFromHash(location.hash));
+  //
+  // Danach wird der Parameter aus der Adresszeile entfernt: Er soll die
+  // Challenge EINMAL öffnen. Blieb er stehen, wählte jeder Reload wieder
+  // stillschweigend denselben Tag — und jede „neue" Partie hatte dieselbe
+  // Auslage, in der Landpartie sichtbar als immer dieselbe Landschaft.
+  function nimmDailyAusAdresse(): DailyLink | null {
+    const link = dailyIdFromHash(location.hash);
+    if (link) {
+      const rest = hashWithoutDaily(location.hash);
+      history.replaceState(null, '', `${location.pathname}${location.search}${rest}`);
+    }
+    return link;
+  }
+  let urlDaily = $state(nimmDailyAusAdresse());
 
   // Unterbrochene Mehrgeräte-Sitzung (Reload, iOS-Tab-Rauswurf) wieder aufnehmen.
   // Ein Code in der Adresszeile ist dabei der stärkste Wunsch: Wer einen QR-Code
@@ -53,7 +66,7 @@
   // die laufende App genauso reagieren wie auf einen frischen Start.
   $effect(() => {
     const onHash = () => {
-      urlDaily = dailyIdFromHash(location.hash) ?? urlDaily;
+      urlDaily = nimmDailyAusAdresse() ?? urlDaily;
       const code = joinCodeFromUrl();
       if (!code || code === session.roomCode) return; // kein/derselbe Raum
       if (session.role !== 'off') session.leave();

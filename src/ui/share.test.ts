@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { dailyIdFromHash, dailyUrl, shareText, type ShareInfo } from './share';
+import { dailyIdFromHash, dailyUrl, shareText, type ShareInfo, hashWithoutDaily} from './share';
 
 const base: ShareInfo = {
   title: 'Tiny Towns',
@@ -78,5 +78,22 @@ describe('dailyIdFromHash', () => {
     expect(dailyIdFromHash('#daily=heute')).toBeNull();
     expect(dailyIdFromHash('#join=ABC234')).toBeNull();
     expect(dailyIdFromHash('')).toBeNull();
+  });
+});
+
+describe('hashWithoutDaily', () => {
+  it('entfernt den Tages-Parameter', () => {
+    expect(hashWithoutDaily('#daily=2026-08-27')).toBe('');
+    expect(hashWithoutDaily('#daily=2026-08-27&mode=land')).toBe('');
+  });
+
+  it('lässt andere Parameter stehen (QR-Raumcode)', () => {
+    expect(hashWithoutDaily('#join=ABC234')).toBe('#join=ABC234');
+    expect(hashWithoutDaily('#daily=2026-08-27&join=ABC234')).toBe('#join=ABC234');
+  });
+
+  it('kommt mit leerer Adresse zurecht', () => {
+    expect(hashWithoutDaily('')).toBe('');
+    expect(hashWithoutDaily('#')).toBe('');
   });
 });
