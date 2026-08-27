@@ -141,9 +141,14 @@ while Anna and Ben are on their phones — the state is identical on every devic
   per player would be a different game, and the towns could not be compared.
   Countryside dailies use their own seed stem and share links carry
   `&mode=land`; highscores and rank thresholds are kept separate
-  from the classic list (solo only). It plays pure: base game plus terrain cards, no
-  expansions. Terrain artwork adapts to the theme (canyon/crater field/ice
-  lake on Mars, mistflow/dragonspire/spelllake in the dragon realm).
+  from the classic list (solo only). Everything else combines freely: the
+  expansions, the Town Hall variant, the cavern rule and the railway all work
+  on the taller board — it is a different board, not a different game. With the
+  railway on, the terrain generator additionally guarantees a spot for the
+  train station on the track (the bottom row); without that guarantee about one
+  layout in five left the station unbuildable. Terrain artwork adapts to the
+  theme (canyon/crater field/ice lake on Mars, mistflow/dragonspire/spelllake
+  in the dragon realm).
 - **Learning mode (🎓, solo):** a guided game for newcomers. Instruction bubbles
   walk through every phase — monument draft, deck pick, placing, marking a
   pattern, choosing the spot, ending the round, finishing the town — and each one

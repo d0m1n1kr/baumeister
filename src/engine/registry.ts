@@ -1,6 +1,7 @@
 // Kartenkatalog: Validierung der JSON-Assets + zufälliges Partie-Setup.
 
 import type { CardDef, Catalog, Category, GameConfig, Resource } from './types';
+import { LAND_COLS, LAND_ROWS } from './types';
 import { generateTerrain } from './terrain';
 
 export const CATEGORY_ORDER: Category[] = [
@@ -170,7 +171,8 @@ export function randomSetup(
   // Reihenfolge und bleibt byte-gleich (dailyGolden.test.ts wacht darüber).
   if (land) {
     config.land = true;
-    config.terrain = generateTerrain(rng);
+    // Mit Eisenbahn muss die unterste Reihe den Bahnhof tragen können
+    config.terrain = generateTerrain(rng, LAND_COLS, LAND_ROWS, { track: train });
     const pool = shuffled(
       Object.values(catalog).filter((d) => d.set === 'landpartie').map((d) => d.id),
       rng

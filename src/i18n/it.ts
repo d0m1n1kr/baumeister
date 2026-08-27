@@ -218,7 +218,6 @@ export const it: Translation = {
   soloDailyHint: 'Caso fisso del giorno — le stesse carte e risorse in tutto il mondo. Confronta i punteggi!',
   landMode: 'Campagna (5×6)',
   landModeHint: 'Tabellone più grande con fiume, montagne e lago — non edificabili, ma le carte rivierasche vi segnano punti.',
-  landNoSets: 'La campagna si gioca pura: gioco base più carte terreno, senza espansioni.',
   landPhoneLimit: 'Su telefono, massimo 2 giocatori su un dispositivo: le caselle diventerebbero troppo piccole. Con i propri dispositivi funziona con qualsiasi numero.',
   landHighscores: 'Record campagna (questo dispositivo)',
   terrain: {

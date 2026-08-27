@@ -201,20 +201,20 @@
       merkeAuswahl();
       // Der Lernmodus ist eine Anzeige-Präferenz dieses Geräts, kein Spielstand
       learn.set(solo && soloMode === 'learn');
-      const land = landActive;
+      // Die Landpartie ist nur ein anderes Brett: Erweiterungen, Rathaus,
+      // Eisenbahn und Höhle gelten dort genauso wie im klassischen Spiel.
       game.start(
         buildGameConfig(
           currentPlayers(),
-          // Landpartie V1 spielt pur: Basis + Anlieger-Deck, keine Erweiterungen
-          land ? ['base'] : activeSets(),
+          activeSets(),
           useMonuments,
-          !solo && !land && cavernRule,
+          !solo && cavernRule,
           {
             solo,
             dailyId: solo && daily ? dailyDate : undefined,
-            townHall: !solo && !land && townHall,
-            train: !land && train,
-            land
+            townHall: !solo && townHall,
+            train,
+            land: landActive
           }
         )
       );
@@ -247,10 +247,9 @@
     try {
       saveNames(names);
       merkeAuswahl();
-      // Landpartie spielt pur — dieselbe Regel wie am Einzelgerät
-      session.setup = landActive
-        ? { sets: ['base'], useMonuments, cavern: false, townHall: false, train: false, land: true }
-        : { sets: activeSets(), useMonuments, cavern: cavernRule, townHall, train, land: false };
+      session.setup = {
+        sets: activeSets(), useMonuments, cavern: cavernRule, townHall, train, land: landActive
+      };
       await session.openRoom(makeRoomCode(), seats, selectedTransport());
     } catch (e) {
       error = e instanceof Error ? e.message : String(e);
@@ -450,9 +449,9 @@
           <span class="optText"><span class="optName">{t.useMonuments}</span></span>
         </label>
 
-        <!-- Rathaus, Eisenbahn und Höhle sind in der Landpartie aus: Sie
-             spielt pur, und die Schalter hätten keine Wirkung. -->
-        {#if !solo && !landActive}
+        <!-- Rathaus, Eisenbahn und Höhle: im Mehrspielerspiel auf beiden
+             Brettern wählbar — die Landpartie ist nur ein anderes Brett. -->
+        {#if !solo}
           <label class="opt toggle">
             <input type="checkbox" bind:checked={townHall} />
             <span class="optText">
@@ -478,10 +477,6 @@
 
         <div class="expansions">
           <span class="expTitle">{t.expansions}</span>
-          {#if landActive}
-            <!-- Landpartie V1 spielt pur — die Checkboxen hätten keine Wirkung -->
-            <p class="hint">{t.landNoSets}</p>
-          {:else}
           {#each SETS.filter((s) => !s.core) as set}
             <label class="opt toggle expRow">
               <input
@@ -495,7 +490,6 @@
               </span>
             </label>
           {/each}
-          {/if}
         </div>
       </section>
     </div>

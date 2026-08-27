@@ -218,7 +218,6 @@ export const nl: Translation = {
   soloDailyHint: 'Vast dagtoeval — wereldwijd dezelfde kaarten en grondstoffen. Vergelijk je punten!',
   landMode: 'Landtocht (5×6)',
   landModeHint: 'Groter bord met rivier, bergen en meer — onbebouwbaar, maar oeverkaarten scoren ernaast.',
-  landNoSets: 'De landtocht speelt puur: basisspel plus terreinkaarten, zonder uitbreidingen.',
   landPhoneLimit: 'Op een telefoon maximaal 2 spelers op één apparaat — de vakjes worden anders te klein. Met eigen apparaten kan elk aantal.',
   landHighscores: 'Topscores landtocht (dit apparaat)',
   terrain: {

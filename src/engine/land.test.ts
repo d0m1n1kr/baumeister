@@ -272,3 +272,113 @@ describe('Landpartie mit mehreren Spielern', () => {
     expect(klassisch.terrain).toBeUndefined();
   });
 });
+
+describe('Landpartie mit Erweiterungen und Eisenbahn', () => {
+  it('buildGameConfig: Fortune, Tiny Trees, Rathaus und Eisenbahn gelten auch hier', async () => {
+    const { buildGameConfig } = await import('../store/newGameConfig');
+    const spieler = [
+      { name: 'A', corner: 0 },
+      { name: 'B', corner: 2 }
+    ];
+    const cfg = buildGameConfig(
+      spieler, ['base', 'fortune', 'tiny_trees'], true, true,
+      { land: true, townHall: true, train: true }
+    );
+    expect(cfg.land).toBe(true);
+    expect(cfg.terrain?.length).toBeGreaterThan(0);
+    expect(cfg.systems).toEqual({ coins: true, trees: true, cavern: true, train: true });
+    expect(cfg.townHall).toBe(true);
+    // 7 Kategorien + Bahnhof + 3 Anlieger
+    expect(cfg.activeCards).toHaveLength(11);
+    expect(cfg.activeCards).toContain('train_station');
+    expect(cfg.activeCards.filter((id) => catalog[id].set === 'landpartie')).toHaveLength(3);
+    // Erweiterungskarten sind wirklich im Topf: mindestens eine Auslage-Karte
+    // darf aus Fortune oder Trees stammen — geprüft über die Sets im Config
+    expect(cfg.sets).toEqual(['base', 'fortune', 'tiny_trees']);
+  });
+
+  it('Eisenbahn: die Landschaft lässt der Landpartie einen Platz für den Bahnhof', async () => {
+    const { buildGameConfig } = await import('../store/newGameConfig');
+    // Über viele Partien: der Bahnhof (Muster 1×3, unterste Reihe) ist baubar
+    for (let i = 0; i < 40; i++) {
+      const cfg = buildGameConfig(
+        [{ name: 'A', corner: 0 }, { name: 'B', corner: 2 }],
+        ['base'], true, false, { land: true, train: true }
+      );
+      const belegt = new Set(cfg.terrain!.map((c) => c.square));
+      const frei = (row: number, col: number) => !belegt.has(at(row, col));
+      let passt = false;
+      for (let c = 0; c + 3 <= LAND_COLS; c++) {
+        if (frei(5, c) && frei(5, c + 1) && frei(5, c + 2)) passt = true;
+      }
+      for (let c = 0; c < LAND_COLS; c++) {
+        if (frei(5, c) && frei(4, c) && frei(3, c)) passt = true;
+      }
+      expect(passt).toBe(true);
+    }
+  });
+
+  it('der Bahnhof lässt sich in der Landpartie an der Strecke bauen', () => {
+    const cfg = config(1, undefined, false);
+    cfg.land = true;
+    cfg.systems.train = true;
+    cfg.activeCards = [...cfg.activeCards, 'train_station'];
+    // Fluss weit weg von der untersten Reihe, damit dort Platz ist
+    cfg.terrain = [{ square: at(0, 0), kind: 'lake' }];
+    const s = newGame(cfg);
+    s.phase = { t: 'round', resource: 'wood' };
+    // Muster des Bahnhofs: Stein, Holz, Stein — waagerecht in die letzte Reihe
+    res(s, 0, at(5, 1), 'stone');
+    res(s, 0, at(5, 2), 'wood');
+    res(s, 0, at(5, 3), 'stone');
+    const gebaut = apply(
+      s,
+      { t: 'build', player: 0, card: 'train_station', squares: [at(5, 1), at(5, 2), at(5, 3)], target: at(5, 2) },
+      catalog
+    );
+    expect(gebaut.players[0].board[at(5, 2)].building?.card).toBe('train_station');
+    // Gegenprobe: eine Reihe höher weist die Regel den Bahnhof ab
+    const s2 = newGame(cfg);
+    s2.phase = { t: 'round', resource: 'wood' };
+    res(s2, 0, at(4, 1), 'stone');
+    res(s2, 0, at(4, 2), 'wood');
+    res(s2, 0, at(4, 3), 'stone');
+    expect(() => apply(
+      s2,
+      { t: 'build', player: 0, card: 'train_station', squares: [at(4, 1), at(4, 2), at(4, 3)], target: at(4, 2) },
+      catalog
+    )).toThrowError('Der Bahnhof muss an der Strecke liegen (unterste Reihe)');
+  });
+
+  it('Caterinas Grotte legt keine Münze auf Landschaft', () => {
+    // Eine Münze auf dem Fluss könnte niemand einsammeln — dort wird nie gebaut.
+    const cfg = config(1, undefined, false);
+    cfg.land = true;
+    cfg.systems.coins = true;
+    // Mittelfelder des 5×6-Bretts sind (2,2) und (3,2) — beide Fluss
+    cfg.terrain = [
+      { square: FLUSS_OBEN, kind: 'river' },
+      { square: FLUSS_UNTEN, kind: 'river' }
+    ];
+    const s = newGame(cfg);
+    s.phase = { t: 'round', resource: 'wood' };
+    s.players[0].monument = { card: 'caterinas_grotto', built: false };
+    // Muster der Grotte (2×4) oben links auslegen und dort bauen
+    const felder: number[] = [];
+    catalog['caterinas_grotto'].pattern.forEach((zeile, r) =>
+      zeile.forEach((mat, c) => {
+        if (!mat) return;
+        res(s, 0, at(r, c), mat);
+        felder.push(at(r, c));
+      })
+    );
+    const nachher = apply(
+      s,
+      { t: 'build', player: 0, card: 'caterinas_grotto', squares: felder, target: felder[0] },
+      catalog
+    );
+    expect(nachher.players[0].board[FLUSS_OBEN].coin).toBeUndefined();
+    expect(nachher.players[0].board[FLUSS_UNTEN].coin).toBeUndefined();
+    expect(nachher.players[0].coins).toBe(0);
+  });
+});

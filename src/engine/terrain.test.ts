@@ -36,6 +36,24 @@ function regions(cells: TerrainCell[]): number[][] {
   return out;
 }
 
+/**
+ * Passt der Bahnhof? Sein Muster ist 1×3 und drehbar, das Gebäude selbst muss
+ * in der untersten Reihe liegen: drei freie Felder nebeneinander in der
+ * letzten Reihe, oder drei übereinander mit dem untersten in der letzten.
+ * Bewusst hier nachgerechnet statt aus dem Modul geholt — sonst prüfte der
+ * Test die Regel gegen sich selbst.
+ */
+function bahnhofPasst(blocked: Set<number>): boolean {
+  const frei = (r: number, c: number) => !blocked.has(idx(r, c, C));
+  for (let c = 0; c + 3 <= C; c++) {
+    if (frei(R - 1, c) && frei(R - 1, c + 1) && frei(R - 1, c + 2)) return true;
+  }
+  for (let c = 0; c < C; c++) {
+    if (frei(R - 1, c) && frei(R - 2, c) && frei(R - 3, c)) return true;
+  }
+  return false;
+}
+
 function checkConstraints(cells: TerrainCell[]): void {
   const blocked = new Set(cells.map((c) => c.square));
   // Feldzahl im Band — und damit die bebaubare Fläche: etwas mehr als die
@@ -103,6 +121,38 @@ describe('generateTerrain', () => {
         for (const nb of neighbors4(c.square, C, R)) expect(river.has(nb)).toBe(false);
       }
     }
+  });
+
+  it('Eisenbahn: die unterste Reihe trägt den Bahnhof', () => {
+    // Der Bahnhof (Muster 1×3, drehbar) muss in der untersten Reihe gebaut
+    // werden. Mit `track` garantiert der Generator dafür einen Platz.
+    for (let seed = 1; seed <= 300; seed++) {
+      const blocked = new Set(
+        generateTerrain(mulberry32(seed), C, R, { track: true }).map((c) => c.square)
+      );
+      expect(bahnhofPasst(blocked)).toBe(true);
+    }
+  });
+
+  it('ohne die Option gibt es Layouts ohne Bahnhofsplatz (die Prüfung greift also)', () => {
+    let ohnePlatz = 0;
+    for (let seed = 1; seed <= 300; seed++) {
+      const blocked = new Set(generateTerrain(mulberry32(seed)).map((c) => c.square));
+      if (!bahnhofPasst(blocked)) ohnePlatz++;
+    }
+    expect(ohnePlatz).toBeGreaterThan(0);
+  });
+
+  it('Eisenbahn-Layouts erfüllen weiterhin alle übrigen Constraints', () => {
+    for (let seed = 1; seed <= 200; seed++) {
+      const cells = generateTerrain(mulberry32(seed), C, R, { track: true });
+      expect(cells).not.toBe(FALLBACK_TERRAIN);
+      checkConstraints(cells);
+    }
+  });
+
+  it('das Rückfall-Layout trägt auch den Bahnhof', () => {
+    expect(bahnhofPasst(new Set(FALLBACK_TERRAIN.map((c) => c.square)))).toBe(true);
   });
 });
 

@@ -218,7 +218,6 @@ export const en: Translation = {
   soloDailyHint: 'Fixed daily seed — the same cards and resources worldwide. Compare your scores!',
   landMode: 'Countryside (5×6)',
   landModeHint: 'Bigger board with a river, mountains and a lake — unbuildable, but waterfront cards score next to them.',
-  landNoSets: 'The countryside plays pure: base game plus terrain cards, no expansions.',
   landPhoneLimit: 'On a phone, only up to 2 players on one device — the squares would get too small. With your own devices it works for any number.',
   landHighscores: 'Countryside highscores (this device)',
   terrain: {
