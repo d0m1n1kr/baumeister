@@ -1,6 +1,12 @@
 <script lang="ts">
   import { game } from '../store/gameStore.svelte';
-  import { buildGameConfig, todayId } from '../store/newGameConfig';
+  import {
+    DAILY_HISTORY,
+    buildGameConfig,
+    dayPlayable,
+    shiftDay,
+    todayId
+  } from '../store/newGameConfig';
   import { loadNames, saveNames } from '../store/playerNames';
   import { SETS } from '../data/sets';
   import { sortPlayersClockwise } from '../engine/registry';
@@ -41,7 +47,18 @@
   let soloMode = $state<'free' | 'daily' | 'learn'>(learn.enabled ? 'learn' : 'free');
   // Aus einem geteilten Link kann auch ein vergangener Tag kommen — dann wird
   // GENAU dieser gespielt, sonst ließe sich das Ergebnis nicht vergleichen.
-  const dailyDate = $derived(initialDaily ?? todayId());
+  // Blättern muss trotzdem gehen: In der installierten App gibt es keinen Link
+  // zum Antippen (iOS übergibt Web-Links nie an eine Homescreen-App), also ist
+  // die Tageswahl der einzige Weg zu einer geteilten Challenge von gestern.
+  // Startwert ist heute; ein Tag aus dem Link setzt der Effekt unten — dort
+  // liegt auch der Fall „Link im schon offenen Tab" (nur hashchange).
+  let dailyDate = $state(todayId());
+  const canPrevDay = $derived(dayPlayable(shiftDay(dailyDate, -1)));
+  const canNextDay = $derived(dayPlayable(shiftDay(dailyDate, 1)));
+  function stepDay(delta: number) {
+    const next = shiftDay(dailyDate, delta);
+    if (dayPlayable(next)) dailyDate = next;
+  }
   const daily = $derived(soloMode === 'daily');
   const solo = $derived(count === 1);
   // Die Spielerzeilen teilen sich ein Raster. Es muss genau so viele Spalten
@@ -63,6 +80,7 @@
     setCount(1);
     soloMode = 'daily';
     multiDevice = false;
+    dailyDate = initialDaily;
   });
 
   function toggleSet(id: string) {
@@ -243,9 +261,28 @@
                 🎓 {t.learn.setupOption}
               </button>
             </div>
+            {#if soloMode === 'daily'}
+              <!-- Tageswahl: heute und die letzten Tage. Ohne sie käme man in
+                   der installierten App an eine geteilte Challenge von gestern
+                   gar nicht heran. -->
+              <div class="dayPick">
+                <button
+                  class="iconBtn"
+                  disabled={!canPrevDay}
+                  title={t.dailyPrevDay}
+                  onpointerup={() => stepDay(-1)}>‹</button>
+                <span class="dayLabel">
+                  📅 {dailyDate}{#if dailyDate === todayId()} · {t.dailyToday}{/if}
+                </span>
+                <button
+                  class="iconBtn"
+                  disabled={!canNextDay}
+                  title={t.dailyNextDay}
+                  onpointerup={() => stepDay(1)}>›</button>
+              </div>
+            {/if}
             <p class="hint">
-              {#if soloMode === 'daily'}{t.soloDailyHint}{#if dailyDate !== todayId()}
-            <strong class="sharedDay">📅 {dailyDate}</strong>{/if}{/if}
+              {#if soloMode === 'daily'}{t.soloDailyHint}{/if}
               {#if soloMode === 'learn'}{t.learn.setupHint}{/if}
               <button class="link helpLink tapArea" onpointerup={() => (showHelp = true)}>
                 📖 {t.helpButton}
@@ -479,7 +516,21 @@
   /* Modus-Knöpfe teilen sich die Zeile gleichmäßig, statt den Titel zu quetschen */
   .seg.spread button { flex: 1 1 0; min-width: 0; font-size: var(--fs-sm); padding: 8px 6px; }
 
-  .sharedDay { color: var(--accent); }
+  /* Tageswahl der Challenge: Pfeile links und rechts, Datum in der Mitte */
+  .dayPick {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+  }
+  .dayPick button:disabled { opacity: 0.35; }
+  .dayLabel {
+    font-size: var(--fs-md);
+    color: var(--accent);
+    font-variant-numeric: tabular-nums;
+    min-width: 11ch;
+    text-align: center;
+  }
   .hint { margin: 0; font-size: var(--fs-xs); color: var(--text-dim); line-height: 1.4; }
 
   /* Namensfeld mit Löschknopf: Der Knopf liegt IM Feld, damit die Spalte

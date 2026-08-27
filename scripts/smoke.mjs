@@ -629,6 +629,66 @@ try {
   }
   console.log('✓ Endwertung: nichts zu scrollen, Flächen gleich breit (Handy und Tablet)');
 
+  // ---------- Tageswahl der Challenge ----------
+  // In der installierten App gibt es keinen Link zum Antippen: iOS übergibt
+  // Web-Links nie an eine Homescreen-App. Wer eine geteilte Challenge von
+  // gestern spielen will, braucht die Tageswahl — sonst käme er nur über den
+  // Browser hin, mit getrennter Bestenliste.
+  {
+    const ctx = await browser.newContext({ viewport: { width: 402, height: 874 }, locale: 'de-DE' });
+    const dp = await ctx.newPage();
+    dp.on('pageerror', (e) => fail(`Tageswahl: Seitenfehler: ${e.message}`));
+    await dp.goto(BASE_URL);
+    await dp.locator('#splash').waitFor({ state: 'detached', timeout: 10000 });
+    await dp.locator('.seg button', { hasText: '1' }).first().click();
+    await dp.locator('.seg button', { hasText: 'Tages-Challenge' }).click();
+    const pick = dp.locator('.dayPick');
+    await pick.waitFor({ timeout: 5000 });
+    const zurueck = pick.locator('button').first();
+    const vor = pick.locator('button').last();
+    const tag = () => pick.locator('.dayLabel').innerText();
+    const heute = await dp.evaluate(() => {
+      const d = new Date();
+      return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+    });
+    if (!(await tag()).includes(heute)) fail(`Tageswahl: startet nicht bei heute (${await tag()})`);
+    if (!(await tag()).includes('heute')) fail('Tageswahl: heute ist nicht als heute gekennzeichnet');
+    // Die Zukunft bleibt zu — sonst wäre die Auslage von morgen vorab bekannt
+    if (!(await vor.isDisabled())) fail('Tageswahl: die Zukunft ist wählbar');
+    await zurueck.dispatchEvent('pointerup');
+    const gestern = await tag();
+    if (gestern.includes(heute)) fail('Tageswahl: ‹ hat den Tag nicht geändert');
+    if (await vor.isDisabled()) fail('Tageswahl: von gestern führt kein Weg zurück nach heute');
+    // Bis ans Ende der Historie blättern: dann ist ‹ zu
+    for (let i = 0; i < 13; i++) await zurueck.dispatchEvent('pointerup');
+    if (!(await zurueck.isDisabled())) fail('Tageswahl: blättert über die Historie hinaus');
+    // Und der gewählte Tag muss auch in der Partie ankommen
+    await vor.dispatchEvent('pointerup');
+    const gewaehlt = (await tag()).replace(/[^0-9-]/g, '');
+    await dp.locator('.bar button.big').click();
+    await dp.locator('.corner').first().waitFor({ timeout: 5000 });
+    const gespielt = await dp.evaluate(
+      () => JSON.parse(localStorage.getItem('tinytowns.save.v1')).config.dailyId
+    );
+    if (gespielt !== gewaehlt) fail(`Tageswahl: gespielt wird ${gespielt}, gewählt war ${gewaehlt}`);
+    console.log(`✓ Tageswahl: heute bis ${gewaehlt}, Zukunft gesperrt, gewählter Tag wird gespielt`);
+    await ctx.close();
+  }
+
+  // Manifest: Ohne id/scope/start_url kann Chrome einen geteilten Link nicht an
+  // die installierte App geben — und navigate-existing hält es bei einem
+  // Fenster. (Auf iOS hilft beides nicht, dort führt die Tageswahl hin.)
+  {
+    const mf = await fetch(new URL('manifest.webmanifest', BASE_URL)).then((r) => r.json());
+    for (const key of ['id', 'scope', 'start_url']) {
+      if (!mf[key]) fail(`Manifest: ${key} fehlt — Links landen immer im Browser`);
+    }
+    if (mf.launch_handler?.client_mode !== 'navigate-existing') {
+      fail('Manifest: launch_handler fehlt oder öffnet ein zweites Fenster');
+    }
+    console.log('✓ Manifest: Geltungsbereich und Start gesetzt, Links ins offene Fenster');
+  }
+
   // Installations-Hinweis: Auf iOS gibt es keine Schnittstelle dafür, also muss
   // dort eine Anleitung erscheinen — und einmal weggeklickt bleibt sie weg.
   {
