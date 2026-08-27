@@ -90,10 +90,10 @@
     try {
       const href = location.href;
       const url = st.config.dailyId ? dailyUrl(st.config.dailyId, href, land) : href;
-      const modeTag = land ? ` — 🏞 ${t.soloLand}` : '';
+      const modeTag = land ? ` — 🏞 ${t.landMode}` : '';
       const subtitle =
         (st.config.dailyId ? `${t.soloDaily} ${st.config.dailyId}` : '') +
-        (land ? (st.config.dailyId ? ' · ' : '') + `🏞 ${t.soloLand}` : '');
+        (land ? (st.config.dailyId ? ' · ' : '') + `🏞 ${t.landMode}` : '');
       const text = shareText({
         title: t.appTitle + modeTag,
         rank,

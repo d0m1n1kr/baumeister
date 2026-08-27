@@ -870,6 +870,112 @@ try {
     await ctx2.close();
     await ctx.close();
     console.log('✓ Landpartie: 30 Felder (5×6), Landschaft gesperrt, 10 Karten, Tageskarte deterministisch');
+
+    // Mehrspieler: Alle bekommen DIESELBE Landschaft. Verschiedene Landschaften
+    // wären verschiedene Spiele — die Städte ließen sich nicht vergleichen.
+    for (const [label, w, h, players] of [
+      ['Tablet quer', 1180, 820, 4],
+      ['Handy hoch', 402, 874, 2]
+    ]) {
+      const mctx = await browser.newContext({ viewport: { width: w, height: h }, locale: 'de-DE' });
+      const mp = await mctx.newPage();
+      mp.on('pageerror', (e) => fail(`Landpartie ${label} ${players}P: Seitenfehler: ${e.message}`));
+      await mp.goto(BASE_URL);
+      await mp.locator('#splash').waitFor({ state: 'detached', timeout: 10000 });
+      const neu = mp.locator('button', { hasText: 'Neues Spiel' });
+      if (await neu.count()) await neu.click();
+      await mp.locator('.seg button', { hasText: String(players) }).first().click();
+      const schalter = mp.locator('.landOpt input');
+      if ((await schalter.count()) === 0) {
+        fail(`Landpartie ${label} ${players}P: kein Schalter bei ${players} Spielern`);
+      }
+      await schalter.check();
+      await mp.locator('.bar button.big').click();
+      await mp.locator('.board').first().waitFor({ timeout: 8000 });
+      await mp.waitForTimeout(400);
+      const g = await mp.evaluate(() => {
+        const st = JSON.parse(localStorage.getItem('tinytowns.save.v1'));
+        const fingerprint = st.players.map((p) => p.board.map((sq) => sq.terrain ?? '-').join(''));
+        const bretter = [...document.querySelectorAll('.board')].map((el) => {
+          const r = el.getBoundingClientRect();
+          return { w: Math.round(r.width), h: Math.round(r.height) };
+        });
+        return {
+          spieler: st.players.length,
+          land: st.config.land === true,
+          felder: st.players[0].board.length,
+          landschaft: st.players[0].board.filter((sq) => sq.terrain).length,
+          verschiedene: new Set(fingerprint).size,
+          karten: st.config.activeCards.length,
+          erweiterungen: st.config.sets,
+          systeme: st.config.systems,
+          bretter,
+          clipped: [...document.querySelectorAll('.corner')].some(
+            (c) => c.scrollWidth - c.clientWidth > 1 || c.scrollHeight - c.clientHeight > 1
+          )
+        };
+      });
+      const wo = `Landpartie ${label} ${players}P`;
+      if (!g.land || g.felder !== 30) fail(`${wo}: ${g.felder} Felder, land=${g.land}`);
+      if (g.landschaft < 9 || g.landschaft > 13) fail(`${wo}: ${g.landschaft} Landschaftsfelder`);
+      if (g.verschiedene !== 1) fail(`${wo}: ${g.verschiedene} verschiedene Landschaften`);
+      if (g.bretter.length !== players) fail(`${wo}: ${g.bretter.length} Bretter statt ${players}`);
+      // Gleich große Bretter, und die Form stimmt (5:6, also höher als breit)
+      for (const b of g.bretter) {
+        if (b.w !== g.bretter[0].w || b.h !== g.bretter[0].h) {
+          fail(`${wo}: Bretter unterschiedlich groß (${JSON.stringify(g.bretter)})`);
+        }
+        if (Math.abs(b.h / b.w - 6 / 5) > 0.05) fail(`${wo}: Brettform ${b.w}×${b.h} ist nicht 5:6`);
+      }
+      if (g.clipped) fail(`${wo}: Inhalt wird am Zellenrand abgeschnitten`);
+      // Landpartie spielt pur: keine Erweiterungen, keine Zusatzmodi
+      if (g.karten !== 10) fail(`${wo}: ${g.karten} Karten statt 10`);
+      if (JSON.stringify(g.erweiterungen) !== JSON.stringify(['base'])) {
+        fail(`${wo}: Erweiterungen aktiv (${g.erweiterungen})`);
+      }
+      for (const [name, an] of Object.entries(g.systeme)) {
+        if (an) fail(`${wo}: System „${name}" ist an, die Landpartie spielt pur`);
+      }
+      await mctx.close();
+    }
+    console.log('✓ Landpartie mehrspielerfähig: dieselbe Landschaft für alle, gleich große Bretter, pur');
+
+    // Grenze am Handy: Zu drei oder vier an EINEM Telefon wäre das 5×6-Brett
+    // unbedienbar (gemessen 23 px je Feld). Der Schalter verschwindet dort —
+    // aber nicht stillschweigend, sondern mit Begründung. Mit eigenen Geräten
+    // und auf dem Tablet gilt die Grenze nicht.
+    for (const [label, w, h, players, multi, erwartet] of [
+      ['Handy hoch', 402, 874, 4, false, 'gesperrt'],
+      ['Handy hoch', 402, 874, 3, false, 'gesperrt'],
+      ['Handy quer', 874, 402, 4, false, 'gesperrt'],
+      ['Handy hoch', 402, 874, 2, false, 'offen'],
+      ['Handy hoch', 402, 874, 4, true, 'offen'],
+      ['Tablet quer', 1180, 820, 4, false, 'offen'],
+      ['Tablet hoch', 1024, 1366, 4, false, 'offen']
+    ]) {
+      const gctx = await browser.newContext({ viewport: { width: w, height: h }, locale: 'de-DE' });
+      const gp = await gctx.newPage();
+      gp.on('pageerror', (e) => fail(`Landpartie-Grenze: Seitenfehler: ${e.message}`));
+      await gp.goto(BASE_URL);
+      await gp.locator('#splash').waitFor({ state: 'detached', timeout: 10000 });
+      const neu2 = gp.locator('button', { hasText: 'Neues Spiel' });
+      if (await neu2.count()) await neu2.click();
+      await gp.locator('.seg button', { hasText: String(players) }).first().click();
+      if (multi) await gp.locator('.seg button', { hasText: 'Mit eigenen' }).click();
+      await gp.waitForTimeout(150);
+      const schalterDa = (await gp.locator('.landOpt input').count()) > 0;
+      const hinweisDa = (await gp.locator('.landHint').count()) > 0;
+      const wo = `Landpartie-Grenze ${label} ${players}P ${multi ? 'eigene Geräte' : 'ein Gerät'}`;
+      if (erwartet === 'gesperrt') {
+        if (schalterDa) fail(`${wo}: Schalter steht trotzdem da`);
+        if (!hinweisDa) fail(`${wo}: gesperrt, aber ohne Begründung`);
+      } else {
+        if (!schalterDa) fail(`${wo}: Schalter fehlt, obwohl erlaubt`);
+        if (hinweisDa) fail(`${wo}: Begründung steht da, obwohl erlaubt`);
+      }
+      await gctx.close();
+    }
+    console.log('✓ Landpartie-Grenze: am Handy zu 3–4 nur mit eigenen Geräten, mit Begründung');
   }
 
   // Manifest: Ohne id/scope/start_url kann Chrome einen geteilten Link nicht an

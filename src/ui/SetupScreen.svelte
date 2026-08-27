@@ -83,6 +83,27 @@
   const linkAktiv = $derived(initialDaily !== null);
   const daily = $derived(soloMode === 'daily');
   const solo = $derived(count === 1);
+  // Handy? Erkannt an der KURZEN Seite, damit das Drehen des Geräts nichts
+  // ändert: Ein Telefon bleibt hoch- wie querkant ein Telefon, ein Tablet
+  // liegt in beiden Lagen über der Schwelle.
+  let phone = $state(false);
+  $effect(() => {
+    if (typeof matchMedia === 'undefined') return;
+    const mq = matchMedia('(max-width: 599px), (max-height: 599px)');
+    const update = () => (phone = mq.matches);
+    update();
+    mq.addEventListener('change', update);
+    return () => mq.removeEventListener('change', update);
+  });
+
+  // Zu drei oder vier an EINEM Handy wird das 5×6-Brett unbedienbar: Jeder
+  // Quadrant ist dann nur halb so breit wie der Schirm, gemessen 23 px je Feld.
+  // Mit eigenen Geräten sieht jeder sein Brett groß — dort gilt die Grenze nicht.
+  const landTooTight = $derived(phone && !multiDevice && count >= 3);
+  // Landpartie gilt sonst für jede Spielerzahl — nur das Lernspiel bleibt bei
+  // der 4×4-Klassik, weil seine Erklärtexte darauf gebaut sind.
+  const landAllowed = $derived((!solo || soloMode !== 'learn') && !landTooTight);
+  const landActive = $derived(landMode && landAllowed);
   // Die Spielerzeilen teilen sich ein Raster. Es muss genau so viele Spalten
   // haben, wie eine Zeile Elemente rendert — sonst rutschen die Felder der
   // nächsten Zeile in die freien Spalten der vorigen.
@@ -180,18 +201,18 @@
       merkeAuswahl();
       // Der Lernmodus ist eine Anzeige-Präferenz dieses Geräts, kein Spielstand
       learn.set(solo && soloMode === 'learn');
-      const land = solo && soloMode !== 'learn' && landMode;
+      const land = landActive;
       game.start(
         buildGameConfig(
           currentPlayers(),
           // Landpartie V1 spielt pur: Basis + Anlieger-Deck, keine Erweiterungen
           land ? ['base'] : activeSets(),
           useMonuments,
-          !solo && cavernRule,
+          !solo && !land && cavernRule,
           {
             solo,
             dailyId: solo && daily ? dailyDate : undefined,
-            townHall: !solo && townHall,
+            townHall: !solo && !land && townHall,
             train: !land && train,
             land
           }
@@ -226,7 +247,10 @@
     try {
       saveNames(names);
       merkeAuswahl();
-      session.setup = { sets: activeSets(), useMonuments, cavern: cavernRule, townHall, train };
+      // Landpartie spielt pur — dieselbe Regel wie am Einzelgerät
+      session.setup = landActive
+        ? { sets: ['base'], useMonuments, cavern: false, townHall: false, train: false, land: true }
+        : { sets: activeSets(), useMonuments, cavern: cavernRule, townHall, train, land: false };
       await session.openRoom(makeRoomCode(), seats, selectedTransport());
     } catch (e) {
       error = e instanceof Error ? e.message : String(e);
@@ -335,24 +359,6 @@
                   onpointerup={() => stepDay(1)}>›</button>
               </div>
             {/if}
-            {#if soloMode !== 'learn'}
-              <!-- Landpartie: 5×6 mit Landschaft — kombinierbar mit Frei und
-                   Tages-Challenge, das Lernspiel bleibt bei der 4×4-Klassik -->
-              <label class="opt landOpt">
-                <input type="checkbox" bind:checked={landMode} />
-                <span class="optText">
-                  <span class="optName">🏞 {t.soloLand}</span>
-                  <span class="optDesc">{t.soloLandHint}</span>
-                </span>
-              </label>
-            {/if}
-            <p class="hint">
-              {#if soloMode === 'daily'}{t.soloDailyHint}{/if}
-              {#if soloMode === 'learn'}{t.learn.setupHint}{/if}
-              <button class="link helpLink tapArea" onpointerup={() => (showHelp = true)}>
-                📖 {t.helpButton}
-              </button>
-            </p>
           {:else}
             <div class="seg spread">
               <button class:primary={!multiDevice} onpointerup={() => (multiDevice = false)}>
@@ -362,13 +368,33 @@
                 {t.ownDevices}
               </button>
             </div>
-            <p class="hint">
-              {multiDevice ? t.ownDevicesHint : t.oneDeviceHint}
-              <button class="link helpLink tapArea" onpointerup={() => (showHelp = true)}>
-                📖 {t.helpButton}
-              </button>
-            </p>
           {/if}
+          {#if landAllowed}
+            <!-- Landpartie: 5×6 mit Landschaft — für jede Spielerzahl, alle
+                 bekommen dieselbe Landschaft. Nur das Lernspiel bleibt bei
+                 der 4×4-Klassik. -->
+            <label class="opt landOpt">
+              <input type="checkbox" bind:checked={landMode} />
+              <span class="optText">
+                <span class="optName">🏞 {t.landMode}</span>
+                <span class="optDesc">{t.landModeHint}</span>
+              </span>
+            </label>
+          {:else if landTooTight}
+            <!-- Nicht stillschweigend weglassen: sagen, warum und was hilft -->
+            <p class="hint landHint">🏞 {t.landPhoneLimit}</p>
+          {/if}
+          <p class="hint">
+            {#if solo}
+              {#if soloMode === 'daily'}{t.soloDailyHint}{/if}
+              {#if soloMode === 'learn'}{t.learn.setupHint}{/if}
+            {:else}
+              {multiDevice ? t.ownDevicesHint : t.oneDeviceHint}
+            {/if}
+            <button class="link helpLink tapArea" onpointerup={() => (showHelp = true)}>
+              📖 {t.helpButton}
+            </button>
+          </p>
         </div>
 
         <div class="stack players" style="grid-template-columns: {rowColumns}">
@@ -424,7 +450,9 @@
           <span class="optText"><span class="optName">{t.useMonuments}</span></span>
         </label>
 
-        {#if !solo}
+        <!-- Rathaus, Eisenbahn und Höhle sind in der Landpartie aus: Sie
+             spielt pur, und die Schalter hätten keine Wirkung. -->
+        {#if !solo && !landActive}
           <label class="opt toggle">
             <input type="checkbox" bind:checked={townHall} />
             <span class="optText">
@@ -450,9 +478,9 @@
 
         <div class="expansions">
           <span class="expTitle">{t.expansions}</span>
-          {#if solo && soloMode !== 'learn' && landMode}
+          {#if landActive}
             <!-- Landpartie V1 spielt pur — die Checkboxen hätten keine Wirkung -->
-            <p class="hint">{t.soloLandNoSets}</p>
+            <p class="hint">{t.landNoSets}</p>
           {:else}
           {#each SETS.filter((s) => !s.core) as set}
             <label class="opt toggle expRow">
@@ -594,6 +622,7 @@
     gap: 10px;
   }
   .dayPick button:disabled { opacity: 0.35; }
+  .landHint { margin: 0; }
   .dayLabel {
     font-size: var(--fs-md);
     color: var(--accent);
