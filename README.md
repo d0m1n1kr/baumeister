@@ -43,9 +43,9 @@ On a phone you get your own board big, with the opponents shown as compact
 mini boards above — and your monument stays genuinely secret, because nobody
 else's device ever receives it.
 
-**The host still sees the whole table.** Here seat 1 is played on the host
-tablet while Anna and Ben are on their phones — the state is identical on every
-device (the host runs the engine and broadcasts it).
+**The host still sees the whole table.** Here Dominik plays on the host tablet
+while Anna and Ben are on their phones — the state is identical on every device
+(the host runs the engine and broadcasts it).
 
 ![Host table with two remote players](docs/screenshots/lan-host-table.png)
 
