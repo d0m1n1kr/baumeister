@@ -215,6 +215,8 @@ export const pl: Translation = {
   soloOfferTitle: 'Wybierz 1 z 3 odkrytych surowców',
   soloDeckCount: (n: number) => `Talia: ${n} kart`,
   soloDaily: 'Wyzwanie dnia',
+  dailyPure:
+    'Wyzwanie dnia zawsze toczy się czysto: gra podstawowa z monumentami. Tylko wtedy ta sama data to ta sama partia na całym świecie — już wyłączenie monumentów dałoby inną talię materiałów.',
   soloDailyHint: 'Stały los dnia — te same karty i surowce na całym świecie. Porównaj punkty!',
   landMode: 'Wycieczka (5×6)',
   landModeHint: 'Większa plansza z rzeką, górami i jeziorem — nie do zabudowy, ale karty nadbrzeżne punktują obok nich.',

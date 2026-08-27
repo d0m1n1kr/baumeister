@@ -807,9 +807,12 @@ try {
       await pg.locator('.seg button', { hasText: '1' }).first().click();
       await pg.locator('.seg button', { hasText: 'Tages-Challenge' }).click();
       await pg.locator('.landOpt input').click();
-      await pg.locator('.opt.toggle input[type="checkbox"]').first().click(); // ohne Monumente
       await pg.locator('.bar button.big').click();
       await pg.locator('.corner').waitFor({ timeout: 5000 });
+      // Monumente sind in der Challenge fest an (sonst wäre der Tag nicht
+      // weltweit dieselbe Partie), also erst den Draft durchklicken.
+      await pg.locator('button', { hasText: 'Monument wählen' }).first().click();
+      await pg.locator('.pickCard button.primary').first().click();
       await pg.waitForTimeout(400);
       return pg.evaluate(() => {
         const st = JSON.parse(localStorage.getItem('tinytowns.save.v1'));
@@ -1054,6 +1057,80 @@ try {
       await gctx.close();
     }
     console.log('✓ Landpartie-Grenze: am Handy zu 3–4 nur mit eigenen Geräten, mit Begründung');
+  }
+
+  // Tages-Challenge spielt pur: Ein Datum muss weltweit dieselbe Partie sein.
+  // Geprüft wird der gefährliche Weg — gemerkte Häkchen aus einer früheren
+  // Runde. Die dürfen nicht durchschlagen, auch nicht die Monumente (ohne sie
+  // zieht der Monument-Stapel nicht und das Material-Deck verschiebt sich).
+  {
+    const vorlieben = {
+      count: 1, multiDevice: false, soloMode: 'daily', land: false,
+      useMonuments: false, sets: ['fortune', 'tiny_trees'],
+      townHall: true, train: true, cavern: true
+    };
+    const starte = async (modus) => {
+      const ctx = await browser.newContext({ viewport: { width: 402, height: 874 }, locale: 'de-DE' });
+      const dp = await ctx.newPage();
+      dp.on('pageerror', (e) => fail(`Challenge pur: Seitenfehler: ${e.message}`));
+      await dp.addInitScript((v) => {
+        localStorage.setItem('tinytowns.setup.v1', JSON.stringify(v));
+      }, { ...vorlieben, soloMode: modus });
+      await dp.goto(BASE_URL);
+      await dp.locator('#splash').waitFor({ state: 'detached', timeout: 10000 });
+      const neu4 = dp.locator('button', { hasText: 'Neues Spiel' });
+      if (await neu4.count()) await neu4.click();
+      await dp.waitForTimeout(200);
+      const oberflaeche = {
+        erweiterungen: await dp.locator('.expRow').count(),
+        monumente: await dp.locator('.opt.toggle').count(),
+        hinweis: await dp.locator('.dailyPureHint').count()
+      };
+      await dp.locator('.bar button.big').click();
+      await dp.locator('.board').first().waitFor({ timeout: 8000 });
+      const partie = await dp.evaluate(() => {
+        const st = JSON.parse(localStorage.getItem('tinytowns.save.v1'));
+        return {
+          dailyId: st.config.dailyId ?? null,
+          sets: st.config.sets,
+          karten: st.config.activeCards.length,
+          monumente: st.config.monumentDeals[0].length,
+          systeme: st.config.systems,
+          rathaus: st.config.townHall === true,
+          deck: (st.soloDeck ?? []).slice(0, 6).join('')
+        };
+      });
+      await ctx.close();
+      return { oberflaeche, partie };
+    };
+
+    const tages = await starte('daily');
+    if (tages.oberflaeche.erweiterungen !== 0) {
+      fail(`Challenge pur: ${tages.oberflaeche.erweiterungen} Erweiterungs-Häkchen stehen noch da`);
+    }
+    if (tages.oberflaeche.monumente !== 0) fail('Challenge pur: Monument-Schalter steht noch da');
+    if (tages.oberflaeche.hinweis === 0) fail('Challenge pur: keine Begründung, warum die Häkchen fehlen');
+    if (tages.partie.dailyId === null) fail('Challenge pur: keine Tages-Challenge gestartet');
+    if (JSON.stringify(tages.partie.sets) !== JSON.stringify(['base'])) {
+      fail(`Challenge pur: Erweiterungen in der Partie (${tages.partie.sets})`);
+    }
+    if (tages.partie.karten !== 7) fail(`Challenge pur: ${tages.partie.karten} Karten statt 7`);
+    if (tages.partie.monumente !== 2) fail('Challenge pur: keine Monumente ausgeteilt');
+    if (tages.partie.rathaus) fail('Challenge pur: Rathaus ist an');
+    for (const [name, an] of Object.entries(tages.partie.systeme)) {
+      if (an) fail(`Challenge pur: System „${name}" ist an`);
+    }
+
+    // Gegenprobe: Im freien Solo wirken die gemerkten Erweiterungen weiter —
+    // nur Eisenbahn, Rathaus und Höhle bleiben aus (Mehrspieler-Regeln).
+    const frei = await starte('free');
+    if (frei.oberflaeche.erweiterungen === 0) fail('Freies Solo: Erweiterungs-Häkchen fehlen');
+    if (frei.partie.dailyId !== null) fail('Freies Solo: doch eine Tages-Challenge gestartet');
+    if (!frei.partie.sets.includes('fortune')) fail('Freies Solo: Fortune kam nicht in der Partie an');
+    if (!frei.partie.systeme.coins) fail('Freies Solo: Münzen sind aus');
+    if (frei.partie.systeme.train) fail('Freies Solo: die Eisenbahn ist an (Mehrspieler-Regel)');
+    if (frei.partie.rathaus) fail('Freies Solo: das Rathaus ist an (Mehrspieler-Regel)');
+    console.log('✓ Tages-Challenge pur: gemerkte Häkchen schlagen nicht durch, freies Solo behält sie');
   }
 
   // Manifest: Ohne id/scope/start_url kann Chrome einen geteilten Link nicht an

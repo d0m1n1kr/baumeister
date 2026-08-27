@@ -215,6 +215,8 @@ export const en: Translation = {
   soloOfferTitle: 'Choose 1 of the 3 face-up resources',
   soloDeckCount: (n: number) => `Draw pile: ${n} cards`,
   soloDaily: 'Daily challenge',
+  dailyPure:
+    'The daily challenge always plays pure: base game with monuments. Only then is a date the same game worldwide — even switching monuments off would deal a different resource deck.',
   soloDailyHint: 'Fixed daily seed — the same cards and resources worldwide. Compare your scores!',
   landMode: 'Countryside (5×6)',
   landModeHint: 'Bigger board with a river, mountains and a lake — unbuildable, but waterfront cards score next to them.',

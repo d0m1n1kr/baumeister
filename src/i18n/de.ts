@@ -215,6 +215,8 @@ export const de = {
   soloOfferTitle: 'Wähle 1 der 3 ausliegenden Materialien',
   soloDeckCount: (n: number) => `Nachziehstapel: ${n} Karten`,
   soloDaily: 'Tages-Challenge',
+  dailyPure:
+    'Die Tages-Challenge spielt immer pur: Basisspiel mit Monumenten. Nur so ist ein Datum weltweit dieselbe Partie — schon abgeschaltete Monumente würden ein anderes Material-Deck ergeben.',
   soloDailyHint: 'Fester Zufall des Tages — weltweit dieselben Karten und Materialien. Vergleiche deine Punkte!',
   landMode: 'Landpartie (5×6)',
   landModeHint: 'Größeres Brett mit Fluss, Bergen und See — unbebaubar, aber Anlieger-Karten bringen dort Punkte.',

@@ -109,7 +109,14 @@ while Anna and Ben are on their phones — the state is identical on every devic
   (up to "Master Architect"), a per-device highscore list, and a **daily challenge**
   (fixed date seed — the same cards worldwide, scores comparable). Today and the
   last 14 days can be picked with ‹ › next to the date; the future stays locked,
-  or tomorrow's setup would be known in advance.
+  or tomorrow's setup would be known in advance. **The daily always plays pure:**
+  base game with monuments, no expansions and no extra modes, and local
+  checkboxes cannot change it — the rule sits in `buildGameConfig`, not just in
+  the setup screen. That is not cosmetic: expansions deal different cards, and
+  even switching monuments off used to shift the RNG (the monument deck then
+  draws nothing) and with it the resource deck, so the same date was not the
+  same game. Countryside stays allowed — it is the board, and it travels in the
+  shared link.
 - **Share your result:** the score screen offers two buttons for solo games —
   one shares the text (rank, score, buildings and, for a daily challenge, a
   `#daily=<date>` link that opens exactly that day's setup on the other device),
@@ -143,7 +150,8 @@ while Anna and Ben are on their phones — the state is identical on every devic
   `&mode=land`; highscores and rank thresholds are kept separate
   from the classic list (solo only). Everything else combines freely: the
   expansions, the Town Hall variant, the cavern rule and the railway all work
-  on the taller board — it is a different board, not a different game. With the
+  on the taller board — it is a different board, not a different game (the
+  daily challenge is the one exception: there it plays pure, see above). With the
   railway on, the terrain generator additionally guarantees a spot for the
   train station on the track (the bottom row); without that guarantee about one
   layout in five left the station unbuildable. Terrain artwork adapts to the

@@ -215,6 +215,8 @@ export const es: Translation = {
   soloOfferTitle: 'Elige 1 de los 3 recursos visibles',
   soloDeckCount: (n: number) => `Mazo: ${n} cartas`,
   soloDaily: 'Reto diario',
+  dailyPure:
+    'El reto diario se juega siempre puro: juego base con monumentos. Solo así una fecha es la misma partida en todo el mundo; incluso desactivar los monumentos daría otro mazo de materiales.',
   soloDailyHint: 'Azar fijo del día — las mismas cartas y recursos en todo el mundo. ¡Compara tus puntos!',
   landMode: 'Campiña (5×6)',
   landModeHint: 'Tablero más grande con río, montañas y lago — no edificables, pero las cartas ribereñas puntúan junto a ellos.',

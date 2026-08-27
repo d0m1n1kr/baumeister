@@ -22,6 +22,19 @@ export function buildGameConfig(
   } = {}
 ): GameConfig {
   const land = opts.land ?? false;
+  // Die Tages-Challenge spielt immer pur: Basisspiel mit Monumenten, sonst
+  // nichts. Sie lebt davon, dass ein Datum weltweit DIESELBE Partie ist —
+  // und lokale Häkchen brechen das doppelt: Erweiterungen ziehen andere
+  // Karten, und schon das Abschalten der Monumente verschiebt den RNG-Lauf
+  // (der Monument-Stapel zieht dann nicht) und damit das Material-Deck.
+  // Die Landpartie bleibt erlaubt: Sie ist das Brett, nicht eine Erweiterung,
+  // und steht im geteilten Link.
+  const pur = !!opts.dailyId;
+  if (pur) {
+    sets = ['base'];
+    useMonuments = true;
+    cavern = false;
+  }
   // Eigener Seed-Stamm je Modus: Die Landpartie desselben Tages darf nicht
   // die klassische Auslage verraten (und umgekehrt).
   const seed = opts.dailyId ? dailySeed(opts.dailyId, land ? 'land-' : '') : randomSeed();
@@ -37,8 +50,8 @@ export function buildGameConfig(
       cavern
     },
     opts.solo ?? false,
-    opts.townHall ?? false,
-    opts.train ?? false,
+    !pur && (opts.townHall ?? false),
+    !pur && (opts.train ?? false),
     land
   );
   config.dailyId = opts.dailyId;
