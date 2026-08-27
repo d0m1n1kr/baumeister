@@ -939,6 +939,43 @@ try {
       await mctx.close();
     }
     console.log('✓ Landpartie mehrspielerfähig: dieselbe Landschaft für alle, gleich große Bretter, pur');
+
+    // Grenze am Handy: Zu drei oder vier an EINEM Telefon wäre das 5×6-Brett
+    // unbedienbar (gemessen 23 px je Feld). Der Schalter verschwindet dort —
+    // aber nicht stillschweigend, sondern mit Begründung. Mit eigenen Geräten
+    // und auf dem Tablet gilt die Grenze nicht.
+    for (const [label, w, h, players, multi, erwartet] of [
+      ['Handy hoch', 402, 874, 4, false, 'gesperrt'],
+      ['Handy hoch', 402, 874, 3, false, 'gesperrt'],
+      ['Handy quer', 874, 402, 4, false, 'gesperrt'],
+      ['Handy hoch', 402, 874, 2, false, 'offen'],
+      ['Handy hoch', 402, 874, 4, true, 'offen'],
+      ['Tablet quer', 1180, 820, 4, false, 'offen'],
+      ['Tablet hoch', 1024, 1366, 4, false, 'offen']
+    ]) {
+      const gctx = await browser.newContext({ viewport: { width: w, height: h }, locale: 'de-DE' });
+      const gp = await gctx.newPage();
+      gp.on('pageerror', (e) => fail(`Landpartie-Grenze: Seitenfehler: ${e.message}`));
+      await gp.goto(BASE_URL);
+      await gp.locator('#splash').waitFor({ state: 'detached', timeout: 10000 });
+      const neu2 = gp.locator('button', { hasText: 'Neues Spiel' });
+      if (await neu2.count()) await neu2.click();
+      await gp.locator('.seg button', { hasText: String(players) }).first().click();
+      if (multi) await gp.locator('.seg button', { hasText: 'Mit eigenen' }).click();
+      await gp.waitForTimeout(150);
+      const schalterDa = (await gp.locator('.landOpt input').count()) > 0;
+      const hinweisDa = (await gp.locator('.landHint').count()) > 0;
+      const wo = `Landpartie-Grenze ${label} ${players}P ${multi ? 'eigene Geräte' : 'ein Gerät'}`;
+      if (erwartet === 'gesperrt') {
+        if (schalterDa) fail(`${wo}: Schalter steht trotzdem da`);
+        if (!hinweisDa) fail(`${wo}: gesperrt, aber ohne Begründung`);
+      } else {
+        if (!schalterDa) fail(`${wo}: Schalter fehlt, obwohl erlaubt`);
+        if (hinweisDa) fail(`${wo}: Begründung steht da, obwohl erlaubt`);
+      }
+      await gctx.close();
+    }
+    console.log('✓ Landpartie-Grenze: am Handy zu 3–4 nur mit eigenen Geräten, mit Begründung');
   }
 
   // Manifest: Ohne id/scope/start_url kann Chrome einen geteilten Link nicht an

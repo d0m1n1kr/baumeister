@@ -219,6 +219,7 @@ export const de = {
   landMode: 'Landpartie (5×6)',
   landModeHint: 'Größeres Brett mit Fluss, Bergen und See — unbebaubar, aber Anlieger-Karten bringen dort Punkte.',
   landNoSets: 'Die Landpartie spielt pur: Basisspiel plus Anlieger-Karten, ohne Erweiterungen.',
+  landPhoneLimit: 'Am Handy nur bis 2 Spieler an einem Gerät — sonst werden die Felder zu klein. Mit eigenen Geräten geht sie zu jeder Spielerzahl.',
   landHighscores: 'Bestenliste Landpartie (dieses Gerät)',
   terrain: {
     river: 'Fluss',

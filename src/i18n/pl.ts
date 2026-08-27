@@ -219,6 +219,7 @@ export const pl: Translation = {
   landMode: 'Wycieczka (5×6)',
   landModeHint: 'Większa plansza z rzeką, górami i jeziorem — nie do zabudowy, ale karty nadbrzeżne punktują obok nich.',
   landNoSets: 'Wycieczka gra czysto: gra podstawowa plus karty terenu, bez dodatków.',
+  landPhoneLimit: 'Na telefonie maksymalnie 2 gracze na jednym urządzeniu — pola byłyby za małe. Na własnych urządzeniach działa przy każdej liczbie.',
   landHighscores: 'Rekordy wycieczki (to urządzenie)',
   terrain: {
     river: 'Rzeka',

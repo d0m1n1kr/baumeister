@@ -219,6 +219,7 @@ export const fr: Translation = {
   landMode: 'Campagne (5×6)',
   landModeHint: 'Plateau plus grand avec rivière, montagnes et lac — inconstructibles, mais les cartes riveraines y marquent des points.',
   landNoSets: 'La campagne se joue pure : jeu de base plus cartes de terrain, sans extensions.',
+  landPhoneLimit: 'Sur téléphone, 2 joueurs maximum sur un seul appareil — les cases deviendraient trop petites. Avec vos propres appareils, tout nombre fonctionne.',
   landHighscores: 'Meilleurs scores campagne (cet appareil)',
   terrain: {
     river: 'Rivière',

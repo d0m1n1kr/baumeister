@@ -83,9 +83,26 @@
   const linkAktiv = $derived(initialDaily !== null);
   const daily = $derived(soloMode === 'daily');
   const solo = $derived(count === 1);
-  // Landpartie gilt für jede Spielerzahl — nur das Lernspiel bleibt bei der
-  // 4×4-Klassik, weil seine Erklärtexte darauf gebaut sind.
-  const landAllowed = $derived(!solo || soloMode !== 'learn');
+  // Handy? Erkannt an der KURZEN Seite, damit das Drehen des Geräts nichts
+  // ändert: Ein Telefon bleibt hoch- wie querkant ein Telefon, ein Tablet
+  // liegt in beiden Lagen über der Schwelle.
+  let phone = $state(false);
+  $effect(() => {
+    if (typeof matchMedia === 'undefined') return;
+    const mq = matchMedia('(max-width: 599px), (max-height: 599px)');
+    const update = () => (phone = mq.matches);
+    update();
+    mq.addEventListener('change', update);
+    return () => mq.removeEventListener('change', update);
+  });
+
+  // Zu drei oder vier an EINEM Handy wird das 5×6-Brett unbedienbar: Jeder
+  // Quadrant ist dann nur halb so breit wie der Schirm, gemessen 23 px je Feld.
+  // Mit eigenen Geräten sieht jeder sein Brett groß — dort gilt die Grenze nicht.
+  const landTooTight = $derived(phone && !multiDevice && count >= 3);
+  // Landpartie gilt sonst für jede Spielerzahl — nur das Lernspiel bleibt bei
+  // der 4×4-Klassik, weil seine Erklärtexte darauf gebaut sind.
+  const landAllowed = $derived((!solo || soloMode !== 'learn') && !landTooTight);
   const landActive = $derived(landMode && landAllowed);
   // Die Spielerzeilen teilen sich ein Raster. Es muss genau so viele Spalten
   // haben, wie eine Zeile Elemente rendert — sonst rutschen die Felder der
@@ -363,6 +380,9 @@
                 <span class="optDesc">{t.landModeHint}</span>
               </span>
             </label>
+          {:else if landTooTight}
+            <!-- Nicht stillschweigend weglassen: sagen, warum und was hilft -->
+            <p class="hint landHint">🏞 {t.landPhoneLimit}</p>
           {/if}
           <p class="hint">
             {#if solo}
@@ -602,6 +622,7 @@
     gap: 10px;
   }
   .dayPick button:disabled { opacity: 0.35; }
+  .landHint { margin: 0; }
   .dayLabel {
     font-size: var(--fs-md);
     color: var(--accent);
