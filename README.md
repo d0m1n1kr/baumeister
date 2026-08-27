@@ -15,7 +15,7 @@ several expansions are all in the box.
 
 **One tablet, four towns.** Everyone plays at the same time; each corner is
 rotated toward its player, and the round's building cards sit in the middle.
-The Master Builder (👑) has named wheat — everyone places it on their own board.
+The Master Builder (👑) has named wood — everyone places it on their own board.
 
 ![Four players around one tablet](docs/screenshots/tablet-table.png)
 
