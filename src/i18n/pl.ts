@@ -216,6 +216,11 @@ export const pl: Translation = {
   soloDeckCount: (n: number) => `Talia: ${n} kart`,
   soloDaily: 'Wyzwanie dnia',
   soloDailyHint: 'Stały los dnia — te same karty i surowce na całym świecie. Porównaj punkty!',
+  terrain: {
+    river: 'Rzeka',
+    mountain: 'Góry',
+    lake: 'Jezioro'
+  },
   dailyPrevDay: 'Poprzedni dzień',
   dailyNextDay: 'Następny dzień',
   dailyToday: 'dziś',

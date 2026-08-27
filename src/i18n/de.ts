@@ -216,6 +216,11 @@ export const de = {
   soloDeckCount: (n: number) => `Nachziehstapel: ${n} Karten`,
   soloDaily: 'Tages-Challenge',
   soloDailyHint: 'Fester Zufall des Tages — weltweit dieselben Karten und Materialien. Vergleiche deine Punkte!',
+  terrain: {
+    river: 'Fluss',
+    mountain: 'Berge',
+    lake: 'See'
+  },
   dailyPrevDay: 'Tag zurück',
   dailyNextDay: 'Tag vor',
   dailyToday: 'heute',

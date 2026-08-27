@@ -216,6 +216,11 @@ export const en: Translation = {
   soloDeckCount: (n: number) => `Draw pile: ${n} cards`,
   soloDaily: 'Daily challenge',
   soloDailyHint: 'Fixed daily seed — the same cards and resources worldwide. Compare your scores!',
+  terrain: {
+    river: 'River',
+    mountain: 'Mountains',
+    lake: 'Lake'
+  },
   dailyPrevDay: 'Previous day',
   dailyNextDay: 'Next day',
   dailyToday: 'today',

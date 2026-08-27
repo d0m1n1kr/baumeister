@@ -84,6 +84,7 @@ export function themedResourceNames(lang: string): Record<Resource, string> | nu
 export const THEME_STRINGS: Partial<Record<ThemeId, Record<string, Record<string, unknown>>>> = {
   mars: {
     de: {
+      terrain: { river: 'Canyon', mountain: 'Kraterfeld', lake: 'Eissee' },
       chooseBuildTarget: 'Wähle das Feld für das Modul',
       declareComplete: 'Kolonie fertigstellen',
       declareCompleteTitle: 'Kolonie fertigstellen?',
@@ -154,6 +155,7 @@ export const THEME_STRINGS: Partial<Record<ThemeId, Record<string, Record<string
       }
     },
     en: {
+      terrain: { river: 'Canyon', mountain: 'Crater field', lake: 'Ice lake' },
       chooseBuildTarget: 'Choose the square for the module',
       declareComplete: 'Complete colony',
       declareCompleteTitle: 'Complete your colony?',
@@ -227,6 +229,7 @@ export const THEME_STRINGS: Partial<Record<ThemeId, Record<string, Record<string
   ,
   fantasy: {
     de: {
+      terrain: { river: 'Nebelfluss', mountain: 'Drachenfels', lake: 'Zaubersee' },
       chooseBuildTarget: 'Wähle das Feld für das Bauwerk',
       declareComplete: 'Weiler fertigstellen',
       declareCompleteTitle: 'Weiler fertigstellen?',
@@ -297,6 +300,7 @@ export const THEME_STRINGS: Partial<Record<ThemeId, Record<string, Record<string
       }
     },
     en: {
+      terrain: { river: 'Mistflow', mountain: 'Dragonspire', lake: 'Spelllake' },
       chooseBuildTarget: 'Choose the square for the structure',
       declareComplete: 'Complete hamlet',
       declareCompleteTitle: 'Complete your hamlet?',

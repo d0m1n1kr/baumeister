@@ -26,3 +26,9 @@ export function artFor(card: CardDef): string | undefined {
   if (themedArt && artBySvgName[themedArt]) return artBySvgName[themedArt];
   return card.art ? artBySvgName[card.art] : undefined;
 }
+
+/** Landschafts-Kachel (Landpartie) — gleiche Namenskonvention wie Karten:
+ *  `<theme>_<kind>.svg` mit klassischem `<kind>.svg` als Rückfall. */
+export function artForTerrain(kind: string): string | undefined {
+  return artBySvgName[`${theme}_${kind}.svg`] ?? artBySvgName[`${kind}.svg`];
+}

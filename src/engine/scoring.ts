@@ -163,7 +163,9 @@ function feedingCandidates(p: PlayerState, catalog: Catalog): FeedCandidate[] {
       }
     }
     bases = dedupeSets(next);
-    if (bases.length > 64) bases = bases.slice(0, 64); // Sicherheitsgrenze
+    // Sicherheitsgrenze, skaliert mit der Brettfläche (6×6 hat mehr Hütten)
+    const basesCap = size > 4 ? 96 : 64;
+    if (bases.length > basesCap) bases = bases.slice(0, basesCap);
   }
 
   // Bauernhof-Kapazität auf die restlichen Hütten verteilen
