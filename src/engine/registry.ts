@@ -17,7 +17,9 @@ export function validateCard(def: CardDef): void {
   const w = def.pattern[0].length;
   if (w === 0 || def.pattern.some((row) => row.length !== w)) err('pattern nicht rechteckig');
   if (!def.pattern.flat().some((c) => c !== null)) err('pattern ist leer');
-  if (def.pattern.length > 4 || w > 4) err('pattern größer als das Brett');
+  // 6 = größtes Brett (Landpartie); Muster bleiben faktisch ≤ 4×4, nur die
+  // harte Kopplung an die klassische Brettgröße fällt.
+  if (def.pattern.length > 6 || w > 6) err('pattern größer als das Brett');
   if (!def.scoring?.type) err('scoring fehlt');
   if (def.kind === 'monument' && def.category !== 'monument') err('Monument braucht category "monument"');
   if (def.kind !== 'monument' && def.category === 'monument') err('category "monument" nur für Monumente');

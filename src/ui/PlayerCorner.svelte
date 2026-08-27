@@ -130,14 +130,14 @@
     const resourceSquares = selected.filter((i) => p.board[i].resource);
     if ((def.effects ?? []).includes('buildAnywhereSelf') || anywhereAllowed) {
       const empty = p.board
-        .map((sq, i) => (!sq.building && (!sq.resource || resourceSquares.includes(i)) ? i : -1))
+        .map((sq, i) => (!sq.building && !sq.terrain && (!sq.resource || resourceSquares.includes(i)) ? i : -1))
         .filter((i) => i >= 0);
       return [...new Set([...empty, ...resourceSquares])];
     }
     return resourceSquares;
   });
 
-  const emptySquares = $derived(p.board.map((sq, i) => (!sq.building && !sq.resource ? i : -1)).filter((i) => i >= 0));
+  const emptySquares = $derived(p.board.map((sq, i) => (!sq.building && !sq.resource && !sq.terrain ? i : -1)).filter((i) => i >= 0));
   const boardFull = $derived(emptySquares.length === 0);
   const coinsActive = $derived(st.config.systems.coins);
   const treesActive = $derived(st.config.systems.trees);
@@ -188,7 +188,7 @@
     const sq = p.board[square];
     // Tiny Trees: Samen setzen
     if (st.phase.t === 'seedPlacement') {
-      if (p.seedSquare == null && !sq.building && !sq.resource) {
+      if (p.seedSquare == null && !sq.building && !sq.resource && !sq.terrain) {
         showError(game.dispatch({ t: 'placeSeed', player, square }));
       }
       return;
@@ -751,7 +751,7 @@
           {#if mode !== 'promenadePlace'}
             <button class="primary" onpointerup={() => (mode = 'promenadePlace')}>{t.choosePlacement}</button>
           {/if}
-          {#if !p.board.some((sq) => !sq.building && !sq.resource && !sq.coin)}
+          {#if !p.board.some((sq) => !sq.building && !sq.resource && !sq.coin && !sq.terrain)}
             <button onpointerup={() => { showError(game.dispatch({ t: 'resolvePromenade', player, square: null })); resetMode(); }}>
               {t.skip}
             </button>

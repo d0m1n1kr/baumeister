@@ -144,8 +144,15 @@ export type Catalog = Record<string, CardDef>;
 
 // ---------- Spielzustand ----------
 
+/** Klassische Brettgröße. Die Landpartie spielt auf 6×6 — überall dort, wo es
+ *  auf die Größe ankommt, gilt deshalb die des konkreten Bretts (boardSizeOf),
+ *  und diese Konstante ist nur noch der Default. */
 export const BOARD_SIZE = 4;
 export const NUM_SQUARES = BOARD_SIZE * BOARD_SIZE;
+
+/** Kantenlänge eines konkreten Bretts — selbstbeschreibend aus der Feldzahl,
+ *  damit alte Spielstände ohne Migrationsfeld weiterlaufen. */
+export const boardSizeOf = (board: unknown[]): number => Math.round(Math.sqrt(board.length));
 
 export interface PlacedBuilding {
   card: string;
@@ -157,19 +164,30 @@ export interface PlacedBuilding {
   stock?: string[];
 }
 
+/** Landschaftsfelder der Landpartie — unbebaubar, aber wertungsrelevant. */
+export type TerrainKind = 'river' | 'mountain' | 'lake';
+
 export interface Square {
   building?: PlacedBuilding;
   /** Material; koexistiert mit building nur via Statue des Bondmakers. */
   resource?: Resource;
   /** Fortune: Münze auf dem Feld (Grotto/Promenade). */
   coin?: boolean;
+  /** Landpartie: Landschaft (Fluss/Berg/See) — Feld ist nie bebaubar. */
+  terrain?: TerrainKind;
 }
+
+/** Gesperrtes Feld (Landschaft): kein Material, kein Gebäude, keine Münze. */
+export const isBlocked = (sq: Square): boolean => !!sq.terrain;
+/** Wirklich freies Feld — die eine Definition für alle „ist da Platz?"-Fragen. */
+export const isFreeSquare = (sq: Square): boolean =>
+  !sq.building && !sq.resource && !sq.terrain;
 
 export interface PlayerState {
   name: string;
   /** Ecke 0=unten links, 1=unten rechts, 2=oben rechts, 3=oben links. */
   corner: number;
-  board: Square[]; // Länge 16, Index = row*4+col
+  board: Square[]; // Länge size², Index = row*size+col (klassisch 4, Landpartie 6)
   /** Beim Draft: die 2 zugeteilten Monumente; nach Wahl geleert. */
   monumentOptions?: string[];
   monument?: { card: string; built: boolean };
@@ -256,6 +274,8 @@ export interface GameConfig {
   townHallDeck?: Resource[];
   /** Rathaus: Seed für deterministische Neumischungen des Abwurfstapels. */
   thSeed?: number;
+  /** Landpartie: 6×6-Brett mit Landschaft (nur solo). */
+  land?: boolean;
   /** Tages-Challenge: Datum des festen Seeds (z. B. „2026-08-23"). */
   dailyId?: string;
   /** Eindeutige Partie-Kennung (Bestenliste: jede Partie zählt nur einmal). */
@@ -350,31 +370,43 @@ export interface PlayerScore {
 
 // ---------- Hilfsfunktionen ----------
 
-export const idx = (row: number, col: number): number => row * BOARD_SIZE + col;
-export const rowOf = (i: number): number => Math.floor(i / BOARD_SIZE);
-export const colOf = (i: number): number => i % BOARD_SIZE;
+// Alle Geometrie-Helfer nehmen die Kantenlänge als letzten Parameter mit
+// Default BOARD_SIZE: Bestehende Aufrufer (und Tests) bleiben wortgleich
+// gültig, und die Landpartie reicht ihre 6 durch.
+export const idx = (row: number, col: number, n = BOARD_SIZE): number => row * n + col;
+export const rowOf = (i: number, n = BOARD_SIZE): number => Math.floor(i / n);
+export const colOf = (i: number, n = BOARD_SIZE): number => i % n;
 
 /** Orthogonale Nachbarn eines Feldes. */
-export function neighbors4(i: number): number[] {
-  const r = rowOf(i), c = colOf(i), out: number[] = [];
-  if (r > 0) out.push(idx(r - 1, c));
-  if (r < BOARD_SIZE - 1) out.push(idx(r + 1, c));
-  if (c > 0) out.push(idx(r, c - 1));
-  if (c < BOARD_SIZE - 1) out.push(idx(r, c + 1));
+export function neighbors4(i: number, n = BOARD_SIZE): number[] {
+  const r = rowOf(i, n), c = colOf(i, n), out: number[] = [];
+  if (r > 0) out.push(idx(r - 1, c, n));
+  if (r < n - 1) out.push(idx(r + 1, c, n));
+  if (c > 0) out.push(idx(r, c - 1, n));
+  if (c < n - 1) out.push(idx(r, c + 1, n));
   return out;
 }
 
 /** Alle 8 umliegenden Felder. */
-export function neighbors8(i: number): number[] {
-  const r = rowOf(i), c = colOf(i), out: number[] = [];
+export function neighbors8(i: number, n = BOARD_SIZE): number[] {
+  const r = rowOf(i, n), c = colOf(i, n), out: number[] = [];
   for (let dr = -1; dr <= 1; dr++)
     for (let dc = -1; dc <= 1; dc++) {
       if (dr === 0 && dc === 0) continue;
       const nr = r + dr, nc = c + dc;
-      if (nr >= 0 && nr < BOARD_SIZE && nc >= 0 && nc < BOARD_SIZE) out.push(idx(nr, nc));
+      if (nr >= 0 && nr < n && nc >= 0 && nc < n) out.push(idx(nr, nc, n));
     }
   return out;
 }
 
-export const CORNER_SQUARES = [0, 3, 12, 15];
-export const CENTER_SQUARES = [5, 6, 9, 10];
+/** Die vier Eckfelder (Kloster). */
+export const cornerSquares = (n = BOARD_SIZE): number[] =>
+  [idx(0, 0, n), idx(0, n - 1, n), idx(n - 1, 0, n), idx(n - 1, n - 1, n)];
+/** Die vier Mittelfelder (Schneiderei, Grotte) — bei gerader Kantenlänge
+ *  das exakte Zentrum, klassisch [5, 6, 9, 10]. */
+export function centerSquares(n = BOARD_SIZE): number[] {
+  const a = Math.floor((n - 1) / 2), b = Math.ceil((n - 1) / 2);
+  return [idx(a, a, n), idx(a, b, n), idx(b, a, n), idx(b, b, n)].filter(
+    (v, i, arr) => arr.indexOf(v) === i
+  );
+}

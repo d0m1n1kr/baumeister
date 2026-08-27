@@ -47,6 +47,9 @@
   // Reload) gibt es kein Vorher-Brett, also auch keine Animation.
   const reduceMotion =
     typeof matchMedia !== 'undefined' && matchMedia('(prefers-reduced-motion: reduce)').matches;
+  // Kantenlänge des KONKRETEN Bretts: klassisch 4, Landpartie 6.
+  const size = $derived(Math.round(Math.sqrt(board.length)));
+
   let prevBoard: { card: string | null; resource: string | null }[] | null = null;
   let fresh = $state<Record<number, 'build' | 'monument'>>({});
   let ghosts = $state<Ghost[]>([]);
@@ -82,10 +85,10 @@
       if (lost && !snap[i].resource && !builtAt.includes(i)) {
         spawned.push({
           id: ghostSeq++,
-          col: i % 4,
-          row: Math.floor(i / 4),
-          dx: (target % 4 - i % 4) * 100,
-          dy: (Math.floor(target / 4) - Math.floor(i / 4)) * 100,
+          col: i % size,
+          row: Math.floor(i / size),
+          dx: (target % size - i % size) * 100,
+          dy: (Math.floor(target / size) - Math.floor(i / size)) * 100,
           color: RESOURCE_CSS[lost as keyof typeof RESOURCE_CSS]
         });
       }
@@ -101,6 +104,7 @@
 
 <div
   class="board"
+  style="--n: {size}"
   data-track={trackEdge ? player : undefined}
   data-track-edge={trackEdge ?? undefined}
 >
@@ -153,7 +157,7 @@
   {#each ghosts as g (g.id)}
     <span
       class="ghost"
-      style="left: {g.col * 25}%; top: {g.row * 25}%; --dx: {g.dx}%; --dy: {g.dy}%"
+      style="left: {(g.col * 100) / size}%; top: {(g.row * 100) / size}%; --dx: {g.dx}%; --dy: {g.dy}%"
     >
       <span class="ghostDot" style="background: {g.color}"></span>
     </span>
@@ -164,8 +168,8 @@
   .board {
     position: relative; /* Bezugsrahmen für die fliegenden Material-Geister */
     display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    grid-template-rows: repeat(4, 1fr);
+    grid-template-columns: repeat(var(--n, 4), 1fr);
+    grid-template-rows: repeat(var(--n, 4), 1fr);
     gap: 4px;
     background: var(--board-bg);
     border: 3px solid var(--board-border);
@@ -225,8 +229,8 @@
      exakte Zellenkoordinaten. */
   .ghost {
     position: absolute;
-    width: 25%;
-    height: 25%;
+    width: calc(100% / var(--n, 4));
+    height: calc(100% / var(--n, 4));
     display: grid;
     place-items: center;
     pointer-events: none;
