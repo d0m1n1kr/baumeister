@@ -62,11 +62,16 @@ describe('dailyUrl', () => {
 
 describe('dailyIdFromHash', () => {
   it('liest die Kennung', () => {
-    expect(dailyIdFromHash('#daily=2026-08-26')).toBe('2026-08-26');
+    expect(dailyIdFromHash('#daily=2026-08-26')).toEqual({ id: '2026-08-26', land: false });
   });
 
   it('liest sie auch hinter einem anderen Parameter', () => {
-    expect(dailyIdFromHash('#x=1&daily=2026-01-02')).toBe('2026-01-02');
+    expect(dailyIdFromHash('#x=1&daily=2026-01-02')).toEqual({ id: '2026-01-02', land: false });
+  });
+
+  it('erkennt den Landpartie-Marker', () => {
+    expect(dailyIdFromHash('#daily=2026-08-27&mode=land')).toEqual({ id: '2026-08-27', land: true });
+    expect(dailyIdFromHash('#daily=2026-08-27&mode=landx')).toEqual({ id: '2026-08-27', land: false });
   });
 
   it('weist alles zurück, was kein Datum ist', () => {

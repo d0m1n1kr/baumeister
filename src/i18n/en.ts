@@ -216,6 +216,10 @@ export const en: Translation = {
   soloDeckCount: (n: number) => `Draw pile: ${n} cards`,
   soloDaily: 'Daily challenge',
   soloDailyHint: 'Fixed daily seed — the same cards and resources worldwide. Compare your scores!',
+  soloLand: 'Countryside (6×6)',
+  soloLandHint: 'Bigger board with a river, mountains and a lake — unbuildable, but waterfront cards score next to them.',
+  soloLandNoSets: 'The countryside plays pure: base game plus terrain cards, no expansions.',
+  landHighscores: 'Countryside highscores (this device)',
   terrain: {
     river: 'River',
     mountain: 'Mountains',

@@ -113,7 +113,7 @@ try {
     await gp.goto(BASE_URL);
     await gp.locator('#splash').waitFor({ state: 'detached', timeout: 10000 });
     await gp.locator('.seg button', { hasText: String(players) }).first().click();
-    await gp.locator('.opt input[type="checkbox"]').first().click(); // ohne Monumente
+    await gp.locator('.opt.toggle input[type="checkbox"]').first().click(); // ohne Monumente
     await gp.locator('.bar button.big').click();
     await gp.locator('.picker').first().waitFor({ timeout: 5000 });
     // Material ansagen: Solo bietet drei Marken, Mehrspieler den Materialwähler
@@ -181,7 +181,7 @@ try {
     await gp.goto(BASE_URL);
     await gp.locator('#splash').waitFor({ state: 'detached', timeout: 10000 });
     await gp.locator('.seg button', { hasText: String(players) }).first().click();
-    await gp.locator('.opt input[type="checkbox"]').first().click(); // ohne Monumente
+    await gp.locator('.opt.toggle input[type="checkbox"]').first().click(); // ohne Monumente
     await gp.locator('.opt', { hasText: 'Eisenbahn' }).locator('input').click();
     await gp.locator('.bar button.big').click();
     await gp.locator('.picker').first().waitFor({ timeout: 5000 });
@@ -673,6 +673,81 @@ try {
     if (gespielt !== gewaehlt) fail(`Tageswahl: gespielt wird ${gespielt}, gewählt war ${gewaehlt}`);
     console.log(`✓ Tageswahl: heute bis ${gewaehlt}, Zukunft gesperrt, gewählter Tag wird gespielt`);
     await ctx.close();
+  }
+
+  // ---------- Landpartie: 6×6, Landschaft, Anlieger-Karten ----------
+  // Der Modus lebt von zwei Zusagen: Landschaft ist NIE bespielbar, und die
+  // Tages-Challenge erzeugt aus dem Datum weltweit dieselbe Karte.
+  {
+    const starte = async (pg) => {
+      await pg.goto(BASE_URL);
+      await pg.locator('#splash').waitFor({ state: 'detached', timeout: 10000 });
+      await pg.locator('.seg button', { hasText: '1' }).first().click();
+      await pg.locator('.seg button', { hasText: 'Tages-Challenge' }).click();
+      await pg.locator('.landOpt input').click();
+      await pg.locator('.opt.toggle input[type="checkbox"]').first().click(); // ohne Monumente
+      await pg.locator('.bar button.big').click();
+      await pg.locator('.corner').waitFor({ timeout: 5000 });
+      await pg.waitForTimeout(400);
+      return pg.evaluate(() => {
+        const st = JSON.parse(localStorage.getItem('tinytowns.save.v1'));
+        return {
+          zellen: document.querySelectorAll('.cell').length,
+          terrainZellen: document.querySelectorAll('.terrainCell').length,
+          terrainButtons: document.querySelectorAll('.terrainCell[role="button"]').length,
+          terrain: st.config.terrain,
+          karten: st.config.activeCards,
+          land: st.config.land
+        };
+      });
+    };
+    const ctx = await browser.newContext({ viewport: { width: 1180, height: 820 }, locale: 'de-DE' });
+    const lp = await ctx.newPage();
+    lp.on('pageerror', (e) => fail(`Landpartie: Seitenfehler: ${e.message}`));
+    const a = await starte(lp);
+    if (!a.land) fail('Landpartie: Modus kam nicht im Spielstand an');
+    if (a.zellen !== 36) fail(`Landpartie: ${a.zellen} Zellen statt 36`);
+    if (a.terrainZellen < 9 || a.terrainZellen > 13) {
+      fail(`Landpartie: ${a.terrainZellen} Landschaftsfelder (erwartet 9–13)`);
+    }
+    if (a.terrainButtons !== 0) fail('Landpartie: Landschaft ist als Trefffläche markiert');
+    if (a.karten.length !== 10) fail(`Landpartie: ${a.karten.length} Karten statt 10`);
+
+    // Material auf Landschaft tippen bewirkt nichts, auf freiem Feld liegt es
+    await lp.locator('.picker .chip, .picker .offerChip').first().click();
+    await lp.locator('.pendingWrap').first().waitFor({ timeout: 5000 });
+    const tSquare = a.terrain[0].square;
+    const frei = await lp.evaluate((t) => {
+      const st = JSON.parse(localStorage.getItem('tinytowns.save.v1'));
+      for (let i = 0; i < 36; i++) {
+        if (!st.config.terrain.some((c) => c.square === i)) return i;
+      }
+      return -1;
+    }, tSquare);
+    // Terrainzelle hat kein data-square — es darf schlicht kein Ziel geben
+    if (await lp.locator(`[data-square="${tSquare}"]`).count()) {
+      fail('Landpartie: Landschaftsfeld ist als data-square-Ziel erreichbar');
+    }
+    await lp.locator(`[data-square="${frei}"]`).click();
+    const gelegt = await lp.evaluate(
+      (i) => JSON.parse(localStorage.getItem('tinytowns.save.v1')).players[0].board[i].resource,
+      frei
+    );
+    if (!gelegt) fail('Landpartie: Material liegt nicht auf dem freien Feld');
+
+    // Tages-Determinismus: frischer Kontext, gleiches Datum → gleiche Karte
+    const ctx2 = await browser.newContext({ viewport: { width: 1180, height: 820 }, locale: 'de-DE' });
+    const lp2 = await ctx2.newPage();
+    const b = await starte(lp2);
+    if (JSON.stringify(a.terrain) !== JSON.stringify(b.terrain)) {
+      fail('Landpartie: gleiche Tages-Challenge, verschiedene Landschaft');
+    }
+    if (JSON.stringify(a.karten) !== JSON.stringify(b.karten)) {
+      fail('Landpartie: gleiche Tages-Challenge, verschiedene Auslage');
+    }
+    await ctx2.close();
+    await ctx.close();
+    console.log('✓ Landpartie: 36 Felder, Landschaft gesperrt, 10 Karten, Tageskarte deterministisch');
   }
 
   // Manifest: Ohne id/scope/start_url kann Chrome einen geteilten Link nicht an

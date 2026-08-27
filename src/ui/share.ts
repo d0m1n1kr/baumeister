@@ -25,17 +25,24 @@ export interface ShareInfo {
   url: string;
 }
 
-/** Link, der beim Empfänger genau dieselbe Tages-Challenge öffnet. */
-export function dailyUrl(dailyId: string, href: string): string {
+/** Link, der beim Empfänger genau dieselbe Tages-Challenge öffnet —
+ *  bei der Landpartie mit Modus-Marker, sonst landete er in der Klassik. */
+export function dailyUrl(dailyId: string, href: string, land = false): string {
   const url = new URL(href);
-  url.hash = `daily=${dailyId}`;
+  url.hash = `daily=${dailyId}${land ? '&mode=land' : ''}`;
   return url.toString();
 }
 
-/** Tages-Challenge aus der Adresszeile (`#daily=2026-08-26`). */
-export function dailyIdFromHash(hash: string): string | null {
+export interface DailyLink {
+  id: string;
+  land: boolean;
+}
+
+/** Tages-Challenge aus der Adresszeile (`#daily=2026-08-26[&mode=land]`). */
+export function dailyIdFromHash(hash: string): DailyLink | null {
   const m = /[#&]daily=(\d{4}-\d{2}-\d{2})/.exec(hash);
-  return m ? m[1] : null;
+  if (!m) return null;
+  return { id: m[1], land: /[#&]mode=land(&|$)/.test(hash) };
 }
 
 export function shareText(info: ShareInfo): string {

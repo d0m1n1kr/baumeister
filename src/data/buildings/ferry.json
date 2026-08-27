@@ -1,0 +1,58 @@
+{
+  "id": "ferry",
+  "set": "landpartie",
+  "kind": "building",
+  "category": "theater",
+  "color": "yellow",
+  "name": {
+    "de": "Fähranleger",
+    "en": "Ferry Landing"
+  },
+  "text": {
+    "de": "2 Punkte je angrenzendem Fluss-Feld.",
+    "en": "2 points per adjacent river square."
+  },
+  "pattern": [
+    [
+      "glass",
+      "wood",
+      "wood"
+    ]
+  ],
+  "features": [
+    "adjacency"
+  ],
+  "scoring": {
+    "type": "perAdjacentTerrain",
+    "terrains": [
+      "river"
+    ],
+    "vpEach": 2
+  },
+  "effects": [],
+  "art": "ferry.svg",
+  "themes": {
+    "mars": {
+      "name": {
+        "de": "Seilbahnstation",
+        "en": "Cable Dock"
+      },
+      "text": {
+        "de": "2 Punkte je angrenzendem Canyon-Feld.",
+        "en": "2 points per adjacent canyon square."
+      },
+      "art": "mars_ferry.svg"
+    },
+    "fantasy": {
+      "name": {
+        "de": "Fährsteg",
+        "en": "Ferry Pier"
+      },
+      "text": {
+        "de": "2 Punkte je angrenzendem Nebelfluss-Feld.",
+        "en": "2 points per adjacent mistflow square."
+      },
+      "art": "fantasy_ferry.svg"
+    }
+  }
+}

@@ -135,3 +135,70 @@ describe('Landpartie: Wertung bleibt schnell', () => {
     expect(dauer).toBeLessThan(200);
   });
 });
+
+describe('Landpartie: Setup und Wertungs-Bausteine', () => {
+  it('randomSetup mit land: 10 Karten (7 + 3 Anlieger), Terrain im Config', async () => {
+    const { dailySeed, mulberry32, randomSetup } = await import('./registry');
+    const cfg = randomSetup(
+      catalog, [{ name: 'Solo', corner: 0 }], true,
+      mulberry32(dailySeed('2026-08-27', 'land-')), ['base'], {}, true, false, false, true
+    );
+    expect(cfg.land).toBe(true);
+    expect(cfg.activeCards).toHaveLength(10);
+    const landCards = cfg.activeCards.filter((id) => catalog[id].set === 'landpartie');
+    expect(landCards).toHaveLength(3);
+    expect(cfg.terrain!.length).toBeGreaterThanOrEqual(9);
+    // deterministisch
+    const again = randomSetup(
+      catalog, [{ name: 'Solo', corner: 0 }], true,
+      mulberry32(dailySeed('2026-08-27', 'land-')), ['base'], {}, true, false, false, true
+    );
+    expect(again.activeCards).toEqual(cfg.activeCards);
+    expect(again.terrain).toEqual(cfg.terrain);
+  });
+
+  it('ohne land landet keine Anlieger-Karte in der Auslage', async () => {
+    const { dailySeed, mulberry32, randomSetup } = await import('./registry');
+    const cfg = randomSetup(
+      catalog, [{ name: 'Solo', corner: 0 }], true,
+      mulberry32(dailySeed('2026-08-27')), ['base'], {}, true
+    );
+    expect(cfg.activeCards.some((id) => catalog[id].set === 'landpartie')).toBe(false);
+    expect(cfg.terrain).toBeUndefined();
+  });
+
+  it('Landpartie- und Klassik-Seed desselben Tages unterscheiden sich', async () => {
+    const { dailySeed } = await import('./registry');
+    expect(dailySeed('2026-08-27', 'land-')).not.toBe(dailySeed('2026-08-27'));
+  });
+
+  it('perAdjacentTerrain zählt nur die genannten Arten', () => {
+    const cfg = config(1, undefined, false);
+    cfg.solo = true;
+    cfg.land = true;
+    // Erzmine auf Feld 8: Nachbarn 2 (oben), 7 (links), 9 (rechts), 14 (unten)
+    cfg.terrain = [
+      { square: 2, kind: 'mountain' },
+      { square: 7, kind: 'mountain' },
+      { square: 9, kind: 'lake' }
+    ];
+    const s = newGame(cfg);
+    put(s, 0, 8, 'ore_mine');
+    const score = scorePlayer(s, 0, catalog);
+    const line = score.lines.find((l) => l.card === 'ore_mine')!;
+    expect(line.points).toBe(6); // 2 Berge × 3, der See zählt nicht
+  });
+
+  it('ifAdjacentTerrain: einmal daneben genügt, weit weg gibt nichts', () => {
+    const cfg = config(1, undefined, false);
+    cfg.solo = true;
+    cfg.land = true;
+    cfg.terrain = [{ square: 9, kind: 'lake' }, { square: 30, kind: 'river' }];
+    const s = newGame(cfg);
+    put(s, 0, 8, 'boathouse');   // grenzt an den See (9)
+    put(s, 0, 5, 'watermill');   // grenzt an nichts Passendes
+    const score = scorePlayer(s, 0, catalog);
+    expect(score.lines.find((l) => l.card === 'boathouse')!.points).toBe(3);
+    expect(score.lines.find((l) => l.card === 'watermill')!.points).toBe(0);
+  });
+});

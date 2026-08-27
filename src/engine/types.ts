@@ -49,6 +49,10 @@ export type ScoringSpec =
   | { type: 'ifAloneInRowAndCol'; target: Selector; vp: number }
   | { type: 'perOwnCountVsRightNeighbor'; baseEach: number; bonusEach: number }
   | { type: 'perStoredResource'; vpEach: number }
+  /** Landpartie: Punkte je angrenzendem Landschaftsfeld der genannten Arten. */
+  | { type: 'perAdjacentTerrain'; terrains: TerrainKind[]; vpEach: number }
+  /** Landpartie: Punkte, wenn mindestens eines der genannten Landschaftsfelder angrenzt. */
+  | { type: 'ifAdjacentTerrain'; terrains: TerrainKind[]; vp: number }
   /** Sonderwertungen (Monumente), implementiert in scoring.ts. */
   | { type: 'handler'; handler: ScoreHandlerId; vp?: number };
 

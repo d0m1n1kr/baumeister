@@ -22,7 +22,9 @@
   import { learn } from './learn.svelte';
   import { install } from './install.svelte';
 
-  let { onjoin, initialDaily = null }: { onjoin: () => void; initialDaily?: string | null } =
+  import type { DailyLink } from './share';
+
+  let { onjoin, initialDaily = null }: { onjoin: () => void; initialDaily?: DailyLink | null } =
     $props();
 
   const DEFAULT_CORNERS: Record<number, number[]> = {
@@ -45,6 +47,9 @@
   let multiDevice = $state(false);
   // Solo: freies Spiel, Tages-Challenge oder Lernspiel (mit Erklärblasen).
   let soloMode = $state<'free' | 'daily' | 'learn'>(learn.enabled ? 'learn' : 'free');
+  // Landpartie: 6×6 mit Landschaft und Anlieger-Karten — gilt für freies Solo
+  // und Tages-Challenge, nicht fürs Lernspiel (das erklärt die 4×4-Klassik).
+  let landMode = $state(false);
   // Aus einem geteilten Link kann auch ein vergangener Tag kommen — dann wird
   // GENAU dieser gespielt, sonst ließe sich das Ergebnis nicht vergleichen.
   // Blättern muss trotzdem gehen: In der installierten App gibt es keinen Link
@@ -80,7 +85,8 @@
     setCount(1);
     soloMode = 'daily';
     multiDevice = false;
-    dailyDate = initialDaily;
+    dailyDate = initialDaily.id;
+    landMode = initialDaily.land;
   });
 
   function toggleSet(id: string) {
@@ -136,13 +142,22 @@
       saveNames(names);
       // Der Lernmodus ist eine Anzeige-Präferenz dieses Geräts, kein Spielstand
       learn.set(solo && soloMode === 'learn');
+      const land = solo && soloMode !== 'learn' && landMode;
       game.start(
-        buildGameConfig(currentPlayers(), activeSets(), useMonuments, !solo && cavernRule, {
-          solo,
-          dailyId: solo && daily ? dailyDate : undefined,
-          townHall: !solo && townHall,
-          train
-        })
+        buildGameConfig(
+          currentPlayers(),
+          // Landpartie V1 spielt pur: Basis + Anlieger-Deck, keine Erweiterungen
+          land ? ['base'] : activeSets(),
+          useMonuments,
+          !solo && cavernRule,
+          {
+            solo,
+            dailyId: solo && daily ? dailyDate : undefined,
+            townHall: !solo && townHall,
+            train: !land && train,
+            land
+          }
+        )
       );
     } catch (e) {
       error = e instanceof Error ? e.message : String(e);
@@ -281,6 +296,17 @@
                   onpointerup={() => stepDay(1)}>›</button>
               </div>
             {/if}
+            {#if soloMode !== 'learn'}
+              <!-- Landpartie: 6×6 mit Landschaft — kombinierbar mit Frei und
+                   Tages-Challenge, das Lernspiel bleibt bei der 4×4-Klassik -->
+              <label class="opt landOpt">
+                <input type="checkbox" bind:checked={landMode} />
+                <span class="optText">
+                  <span class="optName">🏞 {t.soloLand}</span>
+                  <span class="optDesc">{t.soloLandHint}</span>
+                </span>
+              </label>
+            {/if}
             <p class="hint">
               {#if soloMode === 'daily'}{t.soloDailyHint}{/if}
               {#if soloMode === 'learn'}{t.learn.setupHint}{/if}
@@ -385,6 +411,10 @@
 
         <div class="expansions">
           <span class="expTitle">{t.expansions}</span>
+          {#if solo && soloMode !== 'learn' && landMode}
+            <!-- Landpartie V1 spielt pur — die Checkboxen hätten keine Wirkung -->
+            <p class="hint">{t.soloLandNoSets}</p>
+          {:else}
           {#each SETS.filter((s) => !s.core) as set}
             <label class="opt toggle expRow">
               <input
@@ -398,6 +428,7 @@
               </span>
             </label>
           {/each}
+          {/if}
         </div>
       </section>
     </div>

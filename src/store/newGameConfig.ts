@@ -12,9 +12,19 @@ export function buildGameConfig(
   sets: string[],
   useMonuments: boolean,
   cavern = false,
-  opts: { solo?: boolean; dailyId?: string; townHall?: boolean; train?: boolean } = {}
+  opts: {
+    solo?: boolean;
+    dailyId?: string;
+    townHall?: boolean;
+    train?: boolean;
+    /** Landpartie: 6×6 mit Landschaft und Anlieger-Karten (nur solo). */
+    land?: boolean;
+  } = {}
 ): GameConfig {
-  const seed = opts.dailyId ? dailySeed(opts.dailyId) : randomSeed();
+  const land = (opts.solo && opts.land) ?? false;
+  // Eigener Seed-Stamm je Modus: Die Landpartie desselben Tages darf nicht
+  // die klassische Auslage verraten (und umgekehrt).
+  const seed = opts.dailyId ? dailySeed(opts.dailyId, land ? 'land-' : '') : randomSeed();
   const config = randomSetup(
     catalog,
     players,
@@ -28,7 +38,8 @@ export function buildGameConfig(
     },
     opts.solo ?? false,
     opts.townHall ?? false,
-    opts.train ?? false
+    opts.train ?? false,
+    land
   );
   config.dailyId = opts.dailyId;
   config.gameId = randomSeed().toString(36) + Date.now().toString(36);

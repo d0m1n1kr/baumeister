@@ -216,6 +216,10 @@ export const fr: Translation = {
   soloDeckCount: (n: number) => `Pioche : ${n} cartes`,
   soloDaily: 'Défi du jour',
   soloDailyHint: 'Aléa fixe du jour — les mêmes cartes et ressources partout dans le monde. Compare tes scores !',
+  soloLand: 'Campagne (6×6)',
+  soloLandHint: 'Plateau plus grand avec rivière, montagnes et lac — inconstructibles, mais les cartes riveraines y marquent des points.',
+  soloLandNoSets: 'La campagne se joue pure : jeu de base plus cartes de terrain, sans extensions.',
+  landHighscores: 'Meilleurs scores campagne (cet appareil)',
   terrain: {
     river: 'Rivière',
     mountain: 'Montagnes',

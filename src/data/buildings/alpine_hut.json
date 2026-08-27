@@ -1,0 +1,61 @@
+{
+  "id": "alpine_hut",
+  "set": "landpartie",
+  "kind": "building",
+  "category": "chapel",
+  "color": "orange",
+  "name": {
+    "de": "Berghütte",
+    "en": "Alpine Hut"
+  },
+  "text": {
+    "de": "4 Punkte, wenn die Berghütte an die Berge grenzt.",
+    "en": "4 points if the Alpine Hut is adjacent to the mountains."
+  },
+  "pattern": [
+    [
+      null,
+      "stone"
+    ],
+    [
+      "wheat",
+      "wood"
+    ]
+  ],
+  "features": [
+    "adjacency"
+  ],
+  "scoring": {
+    "type": "ifAdjacentTerrain",
+    "terrains": [
+      "mountain"
+    ],
+    "vp": 4
+  },
+  "effects": [],
+  "art": "alpine_hut.svg",
+  "themes": {
+    "mars": {
+      "name": {
+        "de": "Kraterlabor",
+        "en": "Crater Lab"
+      },
+      "text": {
+        "de": "4 Punkte, wenn das Kraterlabor an das Kraterfeld grenzt.",
+        "en": "4 points if the Crater Lab is adjacent to the crater field."
+      },
+      "art": "mars_alpine_hut.svg"
+    },
+    "fantasy": {
+      "name": {
+        "de": "Felshorst",
+        "en": "Crag Eyrie"
+      },
+      "text": {
+        "de": "4 Punkte, wenn der Felshorst an den Drachenfels grenzt.",
+        "en": "4 points if the Crag Eyrie is adjacent to the dragonspire."
+      },
+      "art": "fantasy_alpine_hut.svg"
+    }
+  }
+}
