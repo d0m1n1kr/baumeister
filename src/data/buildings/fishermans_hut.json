@@ -9,8 +9,8 @@
     "en": "Fisherman's Hut"
   },
   "text": {
-    "de": "2 Punkte je angrenzendem See-Feld.",
-    "en": "2 points per adjacent lake square."
+    "de": "1 Punkt je angrenzendem See-Feld.",
+    "en": "1 point for each adjacent lake square."
   },
   "pattern": [
     [
@@ -26,7 +26,7 @@
     "terrains": [
       "lake"
     ],
-    "vpEach": 2
+    "vpEach": 1
   },
   "effects": [],
   "art": "fishermans_hut.svg",
@@ -37,8 +37,8 @@
         "en": "Ice Drill"
       },
       "text": {
-        "de": "2 Punkte je angrenzendem Eissee-Feld.",
-        "en": "2 points per adjacent ice-lake square."
+        "de": "1 Punkt je angrenzendem Eissee-Feld.",
+        "en": "1 point for each adjacent ice-lake square."
       },
       "art": "mars_fishermans_hut.svg"
     },
@@ -48,8 +48,8 @@
         "en": "Fisher's Croft"
       },
       "text": {
-        "de": "2 Punkte je angrenzendem Zaubersee-Feld.",
-        "en": "2 points per adjacent spelllake square."
+        "de": "1 Punkt je angrenzendem Zaubersee-Feld.",
+        "en": "1 point for each adjacent spelllake square."
       },
       "art": "fantasy_fishermans_hut.svg"
     }

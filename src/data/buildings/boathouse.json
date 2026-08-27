@@ -9,8 +9,8 @@
     "en": "Boathouse"
   },
   "text": {
-    "de": "3 Punkte, wenn das Bootshaus an See oder Fluss grenzt.",
-    "en": "3 points if the Boathouse is adjacent to the lake or the river."
+    "de": "Punkte nach der Anzahl deiner Bootshäuser AM WASSER (an See oder Fluss): 1 / 3 / 6 / 10, ab 5 dann 14. Nur Bootshäuser am Wasser zählen.",
+    "en": "Points by the number of your boathouses ON THE WATER (next to a lake or river): 1 / 3 / 6 / 10, then 14 from 5 on. Only boathouses on the water count."
   },
   "pattern": [
     [
@@ -19,15 +19,22 @@
     ]
   ],
   "features": [
+    "count-table",
     "adjacency"
   ],
   "scoring": {
-    "type": "ifAdjacentTerrain",
+    "type": "byCountTableAdjacentTerrain",
     "terrains": [
       "lake",
       "river"
     ],
-    "vp": 3
+    "table": [
+      1,
+      3,
+      6,
+      10
+    ],
+    "overflow": 14
   },
   "effects": [],
   "art": "boathouse.svg",
@@ -38,8 +45,8 @@
         "en": "Airlock Dock"
       },
       "text": {
-        "de": "3 Punkte, wenn das Schleusendock an Eissee oder Canyon grenzt.",
-        "en": "3 points if the Airlock Dock is adjacent to the ice lake or the canyon."
+        "de": "Punkte nach der Anzahl deiner Hangars AM EIS (an Eissee oder Canyon): 1 / 3 / 6 / 10, ab 5 dann 14. Nur Hangars am Eis zählen.",
+        "en": "Points by the number of your hangars ON THE ICE (next to an ice lake or canyon): 1 / 3 / 6 / 10, then 14 from 5 on. Only hangars on the ice count."
       },
       "art": "mars_boathouse.svg"
     },
@@ -49,8 +56,8 @@
         "en": "Skiff Shed"
       },
       "text": {
-        "de": "3 Punkte, wenn der Kahnschuppen an Zaubersee oder Nebelfluss grenzt.",
-        "en": "3 points if the Skiff Shed is adjacent to the spelllake or the mistflow."
+        "de": "Punkte nach der Anzahl deiner Nixenstege AM WASSER (an Zaubersee oder Nebelfluss): 1 / 3 / 6 / 10, ab 5 dann 14. Nur Stege am Wasser zählen.",
+        "en": "Points by the number of your nixie jetties ON THE WATER (next to a spelllake or mistflow): 1 / 3 / 6 / 10, then 14 from 5 on. Only jetties on the water count."
       },
       "art": "fantasy_boathouse.svg"
     }

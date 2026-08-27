@@ -143,8 +143,14 @@ while Anna and Ben are on their phones — the state is identical on every devic
   stays buildable, at most 2 corners covered) and is frozen by golden-seed
   tests, so the daily challenge shows the same map worldwide. Three extra
   waterfront cards join the usual seven (Fisherman's Hut, Watermill, Ore Mine,
-  Ferry Landing, Alpine Hut, Boathouse — 3 drawn of 6) and score next to the
-  matching terrain. **Every player gets the same landscape** — a different one
+  Ferry Landing, Alpine Hut, Boathouse — 3 drawn of 6). Each asks a different
+  question rather than all asking "is there terrain next to me": the Boathouse
+  escalates with how many of them stand **on the water** (1/3/6/10 like the
+  Tavern), the Watermill counts adjacent red buildings but only if it touches
+  the river, the Ferry Landing counts river squares in its whole row and column,
+  and the Alpine Hut only pays while it is alone in its row and column. Their
+  ceilings are held to the base game's band (2 cells → 1–2 points, 3 cells →
+  2–4) by a test that measures every position across 30 generated landscapes. **Every player gets the same landscape** — a different one
   per player would be a different game, and the towns could not be compared.
   Countryside dailies use their own seed stem and share links carry
   `&mode=land`; highscores and rank thresholds are kept separate

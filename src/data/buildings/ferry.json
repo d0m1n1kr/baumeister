@@ -9,8 +9,8 @@
     "en": "Ferry Landing"
   },
   "text": {
-    "de": "2 Punkte je angrenzendem Fluss-Feld.",
-    "en": "2 points per adjacent river square."
+    "de": "1 Punkt je Fluss-Feld in seiner Zeile oder Spalte — der Anleger bedient die ganze Linie, nicht nur das Nachbarfeld.",
+    "en": "1 point for each river square in its row or column — the landing serves the whole line, not just the neighbouring square."
   },
   "pattern": [
     [
@@ -20,14 +20,14 @@
     ]
   ],
   "features": [
-    "adjacency"
+    "row-col"
   ],
   "scoring": {
-    "type": "perAdjacentTerrain",
+    "type": "perTerrainInRowCol",
     "terrains": [
       "river"
     ],
-    "vpEach": 2
+    "vpEach": 1
   },
   "effects": [],
   "art": "ferry.svg",
@@ -38,8 +38,8 @@
         "en": "Cable Dock"
       },
       "text": {
-        "de": "2 Punkte je angrenzendem Canyon-Feld.",
-        "en": "2 points per adjacent canyon square."
+        "de": "1 Punkt je Canyon-Feld in seiner Zeile oder Spalte.",
+        "en": "1 point for each canyon square in its row or column."
       },
       "art": "mars_ferry.svg"
     },
@@ -49,8 +49,8 @@
         "en": "Ferry Pier"
       },
       "text": {
-        "de": "2 Punkte je angrenzendem Nebelfluss-Feld.",
-        "en": "2 points per adjacent mistflow square."
+        "de": "1 Punkt je Nebelfluss-Feld in seiner Zeile oder Spalte.",
+        "en": "1 point for each mistflow square in its row or column."
       },
       "art": "fantasy_ferry.svg"
     }

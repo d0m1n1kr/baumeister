@@ -9,8 +9,8 @@
     "en": "Ore Mine"
   },
   "text": {
-    "de": "3 Punkte je angrenzendem Berg-Feld.",
-    "en": "3 points per adjacent mountain square."
+    "de": "2 Punkte je angrenzendem Berg-Feld.",
+    "en": "2 points for each adjacent mountain square."
   },
   "pattern": [
     [
@@ -30,7 +30,7 @@
     "terrains": [
       "mountain"
     ],
-    "vpEach": 3
+    "vpEach": 2
   },
   "effects": [],
   "art": "ore_mine.svg",
@@ -41,8 +41,8 @@
         "en": "Drill Mine"
       },
       "text": {
-        "de": "3 Punkte je angrenzendem Kraterfeld.",
-        "en": "3 points per adjacent crater-field square."
+        "de": "2 Punkte je angrenzendem Kraterfeld-Feld.",
+        "en": "2 points for each adjacent crater-field square."
       },
       "art": "mars_ore_mine.svg"
     },
@@ -52,8 +52,8 @@
         "en": "Dwarven Digs"
       },
       "text": {
-        "de": "3 Punkte je angrenzendem Drachenfels-Feld.",
-        "en": "3 points per adjacent dragonspire square."
+        "de": "2 Punkte je angrenzendem Drachenzinnen-Feld.",
+        "en": "2 points for each adjacent dragonspire square."
       },
       "art": "fantasy_ore_mine.svg"
     }

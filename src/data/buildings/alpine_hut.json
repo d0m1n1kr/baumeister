@@ -9,8 +9,8 @@
     "en": "Alpine Hut"
   },
   "text": {
-    "de": "4 Punkte, wenn die Berghütte an die Berge grenzt.",
-    "en": "4 points if the Alpine Hut is adjacent to the mountains."
+    "de": "3 Punkte, wenn in ihrer Zeile UND Spalte keine weitere Berghütte steht. Hütten wollen für sich sein.",
+    "en": "3 points if no other alpine hut stands in its row or column. Huts want to be left alone."
   },
   "pattern": [
     [
@@ -23,14 +23,14 @@
     ]
   ],
   "features": [
-    "adjacency"
+    "row-col"
   ],
   "scoring": {
-    "type": "ifAdjacentTerrain",
-    "terrains": [
-      "mountain"
-    ],
-    "vp": 4
+    "type": "ifAloneInRowAndCol",
+    "target": {
+      "card": "alpine_hut"
+    },
+    "vp": 3
   },
   "effects": [],
   "art": "alpine_hut.svg",
@@ -41,8 +41,8 @@
         "en": "Crater Lab"
       },
       "text": {
-        "de": "4 Punkte, wenn das Kraterlabor an das Kraterfeld grenzt.",
-        "en": "4 points if the Crater Lab is adjacent to the crater field."
+        "de": "3 Punkte, wenn in ihrer Zeile UND Spalte keine weitere Kraterhütte steht.",
+        "en": "3 points if no other crater hut stands in its row or column."
       },
       "art": "mars_alpine_hut.svg"
     },
@@ -52,8 +52,8 @@
         "en": "Crag Eyrie"
       },
       "text": {
-        "de": "4 Punkte, wenn der Felshorst an den Drachenfels grenzt.",
-        "en": "4 points if the Crag Eyrie is adjacent to the dragonspire."
+        "de": "3 Punkte, wenn in ihrer Zeile UND Spalte keine weitere Zinnenklause steht.",
+        "en": "3 points if no other spire hermitage stands in its row or column."
       },
       "art": "fantasy_alpine_hut.svg"
     }
