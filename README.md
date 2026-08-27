@@ -4,7 +4,10 @@ Digital adaptation of the board game *Tiny Towns* (base game) as a purely client
 web app (PWA) for **tablets and phones**. The classic mode puts **2–4 players around
 one tablet in landscape**: everyone plays simultaneously at the four corners of the
 device, with the game's 7 building cards in the middle — or each player joins with
-their own device.
+their own device. Beside it stands **Countryside** (🏞), our own variant on a taller
+5×6 board with a river, mountains and a lake you cannot build on, and three extra
+waterfront cards that score next to them. Solo, daily challenge, learning mode and
+several expansions are all in the box.
 
 **▶ Play: [d0m1n1kr.github.io/tiny-towns](https://d0m1n1kr.github.io/tiny-towns/)**
 
@@ -12,9 +15,20 @@ their own device.
 
 **One tablet, four towns.** Everyone plays at the same time; each corner is
 rotated toward its player, and the round's building cards sit in the middle.
-The Master Builder (👑) has named wheat — everyone places it on their own board.
+The Master Builder (👑) has named wood — everyone places it on their own board.
 
 ![Four players around one tablet](docs/screenshots/tablet-table.png)
+
+**Countryside: a taller board with a landscape in it.** 5 wide and 6 high — the
+shape of a phone held upright. The river, the ridge and the lake are unbuildable,
+and the three waterfront cards (here Ferry Landing, Ore Mine, Watermill) only
+score next to the matching terrain. Every player gets the same map, so the towns
+stay comparable. Next to it a solo game on a phone: your own board large, the
+deck's three face-up resources below it.
+
+| Countryside for two, on a tablet held upright | Solo on a phone |
+| --- | --- |
+| <img src="docs/screenshots/countryside.png" alt="Two 5x6 boards with river, mountains and lake, ten cards in the middle" width="420"> | <img src="docs/screenshots/solo-phone.png" alt="Solo game on a phone: own board, seven cards, three face-up resources" width="200"> |
 
 **Everyone on their own device — no server.** The host opens a room; the others
 join by scanning the QR code with the normal camera app (or typing the
@@ -29,9 +43,9 @@ On a phone you get your own board big, with the opponents shown as compact
 mini boards above — and your monument stays genuinely secret, because nobody
 else's device ever receives it.
 
-**The host still sees the whole table.** Here seat 1 is played on the host
-tablet while Anna and Ben are on their phones — the state is identical on every
-device (the host runs the engine and broadcasts it).
+**The host still sees the whole table.** Here Dominik plays on the host tablet
+while Anna and Ben are on their phones — the state is identical on every device
+(the host runs the engine and broadcasts it).
 
 ![Host table with two remote players](docs/screenshots/lan-host-table.png)
 
@@ -156,7 +170,7 @@ device (the host runs the engine and broadcasts it).
   strip, the choice is remembered per device.
 - **Persistence:** autosave to `localStorage` after every action, "Continue" after reload.
   The start screen also remembers what you picked last time — player count,
-  one-device vs. own-devices, the solo variant, Landpartie, monuments and the
+  one-device vs. own-devices, the solo variant, Countryside, monuments and the
   chosen expansions — saved on start, when the choice is real. Seating is not
   remembered (it follows the player count) and neither is the challenge date
   (that one is always today). A shared challenge link is the exception in both
@@ -184,7 +198,14 @@ npm run build      # production build (dist/)
 node scripts/smoke.mjs        # E2E: single-device mode (Chromium)
 node scripts/smoke-multi.mjs  # E2E: multi-device mode in two tabs
 node scripts/smoke-learn.mjs  # E2E: learning mode (bubbles, phone + tablet)
+node scripts/shots.mjs        # regenerates the screenshots in docs/screenshots/
 ```
+
+The screenshots above are generated, not hand-made: `scripts/shots.mjs` drives a
+real Chromium through the app and writes all six files. Every shot is a recipe
+(viewport, player count, mode, game state), so after a design change the images
+are one command away from being current again — and they show the app as it
+really renders, not as it once looked.
 
 The multi-device test runs with `?transport=channel`: the same session and host code,
 but over `BroadcastChannel` between two tabs instead of real P2P — testable without
