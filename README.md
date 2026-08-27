@@ -93,15 +93,25 @@ device (the host runs the engine and broadcasts it).
 - **Solo mode (official variant):** 15 resource cards as a deck, 3 face up, one is
   chosen and rotates face-down to the bottom. With the official rank table
   (up to "Master Architect"), a per-device highscore list, and a **daily challenge**
-  (fixed date seed — the same cards worldwide, scores comparable).
-- **Share your result:** the score screen offers a share button for solo games.
-  Where the browser can share files (iOS 15+, Chromium on Android) a 1080×1080
-  score card is rendered on a canvas and goes along with the text, painted in the
-  theme you are playing; otherwise it is text only, via the native share sheet or
-  the clipboard. For a daily challenge the text carries a `#daily=<date>` link
-  that opens exactly that day's setup on the other device, so the scores really
-  are comparable. The board layout is deliberately left out of both text and
-  image: with an identical setup it would be the solution.
+  (fixed date seed — the same cards worldwide, scores comparable). Today and the
+  last 14 days can be picked with ‹ › next to the date; the future stays locked,
+  or tomorrow's setup would be known in advance.
+- **Share your result:** the score screen offers two buttons for solo games —
+  one shares the text (rank, score, buildings and, for a daily challenge, a
+  `#daily=<date>` link that opens exactly that day's setup on the other device),
+  the other shares a 1080×1080 score card rendered on a canvas in the theme you
+  are playing. They are separate on purpose: when a file is shared, iOS passes
+  only the file on to the target and drops the text, so one call cannot reliably
+  deliver both. The image button only appears where the browser can share files
+  (iOS 15+, Chromium on Android); everything that matters is also written into
+  the image, so that path is complete by itself. Where sharing is unavailable the
+  text goes to the clipboard. The board layout is deliberately left out of both
+  text and image: with an identical setup it would be the solution.
+  A shared link always opens in the browser on iOS — Safari never hands `https`
+  links to a home-screen app, and Universal Links would need a native app plus a
+  file at the domain root. The manifest carries `id`, `scope`, `start_url` and
+  `launch_handler` so Chromium can route such links into the installed app; on
+  iOS the day picker above is the way to a shared challenge.
 - **Learning mode (🎓, solo):** a guided game for newcomers. Instruction bubbles
   walk through every phase — monument draft, deck pick, placing, marking a
   pattern, choosing the spot, ending the round, finishing the town — and each one
