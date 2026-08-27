@@ -568,6 +568,58 @@ try {
       fail(`Geteilter Link: Tages-Challenge nicht vorgewählt (${picked})`);
     }
     console.log('✓ Geteilter Link wählt Solo und die Tages-Challenge vor');
+
+    // …und gilt nur für DIESEN Besuch: Der Parameter verschwindet danach aus
+    // der Adresse. Blieb er stehen, wählte jeder Reload wieder still denselben
+    // Tag vor — jede „neue" Partie hatte dieselbe Auslage, in der Landpartie
+    // sichtbar als immer dieselbe Landschaft.
+    if (/daily=/.test(await rp.evaluate(() => location.hash))) {
+      fail('Geteilter Link: daily bleibt in der Adresse und heftet jede Partie an den Tag');
+    }
+    await rp.reload();
+    await rp.locator('#splash').waitFor({ state: 'detached', timeout: 10000 });
+    const fresh2 = rp.locator('button', { hasText: 'Neues Spiel' });
+    if (await fresh2.count()) await fresh2.click();
+    await rp.locator('.bar button.big').waitFor({ timeout: 5000 });
+    const nachReload = await rp.evaluate(() =>
+      [...document.querySelectorAll('.seg button.primary')].map((b) => b.textContent.trim())
+    );
+    if (nachReload.some((p) => p.includes('Tages-Challenge'))) {
+      fail(`Geteilter Link: nach dem Reload immer noch Tages-Challenge (${nachReload})`);
+    }
+    console.log('✓ Nach dem Reload ist die Adresse frei — neue Partien würfeln wieder');
+    await ctx.close();
+  }
+
+  // ---------- Freie Landpartie würfelt jedes Mal neu ----------
+  // Genau hier fiel es auf: In der Landpartie ist die Landschaft das Gesicht
+  // der Partie. Ist sie zweimal gleich, ist etwas mit dem Seed faul.
+  {
+    const ctx = await browser.newContext({ viewport: { width: 402, height: 874 }, locale: 'de-DE' });
+    const lp = await ctx.newPage();
+    lp.on('pageerror', (e) => fail(`Freie Landpartie: Seitenfehler: ${e.message}`));
+    const layouts = new Set();
+    for (let runde = 0; runde < 3; runde++) {
+      await lp.goto(BASE_URL);
+      await lp.locator('#splash').waitFor({ state: 'detached', timeout: 10000 });
+      const neu = lp.locator('button', { hasText: 'Neues Spiel' });
+      if (await neu.count()) await neu.click();
+      await lp.locator('.seg button', { hasText: '1' }).first().click();
+      await lp.locator('.landOpt input').check();
+      await lp.locator('.bar button.big').click();
+      await lp.locator('.board').first().waitFor({ timeout: 8000 });
+      await lp.waitForTimeout(200);
+      const cfg = await lp.evaluate(
+        () => JSON.parse(localStorage.getItem('tinytowns.save.v1')).config
+      );
+      if (cfg.dailyId) fail(`Freie Landpartie: hat einen dailyId (${cfg.dailyId})`);
+      if (!cfg.terrain?.length) fail('Freie Landpartie: keine Landschaft im Spielstand');
+      layouts.add(JSON.stringify(cfg.terrain));
+    }
+    if (layouts.size < 3) {
+      fail(`Freie Landpartie: nur ${layouts.size} verschiedene Landschaften in 3 Partien`);
+    }
+    console.log('✓ Freie Landpartie: drei Partien, drei verschiedene Landschaften');
     await ctx.close();
   }
 

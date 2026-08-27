@@ -45,6 +45,23 @@ export function dailyIdFromHash(hash: string): DailyLink | null {
   return { id: m[1], land: /[#&]mode=land(&|$)/.test(hash) };
 }
 
+/**
+ * Dieselbe Adresse OHNE den Tages-Parameter.
+ *
+ * Ein geteilter Link soll die Challenge EINMAL öffnen, nicht für immer: Blieb
+ * `#daily=…` in der Adresszeile stehen, wählte jeder Reload wieder still
+ * denselben Tag vor — jede „neue" Partie hatte damit dieselbe Auslage (und in
+ * der Landpartie dieselbe Landschaft), obwohl niemand die Tages-Challenge
+ * ausgewählt hatte. Andere Parameter (Raum-Code eines QR-Links) bleiben stehen.
+ */
+export function hashWithoutDaily(hash: string): string {
+  const rest = hash
+    .replace(/^#/, '')
+    .split('&')
+    .filter((part) => part.length > 0 && !/^daily=/.test(part) && part !== 'mode=land');
+  return rest.length > 0 ? `#${rest.join('&')}` : '';
+}
+
 export function shareText(info: ShareInfo): string {
   const head = info.dailyId
     ? `🏘 ${info.title} — ${info.dailyLabel} ${info.dailyId}`
