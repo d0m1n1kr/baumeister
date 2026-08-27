@@ -215,6 +215,8 @@ export const fr: Translation = {
   soloOfferTitle: 'Choisis 1 des 3 ressources visibles',
   soloDeckCount: (n: number) => `Pioche : ${n} cartes`,
   soloDaily: 'Défi du jour',
+  dailyPure:
+    "Le défi du jour se joue toujours pur : jeu de base avec monuments. C'est la seule façon qu'une date soit la même partie partout — désactiver les monuments donnerait déjà une autre pioche de matériaux.",
   soloDailyHint: 'Aléa fixe du jour — les mêmes cartes et ressources partout dans le monde. Compare tes scores !',
   landMode: 'Campagne (5×6)',
   landModeHint: 'Plateau plus grand avec rivière, montagnes et lac — inconstructibles, mais les cartes riveraines y marquent des points.',

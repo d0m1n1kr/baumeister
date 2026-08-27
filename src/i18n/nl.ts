@@ -215,6 +215,8 @@ export const nl: Translation = {
   soloOfferTitle: 'Kies 1 van de 3 open grondstoffen',
   soloDeckCount: (n: number) => `Trekstapel: ${n} kaarten`,
   soloDaily: 'Dagelijkse uitdaging',
+  dailyPure:
+    'De dagelijkse uitdaging speelt altijd puur: basisspel met monumenten. Alleen zo is een datum wereldwijd hetzelfde spel — monumenten uitzetten zou al een andere materiaalstapel geven.',
   soloDailyHint: 'Vast dagtoeval — wereldwijd dezelfde kaarten en grondstoffen. Vergelijk je punten!',
   landMode: 'Landtocht (5×6)',
   landModeHint: 'Groter bord met rivier, bergen en meer — onbebouwbaar, maar oeverkaarten scoren ernaast.',

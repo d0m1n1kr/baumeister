@@ -104,6 +104,10 @@
   // der 4×4-Klassik, weil seine Erklärtexte darauf gebaut sind.
   const landAllowed = $derived((!solo || soloMode !== 'learn') && !landTooTight);
   const landActive = $derived(landMode && landAllowed);
+  // Die Tages-Challenge spielt pur (Basisspiel mit Monumenten) — nur so ist ein
+  // Datum weltweit dieselbe Partie. Erzwungen wird das in buildGameConfig; hier
+  // verschwinden bloß die Häkchen, die dort ohnehin nichts mehr bewirken.
+  const dailyPur = $derived(solo && daily);
   // Die Spielerzeilen teilen sich ein Raster. Es muss genau so viele Spalten
   // haben, wie eine Zeile Elemente rendert — sonst rutschen die Felder der
   // nächsten Zeile in die freien Spalten der vorigen.
@@ -212,8 +216,11 @@
           {
             solo,
             dailyId: solo && daily ? dailyDate : undefined,
+            // Rathaus, Eisenbahn und Höhle sind Mehrspieler-Regeln: Ihre
+            // Schalter stehen im Solo nicht da, also darf auch eine gemerkte
+            // Auswahl aus einer früheren Runde nicht durchschlagen.
             townHall: !solo && townHall,
-            train,
+            train: !solo && train,
             land: landActive
           }
         )
@@ -444,10 +451,14 @@
 
         <!-- Alle Schalter im selben Raster: Kästchen, Titel, Beschreibung
              beginnen auf derselben Linie und sind gleich breit. -->
-        <label class="opt toggle">
-          <input type="checkbox" bind:checked={useMonuments} />
-          <span class="optText"><span class="optName">{t.useMonuments}</span></span>
-        </label>
+        {#if dailyPur}
+          <p class="hint dailyPureHint">📅 {t.dailyPure}</p>
+        {:else}
+          <label class="opt toggle">
+            <input type="checkbox" bind:checked={useMonuments} />
+            <span class="optText"><span class="optName">{t.useMonuments}</span></span>
+          </label>
+        {/if}
 
         <!-- Rathaus, Eisenbahn und Höhle: im Mehrspielerspiel auf beiden
              Brettern wählbar — die Landpartie ist nur ein anderes Brett. -->
@@ -475,6 +486,7 @@
           </label>
         {/if}
 
+        {#if !dailyPur}
         <div class="expansions">
           <span class="expTitle">{t.expansions}</span>
           {#each SETS.filter((s) => !s.core) as set}
@@ -491,6 +503,7 @@
             </label>
           {/each}
         </div>
+        {/if}
       </section>
     </div>
   </div>
@@ -617,6 +630,7 @@
   }
   .dayPick button:disabled { opacity: 0.35; }
   .landHint { margin: 0; }
+  .dailyPureHint { margin: 0; }
   .dayLabel {
     font-size: var(--fs-md);
     color: var(--accent);
