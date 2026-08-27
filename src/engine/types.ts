@@ -298,7 +298,7 @@ export interface GameConfig {
   townHallDeck?: Resource[];
   /** Rathaus: Seed für deterministische Neumischungen des Abwurfstapels. */
   thSeed?: number;
-  /** Landpartie: 5×6-Brett mit Landschaft (nur solo). */
+  /** Landpartie: 5×6-Brett mit Landschaft — für alle Spieler dieselbe. */
   land?: boolean;
   /** Landpartie: die Landschaftsfelder (aus dem Seed erzeugt, Teil des Setups). */
   terrain?: { square: number; kind: TerrainKind }[];

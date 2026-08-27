@@ -870,6 +870,75 @@ try {
     await ctx2.close();
     await ctx.close();
     console.log('✓ Landpartie: 30 Felder (5×6), Landschaft gesperrt, 10 Karten, Tageskarte deterministisch');
+
+    // Mehrspieler: Alle bekommen DIESELBE Landschaft. Verschiedene Landschaften
+    // wären verschiedene Spiele — die Städte ließen sich nicht vergleichen.
+    for (const [label, w, h, players] of [
+      ['Tablet quer', 1180, 820, 4],
+      ['Handy hoch', 402, 874, 2]
+    ]) {
+      const mctx = await browser.newContext({ viewport: { width: w, height: h }, locale: 'de-DE' });
+      const mp = await mctx.newPage();
+      mp.on('pageerror', (e) => fail(`Landpartie ${label} ${players}P: Seitenfehler: ${e.message}`));
+      await mp.goto(BASE_URL);
+      await mp.locator('#splash').waitFor({ state: 'detached', timeout: 10000 });
+      const neu = mp.locator('button', { hasText: 'Neues Spiel' });
+      if (await neu.count()) await neu.click();
+      await mp.locator('.seg button', { hasText: String(players) }).first().click();
+      const schalter = mp.locator('.landOpt input');
+      if ((await schalter.count()) === 0) {
+        fail(`Landpartie ${label} ${players}P: kein Schalter bei ${players} Spielern`);
+      }
+      await schalter.check();
+      await mp.locator('.bar button.big').click();
+      await mp.locator('.board').first().waitFor({ timeout: 8000 });
+      await mp.waitForTimeout(400);
+      const g = await mp.evaluate(() => {
+        const st = JSON.parse(localStorage.getItem('tinytowns.save.v1'));
+        const fingerprint = st.players.map((p) => p.board.map((sq) => sq.terrain ?? '-').join(''));
+        const bretter = [...document.querySelectorAll('.board')].map((el) => {
+          const r = el.getBoundingClientRect();
+          return { w: Math.round(r.width), h: Math.round(r.height) };
+        });
+        return {
+          spieler: st.players.length,
+          land: st.config.land === true,
+          felder: st.players[0].board.length,
+          landschaft: st.players[0].board.filter((sq) => sq.terrain).length,
+          verschiedene: new Set(fingerprint).size,
+          karten: st.config.activeCards.length,
+          erweiterungen: st.config.sets,
+          systeme: st.config.systems,
+          bretter,
+          clipped: [...document.querySelectorAll('.corner')].some(
+            (c) => c.scrollWidth - c.clientWidth > 1 || c.scrollHeight - c.clientHeight > 1
+          )
+        };
+      });
+      const wo = `Landpartie ${label} ${players}P`;
+      if (!g.land || g.felder !== 30) fail(`${wo}: ${g.felder} Felder, land=${g.land}`);
+      if (g.landschaft < 9 || g.landschaft > 13) fail(`${wo}: ${g.landschaft} Landschaftsfelder`);
+      if (g.verschiedene !== 1) fail(`${wo}: ${g.verschiedene} verschiedene Landschaften`);
+      if (g.bretter.length !== players) fail(`${wo}: ${g.bretter.length} Bretter statt ${players}`);
+      // Gleich große Bretter, und die Form stimmt (5:6, also höher als breit)
+      for (const b of g.bretter) {
+        if (b.w !== g.bretter[0].w || b.h !== g.bretter[0].h) {
+          fail(`${wo}: Bretter unterschiedlich groß (${JSON.stringify(g.bretter)})`);
+        }
+        if (Math.abs(b.h / b.w - 6 / 5) > 0.05) fail(`${wo}: Brettform ${b.w}×${b.h} ist nicht 5:6`);
+      }
+      if (g.clipped) fail(`${wo}: Inhalt wird am Zellenrand abgeschnitten`);
+      // Landpartie spielt pur: keine Erweiterungen, keine Zusatzmodi
+      if (g.karten !== 10) fail(`${wo}: ${g.karten} Karten statt 10`);
+      if (JSON.stringify(g.erweiterungen) !== JSON.stringify(['base'])) {
+        fail(`${wo}: Erweiterungen aktiv (${g.erweiterungen})`);
+      }
+      for (const [name, an] of Object.entries(g.systeme)) {
+        if (an) fail(`${wo}: System „${name}" ist an, die Landpartie spielt pur`);
+      }
+      await mctx.close();
+    }
+    console.log('✓ Landpartie mehrspielerfähig: dieselbe Landschaft für alle, gleich große Bretter, pur');
   }
 
   // Manifest: Ohne id/scope/start_url kann Chrome einen geteilten Link nicht an

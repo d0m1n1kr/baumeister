@@ -216,9 +216,9 @@ export const es: Translation = {
   soloDeckCount: (n: number) => `Mazo: ${n} cartas`,
   soloDaily: 'Reto diario',
   soloDailyHint: 'Azar fijo del día — las mismas cartas y recursos en todo el mundo. ¡Compara tus puntos!',
-  soloLand: 'Campiña (5×6)',
-  soloLandHint: 'Tablero más grande con río, montañas y lago — no edificables, pero las cartas ribereñas puntúan junto a ellos.',
-  soloLandNoSets: 'La campiña se juega pura: juego base más cartas de terreno, sin expansiones.',
+  landMode: 'Campiña (5×6)',
+  landModeHint: 'Tablero más grande con río, montañas y lago — no edificables, pero las cartas ribereñas puntúan junto a ellos.',
+  landNoSets: 'La campiña se juega pura: juego base más cartas de terreno, sin expansiones.',
   landHighscores: 'Récords de campiña (este dispositivo)',
   terrain: {
     river: 'Río',

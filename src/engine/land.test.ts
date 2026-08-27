@@ -222,3 +222,53 @@ describe('Landpartie: Setup und Wertungs-Bausteine', () => {
     expect(score.lines.find((l) => l.card === 'watermill')!.points).toBe(0);
   });
 });
+
+describe('Landpartie mit mehreren Spielern', () => {
+  it('alle bekommen dasselbe 5×6-Brett mit derselben Landschaft', () => {
+    // Fairness: Wer eine andere Landschaft hätte, spielte ein anderes Spiel.
+    const cfg = config(4, undefined, false);
+    cfg.land = true;
+    cfg.terrain = [
+      { square: FLUSS_OBEN, kind: 'river' },
+      { square: FLUSS_UNTEN, kind: 'river' },
+      { square: BERG, kind: 'mountain' },
+      { square: SEE, kind: 'lake' }
+    ];
+    const s = newGame(cfg);
+    expect(s.players).toHaveLength(4);
+    const ersteLandschaft = s.players[0].board.map((sq) => sq.terrain ?? null);
+    for (const p of s.players) {
+      expect(p.board).toHaveLength(FELDER);
+      expect(p.board.map((sq) => sq.terrain ?? null)).toEqual(ersteLandschaft);
+    }
+    // und die Landschaft steht wirklich auf jedem Brett, nicht nur beim Ersten
+    expect(s.players[3].board[BERG].terrain).toBe('mountain');
+  });
+
+  it('die Landschaft sperrt auch bei Mitspielern das Bauen', () => {
+    const cfg = config(2, undefined, false);
+    cfg.land = true;
+    cfg.terrain = [{ square: FLUSS_OBEN, kind: 'river' }];
+    const s = newGame(cfg);
+    s.phase = { t: 'round', resource: 'wood' };
+    s.players[1].pending = 'wood';
+    expect(() => apply(s, { t: 'placeResource', player: 1, square: FLUSS_OBEN }, catalog))
+      .toThrowError('Feld ist belegt');
+  });
+
+  it('buildGameConfig erlaubt die Landpartie auch ohne Solo', async () => {
+    const { buildGameConfig } = await import('../store/newGameConfig');
+    const spieler = [
+      { name: 'A', corner: 0 },
+      { name: 'B', corner: 2 }
+    ];
+    const cfg = buildGameConfig(spieler, ['base'], true, false, { land: true });
+    expect(cfg.land).toBe(true);
+    expect(cfg.terrain?.length).toBeGreaterThan(0);
+    expect(cfg.activeCards).toHaveLength(10); // 7 + 3 Anlieger
+    // Gegenprobe: ohne das Flag bleibt es klassisch
+    const klassisch = buildGameConfig(spieler, ['base'], true, false, {});
+    expect(klassisch.land).toBeUndefined();
+    expect(klassisch.terrain).toBeUndefined();
+  });
+});

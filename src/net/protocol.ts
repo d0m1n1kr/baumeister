@@ -5,8 +5,10 @@
 import type { Action, GameState } from '../engine/types';
 
 /** Bei Änderungen erhöhen — verhindert, dass Geräte mit unterschiedlichen App-Ständen
- *  in einer Partie landen und sich gegenseitig kaputte Zustände schicken. */
-export const PROTOCOL_VERSION = 6;
+ *  in einer Partie landen und sich gegenseitig kaputte Zustände schicken.
+ *  7: Die Landpartie gibt es auch im Mehrspielermodus. Ein Gast mit älterer App
+ *  würde ihr 30-Felder-Brett als Quadrat rechnen und das Raster falsch zeichnen. */
+export const PROTOCOL_VERSION = 7;
 
 export interface SeatInfo {
   index: number;

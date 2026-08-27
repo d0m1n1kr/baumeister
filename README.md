@@ -112,7 +112,7 @@ device (the host runs the engine and broadcasts it).
   file at the domain root. The manifest carries `id`, `scope`, `start_url` and
   `launch_handler` so Chromium can route such links into the installed app; on
   iOS the day picker above is the way to a shared challenge.
-- **Countryside mode (🏞, solo, 5×6):** a taller board — 5 wide, 6 high, which
+- **Countryside mode (🏞, 5×6, any player count):** a taller board — 5 wide, 6 high, which
   is the shape of a phone held upright — with seeded terrain: a river crossing
   edge to edge, a mountain ridge and a lake, all unbuildable. Terrain takes
   9–13 squares, so 17–21 of the 30 stay buildable: a little more room than the
@@ -123,9 +123,11 @@ device (the host runs the engine and broadcasts it).
   tests, so the daily challenge shows the same map worldwide. Three extra
   waterfront cards join the usual seven (Fisherman's Hut, Watermill, Ore Mine,
   Ferry Landing, Alpine Hut, Boathouse — 3 drawn of 6) and score next to the
-  matching terrain. Countryside dailies use their own seed stem and share
-  links carry `&mode=land`; highscores and rank thresholds are kept separate
-  from the classic list. V1 plays pure: base game plus terrain cards, no
+  matching terrain. **Every player gets the same landscape** — a different one
+  per player would be a different game, and the towns could not be compared.
+  Countryside dailies use their own seed stem and share links carry
+  `&mode=land`; highscores and rank thresholds are kept separate
+  from the classic list (solo only). It plays pure: base game plus terrain cards, no
   expansions. Terrain artwork adapts to the theme (canyon/crater field/ice
   lake on Mars, mistflow/dragonspire/spelllake in the dragon realm).
 - **Learning mode (🎓, solo):** a guided game for newcomers. Instruction bubbles

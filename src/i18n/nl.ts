@@ -216,9 +216,9 @@ export const nl: Translation = {
   soloDeckCount: (n: number) => `Trekstapel: ${n} kaarten`,
   soloDaily: 'Dagelijkse uitdaging',
   soloDailyHint: 'Vast dagtoeval — wereldwijd dezelfde kaarten en grondstoffen. Vergelijk je punten!',
-  soloLand: 'Landtocht (5×6)',
-  soloLandHint: 'Groter bord met rivier, bergen en meer — onbebouwbaar, maar oeverkaarten scoren ernaast.',
-  soloLandNoSets: 'De landtocht speelt puur: basisspel plus terreinkaarten, zonder uitbreidingen.',
+  landMode: 'Landtocht (5×6)',
+  landModeHint: 'Groter bord met rivier, bergen en meer — onbebouwbaar, maar oeverkaarten scoren ernaast.',
+  landNoSets: 'De landtocht speelt puur: basisspel plus terreinkaarten, zonder uitbreidingen.',
   landHighscores: 'Topscores landtocht (dit apparaat)',
   terrain: {
     river: 'Rivier',

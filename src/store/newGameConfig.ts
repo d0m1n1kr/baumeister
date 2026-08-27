@@ -17,11 +17,11 @@ export function buildGameConfig(
     dailyId?: string;
     townHall?: boolean;
     train?: boolean;
-    /** Landpartie: 5×6 mit Landschaft und Anlieger-Karten (nur solo). */
+    /** Landpartie: 5×6 mit Landschaft und Anlieger-Karten (jede Spielerzahl). */
     land?: boolean;
   } = {}
 ): GameConfig {
-  const land = (opts.solo && opts.land) ?? false;
+  const land = opts.land ?? false;
   // Eigener Seed-Stamm je Modus: Die Landpartie desselben Tages darf nicht
   // die klassische Auslage verraten (und umgekehrt).
   const seed = opts.dailyId ? dailySeed(opts.dailyId, land ? 'land-' : '') : randomSeed();

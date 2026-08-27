@@ -174,9 +174,11 @@
   /** Host startet aus der Lobby: Konfiguration aus den aktuellen Sitzplätzen bauen. */
   function startFromLobby() {
     const players = session.seats.map((s) => ({ name: s.name, corner: s.corner }));
-    const { sets, useMonuments, cavern, townHall, train } = session.setup;
+    const { sets, useMonuments, cavern, townHall, train, land } = session.setup;
     try {
-      session.startGame(buildGameConfig(players, sets, useMonuments, cavern, { townHall, train }));
+      session.startGame(
+        buildGameConfig(players, sets, useMonuments, cavern, { townHall, train, land })
+      );
     } catch (e) {
       setupError = e instanceof Error ? e.message : String(e);
     }
