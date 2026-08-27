@@ -4,7 +4,7 @@ import type {
   Catalog, CardDef, GameState, PlayerState, PlayerScore, ScoreLine, Selector
 } from './types';
 import {
-  boardSizeOf, cornerSquares, centerSquares,
+  NUM_SQUARES, centerSquares, cornerSquares, dimsOf,
   neighbors4, neighbors8, rowOf, colOf
 } from './types';
 
@@ -56,7 +56,7 @@ function selectorWeight(sel: Selector, target: CardDef): number {
 // ---------- Fütterung ----------
 
 /** Zusammenhängende Gruppen fütterbarer Gebäude (orthogonal). */
-function cottageGroups(buildings: Placed[], size: number): number[][] {
+function cottageGroups(buildings: Placed[], cols: number, rows: number): number[][] {
   const cottageSquares = new Set(buildings.filter((b) => isFeedable(b.def)).map((b) => b.square));
   const seen = new Set<number>();
   const groups: number[][] = [];
@@ -68,7 +68,7 @@ function cottageGroups(buildings: Placed[], size: number): number[][] {
     while (stack.length) {
       const cur = stack.pop()!;
       group.push(cur);
-      for (const n of neighbors4(cur, size)) {
+      for (const n of neighbors4(cur, cols, rows)) {
         if (cottageSquares.has(n) && !seen.has(n)) {
           seen.add(n);
           stack.push(n);
@@ -109,7 +109,7 @@ interface FeedCandidate {
  * Hütten bis zur Kapazität; Root Cellar/Tithe Barn füttern gegen Münzen.
  */
 function feedingCandidates(p: PlayerState, catalog: Catalog): FeedCandidate[] {
-  const size = boardSizeOf(p.board);
+  const { cols, rows } = dimsOf(p.board);
   const buildings = placedBuildings(p, catalog);
   const cottages = buildings.filter((b) => isFeedable(b.def)).map((b) => b.square);
   if (cottages.length === 0) return [{ fed: new Set(), coinsSpent: 0 }];
@@ -128,11 +128,11 @@ function feedingCandidates(p: PlayerState, catalog: Catalog): FeedCandidate[] {
         anywhereCapacity += feeding.count ?? 0;
         break;
       case 'surrounding8':
-        for (const n of neighbors8(b.square, size)) if (cottages.includes(n)) fixed.add(n);
+        for (const n of neighbors8(b.square, cols, rows)) if (cottages.includes(n)) fixed.add(n);
         break;
       case 'rowAndColumn':
         for (const c of cottages) {
-          if (rowOf(c, size) === rowOf(b.square, size) || colOf(c, size) === colOf(b.square, size)) fixed.add(c);
+          if (rowOf(c, cols) === rowOf(b.square, cols) || colOf(c, cols) === colOf(b.square, cols)) fixed.add(c);
         }
         break;
       case 'contiguousGroup':
@@ -144,12 +144,12 @@ function feedingCandidates(p: PlayerState, catalog: Catalog): FeedCandidate[] {
       case 'adjacentPlusPerCoinPer2':
         hasPerCoinPer2 = true;
         // Nachbarn füttert die Zehntscheune gratis
-        for (const n of neighbors4(b.square, size)) if (cottages.includes(n)) fixed.add(n);
+        for (const n of neighbors4(b.square, cols, rows)) if (cottages.includes(n)) fixed.add(n);
         break;
     }
   }
 
-  const groups = cottageGroups(buildings, size);
+  const groups = cottageGroups(buildings, cols, rows);
 
   // Gewächshaus-Kombinationen (jede Wahl unabhängig; Duplikate egal)
   let bases: Set<number>[] = [fixed];
@@ -163,8 +163,9 @@ function feedingCandidates(p: PlayerState, catalog: Catalog): FeedCandidate[] {
       }
     }
     bases = dedupeSets(next);
-    // Sicherheitsgrenze, skaliert mit der Brettfläche (6×6 hat mehr Hütten)
-    const basesCap = size > 4 ? 96 : 64;
+    // Sicherheitsgrenze, skaliert mit der Brettfläche (die Landpartie hat mehr
+    // Felder und damit mehr Hütten als das klassische 4×4)
+    const basesCap = cols * rows > NUM_SQUARES ? 96 : 64;
     if (bases.length > basesCap) bases = bases.slice(0, basesCap);
   }
 
@@ -191,7 +192,7 @@ function feedingCandidates(p: PlayerState, catalog: Catalog): FeedCandidate[] {
         const templeAdj = new Set<number>();
         for (const b of buildings) {
           if (b.def.scoring.type === 'ifAdjacentAtLeast') {
-            for (const n of neighbors4(b.square, size)) templeAdj.add(n);
+            for (const n of neighbors4(b.square, cols, rows)) templeAdj.add(n);
           }
         }
         const sorted = [...remaining].sort((a, b) => Number(templeAdj.has(b)) - Number(templeAdj.has(a)));
@@ -206,10 +207,8 @@ function feedingCandidates(p: PlayerState, catalog: Catalog): FeedCandidate[] {
   // Root Cellar: je 1 Münze füttert alle Hütten einer Zeile/Spalte
   if (hasRowColPerCoin && p.coins > 0) {
     const lines: number[][] = [];
-    for (let i = 0; i < size; i++) {
-      lines.push(cottages.filter((c) => rowOf(c, size) === i));
-      lines.push(cottages.filter((c) => colOf(c, size) === i));
-    }
+    for (let i = 0; i < rows; i++) lines.push(cottages.filter((c) => rowOf(c, cols) === i));
+    for (let i = 0; i < cols; i++) lines.push(cottages.filter((c) => colOf(c, cols) === i));
     const usefulLines = lines.filter((l) => l.length > 0);
     const expanded: FeedCandidate[] = [...results];
     for (const cand of results) {
@@ -295,7 +294,7 @@ function scoreWithFeeding(
 ): PlayerScore {
   const fed = candidate.fed;
   const p = state.players[playerIndex];
-  const size = boardSizeOf(p.board);
+  const { cols, rows } = dimsOf(p.board);
   const buildings = placedBuildings(p, catalog);
   const hasEffect = (e: string) => buildings.some((b) => (b.def.effects ?? []).includes(e as never));
 
@@ -341,7 +340,7 @@ function scoreWithFeeding(
       }
       case 'perAdjacent': {
         let sum = 0;
-        for (const n of neighbors4(b.square, size)) {
+        for (const n of neighbors4(b.square, cols, rows)) {
           const nb = p.board[n].building;
           if (!nb) continue;
           const nd = catalog[nb.card];
@@ -351,7 +350,7 @@ function scoreWithFeeding(
         break;
       }
       case 'ifAdjacentAny': {
-        const hit = neighbors4(b.square, size).some((n) => {
+        const hit = neighbors4(b.square, cols, rows).some((n) => {
           const nb = p.board[n].building;
           return !!nb && spec.targets.some((t) => matchesSelector(t, catalog[nb.card], b.def, fed, n));
         });
@@ -359,7 +358,7 @@ function scoreWithFeeding(
         break;
       }
       case 'ifNotAdjacentAny': {
-        const hit = neighbors4(b.square, size).some((n) => {
+        const hit = neighbors4(b.square, cols, rows).some((n) => {
           const nb = p.board[n].building;
           return !!nb && spec.targets.some((t) => matchesSelector(t, catalog[nb.card], b.def, fed, n));
         });
@@ -368,7 +367,7 @@ function scoreWithFeeding(
       }
       case 'ifAdjacentAtLeast': {
         let sum = 0;
-        for (const n of neighbors4(b.square, size)) {
+        for (const n of neighbors4(b.square, cols, rows)) {
           const nb = p.board[n].building;
           if (!nb) continue;
           const nd = catalog[nb.card];
@@ -388,7 +387,7 @@ function scoreWithFeeding(
       case 'perAdjacentTerrain': {
         // Landpartie: das Gebäude schaut auf die Landschaft nebenan
         let sum = 0;
-        for (const n of neighbors4(b.square, size)) {
+        for (const n of neighbors4(b.square, cols, rows)) {
           const tk = p.board[n].terrain;
           if (tk && spec.terrains.includes(tk)) sum++;
         }
@@ -396,7 +395,7 @@ function scoreWithFeeding(
         break;
       }
       case 'ifAdjacentTerrain': {
-        const hit = neighbors4(b.square, size).some((n) => {
+        const hit = neighbors4(b.square, cols, rows).some((n) => {
           const tk = p.board[n].terrain;
           return !!tk && spec.terrains.includes(tk);
         });
@@ -404,7 +403,7 @@ function scoreWithFeeding(
         break;
       }
       case 'perInZone': {
-        const zone = spec.zone === 'corners' ? cornerSquares(size) : centerSquares(size);
+        const zone = spec.zone === 'corners' ? cornerSquares(cols, rows) : centerSquares(cols, rows);
         let sum = 0;
         for (const o of buildings) {
           if (zone.includes(o.square) && matchesSelector(spec.target, o.def, b.def, fed, o.square)) {
@@ -418,7 +417,7 @@ function scoreWithFeeding(
         const types = new Set<string>();
         for (const o of buildings) {
           if (o.square === b.square || o.card === b.card) continue;
-          if (rowOf(o.square, size) === rowOf(b.square, size) || colOf(o.square, size) === colOf(b.square, size)) {
+          if (rowOf(o.square, cols) === rowOf(b.square, cols) || colOf(o.square, cols) === colOf(b.square, cols)) {
             types.add(o.card);
           }
         }
@@ -431,8 +430,8 @@ function scoreWithFeeding(
         for (const o of buildings) {
           if (o.card !== b.card) continue;
           if (o.square === b.square) { sum++; continue; }
-          if (rowOf(o.square, size) === rowOf(b.square, size)) sum++;
-          if (colOf(o.square, size) === colOf(b.square, size)) sum++;
+          if (rowOf(o.square, cols) === rowOf(b.square, cols)) sum++;
+          if (colOf(o.square, cols) === colOf(b.square, cols)) sum++;
         }
         addPoints(b.card, sum * spec.vpEach);
         break;
@@ -442,7 +441,7 @@ function scoreWithFeeding(
           (o) =>
             o.square !== b.square &&
             matchesSelector(spec.target, o.def, b.def, fed, o.square) &&
-            (rowOf(o.square, size) === rowOf(b.square, size) || colOf(o.square, size) === colOf(b.square, size))
+            (rowOf(o.square, cols) === rowOf(b.square, cols) || colOf(o.square, cols) === colOf(b.square, cols))
         );
         if (!other) addPoints(b.card, spec.vp);
         break;
@@ -518,7 +517,7 @@ function scoreHandler(
   fed: Set<number>
 ): number {
   const p = state.players[playerIndex];
-  const size = boardSizeOf(p.board);
+  const { cols, rows } = dimsOf(p.board);
   switch (handler) {
     case 'archive': {
       const types = new Set(buildings.filter((b) => b.def.kind !== 'monument').map((b) => b.card));
@@ -526,7 +525,7 @@ function scoreHandler(
     }
     case 'mandras': {
       const types = new Set<string>();
-      for (const n of neighbors4(self.square, size)) {
+      for (const n of neighbors4(self.square, cols, rows)) {
         const nb = p.board[n].building;
         if (nb) types.add(nb.card);
       }
@@ -549,7 +548,7 @@ function scoreHandler(
         while (stack.length) {
           const cur = stack.pop()!;
           groupSize++;
-          for (const n of neighbors4(cur, size)) {
+          for (const n of neighbors4(cur, cols, rows)) {
             const nb = p.board[n].building;
             if (nb && nb.card === b.card && !seen.has(n)) {
               seen.add(n);
@@ -576,7 +575,7 @@ function scoreHandler(
     }
     case 'schoolhouse': {
       // Fortune: 2 SP bei gefütterter Nachbar-Hütte; +2 SP bei Münzen ≥ rechter Nachbar
-      const fedAdjacent = neighbors4(self.square, size).some((n) => {
+      const fedAdjacent = neighbors4(self.square, cols, rows).some((n) => {
         const nb = p.board[n].building;
         return !!nb && isCottage(catalog[nb.card]) && fed.has(n);
       });
@@ -591,7 +590,7 @@ function scoreHandler(
       const types = new Set<string>();
       for (const o of buildings) {
         if (o.square === self.square) continue;
-        if (rowOf(o.square, size) === rowOf(self.square, size) || colOf(o.square, size) === colOf(self.square, size)) {
+        if (rowOf(o.square, cols) === rowOf(self.square, cols) || colOf(o.square, cols) === colOf(self.square, cols)) {
           types.add(o.card);
         }
       }

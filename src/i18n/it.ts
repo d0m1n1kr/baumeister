@@ -216,7 +216,7 @@ export const it: Translation = {
   soloDeckCount: (n: number) => `Mazzo: ${n} carte`,
   soloDaily: 'Sfida del giorno',
   soloDailyHint: 'Caso fisso del giorno — le stesse carte e risorse in tutto il mondo. Confronta i punteggi!',
-  soloLand: 'Campagna (6×6)',
+  soloLand: 'Campagna (5×6)',
   soloLandHint: 'Tabellone più grande con fiume, montagne e lago — non edificabili, ma le carte rivierasche vi segnano punti.',
   soloLandNoSets: 'La campagna si gioca pura: gioco base più carte terreno, senza espansioni.',
   landHighscores: 'Record campagna (questo dispositivo)',

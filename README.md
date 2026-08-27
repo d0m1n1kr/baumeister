@@ -112,8 +112,11 @@ device (the host runs the engine and broadcasts it).
   file at the domain root. The manifest carries `id`, `scope`, `start_url` and
   `launch_handler` so Chromium can route such links into the installed app; on
   iOS the day picker above is the way to a shared challenge.
-- **Countryside mode (🏞, solo, 6×6):** a bigger board with seeded terrain —
-  a river crossing edge to edge, a mountain ridge and a lake, all unbuildable.
+- **Countryside mode (🏞, solo, 5×6):** a taller board — 5 wide, 6 high, which
+  is the shape of a phone held upright — with seeded terrain: a river crossing
+  edge to edge, a mountain ridge and a lake, all unbuildable. Terrain takes
+  9–13 squares, so 17–21 of the 30 stay buildable: a little more room than the
+  classic 16, without dragging a game out.
   The layout is generated from the seed with hard constraints (no enclosed
   buildable region under 5 squares, a free 2×4 window so the biggest monument
   stays buildable, at most 2 corners covered) and is frozen by golden-seed

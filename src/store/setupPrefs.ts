@@ -24,7 +24,7 @@ export interface SetupPrefs {
   multiDevice: boolean;
   /** Solo-Variante: freies Spiel, Tages-Challenge oder Lernspiel. */
   soloMode: SoloMode;
-  /** Landpartie: 6×6 mit Landschaft. */
+  /** Landpartie: 5×6 mit Landschaft. */
   land: boolean;
   useMonuments: boolean;
   /** Gewählte Erweiterungen OHNE 'base' (das ist immer dabei). */

@@ -3,7 +3,7 @@
 // auf dem großen Brett. Diese Tests halten beide Welten fest.
 import { describe, expect, it } from 'vitest';
 import {
-  BOARD_SIZE, boardSizeOf, centerSquares, colOf, cornerSquares,
+  BOARD_SIZE, LAND_COLS, LAND_ROWS, centerSquares, colOf, cornerSquares, dimsOf,
   idx, isBlocked, isFreeSquare, neighbors4, neighbors8, rowOf
 } from './types';
 
@@ -20,30 +20,40 @@ describe('Geometrie mit Default (klassisch 4×4)', () => {
   });
 });
 
-describe('Geometrie bei n=6 (Landpartie)', () => {
-  it('Index-Umrechnung', () => {
-    expect(idx(5, 5, 6)).toBe(35);
-    expect(rowOf(35, 6)).toBe(5);
-    expect(colOf(35, 6)).toBe(5);
-    expect(rowOf(6, 6)).toBe(1);
+// Das Landpartie-Brett ist NICHT quadratisch: 5 breit, 6 hoch. Genau da liegt
+// die Falle — wer Zeilen und Spalten verwechselt, bekommt Nachbarn, die über
+// den Rand hinweg „umbrechen", und damit stillschweigend falsche Punkte.
+describe('Geometrie bei 5×6 (Landpartie)', () => {
+  const C = LAND_COLS, R = LAND_ROWS;
+
+  it('Index-Umrechnung über die Spaltenzahl', () => {
+    expect(C).toBe(5);
+    expect(R).toBe(6);
+    expect(idx(5, 4, C)).toBe(29); // letztes Feld
+    expect(rowOf(29, C)).toBe(5);
+    expect(colOf(29, C)).toBe(4);
+    expect(rowOf(5, C)).toBe(1); // Zeilenwechsel nach 5, nicht nach 4 oder 6
   });
 
-  it('Nachbarn klemmen an den echten Rändern, nicht bei Spalte 4', () => {
-    // Feld 4 liegt bei n=6 mitten in Zeile 0 — bei n=4 wäre es Zeilenanfang
-    expect(neighbors4(4, 6).sort((a, b) => a - b)).toEqual([3, 5, 10]);
-    expect(neighbors4(0, 6).sort((a, b) => a - b)).toEqual([1, 6]);
-    expect(neighbors8(35, 6).sort((a, b) => a - b)).toEqual([28, 29, 34]);
-    expect(neighbors4(14, 6)).toHaveLength(4); // mittig: alle vier
+  it('Nachbarn brechen nicht über den rechten Rand um', () => {
+    // Feld 4 ist das RECHTE Ende von Zeile 0 — Feld 5 beginnt Zeile 1
+    expect(neighbors4(4, C, R).sort((a, b) => a - b)).toEqual([3, 9]);
+    expect(neighbors4(0, C, R).sort((a, b) => a - b)).toEqual([1, 5]);
+    // unten rechts: nur zwei orthogonale Nachbarn
+    expect(neighbors4(29, C, R).sort((a, b) => a - b)).toEqual([24, 28]);
+    expect(neighbors8(29, C, R).sort((a, b) => a - b)).toEqual([23, 24, 28]);
+    expect(neighbors4(12, C, R)).toHaveLength(4); // mittig: alle vier
   });
 
-  it('Ecken und Mitte des 6×6', () => {
-    expect(cornerSquares(6)).toEqual([0, 5, 30, 35]);
-    expect(centerSquares(6)).toEqual([14, 15, 20, 21]);
+  it('Ecken und Mitte des 5×6', () => {
+    expect(cornerSquares(C, R)).toEqual([0, 4, 25, 29]);
+    // 5 Spalten sind ungerade: die Mitte liegt auf Spalte 2, also 2 Felder
+    expect(centerSquares(C, R)).toEqual([12, 17]);
   });
 
-  it('boardSizeOf liest die Größe aus dem Brett selbst', () => {
-    expect(boardSizeOf(Array.from({ length: 16 }))).toBe(4);
-    expect(boardSizeOf(Array.from({ length: 36 }))).toBe(6);
+  it('dimsOf liest die Maße aus dem Brett selbst', () => {
+    expect(dimsOf(Array.from({ length: 16 }))).toEqual({ cols: 4, rows: 4 });
+    expect(dimsOf(Array.from({ length: 30 }))).toEqual({ cols: 5, rows: 6 });
   });
 });
 
@@ -59,7 +69,7 @@ describe('freie und gesperrte Felder', () => {
 });
 
 describe('newGame mit Landpartie-Flag', () => {
-  it('legt ein 36-Felder-Brett an, klassisch bleibt 16', async () => {
+  it('legt ein 30-Felder-Brett an, klassisch bleibt 16', async () => {
     const { newGame } = await import('./game');
     const base = {
       players: [{ name: 'A', corner: 0 }],
@@ -68,6 +78,6 @@ describe('newGame mit Landpartie-Flag', () => {
       systems: { coins: false, trees: false, cavern: false, train: false }
     };
     expect(newGame(base as never).players[0].board).toHaveLength(16);
-    expect(newGame({ ...base, land: true } as never).players[0].board).toHaveLength(36);
+    expect(newGame({ ...base, land: true } as never).players[0].board).toHaveLength(30);
   });
 });

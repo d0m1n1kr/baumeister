@@ -216,7 +216,7 @@ export const pl: Translation = {
   soloDeckCount: (n: number) => `Talia: ${n} kart`,
   soloDaily: 'Wyzwanie dnia',
   soloDailyHint: 'Stały los dnia — te same karty i surowce na całym świecie. Porównaj punkty!',
-  soloLand: 'Wycieczka (6×6)',
+  soloLand: 'Wycieczka (5×6)',
   soloLandHint: 'Większa plansza z rzeką, górami i jeziorem — nie do zabudowy, ale karty nadbrzeżne punktują obok nich.',
   soloLandNoSets: 'Wycieczka gra czysto: gra podstawowa plus karty terenu, bez dodatków.',
   landHighscores: 'Rekordy wycieczki (to urządzenie)',

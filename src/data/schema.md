@@ -15,7 +15,7 @@ und Effekt-Bausteine verwenden.
 | `category` | `cottage`, `food`, `well`, `chapel`, `theater`, `tavern`, `factory`, `monument` | Kategorie (pro Partie wird je Nicht-Monument-Kategorie 1 Karte gezogen) |
 | `color` | `blue`, `red`, `grey`, `orange`, `yellow`, `green`, `black`, `pink` | Farbgruppe (für Wertungs-Selektoren) |
 | `name`, `text` | `{ de: string, en?: string }` | Name und Regeltext (i18n) |
-| `pattern` | `(Ressource \| null)[][]` | Baumuster als Raster; Ressourcen: `wood`, `brick`, `stone`, `wheat`, `glass`. Rotation & Spiegelung erledigt die Engine. Max. 4×4 (das Landpartie-Brett ist 6×6, Muster bleiben klein). |
+| `pattern` | `(Ressource \| null)[][]` | Baumuster als Raster; Ressourcen: `wood`, `brick`, `stone`, `wheat`, `glass`. Rotation & Spiegelung erledigt die Engine. Max. 4×4 (das Landpartie-Brett ist 5×6, Muster bleiben klein). |
 | `features` | string[] | Symbole der Mini-Karte, siehe unten |
 | `feeding` | optional | Nur rote Karten: `{ "mode": "anywhere"\|"surrounding8"\|"rowAndColumn"\|"contiguousGroup"\|"rowOrColumnPerCoin"\|"adjacentPlusPerCoinPer2", "count"?: n }` |
 | `unverified` | optional bool | Kartentext/-muster nicht aus Primärquellen belegt (⚠ auf der Mini-Karte) |

@@ -62,7 +62,7 @@
   let soloMode = $state<'free' | 'daily' | 'learn'>(
     prefs?.soloMode ?? (learn.enabled ? 'learn' : 'free')
   );
-  // Landpartie: 6×6 mit Landschaft und Anlieger-Karten — gilt für freies Solo
+  // Landpartie: 5×6 mit Landschaft und Anlieger-Karten — gilt für freies Solo
   // und Tages-Challenge, nicht fürs Lernspiel (das erklärt die 4×4-Klassik).
   let landMode = $state(prefs?.land ?? false);
   // Aus einem geteilten Link kann auch ein vergangener Tag kommen — dann wird
@@ -336,7 +336,7 @@
               </div>
             {/if}
             {#if soloMode !== 'learn'}
-              <!-- Landpartie: 6×6 mit Landschaft — kombinierbar mit Frei und
+              <!-- Landpartie: 5×6 mit Landschaft — kombinierbar mit Frei und
                    Tages-Challenge, das Lernspiel bleibt bei der 4×4-Klassik -->
               <label class="opt landOpt">
                 <input type="checkbox" bind:checked={landMode} />

@@ -181,15 +181,16 @@ export function randomSetup(
   return config;
 }
 
-/** Landpartie-Rangtabelle: gleiche Ränge, höhere Schwellen — auf ~25
- *  bebaubaren Feldern (statt 16) fallen mehr Punkte an. Kein offizieller
- *  Maßstab, kalibriert an Probepartien. */
+/** Landpartie-Rangtabelle: gleiche Ränge, etwas höhere Schwellen. Auf dem
+ *  5×6-Brett bleiben nach der Landschaft ~19 bebaubare Felder statt 16, also
+ *  liegen die Schwellen rund ein Fünftel über der offiziellen Solo-Tabelle.
+ *  Kein offizieller Maßstab. */
 export function landRankIndex(score: number): number {
-  if (score >= 60) return 0;
-  if (score >= 50) return 1;
-  if (score >= 40) return 2;
-  if (score >= 28) return 3;
-  if (score >= 15) return 4;
+  if (score >= 46) return 0;
+  if (score >= 39) return 1;
+  if (score >= 31) return 2;
+  if (score >= 22) return 3;
+  if (score >= 12) return 4;
   return 5;
 }
 

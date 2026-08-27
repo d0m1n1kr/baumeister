@@ -216,7 +216,7 @@ export const pt: Translation = {
   soloDeckCount: (n: number) => `Baralho: ${n} cartas`,
   soloDaily: 'Desafio diário',
   soloDailyHint: 'Acaso fixo do dia — as mesmas cartas e recursos em todo o mundo. Compara os teus pontos!',
-  soloLand: 'Campo (6×6)',
+  soloLand: 'Campo (5×6)',
   soloLandHint: 'Tabuleiro maior com rio, montanhas e lago — não edificáveis, mas as cartas ribeirinhas pontuam ao lado.',
   soloLandNoSets: 'O campo joga-se puro: jogo base mais cartas de terreno, sem expansões.',
   landHighscores: 'Recordes do campo (este aparelho)',

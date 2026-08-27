@@ -7,6 +7,7 @@
   import { suggestBuild, suggestPlacement } from '../engine/advice';
   import { hasFortIronweed, trainStopPlayer } from '../engine/game';
   import type { CardDef, Resource } from '../engine/types';
+  import { dimsOf } from '../engine/types';
   import { cornerRotation, resLabel, RESOURCE_CSS } from './helpers';
   import { sfx } from './sound';
   import { panelReserve } from './panelReserve.svelte';
@@ -139,6 +140,12 @@
 
   const emptySquares = $derived(p.board.map((sq, i) => (!sq.building && !sq.resource && !sq.terrain ? i : -1)).filter((i) => i >= 0));
   const boardFull = $derived(emptySquares.length === 0);
+  // Breite/Höhe des Bretts: klassisch 1, Landpartie 5/6 (hochkant). Damit
+  // rechnet boardWrap seine Breite aus der verfügbaren Höhe.
+  const boardRatio = $derived.by(() => {
+    const { cols, rows } = dimsOf(p.board);
+    return cols / rows;
+  });
   const coinsActive = $derived(st.config.systems.coins);
   const treesActive = $derived(st.config.systems.trees);
   const prismAvailable = $derived(
@@ -475,11 +482,11 @@
   </header>
 
   <div class="row" data-learn={solo ? 'play' : undefined}>
-    <!-- boardArea misst den Restplatz, boardWrap bleibt exakt quadratisch:
-         Overlays (Gleis, Lern-Puls) liegen weiter am Brettrand, nicht am
-         Rand eines gestreckten Kastens. -->
+    <!-- boardArea misst den Restplatz, boardWrap hat exakt die Form des Bretts
+         (klassisch quadratisch, Landpartie 5:6): Overlays (Gleis, Lern-Puls)
+         liegen weiter am Brettrand, nicht am Rand eines gestreckten Kastens. -->
     <div class="boardArea">
-    <div class="boardWrap">
+    <div class="boardWrap" style="--ar: {boardRatio}">
       <BoardGrid
         {player}
         board={p.board}
@@ -1067,7 +1074,9 @@
   .corner.wide .boardArea { width: min(60vw, 60vh); }
   .boardWrap {
     position: relative;
-    width: min(100cqw, 100cqh);
+    /* Aus der Höhe wird die Breite über die Brettform: Ein 5:6-Brett ist bei
+       gleicher Höhe schmaler als ein quadratisches. */
+    width: min(100cqw, calc(100cqh * var(--ar, 1)));
     flex-shrink: 0;
   }
   /* Das BRETT muss mittig stehen, nicht die Gruppe aus Brett und Panel: Die
@@ -1086,8 +1095,8 @@
   /* Ohne Container-Queries (Safari < 16) bleiben die bisherigen Maße */
   @supports not (container-type: size) {
     .boardArea { display: contents; }
-    .boardWrap { width: min(34vh, 24vw); align-self: flex-start; }
-    .corner.wide .boardWrap { width: min(32vh, 44vw); }
+    .boardWrap { width: min(calc(34vh * var(--ar, 1)), 24vw); align-self: flex-start; }
+    .corner.wide .boardWrap { width: min(calc(32vh * var(--ar, 1)), 44vw); }
   }
   /* Handy quer: Bretter stehen nebeneinander — die Höhe ist der Maßstab */
   @media (orientation: landscape) and (max-height: 540px) {
@@ -1127,10 +1136,10 @@
       place-items: center;
       container-type: size;
     }
-    .corner.soloCorner .boardWrap { width: min(100cqw, 100cqh); }
+    .corner.soloCorner .boardWrap { width: min(100cqw, calc(100cqh * var(--ar, 1))); }
     /* Ohne Container-Queries (Safari < 16) bleibt es beim bisherigen Maß */
     @supports not (container-type: size) {
-      .corner.soloCorner .boardWrap { width: min(30vh, 76vw); }
+      .corner.soloCorner .boardWrap { width: min(calc(30vh * var(--ar, 1)), 76vw); }
     }
     /* Platz für Gleis und Zug an der Brett-Unterkante — nur im Eisenbahn-Modus,
        sonst waren es 26 px, die den Knöpfen darunter fehlten */

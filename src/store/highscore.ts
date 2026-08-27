@@ -1,5 +1,5 @@
 // Solo-Bestenliste je Gerät (localStorage). Klassik und Landpartie führen
-// GETRENNTE Listen: 6×6 mit Anlieger-Karten erzeugt andere Punkthöhen, ein
+// GETRENNTE Listen: 5×6 mit Anlieger-Karten erzeugt andere Punkthöhen, ein
 // gemeinsames Top-10 wäre bedeutungslos. Einträge ohne mode-Feld stammen aus
 // älteren Versionen und zählen als Klassik.
 
