@@ -3,7 +3,7 @@
 import type {
   Action, Catalog, GameConfig, GameState, PendingChoice, PlayerState, Resource, Square
 } from './types';
-import { BOARD_SIZE, CENTER_SQUARES, COIN_CAP, NUM_SQUARES, colOf, rowOf } from './types';
+import { BOARD_SIZE, COIN_CAP, boardSizeOf, centerSquares, colOf, isFreeSquare, rowOf } from './types';
 import { matchesPattern } from './patterns';
 import { mulberry32, shuffled } from './registry';
 
@@ -19,7 +19,11 @@ export function newGame(config: GameConfig): GameState {
   const players: PlayerState[] = config.players.map((p, i) => ({
     name: p.name,
     corner: p.corner,
-    board: Array.from({ length: NUM_SQUARES }, (): Square => ({})),
+    // Landpartie spielt auf 6×6, sonst klassisch 4×4
+    board: Array.from(
+      { length: (config.land ? 6 : BOARD_SIZE) ** 2 },
+      (): Square => ({})
+    ),
     monumentOptions: config.useMonuments ? [...config.monumentDeals[i]] : undefined,
     monument: undefined,
     pending: null,
@@ -185,7 +189,7 @@ function placeSeed(s: GameState, player: number, square: number): GameState {
   const p = s.players[player] ?? fail('Unbekannter Spieler');
   if (p.seedSquare != null) fail('Samen bereits gesetzt');
   const sq = p.board[square] ?? fail('Ungültiges Feld');
-  if (sq.building || sq.resource) fail('Feld ist belegt');
+  if (sq.building || sq.resource || sq.terrain) fail('Feld ist belegt');
   p.seedSquare = square;
   if (s.players.every((pl) => pl.seedSquare != null)) {
     s.phase = { t: 'nameResource' };
@@ -383,6 +387,8 @@ function checkPlacementTarget(
   s: GameState, p: PlayerState, player: number, square: number, catalog: Catalog
 ) {
   const sq = p.board[square] ?? fail('Ungültiges Feld');
+  // Landschaft (Landpartie) ist nie bespielbar — gleiche Meldung wie belegt
+  if (sq.terrain) fail('Feld ist belegt');
   if (sq.resource) fail('Feld ist belegt');
   if (sq.building) {
     // Statue des Bondmakers: angesagtes Material auf eine Hütte legen
@@ -410,7 +416,7 @@ function placeResource(s: GameState, player: number, square: number, catalog: Ca
   // Solo: die Deck-Wahl gilt als fremde Ansage (wie bei Fabrik und Münztausch).
   if (hasBuiltEffect(p, 'promenadeCoins', catalog)) {
     const coinSquares = p.board.some((c) => c.coin);
-    const freeWithoutCoin = p.board.some((c) => !c.building && !c.resource && !c.coin);
+    const freeWithoutCoin = p.board.some((c) => isFreeSquare(c) && !c.coin);
     if (isForeignNaming(s, player)) {
       if (coinSquares && !sq.coin) fail('Das Material muss auf ein Münzfeld der Promenade');
     } else if (sq.coin && freeWithoutCoin) {
@@ -584,7 +590,7 @@ function oddityTake(
   }
   const p = s.players[player];
   const sq = p.board[targetSquare] ?? fail('Ungültiges Feld');
-  if (sq.building || sq.resource) fail('Feld ist belegt');
+  if (sq.building || sq.resource || sq.terrain) fail('Feld ist belegt');
   sq.resource = b.stored.pop()!;
   gainCoins(p, 1, catalog); // die Münze erhält der nehmende Baumeister (offizielle Regel)
   s.oddityTaken = true;
@@ -668,7 +674,7 @@ function build(
   // (die Gleise verlaufen an der untersten Reihe jeder Stadt)
   if (effects.includes('trainStation')) {
     if (hasStation(p, catalog)) fail('Nur ein Bahnhof pro Stadt');
-    if (Math.floor(target / BOARD_SIZE) !== BOARD_SIZE - 1) {
+    if (rowOf(target, boardSizeOf(p.board)) !== boardSizeOf(p.board) - 1) {
       fail('Der Bahnhof muss an der Strecke liegen (unterste Reihe)');
     }
   }
@@ -686,7 +692,7 @@ function build(
   const resourceSquares = squares.filter((i) => p.board[i].resource);
   const targetSq = p.board[target] ?? fail('Ungültiger Bauplatz');
   if (anywhere) {
-    const emptyAfter = !targetSq.building && (!targetSq.resource || resourceSquares.includes(target));
+    const emptyAfter = !targetSq.building && !targetSq.terrain && (!targetSq.resource || resourceSquares.includes(target));
     if (!emptyAfter) fail('Bauplatz ist nicht frei');
   } else if (!resourceSquares.includes(target)) {
     fail('Bauplatz muss eines der Materialfelder sein');
@@ -802,7 +808,8 @@ function placeBuildingByEffect(
   // Eisenbahn: auch per Effekt kein zweiter Bahnhof und nur an der Strecke
   if ((catalog[card]?.effects ?? []).includes('trainStation')) {
     if (hasStation(p, catalog)) fail('Nur ein Bahnhof pro Stadt');
-    if (Math.floor(target / BOARD_SIZE) !== BOARD_SIZE - 1) {
+    const n = boardSizeOf(p.board);
+    if (rowOf(target, n) !== n - 1) {
       fail('Der Bahnhof muss an der Strecke liegen (unterste Reihe)');
     }
   }
@@ -847,12 +854,13 @@ function applyCoinEffects(
 
   if (effects.includes('teahouseCoins')) {
     // +1 Münze je Gebäudetyp in Zeile ODER Spalte (bessere Achse), selbst ausgenommen, max 3
-    const row = rowOf(target), col = colOf(target);
+    const n = boardSizeOf(p.board);
+    const row = rowOf(target, n), col = colOf(target, n);
     const rowTypes = new Set<string>(), colTypes = new Set<string>();
     p.board.forEach((sq, i) => {
       if (!sq.building || i === target) return;
-      if (rowOf(i) === row) rowTypes.add(sq.building.card);
-      if (colOf(i) === col) colTypes.add(sq.building.card);
+      if (rowOf(i, n) === row) rowTypes.add(sq.building.card);
+      if (colOf(i, n) === col) colTypes.add(sq.building.card);
     });
     gainCoins(p, Math.min(3, Math.max(rowTypes.size, colTypes.size)), catalog);
   }
@@ -878,7 +886,7 @@ function applyCoinEffects(
   }
 
   if (effects.includes('grottoCoins')) {
-    for (const c of CENTER_SQUARES) {
+    for (const c of centerSquares(boardSizeOf(p.board))) {
       const sq = p.board[c];
       if (sq.building) gainCoins(p, 1, catalog); // bebaut (inkl. Grotto selbst) → sofort
       else if (!sq.coin) sq.coin = true;         // Münze teilt sich das Feld ggf. mit Material
@@ -907,7 +915,7 @@ function resolveCathedral(
   if (square != null && square !== choice.square) {
     if (!(grayDef.effects ?? []).includes('buildAnywhereSelf')) fail('Dieses Gebäude bleibt auf dem Feld');
     const sq = p.board[square] ?? fail('Ungültiges Feld');
-    if (sq.building || sq.resource) fail('Feld ist belegt');
+    if (sq.building || sq.resource || sq.terrain) fail('Feld ist belegt');
     target = square;
   }
   delete p.board[choice.square].building;
@@ -927,7 +935,7 @@ function resolveOkaver(
     return s;
   }
   const sq = p.board[square] ?? fail('Ungültiges Feld');
-  if (sq.building || sq.resource) fail('Feld ist belegt');
+  if (sq.building || sq.resource || sq.terrain) fail('Feld ist belegt');
   removeChoice(p, choice);
   placeBuildingByEffect(s, player, 'cottage', square, catalog);
   return s;
@@ -975,7 +983,7 @@ function resolveGrove(
     if (!s.config.activeCards.includes(card)) fail('Karte nicht im Vorrat');
     if (catalog[card]?.kind === 'monument') fail('Monumente nicht erlaubt');
     const sq = p.board[square ?? -1] ?? fail('Ungültiges Feld');
-    if (sq.building || sq.resource) fail('Feld ist belegt');
+    if (sq.building || sq.resource || sq.terrain) fail('Feld ist belegt');
     removeChoice(p, choice);
     placeBuildingByEffect(s, player, card, square!, catalog);
     return s;
@@ -1031,7 +1039,7 @@ function resolveOpaleyeClaim(
   const choice = takeChoice(p, 'opaleyeClaim');
   if (accept) {
     const sq = p.board[square ?? -1] ?? fail('Ungültiges Feld');
-    if (sq.building || sq.resource) fail('Feld ist belegt');
+    if (sq.building || sq.resource || sq.terrain) fail('Feld ist belegt');
     const stock = p.board[choice.square].building?.stock;
     if (stock) stock.splice(stock.indexOf(choice.card), 1);
     removeChoice(p, choice);
@@ -1057,7 +1065,7 @@ function resolveMasons(
   if (catalog[card]?.kind === 'monument') fail('Monumente nicht erlaubt');
   if (choice.picked.includes(card)) fail('Jedes Gebäude nur einmal');
   const sq = p.board[square ?? -1] ?? fail('Ungültiges Feld');
-  if (sq.building || sq.resource) fail('Feld ist belegt');
+  if (sq.building || sq.resource || sq.terrain) fail('Feld ist belegt');
   p.coins--;
   choice.picked.push(card);
   if (p.coins === 0) removeChoice(p, choice);
@@ -1069,7 +1077,7 @@ function resolveMasons(
 function resolvePromenade(s: GameState, player: number, square: number | null): GameState {
   const p = s.players[player] ?? fail('Unbekannter Spieler');
   const choice = takeChoice(p, 'promenadeCoins');
-  const hasFree = p.board.some((sq) => !sq.building && !sq.resource && !sq.coin);
+  const hasFree = p.board.some((sq) => isFreeSquare(sq) && !sq.coin);
   if (square == null) {
     // Abbrechen nur, wenn kein geeignetes Feld mehr existiert
     if (hasFree) fail('Es müssen 3 Münzen auf leere Felder gelegt werden');
@@ -1077,7 +1085,7 @@ function resolvePromenade(s: GameState, player: number, square: number | null): 
     return s;
   }
   const sq = p.board[square] ?? fail('Ungültiges Feld');
-  if (sq.building || sq.resource || sq.coin) fail('Feld ist belegt');
+  if (sq.building || sq.resource || sq.coin || sq.terrain) fail('Feld ist belegt');
   sq.coin = true;
   choice.remaining--;
   if (choice.remaining <= 0) removeChoice(p, choice);
@@ -1092,7 +1100,7 @@ function resolveSeedBonus(
   const choice = takeChoice(p, 'seedBonus');
   if (resource != null) {
     const sq = p.board[square ?? -1] ?? fail('Ungültiges Feld');
-    if (sq.building || sq.resource) fail('Feld ist belegt');
+    if (sq.building || sq.resource || sq.terrain) fail('Feld ist belegt');
     sq.resource = resource;
   }
   removeChoice(p, choice);
@@ -1115,7 +1123,7 @@ function roundDone(s: GameState, player: number, catalog: Catalog): GameState {
   if (
     s.config.townHall && named == null && p.placedSquare == null &&
     !hasFortIronweed(p, catalog) &&
-    p.board.some((sq) => !sq.building && !sq.resource)
+    p.board.some((sq) => isFreeSquare(sq))
   ) {
     fail('Erst ein Material wählen und platzieren');
   }
@@ -1137,7 +1145,7 @@ function cleanupPrismLeftovers(p: PlayerState): void {
 function declareComplete(s: GameState, player: number, catalog: Catalog): GameState {
   requireRound(s);
   const p = activePlayer(s, player);
-  if (p.board.some((sq) => !sq.building && !sq.resource)) fail('Es gibt noch freie Felder');
+  if (p.board.some((sq) => isFreeSquare(sq))) fail('Es gibt noch freie Felder');
   cleanupPrismLeftovers(p);
   p.done = true;
   p.finishRound = s.round;

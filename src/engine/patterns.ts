@@ -1,7 +1,7 @@
 // Baumuster-Matching: Rotation + Spiegelung erlaubt, Handelsposten als Wild-Zelle.
 
 import type { Pattern, PatternCell, Resource, Square, Catalog } from './types';
-import { BOARD_SIZE, rowOf, colOf } from './types';
+import { boardSizeOf, rowOf, colOf } from './types';
 
 function rotate(p: Pattern): Pattern {
   const rows = p.length, cols = p[0].length;
@@ -85,17 +85,18 @@ export function matchesPattern(cardId: string, input: MatchInput): boolean {
   }
   if (realResources === 0) return false;
 
-  // Bounding-Box der Auswahl
-  let rMin = BOARD_SIZE, rMax = -1, cMin = BOARD_SIZE, cMax = -1;
+  // Bounding-Box der Auswahl (Größe des KONKRETEN Bretts — Landpartie: 6)
+  const n = boardSizeOf(board);
+  let rMin = n, rMax = -1, cMin = n, cMax = -1;
   for (const s of squares) {
-    rMin = Math.min(rMin, rowOf(s)); rMax = Math.max(rMax, rowOf(s));
-    cMin = Math.min(cMin, colOf(s)); cMax = Math.max(cMax, colOf(s));
+    rMin = Math.min(rMin, rowOf(s, n)); rMax = Math.max(rMax, rowOf(s, n));
+    cMin = Math.min(cMin, colOf(s, n)); cMax = Math.max(cMax, colOf(s, n));
   }
   const h = rMax - rMin + 1, w = cMax - cMin + 1;
 
   for (const o of cachedOrientations(cardId, def.pattern)) {
     if (o.length !== h || o[0].length !== w) continue;
-    if (matchOrientation(o, rMin, cMin, cells)) return true;
+    if (matchOrientation(o, rMin, cMin, cells, n)) return true;
   }
   return false;
 }
@@ -104,13 +105,14 @@ function matchOrientation(
   o: Pattern,
   rMin: number,
   cMin: number,
-  cells: Map<number, Resource | '*'>
+  cells: Map<number, Resource | '*'>,
+  n: number
 ): boolean {
   let used = 0;
   for (let r = 0; r < o.length; r++) {
     for (let c = 0; c < o[0].length; c++) {
       const want = o[r][c];
-      const have = cells.get((rMin + r) * BOARD_SIZE + (cMin + c));
+      const have = cells.get((rMin + r) * n + (cMin + c));
       if (want === null) {
         if (have !== undefined) return false; // Auswahl enthält Feld außerhalb des Musters
       } else {
@@ -138,24 +140,27 @@ export function matchingCards(candidates: string[], input: MatchInput): string[]
 export function anyPlacementPossible(cardId: string, board: Square[], catalog: Catalog): boolean {
   const def = catalog[cardId];
   if (!def) return false;
+  const n = boardSizeOf(board);
   for (const o of cachedOrientations(cardId, def.pattern)) {
     const h = o.length, w = o[0].length;
-    for (let r = 0; r + h <= BOARD_SIZE; r++) {
-      for (let c = 0; c + w <= BOARD_SIZE; c++) {
-        if (fitsAt(o, r, c, board, catalog)) return true;
+    for (let r = 0; r + h <= n; r++) {
+      for (let c = 0; c + w <= n; c++) {
+        if (fitsAt(o, r, c, board, catalog, n)) return true;
       }
     }
   }
   return false;
 }
 
-function fitsAt(o: Pattern, rOff: number, cOff: number, board: Square[], catalog: Catalog): boolean {
+function fitsAt(
+  o: Pattern, rOff: number, cOff: number, board: Square[], catalog: Catalog, n: number
+): boolean {
   let real = 0;
   for (let r = 0; r < o.length; r++) {
     for (let c = 0; c < o[0].length; c++) {
       const want = o[r][c];
       if (want === null) continue;
-      const sq = board[(rOff + r) * BOARD_SIZE + (cOff + c)];
+      const sq = board[(rOff + r) * n + (cOff + c)];
       if (sq.resource && sq.building) return false;
       const have = buildCell(sq, catalog);
       if (!have) return false;
