@@ -29,7 +29,8 @@ und Effekt-Bausteine verwenden.
 - `flat` — `{ "vp": n }`
 - `ifFed` — `{ "vp": n }`: Punkte, wenn das Gebäude gefüttert ist
 - `byCountTable` — `{ "table": [p1, p2, …], "overflow": n }`: Gesamtpunkte nach Anzahl gleicher Gebäude
-- `perAdjacent` — `{ "target": SEL, "vpEach": n }`
+- `perAdjacent` — `{ "target": SEL, "vpEach": n, "requireTerrain"?: [ART…] }`
+  (`requireTerrain`: zählt nur, wenn das Gebäude selbst an diese Landschaft grenzt)
 - `ifAdjacentAny` — `{ "targets": [SEL…], "vp": n }`
 - `ifNotAdjacentAny` — `{ "targets": [SEL…], "vp": n }`
 - `ifAdjacentAtLeast` — `{ "target": SEL, "count": n, "vp": n }`
@@ -41,7 +42,12 @@ und Effekt-Bausteine verwenden.
 - `perOwnCountVsRightNeighbor` — `{ "baseEach": n, "bonusEach": n }`
 - `perStoredResource` — `{ "vpEach": n }` (z. B. Lagerhaus: −1)
 - `perAdjacentTerrain` — `{ "terrains": ["river"|"mountain"|"lake"…], "vpEach": n }` (Landpartie)
-- `ifAdjacentTerrain` — `{ "terrains": […], "vp": n }` (Landpartie)
+- `ifAdjacentTerrain` — `{ "terrains": […], "vp": n, "count"?: n }` (Landpartie;
+  `count` = wie viele Landschaftsfelder mindestens angrenzen müssen, Standard 1)
+- `byCountTableAdjacentTerrain` — `{ "terrains": […], "table": [p1, p2, …], "overflow": n }`
+  (Landpartie; wie `byCountTable`, gezählt werden aber nur die Exemplare AN dieser Landschaft)
+- `perTerrainInRowCol` — `{ "terrains": […], "vpEach": n }` (Landpartie; Landschaftsfelder
+  in Zeile ∪ Spalte des Gebäudes — eine Linie, keine Nachbarschaft)
 - `handler` — `{ "handler": "archive"\|"mandras"\|"skyBaths"\|"silva"\|"shrine"\|"starloom"\|"schoolhouse"\|"eraflage", "vp"?: n }`
 
 **Selektoren (SEL):** `"cottage"` (Hütten-Gebäude; Schloss Barrett zählt doppelt),
@@ -71,6 +77,28 @@ werden im Landpartie-Modus 3 als Karten 8–10 gezogen; nie in Kategorie-Pools).
 Systeme: `coins` (Fortune: 1 Münze bei 2+ Bauten pro Runde, max. 4, Tausch gegen
 1 Münze außer als Baumeister, 1 SP je Münze am Ende) und `trees` (Tiny Trees:
 Samen-Phase, Gratis-Material beim Überbauen, Baum = 2 SP als einziges unbebautes Feld).
+
+### Anlieger-Karten: sechs verschiedene Entscheidungen
+
+Die sechs Landpartie-Karten sollen sich wie Basiskarten anfühlen — also nicht
+alle dieselbe Frage stellen („liegt Landschaft daneben?"), sondern jede eine
+andere. Zwei schauen auf die Stadt statt auf die Landschaft, eine auf eine ganze
+Linie, eine auf die Anzahl eigener Exemplare:
+
+| Karte | Zellen | Mechanik | Vorbild im Basisspiel | Max. 1 Kopie* |
+|---|---|---|---|---|
+| Fischerhütte | 2 | 1 P je See-Feld daneben | Brunnen (1 je Hütte) | 2 |
+| Bootshaus | 2 | Staffel 1/3/6/10/14 über die Exemplare AM Wasser | Taverne | 1 |
+| Erzmine | 3 | 2 P je Berg-Feld daneben | Brunnen, größere Stufe | 4 |
+| Wassermühle | 3 | 2 P je rotem Nachbarn — nur am Fluss | Brunnen + Bedingung | 6 |
+| Fähranleger | 3 | 1 P je Fluss-Feld in Zeile ∪ Spalte | Markt / Bardenbühne | 5 |
+| Berghütte | 3 | 3 P, wenn allein in Zeile UND Spalte | Gasthaus | 3 |
+
+\* Bestes Ergebnis einer einzelnen Kopie, gemessen über 30 echte Landschaften
+(`land.test.ts` wacht darüber). Zum Vergleich das Basisspiel: 2 Zellen bringen
+1–2 Punkte (Schuppen, Brunnen, Springbrunnen), 3 Zellen 2–4 (Taverne, Gasthaus,
+Tempel). Wer hier Werte anhebt, hebt sie über das Basisspiel — der Test schlägt
+dann an, und das ist Absicht.
 
 ## Features (Symbolzeile der Mini-Karte)
 

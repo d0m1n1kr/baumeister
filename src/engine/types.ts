@@ -37,7 +37,8 @@ export type ScoringSpec =
   | { type: 'ifFed'; vp: number }
   /** table[i] = Punkte bei (i+1) Exemplaren; darüber: overflow. */
   | { type: 'byCountTable'; table: number[]; overflow: number }
-  | { type: 'perAdjacent'; target: Selector; vpEach: number }
+  /** `requireTerrain`: zählt nur, wenn das Gebäude selbst an diese Landschaft grenzt. */
+  | { type: 'perAdjacent'; target: Selector; vpEach: number; requireTerrain?: TerrainKind[] }
   | { type: 'ifAdjacentAny'; targets: Selector[]; vp: number }
   | { type: 'ifNotAdjacentAny'; targets: Selector[]; vp: number }
   | { type: 'ifAdjacentAtLeast'; target: Selector; count: number; vp: number }
@@ -51,8 +52,12 @@ export type ScoringSpec =
   | { type: 'perStoredResource'; vpEach: number }
   /** Landpartie: Punkte je angrenzendem Landschaftsfeld der genannten Arten. */
   | { type: 'perAdjacentTerrain'; terrains: TerrainKind[]; vpEach: number }
-  /** Landpartie: Punkte, wenn mindestens eines der genannten Landschaftsfelder angrenzt. */
-  | { type: 'ifAdjacentTerrain'; terrains: TerrainKind[]; vp: number }
+  /** Landpartie: Punkte, wenn genügend Landschaftsfelder angrenzen (`count`, Standard 1). */
+  | { type: 'ifAdjacentTerrain'; terrains: TerrainKind[]; vp: number; count?: number }
+  /** Landpartie: Tabelle über die Exemplare DIESER Karte, die an der Landschaft liegen. */
+  | { type: 'byCountTableAdjacentTerrain'; terrains: TerrainKind[]; table: number[]; overflow: number }
+  /** Landpartie: Punkte je Landschaftsfeld in Zeile ∪ Spalte des Gebäudes. */
+  | { type: 'perTerrainInRowCol'; terrains: TerrainKind[]; vpEach: number }
   /** Sonderwertungen (Monumente), implementiert in scoring.ts. */
   | { type: 'handler'; handler: ScoreHandlerId; vp?: number };
 

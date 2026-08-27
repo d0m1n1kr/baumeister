@@ -1,7 +1,7 @@
 // Endwertung: Fütterungs-Resolver (optimal) + deklarativer Wertungs-Interpreter.
 
 import type {
-  Catalog, CardDef, GameState, PlayerState, PlayerScore, ScoreLine, Selector
+  Catalog, CardDef, GameState, PlayerState, PlayerScore, ScoreLine, Selector, TerrainKind
 } from './types';
 import {
   NUM_SQUARES, centerSquares, cornerSquares, dimsOf,
@@ -56,6 +56,22 @@ function selectorWeight(sel: Selector, target: CardDef): number {
 // ---------- Fütterung ----------
 
 /** Zusammenhängende Gruppen fütterbarer Gebäude (orthogonal). */
+/** Landpartie: Wie viele der genannten Landschaftsfelder grenzen an dieses Feld? */
+function zaehleLandschaft(
+  p: PlayerState, square: number, terrains: TerrainKind[], cols: number, rows: number
+): number {
+  let n = 0;
+  for (const nb of neighbors4(square, cols, rows)) {
+    const tk = p.board[nb].terrain;
+    if (tk && terrains.includes(tk)) n++;
+  }
+  return n;
+}
+
+const grenztAnLandschaft = (
+  p: PlayerState, square: number, terrains: TerrainKind[], cols: number, rows: number
+): boolean => zaehleLandschaft(p, square, terrains, cols, rows) > 0;
+
 function cottageGroups(buildings: Placed[], cols: number, rows: number): number[][] {
   const cottageSquares = new Set(buildings.filter((b) => isFeedable(b.def)).map((b) => b.square));
   const seen = new Set<number>();
@@ -339,6 +355,8 @@ function scoreWithFeeding(
         break;
       }
       case 'perAdjacent': {
+        // Landschafts-Tor: Die Wassermühle mahlt nur, wenn sie am Fluss steht
+        if (spec.requireTerrain && !grenztAnLandschaft(p, b.square, spec.requireTerrain, cols, rows)) break;
         let sum = 0;
         for (const n of neighbors4(b.square, cols, rows)) {
           const nb = p.board[n].building;
@@ -386,20 +404,36 @@ function scoreWithFeeding(
       }
       case 'perAdjacentTerrain': {
         // Landpartie: das Gebäude schaut auf die Landschaft nebenan
-        let sum = 0;
-        for (const n of neighbors4(b.square, cols, rows)) {
-          const tk = p.board[n].terrain;
-          if (tk && spec.terrains.includes(tk)) sum++;
-        }
-        addPoints(b.card, sum * spec.vpEach);
+        addPoints(b.card, zaehleLandschaft(p, b.square, spec.terrains, cols, rows) * spec.vpEach);
         break;
       }
       case 'ifAdjacentTerrain': {
-        const hit = neighbors4(b.square, cols, rows).some((n) => {
-          const tk = p.board[n].terrain;
-          return !!tk && spec.terrains.includes(tk);
+        const treffer = zaehleLandschaft(p, b.square, spec.terrains, cols, rows);
+        if (treffer >= (spec.count ?? 1)) addPoints(b.card, spec.vp);
+        break;
+      }
+      case 'byCountTableAdjacentTerrain': {
+        // Wie die Taverne — gezählt werden aber nur die Exemplare AM Wasser.
+        // Einmal je Kartenart, sonst zählte jedes Exemplar die Tabelle erneut.
+        if (countByCardHandled.has(b.card)) break;
+        countByCardHandled.add(b.card);
+        const count = buildings.filter(
+          (o) => o.card === b.card && grenztAnLandschaft(p, o.square, spec.terrains, cols, rows)
+        ).length;
+        if (count === 0) break;
+        addPoints(b.card, count <= spec.table.length ? spec.table[count - 1] : spec.overflow);
+        break;
+      }
+      case 'perTerrainInRowCol': {
+        // Der Fähranleger bedient eine ganze Linie, nicht nur das Nachbarfeld
+        let sum = 0;
+        const zeile = rowOf(b.square, cols);
+        const spalte = colOf(b.square, cols);
+        p.board.forEach((sq, i) => {
+          if (!sq.terrain || !spec.terrains.includes(sq.terrain)) return;
+          if (rowOf(i, cols) === zeile || colOf(i, cols) === spalte) sum++;
         });
-        if (hit) addPoints(b.card, spec.vp);
+        addPoints(b.card, sum * spec.vpEach);
         break;
       }
       case 'perInZone': {

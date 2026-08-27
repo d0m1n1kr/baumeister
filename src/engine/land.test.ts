@@ -4,7 +4,9 @@ import { describe, expect, it } from 'vitest';
 import { apply, newGame } from './game';
 import { scorePlayer } from './scoring';
 import { catalog, config, put, res } from './test-helpers';
-import { LAND_COLS } from './types';
+import { generateTerrain } from './terrain';
+import { mulberry32 } from './registry';
+import { LAND_COLS, isFreeSquare, neighbors4 } from './types';
 import type { GameState } from './types';
 
 const FELDER = 5 * 6;
@@ -17,6 +19,18 @@ const FLUSS_OBEN = at(2, 2); // 12
 const FLUSS_UNTEN = at(3, 2); // 17
 const BERG = at(4, 0); // 20
 const SEE = at(0, 4); // 4
+
+/** Solo-Landpartie mit frei gesetzter Landschaft — für die Wertungs-Tests. */
+function landCfg(terrain: { square: number; kind: 'river' | 'mountain' | 'lake' }[]) {
+  const cfg = config(1, undefined, false);
+  cfg.solo = true;
+  cfg.land = true;
+  cfg.terrain = terrain;
+  return cfg;
+}
+
+const punkte = (s: GameState, card: string) =>
+  scorePlayer(s, 0, catalog).lines.find((l) => l.card === card)?.points ?? 0;
 
 function landGame(): GameState {
   const cfg = config(1, undefined, false);
@@ -190,36 +204,134 @@ describe('Landpartie: Setup und Wertungs-Bausteine', () => {
     expect(dailySeed('2026-08-27', 'land-')).not.toBe(dailySeed('2026-08-27'));
   });
 
-  it('perAdjacentTerrain zählt nur die genannten Arten', () => {
-    const cfg = config(1, undefined, false);
-    cfg.solo = true;
-    cfg.land = true;
-    // Erzmine mittig auf (1,2); ihre vier Nachbarn sind (0,2), (2,2), (1,1), (1,3)
-    const mine = at(1, 2);
-    cfg.terrain = [
+  it('Fischerhütte: 1 Punkt je See-Feld, andere Landschaft zählt nicht', () => {
+    const cfg = landCfg([
+      { square: at(0, 2), kind: 'lake' },
+      { square: at(1, 1), kind: 'lake' },
+      { square: at(1, 3), kind: 'mountain' }
+    ]);
+    const s = newGame(cfg);
+    put(s, 0, at(1, 2), 'fishermans_hut'); // 2 Seen + 1 Berg als Nachbarn
+    expect(punkte(s, 'fishermans_hut')).toBe(2);
+  });
+
+  it('Erzmine: 2 Punkte je Berg-Feld', () => {
+    const cfg = landCfg([
       { square: at(0, 2), kind: 'mountain' },
       { square: at(1, 1), kind: 'mountain' },
       { square: at(1, 3), kind: 'lake' }
-    ];
+    ]);
     const s = newGame(cfg);
-    put(s, 0, mine, 'ore_mine');
-    const score = scorePlayer(s, 0, catalog);
-    const line = score.lines.find((l) => l.card === 'ore_mine')!;
-    expect(line.points).toBe(6); // 2 Berge × 3, der See zählt nicht
+    put(s, 0, at(1, 2), 'ore_mine');
+    expect(punkte(s, 'ore_mine')).toBe(4); // 2 Berge × 2, der See zählt nicht
   });
 
-  it('ifAdjacentTerrain: einmal daneben genügt, weit weg gibt nichts', () => {
-    const cfg = config(1, undefined, false);
-    cfg.solo = true;
-    cfg.land = true;
-    // See oben rechts, Fluss ganz unten links — bewusst weit auseinander
-    cfg.terrain = [{ square: at(0, 4), kind: 'lake' }, { square: at(5, 0), kind: 'river' }];
+  it('Bootshaus staffelt sich — aber nur die am Wasser zählen mit', () => {
+    // Der Wunsch dahinter: mehrere Bootshäuser sollen sich lohnen, wie die
+    // Taverne. Fluss senkrecht in Spalte 2, also liegt Spalte 1 am Wasser.
+    const cfg = landCfg([0, 1, 2, 3, 4, 5].map((r) => ({ square: at(r, 2), kind: 'river' as const })));
+    const stufen = [1, 2, 3, 4, 5].map((k) => {
+      const s = newGame(cfg);
+      for (let i = 0; i < k; i++) put(s, 0, at(i, 1), 'boathouse');
+      return punkte(s, 'boathouse');
+    });
+    expect(stufen).toEqual([1, 3, 6, 10, 14]);
+
+    // Eines abseits des Wassers bringt die Staffel nicht weiter
     const s = newGame(cfg);
-    put(s, 0, at(1, 4), 'boathouse'); // direkt unter dem See
-    put(s, 0, at(2, 2), 'watermill'); // grenzt an nichts Passendes
-    const score = scorePlayer(s, 0, catalog);
-    expect(score.lines.find((l) => l.card === 'boathouse')!.points).toBe(3);
-    expect(score.lines.find((l) => l.card === 'watermill')!.points).toBe(0);
+    put(s, 0, at(0, 1), 'boathouse'); // am Fluss
+    put(s, 0, at(5, 4), 'boathouse'); // trocken
+    expect(punkte(s, 'boathouse')).toBe(1);
+  });
+
+  it('Wassermühle: zählt rote Nachbarn — aber nur am Fluss', () => {
+    const cfg = landCfg([{ square: at(2, 1), kind: 'river' }]);
+    const amFluss = newGame(cfg);
+    put(amFluss, 0, at(2, 2), 'watermill');
+    put(amFluss, 0, at(1, 2), 'farm');    // rot
+    put(amFluss, 0, at(3, 2), 'orchard'); // rot
+    put(amFluss, 0, at(2, 3), 'well');    // grau, zählt nicht
+    expect(punkte(amFluss, 'watermill')).toBe(4);
+
+    // Dieselbe Nachbarschaft ohne Fluss daneben: die Mühle mahlt nicht
+    const trocken = newGame(cfg);
+    put(trocken, 0, at(4, 2), 'watermill');
+    put(trocken, 0, at(3, 2), 'farm');
+    put(trocken, 0, at(5, 2), 'orchard');
+    expect(punkte(trocken, 'watermill')).toBe(0);
+  });
+
+  it('Fähranleger: Fluss-Felder in Zeile und Spalte, nicht die Nachbarschaft', () => {
+    // Fluss waagerecht durch Zeile 3 (5 Felder) und ein Stück in Spalte 0
+    const cfg = landCfg([
+      ...[0, 1, 2, 3, 4].map((c) => ({ square: at(3, c), kind: 'river' as const })),
+      { square: at(4, 0), kind: 'river' as const }
+    ]);
+    const s = newGame(cfg);
+    put(s, 0, at(1, 0), 'ferry'); // Spalte 0 trifft 2 Fluss-Felder, Zeile 1 keines
+    expect(punkte(s, 'ferry')).toBe(2);
+
+    // Weit weg von jeder Fluss-Linie: nichts — Nachbarschaft hilft hier nicht
+    const s2 = newGame(cfg);
+    put(s2, 0, at(0, 2), 'ferry'); // Spalte 2 trifft Zeile 3 → 1 Feld
+    expect(punkte(s2, 'ferry')).toBe(1);
+  });
+
+  it('Berghütte: 3 Punkte, solange sie in Zeile und Spalte allein steht', () => {
+    const cfg = landCfg([{ square: at(0, 0), kind: 'mountain' }]);
+    const allein = newGame(cfg);
+    put(allein, 0, at(1, 1), 'alpine_hut');
+    expect(punkte(allein, 'alpine_hut')).toBe(3);
+
+    // Zwei versetzt (verschiedene Zeile UND Spalte): beide zählen
+    const versetzt = newGame(cfg);
+    put(versetzt, 0, at(1, 1), 'alpine_hut');
+    put(versetzt, 0, at(3, 3), 'alpine_hut');
+    expect(punkte(versetzt, 'alpine_hut')).toBe(6);
+
+    // Zwei in derselben Spalte: keine von beiden zählt
+    const gereiht = newGame(cfg);
+    put(gereiht, 0, at(1, 1), 'alpine_hut');
+    put(gereiht, 0, at(4, 1), 'alpine_hut');
+    expect(punkte(gereiht, 'alpine_hut')).toBe(0);
+  });
+
+  it('Obergrenzen: eine Kopie bleibt im Band des Basisspiels', () => {
+    // Wachhund gegen Powerkreep. Gemessen wird in ECHTEN Landschaften (nicht in
+    // konstruierten Extremen): jede freie Position, bestes Ergebnis. Bezug ist
+    // das Basisspiel — 2 Zellen bringen dort 1–2 Punkte (Schuppen, Brunnen,
+    // Springbrunnen), 3 Zellen 2–4 (Taverne, Gasthaus, Tempel).
+    const GRENZEN: Record<string, number> = {
+      fishermans_hut: 2,
+      boathouse: 1, // allein am Wasser; die Staffel kommt erst mit mehreren
+      ore_mine: 4,
+      watermill: 6, // nur mit drei roten Nachbarn — 12 Zellen Vorarbeit
+      ferry: 5,
+      alpine_hut: 3
+    };
+    for (const [card, grenze] of Object.entries(GRENZEN)) {
+      let best = 0;
+      for (let seed = 1; seed <= 30; seed++) {
+        const cfg = landCfg(generateTerrain(mulberry32(seed)));
+        cfg.activeCards = [...cfg.activeCards, card];
+        const leer = newGame(cfg);
+        for (let sq = 0; sq < FELDER; sq++) {
+          if (!isFreeSquare(leer.players[0].board[sq])) continue;
+          const s2 = newGame(cfg);
+          s2.players[0].board[sq].building = { card };
+          if (card === 'watermill') {
+            // Beste Lage für die Mühle: alle freien Nachbarn mit Nahrung besetzt
+            for (const nb of neighbors4(sq, LAND_COLS, 6)) {
+              if (isFreeSquare(s2.players[0].board[nb])) {
+                s2.players[0].board[nb].building = { card: 'farm' };
+              }
+            }
+          }
+          best = Math.max(best, punkte(s2, card));
+        }
+      }
+      expect({ card, best }).toEqual({ card, best: Math.min(best, grenze) });
+    }
   });
 });
 

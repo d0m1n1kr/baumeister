@@ -9,8 +9,8 @@
     "en": "Watermill"
   },
   "text": {
-    "de": "4 Punkte, wenn die Wassermühle an den Fluss grenzt.",
-    "en": "4 points if the Watermill is adjacent to the river."
+    "de": "2 Punkte je angrenzendem roten Gebäude (Nahrung) — aber nur, wenn die Mühle selbst an den Fluss grenzt. Ohne Fluss mahlt sie nicht.",
+    "en": "2 points for each adjacent red building (food) — but only if the mill itself touches the river. Away from the river it does not grind."
   },
   "pattern": [
     [
@@ -23,11 +23,14 @@
     "adjacency"
   ],
   "scoring": {
-    "type": "ifAdjacentTerrain",
-    "terrains": [
+    "type": "perAdjacent",
+    "target": {
+      "color": "red"
+    },
+    "vpEach": 2,
+    "requireTerrain": [
       "river"
-    ],
-    "vp": 4
+    ]
   },
   "effects": [],
   "art": "watermill.svg",
@@ -38,8 +41,8 @@
         "en": "Dust Turbine"
       },
       "text": {
-        "de": "4 Punkte, wenn die Staubturbine an den Canyon grenzt.",
-        "en": "4 points if the Dust Turbine is adjacent to the canyon."
+        "de": "2 Punkte je angrenzendem roten Modul (Nahrung) — aber nur, wenn die Pumpstation selbst an den Canyon grenzt.",
+        "en": "2 points for each adjacent red module (food) — but only if the pumping station itself touches the canyon."
       },
       "art": "mars_watermill.svg"
     },
@@ -49,8 +52,8 @@
         "en": "Mistmill"
       },
       "text": {
-        "de": "4 Punkte, wenn die Nebelmühle an den Nebelfluss grenzt.",
-        "en": "4 points if the Mistmill is adjacent to the mistflow."
+        "de": "2 Punkte je angrenzendem roten Bauwerk (Nahrung) — aber nur, wenn die Mühle selbst an den Nebelfluss grenzt.",
+        "en": "2 points for each adjacent red structure (food) — but only if the mill itself touches the mistflow."
       },
       "art": "fantasy_watermill.svg"
     }
