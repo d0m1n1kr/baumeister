@@ -299,6 +299,64 @@ try {
     }
     await ctx.close();
     console.log('✓ Spielernamen: gemerkt über Partie und Neustart, ✕ löscht einzeln');
+
+  // ---------- Gemerkte Auswahl im Startbildschirm ----------
+  // Wer immer zu viert mit Fortune spielt, soll das nicht jedes Mal neu
+  // zusammenklicken. Ein Challenge-Link ist die Ausnahme: Er bestimmt, was
+  // gespielt wird — und darf die eigenen Vorgaben nicht überschreiben.
+  {
+    const ctx = await browser.newContext({ viewport: { width: 402, height: 874 }, locale: 'de-DE' });
+    const sp = await ctx.newPage();
+    sp.on('pageerror', (e) => fail(`Auswahl merken: Seitenfehler: ${e.message}`));
+    const heute = new Date();
+    const tag = `${heute.getFullYear()}-${String(heute.getMonth() + 1).padStart(2, '0')}-${String(heute.getDate()).padStart(2, '0')}`;
+    const start = async (url = BASE_URL) => {
+      await sp.goto(url);
+      await sp.locator('#splash').waitFor({ state: 'detached', timeout: 10000 });
+      const neu = sp.locator('button', { hasText: 'Neues Spiel' });
+      if (await neu.count()) await neu.click();
+      await sp.locator('.bar button.big').waitFor({ timeout: 5000 });
+    };
+    const aktiv = () =>
+      sp.evaluate(() =>
+        [...document.querySelectorAll('.seg button.primary')].map((b) => b.textContent.trim())
+      );
+    const gemerkt = () => sp.evaluate(() => localStorage.getItem('tinytowns.setup.v1'));
+
+    // Auswahl treffen und eine Partie starten — erst dann ist sie echt
+    await start();
+    await sp.locator('.seg button', { hasText: '2' }).first().click();
+    await sp.locator('.opt', { hasText: 'Fortune' }).locator('input').check();
+    await sp.locator('.bar button.big').click();
+    await sp.locator('.board').first().waitFor({ timeout: 8000 });
+
+    // Frisch geladen muss beides wieder dastehen
+    await start();
+    const nachher = await aktiv();
+    if (!nachher.includes('2')) fail(`Auswahl merken: Spielerzahl nicht gemerkt (${nachher})`);
+    const fortune = await sp.locator('.opt', { hasText: 'Fortune' }).locator('input').isChecked();
+    if (!fortune) fail('Auswahl merken: Erweiterung nicht gemerkt');
+
+    // Challenge-Link: gewinnt für diesen Besuch, ändert aber nichts an den Vorgaben
+    const vorLink = await gemerkt();
+    await start(`${BASE_URL}#daily=${tag}`);
+    const imLink = await aktiv();
+    if (!imLink.includes('1') || !imLink.some((x) => x.includes('Tages-Challenge'))) {
+      fail(`Auswahl merken: Link setzt sich nicht durch (${imLink})`);
+    }
+    await sp.locator('.bar button.big').click();
+    await sp.locator('.board').first().waitFor({ timeout: 8000 });
+    if ((await gemerkt()) !== vorLink) {
+      fail('Auswahl merken: eine Partie aus dem Link hat die eigenen Vorgaben überschrieben');
+    }
+
+    // …und danach steht die eigene Auswahl unverändert da
+    await start();
+    const zurueck = await aktiv();
+    if (!zurueck.includes('2')) fail(`Auswahl merken: nach dem Link verloren (${zurueck})`);
+    console.log('✓ Startbildschirm merkt Spielerzahl und Variante — außer beim Challenge-Link');
+    await ctx.close();
+  }
   }
 
   // Trefflächen: Jedes Bedienelement muss mindestens 44×44 groß sein — als
@@ -576,17 +634,29 @@ try {
     if (/daily=/.test(await rp.evaluate(() => location.hash))) {
       fail('Geteilter Link: daily bleibt in der Adresse und heftet jede Partie an den Tag');
     }
-    await rp.reload();
-    await rp.locator('#splash').waitFor({ state: 'detached', timeout: 10000 });
-    const fresh2 = rp.locator('button', { hasText: 'Neues Spiel' });
-    if (await fresh2.count()) await fresh2.click();
-    await rp.locator('.bar button.big').waitFor({ timeout: 5000 });
-    const nachReload = await rp.evaluate(() =>
+    // Der Reload-Beweis braucht ein FRISCHES Gerät: Seit der Startbildschirm die
+    // letzte Auswahl merkt, wäre „Tages-Challenge nach dem Reload" auch dann
+    // richtig, wenn man sie zuvor von Hand gewählt hat. Ohne gemerkte Vorgaben
+    // kann nur eine Ursache übrig bleiben — ein Link, der in der Adresse klebt.
+    const jungfräulich = await browser.newContext({
+      viewport: { width: 402, height: 874 },
+      locale: 'de-DE'
+    });
+    const np = await jungfräulich.newPage();
+    np.on('pageerror', (e) => fail(`Geteilter Link (frisches Gerät): Seitenfehler: ${e.message}`));
+    await np.goto(link);
+    await np.locator('#splash').waitFor({ state: 'detached', timeout: 10000 });
+    await np.locator('.bar button.big').waitFor({ timeout: 5000 });
+    await np.reload();
+    await np.locator('#splash').waitFor({ state: 'detached', timeout: 10000 });
+    await np.locator('.bar button.big').waitFor({ timeout: 5000 });
+    const nachReload = await np.evaluate(() =>
       [...document.querySelectorAll('.seg button.primary')].map((b) => b.textContent.trim())
     );
     if (nachReload.some((p) => p.includes('Tages-Challenge'))) {
       fail(`Geteilter Link: nach dem Reload immer noch Tages-Challenge (${nachReload})`);
     }
+    await jungfräulich.close();
     console.log('✓ Nach dem Reload ist die Adresse frei — neue Partien würfeln wieder');
     await ctx.close();
   }
