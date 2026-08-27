@@ -150,6 +150,14 @@ device (the host runs the engine and broadcasts it).
   coin, tree, error tone, "your turn", and the final fanfare; 🔊 toggle in the card
   strip, the choice is remembered per device.
 - **Persistence:** autosave to `localStorage` after every action, "Continue" after reload.
+  The start screen also remembers what you picked last time — player count,
+  one-device vs. own-devices, the solo variant, Landpartie, monuments and the
+  chosen expansions — saved on start, when the choice is real. Seating is not
+  remembered (it follows the player count) and neither is the challenge date
+  (that one is always today). A shared challenge link is the exception in both
+  directions: it overrides the remembered choices for that visit and is not
+  written back, so one shared link cannot silently turn your default into
+  "1 player, daily challenge".
 - **PWA:** fully offline-capable (all assets are precached on first visit; game
   logic and game state live entirely in the client). The start screen offers to
   install the app: on Chromium the system dialog via `beforeinstallprompt`, on

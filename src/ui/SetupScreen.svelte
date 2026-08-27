@@ -8,6 +8,7 @@
     todayId
   } from '../store/newGameConfig';
   import { loadNames, saveNames } from '../store/playerNames';
+  import { loadPrefs, savePrefs } from '../store/setupPrefs';
   import { SETS } from '../data/sets';
   import { sortPlayersClockwise } from '../engine/registry';
   import { session } from '../net/session.svelte';
@@ -34,22 +35,36 @@
     4: [0, 1, 2, 3]
   };
 
-  let count = $state(4);
+  // Gemerkte Einstellungen dieses Geräts (Spielerzahl, Variante, Erweiterungen).
+  // Kommt man über einen Challenge-Link, gelten sie NICHT: Der Link sagt, was
+  // gespielt wird, und soll die eigenen Vorgaben auch nicht überschreiben.
+  // Bewusst der Anfangswert: Geladen wird genau einmal beim Aufbau. Ein Link,
+  // der später per hashchange kommt, überschreibt die Felder ohnehin selbst
+  // (Effekt unten) — und `linkAktiv` verhindert dann das Zurückschreiben.
+  // svelte-ignore state_referenced_locally
+  const prefs = initialDaily === null ? loadPrefs() : null;
+
+  let count = $state(prefs?.count ?? 4);
   // Leer heißt „Standardname". Vorher stand der Standardname als Wert im Feld
   // und musste erst weggelöscht werden, bevor man den eigenen tippen konnte.
   let names = $state(loadNames());
-  let corners = $state([...DEFAULT_CORNERS[4]]);
-  let useMonuments = $state(true);
-  let cavernRule = $state(false);
-  let townHall = $state(false);
-  let train = $state(false);
-  let chosenSets = $state<string[]>([]);
-  let multiDevice = $state(false);
+  let corners = $state([...DEFAULT_CORNERS[prefs?.count ?? 4]]);
+  let useMonuments = $state(prefs?.useMonuments ?? true);
+  let cavernRule = $state(prefs?.cavern ?? false);
+  let townHall = $state(prefs?.townHall ?? false);
+  let train = $state(prefs?.train ?? false);
+  let chosenSets = $state<string[]>([...(prefs?.sets ?? [])]);
+  let multiDevice = $state(prefs?.multiDevice ?? false);
   // Solo: freies Spiel, Tages-Challenge oder Lernspiel (mit Erklärblasen).
-  let soloMode = $state<'free' | 'daily' | 'learn'>(learn.enabled ? 'learn' : 'free');
+  // Der Lernmodus ist zusätzlich eine eigene Anzeige-Präferenz (Blasen im
+  // Spiel); ist er an, war die letzte Partie ein Lernspiel — dann bleibt es
+  // dabei, sonst gilt die gemerkte Variante.
+  let soloMode = $state<'free' | 'daily' | 'learn'>(
+    prefs?.soloMode ?? (learn.enabled ? 'learn' : 'free')
+  );
   // Landpartie: 6×6 mit Landschaft und Anlieger-Karten — gilt für freies Solo
   // und Tages-Challenge, nicht fürs Lernspiel (das erklärt die 4×4-Klassik).
-  let landMode = $state(false);
+  let landMode = $state(prefs?.land ?? false);
   // Aus einem geteilten Link kann auch ein vergangener Tag kommen — dann wird
   // GENAU dieser gespielt, sonst ließe sich das Ergebnis nicht vergleichen.
   // Blättern muss trotzdem gehen: In der installierten App gibt es keinen Link
@@ -64,6 +79,8 @@
     const next = shiftDay(dailyDate, delta);
     if (dayPlayable(next)) dailyDate = next;
   }
+  /** Ist gerade ein Challenge-Link im Spiel? Dann nichts merken. */
+  const linkAktiv = $derived(initialDaily !== null);
   const daily = $derived(soloMode === 'daily');
   const solo = $derived(count === 1);
   // Die Spielerzeilen teilen sich ein Raster. Es muss genau so viele Spalten
@@ -137,9 +154,30 @@
     return ['base', ...chosenSets];
   }
 
+  /**
+   * Auswahl fürs nächste Mal merken — beim Start, denn dann ist sie echt.
+   * Nicht bei einer Partie aus einem Challenge-Link: Der Link bestimmt Solo
+   * und Tages-Challenge, das ist die Wahl des Absenders, nicht meine.
+   */
+  function merkeAuswahl() {
+    if (linkAktiv) return;
+    savePrefs({
+      count,
+      multiDevice,
+      soloMode,
+      land: landMode,
+      useMonuments,
+      sets: chosenSets,
+      townHall,
+      train,
+      cavern: cavernRule
+    });
+  }
+
   function start() {
     try {
       saveNames(names);
+      merkeAuswahl();
       // Der Lernmodus ist eine Anzeige-Präferenz dieses Geräts, kein Spielstand
       learn.set(solo && soloMode === 'learn');
       const land = solo && soloMode !== 'learn' && landMode;
@@ -187,6 +225,7 @@
     error = '';
     try {
       saveNames(names);
+      merkeAuswahl();
       session.setup = { sets: activeSets(), useMonuments, cavern: cavernRule, townHall, train };
       await session.openRoom(makeRoomCode(), seats, selectedTransport());
     } catch (e) {
