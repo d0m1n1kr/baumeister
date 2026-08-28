@@ -1,21 +1,37 @@
 <script lang="ts">
-  // „Kauf das Original hier" — ein Link, kein Skript. Die Werbekennzeichnung
-  // und der Amazon-Partner-Hinweis erscheinen nur, wenn wirklich eine
-  // Partner-ID eingetragen ist: ohne sie wäre der Satz einfach falsch.
-  import { buyUrl, isAffiliate } from '../data/affiliate';
+  // Herkunft und Kauf-Hinweis in einem Block: erst was das hier ist, dann wo
+  // es das Original gibt. Ein Link, kein Skript, keine Provision — bewusst
+  // kein Affiliate-Link (siehe shop.ts), damit das Projekt ein Fanprojekt
+  // ohne geschäftlichen Zweck bleibt.
+  import { buyUrl } from '../data/shop';
   import { lang, t } from '../i18n';
-
-  const url = buyUrl(lang);
-  const werbung = isAffiliate(lang);
 </script>
 
-<p class="buy">
-  <span class="ask">{t.buyOriginal}</span>
-  <a class="link tapArea" href={url} target="_blank" rel="sponsored noopener">🛒 {t.buyOriginalLink}</a>
-  {#if werbung}<span class="note">{t.affiliateNote}</span>{/if}
-</p>
+<div class="origin">
+  <p class="basedOn">{t.basedOn}</p>
+  <p class="buy">
+    <span class="ask">{t.buyOriginal}</span>
+    <a class="link tapArea" href={buyUrl(lang)} target="_blank" rel="noopener noreferrer">
+      🛒 {t.buyOriginalLink}
+    </a>
+  </p>
+</div>
 
 <style>
+  .origin {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    text-align: center;
+    color: var(--text-dim);
+  }
+  .basedOn {
+    margin: 0;
+    font-size: var(--fs-xs);
+    opacity: 0.8;
+    max-width: 42ch;
+  }
   .buy {
     margin: 0;
     display: flex;
@@ -24,18 +40,10 @@
     justify-content: center;
     gap: 4px 8px;
     font-size: var(--fs-sm);
-    color: var(--text-dim);
-    text-align: center;
   }
   .link {
     color: var(--accent);
     font-weight: 600;
     text-decoration: underline;
-  }
-  /* Der Hinweis gehört dazu, soll aber nicht mit dem Link konkurrieren. */
-  .note {
-    flex-basis: 100%;
-    font-size: var(--fs-xs);
-    opacity: 0.8;
   }
 </style>

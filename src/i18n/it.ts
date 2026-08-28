@@ -9,7 +9,9 @@ export const it: Translation = {
   themeMars: 'Colonia marziana',
   themeFantasy: 'Regno dei draghi',
   language: 'Lingua',
-  appTitle: 'Tiny Towns',
+  appTitle: 'Baumeister',
+  basedOn:
+    "Adattamento del gioco da tavolo Tiny Towns di Peter McPherson (AEG). Progetto amatoriale, non affiliato all'editore.",
   newGame: 'Nuova partita',
   resumeGame: 'Riprendi',
   players: 'Giocatori',
@@ -190,7 +192,7 @@ export const it: Translation = {
   scanTitle: 'Scansiona codice QR',
   scanPrompt: 'Inquadra il codice QR dell’host con la fotocamera',
   cameraError: 'Fotocamera non disponibile — consenti l’accesso o digita il codice.',
-  scanInvalid: 'Non è un codice Tiny Towns',
+  scanInvalid: 'Non è un codice Baumeister',
   connecting: 'Connessione …',
   relayStatus: (open: number, total: number) => `Segnalazione: ${open}/${total} relay raggiungibili`,
   waitingForHost: 'In attesa che l’host avvii …',
@@ -217,8 +219,6 @@ export const it: Translation = {
   soloDaily: 'Sfida del giorno',
   buyOriginal: "Ti piace il gioco? Compra l'originale qui:",
   buyOriginalLink: "Tiny Towns su Amazon",
-  affiliateNote:
-    "Pubblicità · In qualità di Affiliato Amazon ricevo un guadagno dagli acquisti idonei.",
   dailyPure:
     'La sfida del giorno si gioca sempre pura: gioco base con monumenti. Solo così una data è la stessa partita in tutto il mondo — già disattivare i monumenti darebbe un altro mazzo di materiali.',
   soloDailyHint: 'Caso fisso del giorno — le stesse carte e risorse in tutto il mondo. Confronta i punteggi!',

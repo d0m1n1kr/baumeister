@@ -1210,9 +1210,9 @@ try {
   }
 
   // Hinweis aufs Originalspiel: steht im Startbildschirm und im Ergebnis, führt
-  // zu Amazon und öffnet einen neuen Tab. Ohne eingetragene Partner-ID ist es
-  // ein gewöhnlicher Shop-Link — dann darf auch kein Werbehinweis dastehen,
-  // der wäre unwahr.
+  // in die Amazon-Suche des Sprachlandes und öffnet einen neuen Tab. Bewusst
+  // KEIN Affiliate-Link — bliebe eine Partner-ID im Link hängen, wäre das
+  // Projekt nicht mehr rein privat (Werbekennzeichnung, Impressum).
   {
     const ctx = await browser.newContext({ viewport: { width: 402, height: 874 }, locale: 'de-DE' });
     const kp = await ctx.newPage();
@@ -1233,15 +1233,14 @@ try {
       if (l.ziel !== '_blank') fail(`Kauf-Link (${wo}): öffnet nicht in neuem Tab`);
       // noopener: sonst kann die Zielseite auf das offene Spiel zugreifen
       if (!l.rel.includes('noopener')) fail(`Kauf-Link (${wo}): rel ohne noopener (${l.rel})`);
-      if (!l.rel.includes('sponsored')) fail(`Kauf-Link (${wo}): rel ohne sponsored (${l.rel})`);
+      if (!l.rel.includes('noreferrer')) fail(`Kauf-Link (${wo}): rel ohne noreferrer (${l.rel})`);
       if (l.breit < 44) fail(`Kauf-Link (${wo}): nur ${l.breit}px breit`);
       const frage = await kp.locator('.buy .ask').first().textContent();
       if (!/Original/.test(frage)) fail(`Kauf-Link (${wo}): Text passt nicht („${frage}")`);
-      // Partner-ID im Link ⇔ Werbehinweis sichtbar
-      const mitId = /[?&]tag=/.test(l.href);
-      const hinweis = (await kp.locator('.buy .note').count()) > 0;
-      if (mitId !== hinweis) {
-        fail(`Kauf-Link (${wo}): Partner-ID ${mitId ? 'gesetzt' : 'fehlt'}, Werbehinweis ${hinweis ? 'da' : 'fehlt'}`);
+      // Kein Affiliate-Link: nur der Suchbegriff, kein Partner- oder Trackingparameter
+      const parameter = [...new URL(l.href).searchParams.keys()];
+      if (JSON.stringify(parameter) !== JSON.stringify(['k'])) {
+        fail(`Kauf-Link (${wo}): fremde Parameter im Link (${parameter})`);
       }
     };
     await pruefe('Startbildschirm');
@@ -1262,7 +1261,35 @@ try {
     await kp.locator('button.share').first().waitFor({ timeout: 10000 });
     await pruefe('Ergebnisbildschirm');
     await ctx.close();
-    console.log('✓ Kauf-Link: Startbildschirm und Ergebnis, neuer Tab, Hinweis nur mit Partner-ID');
+    console.log('✓ Kauf-Link: Startbildschirm und Ergebnis, neuer Tab, reine Suche ohne Partner-ID');
+  }
+
+  // Der Name der App ist „Baumeister"; das Originalspiel wird nur beschreibend
+  // genannt (Fußzeile, Kauf-Link). Fällt das auseinander, heißt die App wieder
+  // wie die Marke — genau das soll die Umbenennung verhindern.
+  {
+    const ctx = await browser.newContext({ viewport: { width: 402, height: 874 }, locale: 'de-DE' });
+    const np = await ctx.newPage();
+    np.on('pageerror', (e) => fail(`Name: Seitenfehler: ${e.message}`));
+    await np.goto(BASE_URL);
+    await np.locator('#splash').waitFor({ state: 'detached', timeout: 10000 });
+    const n = await np.evaluate(() => ({
+      titel: document.title,
+      ueberschrift: document.querySelector('h1')?.textContent?.trim() ?? '',
+      herkunft: document.querySelector('.origin')?.innerText ?? ''
+    }));
+    if (n.titel !== 'Baumeister') fail(`Name: Seitentitel „${n.titel}"`);
+    if (!/Baumeister/.test(n.ueberschrift)) fail(`Name: Überschrift „${n.ueberschrift}"`);
+    // Das Original darf vorkommen — aber nur dort, wo es beschreibend ist
+    if (!/Tiny Towns/.test(n.herkunft)) fail('Name: Herkunftsangabe fehlt');
+    if (!/Fanprojekt/.test(n.herkunft)) fail('Name: es steht nicht da, dass es ein Fanprojekt ist');
+    if (/Tiny Towns/.test(n.ueberschrift)) fail('Name: Überschrift trägt noch den Markennamen');
+    const mf = await fetch(new URL('manifest.webmanifest', BASE_URL)).then((r) => r.json());
+    if (mf.name !== 'Baumeister' || mf.short_name !== 'Baumeister') {
+      fail(`Name: Manifest heißt „${mf.name}" / „${mf.short_name}"`);
+    }
+    await ctx.close();
+    console.log('✓ Name: App heißt Baumeister, das Original wird nur beschreibend genannt');
   }
 
   // Manifest: Ohne id/scope/start_url kann Chrome einen geteilten Link nicht an
