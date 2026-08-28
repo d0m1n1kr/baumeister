@@ -9,8 +9,8 @@
     "en": "Alpine Hut"
   },
   "text": {
-    "de": "3 Punkte, wenn in ihrer Zeile UND Spalte keine weitere Berghütte steht. Hütten wollen für sich sein.",
-    "en": "3 points if no other alpine hut stands in its row or column. Huts want to be left alone."
+    "de": "3 Punkte, wenn in ihrer Zeile UND Spalte keine weitere Berghütte steht. Berghütten stehen gern allein.",
+    "en": "3 points if no other Alpine Hut stands in its row or column. Alpine Huts like their space."
   },
   "pattern": [
     [
@@ -41,8 +41,8 @@
         "en": "Crater Lab"
       },
       "text": {
-        "de": "3 Punkte, wenn in ihrer Zeile UND Spalte keine weitere Kraterhütte steht.",
-        "en": "3 points if no other crater hut stands in its row or column."
+        "de": "3 Punkte, wenn in seiner Zeile UND Spalte kein weiteres Kraterlabor steht. Kraterlabore stehen gern allein.",
+        "en": "3 points if no other Crater Lab stands in its row or column. Crater Labs like their space."
       },
       "art": "mars_alpine_hut.svg"
     },
@@ -52,8 +52,8 @@
         "en": "Crag Eyrie"
       },
       "text": {
-        "de": "3 Punkte, wenn in ihrer Zeile UND Spalte keine weitere Zinnenklause steht.",
-        "en": "3 points if no other spire hermitage stands in its row or column."
+        "de": "3 Punkte, wenn in seiner Zeile UND Spalte kein weiterer Felshorst steht. Felshorste stehen gern allein.",
+        "en": "3 points if no other Crag Eyrie stands in its row or column. Crag Eyries like their space."
       },
       "art": "fantasy_alpine_hut.svg"
     }

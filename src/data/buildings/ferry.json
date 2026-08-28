@@ -9,8 +9,8 @@
     "en": "Ferry Landing"
   },
   "text": {
-    "de": "1 Punkt je Fluss-Feld in seiner Zeile oder Spalte — der Anleger bedient die ganze Linie, nicht nur das Nachbarfeld.",
-    "en": "1 point for each river square in its row or column — the landing serves the whole line, not just the neighbouring square."
+    "de": "1 Punkt je Fluss-Feld in seiner Zeile oder Spalte — der Fähranleger bedient die ganze Linie, nicht nur das Nachbarfeld.",
+    "en": "1 point for each river square in its row or column — the Ferry Landing serves the whole line, not just the neighbouring square."
   },
   "pattern": [
     [
@@ -38,8 +38,8 @@
         "en": "Cable Dock"
       },
       "text": {
-        "de": "1 Punkt je Canyon-Feld in seiner Zeile oder Spalte.",
-        "en": "1 point for each canyon square in its row or column."
+        "de": "1 Punkt je Canyon-Feld in seiner Zeile oder Spalte — die Seilbahnstation bedient die ganze Linie, nicht nur das Nachbarfeld.",
+        "en": "1 point for each canyon square in its row or column — the Cable Dock serves the whole line, not just the neighbouring square."
       },
       "art": "mars_ferry.svg"
     },
@@ -49,8 +49,8 @@
         "en": "Ferry Pier"
       },
       "text": {
-        "de": "1 Punkt je Nebelfluss-Feld in seiner Zeile oder Spalte.",
-        "en": "1 point for each mistflow square in its row or column."
+        "de": "1 Punkt je Nebelfluss-Feld in seiner Zeile oder Spalte — der Fährsteg bedient die ganze Linie, nicht nur das Nachbarfeld.",
+        "en": "1 point for each mistflow square in its row or column — the Ferry Pier serves the whole line, not just the neighbouring square."
       },
       "art": "fantasy_ferry.svg"
     }

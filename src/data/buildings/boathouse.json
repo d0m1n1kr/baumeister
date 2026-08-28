@@ -10,7 +10,7 @@
   },
   "text": {
     "de": "Punkte nach der Anzahl deiner Bootshäuser AM WASSER (an See oder Fluss): 1 / 3 / 6 / 10, ab 5 dann 14. Nur Bootshäuser am Wasser zählen.",
-    "en": "Points by the number of your boathouses ON THE WATER (next to a lake or river): 1 / 3 / 6 / 10, then 14 from 5 on. Only boathouses on the water count."
+    "en": "Points by the number of your Boathouses ON THE WATER (next to a lake or river): 1 / 3 / 6 / 10, then 14 from 5 on. Only Boathouses on the water count."
   },
   "pattern": [
     [
@@ -45,8 +45,8 @@
         "en": "Airlock Dock"
       },
       "text": {
-        "de": "Punkte nach der Anzahl deiner Hangars AM EIS (an Eissee oder Canyon): 1 / 3 / 6 / 10, ab 5 dann 14. Nur Hangars am Eis zählen.",
-        "en": "Points by the number of your hangars ON THE ICE (next to an ice lake or canyon): 1 / 3 / 6 / 10, then 14 from 5 on. Only hangars on the ice count."
+        "de": "Punkte nach der Anzahl deiner Schleusendocks AM EIS (an Eissee oder Canyon): 1 / 3 / 6 / 10, ab 5 dann 14. Nur Schleusendocks am Eis zählen.",
+        "en": "Points by the number of your Airlock Docks ON THE ICE (next to an ice lake or canyon): 1 / 3 / 6 / 10, then 14 from 5 on. Only Airlock Docks on the ice count."
       },
       "art": "mars_boathouse.svg"
     },
@@ -56,8 +56,8 @@
         "en": "Skiff Shed"
       },
       "text": {
-        "de": "Punkte nach der Anzahl deiner Nixenstege AM WASSER (an Zaubersee oder Nebelfluss): 1 / 3 / 6 / 10, ab 5 dann 14. Nur Stege am Wasser zählen.",
-        "en": "Points by the number of your nixie jetties ON THE WATER (next to a spelllake or mistflow): 1 / 3 / 6 / 10, then 14 from 5 on. Only jetties on the water count."
+        "de": "Punkte nach der Anzahl deiner Kahnschuppen AM WASSER (an Zaubersee oder Nebelfluss): 1 / 3 / 6 / 10, ab 5 dann 14. Nur Kahnschuppen am Wasser zählen.",
+        "en": "Points by the number of your Skiff Sheds ON THE WATER (next to a spelllake or mistflow): 1 / 3 / 6 / 10, then 14 from 5 on. Only Skiff Sheds on the water count."
       },
       "art": "fantasy_boathouse.svg"
     }
