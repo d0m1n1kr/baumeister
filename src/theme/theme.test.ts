@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import { allCards, artBySvgName } from '../data';
-import { pickTheme, SKINNED_THEMES, THEME_RESOURCES, THEME_STRINGS } from './index';
+import { DEFAULT_THEME, pickTheme, SKINNED_THEMES, THEME_RESOURCES, THEME_STRINGS } from './index';
 
 /**
  * Begriffe der klassischen Welt, die im jeweiligen Theme NICHT mehr
@@ -115,8 +115,12 @@ describe('Theme-Wahl', () => {
   it('nur registrierte Themes, sonst klassisch', () => {
     expect(pickTheme('mars')).toBe('mars');
     expect(pickTheme('fantasy')).toBe('fantasy');
+    // Eine gespeicherte Wahl gilt immer — auch die klassische Welt
     expect(pickTheme('classic')).toBe('classic');
-    expect(pickTheme('xyz')).toBe('classic');
-    expect(pickTheme(null)).toBe('classic');
+    expect(pickTheme('mars')).toBe('mars');
+    // Ohne (gültige) Wahl gilt der Standard: das Drachenreich
+    expect(pickTheme('xyz')).toBe(DEFAULT_THEME);
+    expect(pickTheme(null)).toBe(DEFAULT_THEME);
+    expect(DEFAULT_THEME).toBe('fantasy');
   });
 });

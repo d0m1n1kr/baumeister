@@ -10,21 +10,29 @@ export type ThemeId = 'classic' | 'mars' | 'fantasy';
 
 export const THEMES: { id: ThemeId }[] = [{ id: 'classic' }, { id: 'mars' }, { id: 'fantasy' }];
 
+/**
+ * Standard-Welt: das Drachenreich. Seine Namen, Texte und Artworks sind
+ * durchgehend eigene Schöpfungen — die App zeigt damit von sich aus keine
+ * fremden Bezeichnungen. Die klassische Welt bleibt eine Wahl im 🎨-Menü,
+ * ihre Namen sind die des Originals.
+ */
+export const DEFAULT_THEME: ThemeId = 'fantasy';
+
 /** Alle Themes außer dem klassischen — diese brauchen Karten-Overrides. */
 export const SKINNED_THEMES: Exclude<ThemeId, 'classic'>[] = ['mars', 'fantasy'];
 
 const STORAGE_KEY = 'tinytowns.theme';
 
-/** Gültige gespeicherte Wahl oder Standard (klassisch). */
+/** Gültige gespeicherte Wahl oder der Standard. */
 export function pickTheme(stored: string | null): ThemeId {
-  return THEMES.some((t) => t.id === stored) ? (stored as ThemeId) : 'classic';
+  return THEMES.some((t) => t.id === stored) ? (stored as ThemeId) : DEFAULT_THEME;
 }
 
 function detect(): ThemeId {
   try {
     return pickTheme(localStorage.getItem(STORAGE_KEY));
   } catch {
-    return 'classic';
+    return DEFAULT_THEME;
   }
 }
 

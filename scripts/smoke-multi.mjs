@@ -38,7 +38,18 @@ try {
   await waitForServer();
   browser = await chromium.launch({ executablePath: '/opt/pw-browsers/chromium' });
   // BroadcastChannel wirkt nur innerhalb eines Kontexts → beide Tabs im selben Kontext
-  const context = await browser.newContext({ viewport: { width: 1180, height: 820 }, locale: 'de-DE' });
+  // Der Test sucht Materialien über ihre klassischen Namen („Holz"). Diese
+  // Wörter gehören zur klassischen Welt — im Drachenreich (Standard) heißen
+  // sie anders. Der Test misst Netzwerk und Sitzung, nicht Benennung, also
+  // wird die Welt fest vorgegeben.
+  const context = await browser.newContext({
+    viewport: { width: 1180, height: 820 },
+    locale: 'de-DE',
+    storageState: {
+      cookies: [],
+      origins: [{ origin: new URL(BASE_URL).origin, localStorage: [{ name: 'tinytowns.theme', value: 'classic' }] }]
+    }
+  });
 
   const host = await context.newPage();
   host.on('pageerror', (e) => fail(`Host-Seitenfehler: ${e.message}`));
