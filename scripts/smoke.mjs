@@ -1285,6 +1285,53 @@ try {
     console.log('✓ Kauf-Link: Startbildschirm und Ergebnis, neuer Tab, reine Suche ohne Partner-ID');
   }
 
+  // Detail-Modus hieß früher „Alice-Modus". Wer ihn eingeschaltet hatte, soll
+  // ihn eingeschaltet behalten — die Umbenennung darf keine Einstellung
+  // wegwerfen. Beim ersten Umschalten wandert die Wahl auf den neuen Schlüssel.
+  {
+    const ctx = await klassischerKontext({ viewport: { width: 402, height: 874 }, locale: 'de-DE' });
+    const ap = await ctx.newPage();
+    ap.on('pageerror', (e) => fail(`Detail-Modus: Seitenfehler: ${e.message}`));
+    await ap.addInitScript(() => localStorage.setItem('tinytowns.aliceMode', '1'));
+    await ap.goto(BASE_URL);
+    await ap.locator('#splash').waitFor({ state: 'detached', timeout: 10000 });
+    const neu9 = ap.locator('button', { hasText: 'Neues Spiel' });
+    if (await neu9.count()) await neu9.click();
+    await ap.locator('.seg button', { hasText: '1' }).first().click();
+    await ap.locator('.bar button.big').click();
+    await ap.locator('.board').first().waitFor({ timeout: 8000 });
+    await ap.waitForTimeout(300);
+
+    const knopf = ap.locator('.detailBtn').first();
+    if ((await knopf.count()) === 0) fail('Detail-Modus: Schalter fehlt');
+    if (!(await knopf.evaluate((b) => b.classList.contains('active')))) {
+      fail('Detail-Modus: alte Einstellung („aliceMode") wurde nicht übernommen');
+    }
+    if ((await ap.locator('.mini .desc').count()) === 0) {
+      fail('Detail-Modus: Karten zeigen trotz Einstellung keine Beschreibung');
+    }
+    // Am Handy blendet die CSS die Beschriftung aus — der Text steht trotzdem da
+    const beschriftung = (await knopf.locator('.btnLabel').textContent())?.trim();
+    if (!/Detail/.test(beschriftung ?? '')) {
+      fail(`Detail-Modus: Schalter heißt „${beschriftung}"`);
+    }
+
+    // Umschalten schreibt den neuen Schlüssel und räumt den alten weg
+    await knopf.click();
+    await ap.waitForTimeout(200);
+    const schluessel = await ap.evaluate(() => ({
+      neu: localStorage.getItem('tinytowns.detailMode'),
+      alt: localStorage.getItem('tinytowns.aliceMode')
+    }));
+    if (schluessel.neu !== '0') fail(`Detail-Modus: neuer Schlüssel steht auf „${schluessel.neu}"`);
+    if (schluessel.alt !== null) fail('Detail-Modus: alter Schlüssel blieb liegen');
+    if ((await ap.locator('.mini .desc').count()) !== 0) {
+      fail('Detail-Modus: ausgeschaltet, aber Beschreibungen stehen noch da');
+    }
+    await ctx.close();
+    console.log('✓ Detail-Modus: alte „Alice"-Einstellung gilt weiter und wandert beim Umschalten mit');
+  }
+
   // Standard-Welt: Ohne gespeicherte Wahl zeigt die App das Drachenreich —
   // eigene Namen, eigene Texte, eigene Artworks. Geprüft wird auch der Splash:
   // Er wird vor dem JS gesetzt, sonst blitzt kurz die klassische Welt auf.
@@ -1623,8 +1670,8 @@ try {
 
   // Am Handy muss das Panel ohne Scrollen reichen — sonst ist der letzte Knopf
   // (Monument) unerreichbar
-  await pwaPage.locator('.aliceBtn').first().click(); // Alice-Modus: mehr Kartenhöhe
-  await pwaPage.locator('.aliceBtn', { hasText: '🎓' }).click(); // Lernmodus: Vorschlagszeile
+  await pwaPage.locator('.detailBtn').first().click(); // Detail-Modus: mehr Kartenhöhe
+  await pwaPage.locator('.detailBtn', { hasText: '🎓' }).click(); // Lernmodus: Vorschlagszeile
   await pwaPage.locator('.panel button', { hasText: 'Monument wählen' }).click();
   await pwaPage.locator('.pick .pickCard button.primary').first().click();
   await pwaPage.locator('.picker.offer').waitFor({ timeout: 5000 });

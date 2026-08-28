@@ -145,8 +145,8 @@ export const en: Translation = {
   shareFailed: 'Sharing did not work',
   playAgain: 'Play again',
 
-  aliceMode: 'Alice mode',
-  aliceModeHint: 'Show all cards with their text permanently',
+  detailMode: "Detail mode",
+  detailModeHint: "Show all cards with their text permanently",
   flipCards: 'Rotate the card display for the far side',
 
   townHallMode: 'Town Hall mode',
@@ -310,7 +310,7 @@ export const en: Translation = {
     guestSteps: [
       'Scan the QR code or type the room code, choose a name — your seat is assigned automatically.',
       'You see your board large and the opponents small; your monument lies open for you.',
-      '“📖 Alice mode” shows all cards with their text permanently.',
+      "“📖 Detail mode” shows all cards with their text permanently.",
       'Briefly away or reloaded? The app rejoins automatically. If it doesn’t: wake the host device or have it reassign the seat.'
     ]
   },

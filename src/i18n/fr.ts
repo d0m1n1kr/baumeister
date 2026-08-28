@@ -145,8 +145,8 @@ export const fr: Translation = {
   shareFailed: 'Le partage a échoué',
   playAgain: 'Rejouer',
 
-  aliceMode: 'Mode Alice',
-  aliceModeHint: 'Afficher toutes les cartes avec leur texte en permanence',
+  detailMode: "Mode détaillé",
+  detailModeHint: "Afficher toutes les cartes avec leur texte en permanence",
   flipCards: 'Tourner les cartes pour le côté opposé',
 
   townHallMode: 'Mode Hôtel de ville',
@@ -310,7 +310,7 @@ export const fr: Translation = {
     guestSteps: [
       'Scanne le code QR ou saisis le code du salon, choisis un nom — ta place est attribuée automatiquement.',
       'Tu vois ton plateau en grand, les adversaires en petit ; ton monument est visible pour toi.',
-      '« 📖 Mode Alice » affiche toutes les cartes avec leur texte en permanence.',
+      "« 📖 Mode détaillé » affiche toutes les cartes avec leur texte en permanence.",
       'Absent un instant ou rechargé ? L’appli rejoint automatiquement. Sinon : réveille l’appareil hôte ou fais-y réattribuer la place.'
     ]
   },

@@ -36,30 +36,34 @@
     return t.trainTunnel;
   });
 
-  // Alice-Modus (Einzelansicht): alle Karten dauerhaft samt Beschreibung offen,
-  // damit niemand jede Karte einzeln antippen muss. Reine Anzeige-Präferenz
-  // dieses Geräts — sie überlebt Reloads im localStorage.
-  const ALICE_KEY = 'tinytowns.aliceMode';
-  let alice = $state(readAlice());
+  // Detail-Modus (Einzelansicht): alle Karten dauerhaft samt Beschreibung
+  // offen, damit niemand jede Karte einzeln antippen muss. Reine
+  // Anzeige-Präferenz dieses Geräts — sie überlebt Reloads im localStorage.
+  const DETAIL_KEY = 'tinytowns.detailMode';
+  /** Frühere Fassungen nannten den Modus „Alice" — alte Wahl weiter achten. */
+  const ALT_KEY = 'tinytowns.aliceMode';
+  let detail = $state(readDetail());
 
-  function readAlice(): boolean {
+  function readDetail(): boolean {
     try {
-      return localStorage.getItem(ALICE_KEY) === '1';
+      const wert = localStorage.getItem(DETAIL_KEY) ?? localStorage.getItem(ALT_KEY);
+      return wert === '1';
     } catch {
       return false;
     }
   }
 
-  function toggleAlice() {
-    alice = !alice;
+  function toggleDetail() {
+    detail = !detail;
     try {
-      localStorage.setItem(ALICE_KEY, alice ? '1' : '0');
+      localStorage.setItem(DETAIL_KEY, detail ? '1' : '0');
+      localStorage.removeItem(ALT_KEY); // ab jetzt gilt nur noch der neue Schlüssel
     } catch {
       // privater Modus — gilt dann nur für diese Sitzung
     }
   }
 
-  const aliceOn = $derived(solo && alice);
+  const detailOn = $derived(solo && detail);
 
   // Kartenauslage um 180° drehen — für die Spieler auf der Gegenseite des
   // Geräts. Reine Anzeige-Präferenz dieses Geräts, überlebt Reloads.
@@ -150,13 +154,13 @@
       <span class="trainWhere">{trainStatus}</span>
     {/if}
     {#if solo}
-      <button class="aliceBtn" class:active={alice} onpointerup={toggleAlice} title={t.aliceModeHint}>
-        📖 <span class="btnLabel">{t.aliceMode}</span>
+      <button class="detailBtn" class:active={detail} onpointerup={toggleDetail} title={t.detailModeHint}>
+        📖 <span class="btnLabel">{t.detailMode}</span>
       </button>
       {#if st.config.solo}
         <!-- Lernmodus: nur im Solospiel, dort führen die Blasen durch die Phasen -->
         <button
-          class="aliceBtn"
+          class="detailBtn"
           class:active={learn.enabled}
           onpointerup={() => learn.toggle()}
           title={t.learn.modeHint}
@@ -169,13 +173,13 @@
          Kopfzeile, nicht neben dem Spielernamen. -->
     <button class="abort quit iconBtn" onpointerup={() => onabort?.()} title={t.abortGame}>✕</button>
   </div>
-  <div class="cards" class:alice={aliceOn} class:flipped={flipped && !solo} class:many={cardIds.length > 8}>
+  <div class="cards" class:detail={detailOn} class:flipped={flipped && !solo} class:many={cardIds.length > 8}>
     {#each cardIds as id}
       <div class="cardWrap">
         <CardMini
           card={catalog[id]}
           compact={compactCards}
-          description={aliceOn ? cardText(catalog[id]) : ''}
+          description={detailOn ? cardText(catalog[id]) : ''}
           onclick={(e) => open(catalog[id], e)}
         />
       </div>
@@ -320,7 +324,7 @@
     .strip.soloStrip.horizontal .cardWrap { width: calc(25% - 5px); }
     /* Mehr als 8 Karten (Monument als 9.): eine Reihe, seitlich scrollbar —
        drei Umbruch-Reihen würden das Brett aus dem Bildschirm schieben */
-    .strip.soloStrip.horizontal .cards.many:not(.alice) {
+    .strip.soloStrip.horizontal .cards.many:not(.detail) {
       flex-wrap: nowrap;
       justify-content: flex-start;
       overflow-x: auto;
@@ -331,7 +335,7 @@
       min-width: 0;
       align-self: stretch;
     }
-    .strip.soloStrip.horizontal .cards.many:not(.alice) .cardWrap {
+    .strip.soloStrip.horizontal .cards.many:not(.detail) .cardWrap {
       flex: 0 0 calc(25% - 5px);
       min-width: 0;
     }
@@ -340,7 +344,7 @@
   /* Tablet-Hochformat (2 Spieler / Einzelansicht): genug Höhe — Karten
      umbrechen lassen statt horizontal zu scrollen */
   @media (orientation: portrait) and (min-height: 900px) {
-    .strip.horizontal .cards:not(.alice) {
+    .strip.horizontal .cards:not(.detail) {
       flex-wrap: wrap;
       justify-content: flex-start;
       row-gap: 6px;
@@ -348,8 +352,8 @@
     }
   }
 
-  /* Alice-Modus: Karten samt Beschreibung dauerhaft offen (Einzelansicht) */
-  .aliceBtn {
+  /* Detail-Modus: Karten samt Beschreibung dauerhaft offen (Einzelansicht) */
+  .detailBtn {
     font-size: var(--fs-xs);
     padding: 3px 10px;
     opacity: 0.7;
@@ -361,12 +365,12 @@
   @media (max-width: 720px), (max-height: 540px) {
     .btnLabel { display: none; }
   }
-  .aliceBtn.active {
+  .detailBtn.active {
     opacity: 1;
     border-color: var(--accent);
     color: var(--accent);
   }
-  .strip.horizontal .cards.alice {
+  .strip.horizontal .cards.detail {
     /* Raster statt Flex: grid-auto-rows 1fr macht alle Karten gleich hoch */
     display: grid;
     grid-template-columns: repeat(4, minmax(0, 1fr));
@@ -381,26 +385,26 @@
        bei Bedarf scrollt das Kartenraster in sich */
     max-height: 36vh;
   }
-  .strip.horizontal .cards.alice .cardWrap {
+  .strip.horizontal .cards.detail .cardWrap {
     width: auto;
     display: flex; /* Karte füllt die Rasterzelle in voller Höhe */
   }
   /* Mehr als 8 Karten (Monument als 9.): 5 Spalten statt 4 — das Raster
      bleibt bei maximal 2 Zeilen und schiebt das Brett nicht aus dem Bild */
-  .strip.horizontal .cards.alice.many {
+  .strip.horizontal .cards.detail.many {
     grid-template-columns: repeat(5, minmax(0, 1fr));
     width: min(100%, 1100px);
   }
   @media (max-width: 720px) and (orientation: portrait) {
     /* Am Handy: zwei Spalten, Leiste fest gedeckelt und in sich scrollbar —
        das Spielbrett darunter muss immer erreichbar bleiben */
-    .strip.soloStrip.horizontal .cards.alice {
+    .strip.soloStrip.horizontal .cards.detail {
       grid-template-columns: repeat(2, minmax(0, 1fr));
       gap: 5px;
       /* Deckel: Der Rest des Bildschirms gehört Brett und Knöpfen. Die Karten
          scrollen in sich — seit touch-action das auch zulässt. */
       max-height: 28vh;
     }
-    .strip.soloStrip.horizontal .cards.alice .cardWrap { width: auto; }
+    .strip.soloStrip.horizontal .cards.detail .cardWrap { width: auto; }
   }
 </style>

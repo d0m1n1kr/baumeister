@@ -145,8 +145,8 @@ export const pl: Translation = {
   shareFailed: 'Udostępnianie nie powiodło się',
   playAgain: 'Zagraj ponownie',
 
-  aliceMode: 'Tryb Alice',
-  aliceModeHint: 'Pokazuj stale wszystkie karty z opisem',
+  detailMode: "Tryb szczegółów",
+  detailModeHint: "Pokazuj stale wszystkie karty z opisem",
   flipCards: 'Obróć karty w stronę przeciwną',
 
   townHallMode: 'Tryb Ratusza',
@@ -310,7 +310,7 @@ export const pl: Translation = {
     guestSteps: [
       'Zeskanuj kod QR lub wpisz kod pokoju, wybierz imię — miejsce dostaniesz automatycznie.',
       'Widzisz swoją planszę dużą, przeciwników małych; twój monument leży dla ciebie odkryty.',
-      '„📖 Tryb Alice” pokazuje stale wszystkie karty z opisem.',
+      "„📖 Tryb szczegółów\" stale pokazuje wszystkie karty z opisem.",
       'Chwila przerwy albo przeładowanie? Aplikacja dołącza ponownie sama. Jeśli nie: obudź urządzenie gospodarza lub tam przydziel miejsce od nowa.'
     ]
   },

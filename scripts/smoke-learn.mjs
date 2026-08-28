@@ -202,9 +202,9 @@ async function run(browser, label, viewport) {
   console.log(`✓ ${label}: ein neues Lernspiel erklärt wieder von vorn`);
 
   // 6) Schalter in der Kartenleiste schaltet die Blasen ab
-  await page.locator('.aliceBtn', { hasText: '🎓' }).click();
+  await page.locator('.detailBtn', { hasText: '🎓' }).click();
   if ((await page.locator('.bubble').count()) !== 0) fail(`${label}: 🎓-Schalter wirkt nicht`);
-  await page.locator('.aliceBtn', { hasText: '🎓' }).click();
+  await page.locator('.detailBtn', { hasText: '🎓' }).click();
   console.log(`✓ ${label}: 🎓-Schalter blendet die Blasen aus und wieder ein`);
 
   await context.close();

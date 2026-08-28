@@ -1,4 +1,4 @@
-// Lernmodus: Anzeige-Präferenz dieses Geräts (wie Alice-Modus und Ton) plus
+// Lernmodus: Anzeige-Präferenz dieses Geräts (wie Detail-Modus und Ton) plus
 // die Merkliste der weggetippten Erklärblasen. Der Spielzustand bleibt davon
 // unberührt — die Engine weiß nichts vom Lernmodus.
 

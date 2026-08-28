@@ -16,7 +16,7 @@
     onclick?: (e: PointerEvent) => void;
     badge?: string;
     compact?: boolean;
-    /** Alice-Modus: Kartentext direkt auf der Karte anzeigen. */
+    /** Detail-Modus: Kartentext direkt auf der Karte anzeigen. */
     description?: string;
   } = $props();
 </script>
