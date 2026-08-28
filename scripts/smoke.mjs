@@ -75,7 +75,28 @@ let browser;
 try {
   await waitForServer();
   browser = await chromium.launch({ executablePath: '/opt/pw-browsers/chromium' });
-  page = await browser.newPage({ viewport: { width: 1180, height: 820 }, locale: 'de-DE' });
+
+  /**
+   * Die meisten Prüfungen suchen Bedienelemente über ihre deutsche
+   * Beschriftung („Eisenbahn-Modus", „Stadt fertigstellen"). Diese Wörter
+   * gehören zur klassischen Welt; im Drachenreich heißen sie anders. Damit die
+   * Prüfungen weiter das messen, wofür sie geschrieben wurden — Mechanik und
+   * Layout, nicht Benennung — laufen sie fest in der klassischen Welt. Der
+   * Standard (Drachenreich) hat einen eigenen Block, der ihn ausdrücklich
+   * prüft; dort wird kein Theme vorgegeben.
+   */
+  const klassischerKontext = (opts = {}) =>
+    browser.newContext({
+      ...opts,
+      storageState: {
+        cookies: [],
+        origins: [{ origin: new URL(BASE_URL).origin, localStorage: [{ name: 'tinytowns.theme', value: 'classic' }] }]
+      }
+    });
+  // Der Hauptdurchlauf sucht Materialien über ihre klassischen Namen
+  // („Weizen", „Ziegel"), also läuft auch er in der klassischen Welt.
+  const hauptKontext = await klassischerKontext({ viewport: { width: 1180, height: 820 }, locale: 'de-DE' });
+  page = await hauptKontext.newPage();
   page.on('pageerror', (e) => fail(`Seitenfehler: ${e.message}`));
   await page.goto(BASE_URL);
 
@@ -107,7 +128,7 @@ try {
     ['Tablet hoch 4 Spieler', 1024, 1366, 4, 75],
     ['Handy quer 2 Spieler', 874, 402, 2, 60]
   ]) {
-    const ctx = await browser.newContext({ viewport: { width: w, height: h }, locale: 'de-DE' });
+    const ctx = await klassischerKontext({ viewport: { width: w, height: h }, locale: 'de-DE' });
     const gp = await ctx.newPage();
     gp.on('pageerror', (e) => fail(`Spielfläche ${label}: Seitenfehler: ${e.message}`));
     await gp.goto(BASE_URL);
@@ -175,7 +196,7 @@ try {
     ['Handy hoch 4 Spieler', 402, 874, 4],
     ['Handy quer 2 Spieler', 874, 402, 2]
   ]) {
-    const ctx = await browser.newContext({ viewport: { width: w, height: h }, locale: 'de-DE' });
+    const ctx = await klassischerKontext({ viewport: { width: w, height: h }, locale: 'de-DE' });
     const gp = await ctx.newPage();
     gp.on('pageerror', (e) => fail(`Gleise ${label}: Seitenfehler: ${e.message}`));
     await gp.goto(BASE_URL);
@@ -253,7 +274,7 @@ try {
   // Gemerkte Spielernamen: einmal tippen, beim nächsten Start wieder da — und
   // das ✕ im Feld löscht einen einzelnen Namen wieder weg.
   {
-    const ctx = await browser.newContext({ viewport: { width: 402, height: 874 }, locale: 'de-DE' });
+    const ctx = await klassischerKontext({ viewport: { width: 402, height: 874 }, locale: 'de-DE' });
     const np = await ctx.newPage();
     np.on('pageerror', (e) => fail(`Namen: Seitenfehler: ${e.message}`));
     await np.goto(BASE_URL);
@@ -305,7 +326,7 @@ try {
   // zusammenklicken. Ein Challenge-Link ist die Ausnahme: Er bestimmt, was
   // gespielt wird — und darf die eigenen Vorgaben nicht überschreiben.
   {
-    const ctx = await browser.newContext({ viewport: { width: 402, height: 874 }, locale: 'de-DE' });
+    const ctx = await klassischerKontext({ viewport: { width: 402, height: 874 }, locale: 'de-DE' });
     const sp = await ctx.newPage();
     sp.on('pageerror', (e) => fail(`Auswahl merken: Seitenfehler: ${e.message}`));
     const heute = new Date();
@@ -390,7 +411,7 @@ try {
       if (bad.length) fail(`Trefflächen ${wo}: zu klein — ${bad.join(', ')}`);
     };
 
-    const ctx = await browser.newContext({ viewport: { width: 402, height: 874 }, locale: 'de-DE' });
+    const ctx = await klassischerKontext({ viewport: { width: 402, height: 874 }, locale: 'de-DE' });
     const tp = await ctx.newPage();
     tp.on('pageerror', (e) => fail(`Trefflächen: Seitenfehler: ${e.message}`));
     await tp.goto(BASE_URL);
@@ -420,7 +441,7 @@ try {
     ['Tablet', 1024, 1366],
     ['Tablet quer', 1180, 820]
   ]) {
-    const ctx = await browser.newContext({ viewport: { width: w, height: h }, locale: 'de-DE' });
+    const ctx = await klassischerKontext({ viewport: { width: w, height: h }, locale: 'de-DE' });
     const p2 = await ctx.newPage();
     p2.on('pageerror', (e) => fail(`Startbildschirm ${label}: Seitenfehler: ${e.message}`));
     await p2.goto(BASE_URL);
@@ -493,7 +514,7 @@ try {
     ['Startbildschirm', async (pg) => pg],
     ['Beitritt', async (pg) => { await pg.locator('button', { hasText: 'Partie beitreten' }).click(); return pg; }]
   ]) {
-    const ctx = await browser.newContext({ viewport: { width: 402, height: 874 }, locale: 'de-DE' });
+    const ctx = await klassischerKontext({ viewport: { width: 402, height: 874 }, locale: 'de-DE' });
     const pg = await ctx.newPage();
     pg.on('pageerror', (e) => fail(`${label}: Seitenfehler: ${e.message}`));
     await pg.goto(BASE_URL);
@@ -515,7 +536,7 @@ try {
   // einem Link auf GENAU diesen Tag füttern — und der Link muss beim Empfänger
   // dieselbe Tages-Challenge vorwählen.
   {
-    const ctx = await browser.newContext({ viewport: { width: 402, height: 874 }, locale: 'de-DE' });
+    const ctx = await klassischerKontext({ viewport: { width: 402, height: 874 }, locale: 'de-DE' });
     const sp = await ctx.newPage();
     sp.on('pageerror', (e) => fail(`Teilen: Seitenfehler: ${e.message}`));
     // navigator.share gibt es im Testbrowser nicht — einsetzen und mitschneiden
@@ -638,7 +659,7 @@ try {
     // letzte Auswahl merkt, wäre „Tages-Challenge nach dem Reload" auch dann
     // richtig, wenn man sie zuvor von Hand gewählt hat. Ohne gemerkte Vorgaben
     // kann nur eine Ursache übrig bleiben — ein Link, der in der Adresse klebt.
-    const jungfräulich = await browser.newContext({
+    const jungfräulich = await klassischerKontext({
       viewport: { width: 402, height: 874 },
       locale: 'de-DE'
     });
@@ -665,7 +686,7 @@ try {
   // Genau hier fiel es auf: In der Landpartie ist die Landschaft das Gesicht
   // der Partie. Ist sie zweimal gleich, ist etwas mit dem Seed faul.
   {
-    const ctx = await browser.newContext({ viewport: { width: 402, height: 874 }, locale: 'de-DE' });
+    const ctx = await klassischerKontext({ viewport: { width: 402, height: 874 }, locale: 'de-DE' });
     const lp = await ctx.newPage();
     lp.on('pageerror', (e) => fail(`Freie Landpartie: Seitenfehler: ${e.message}`));
     const layouts = new Set();
@@ -702,7 +723,7 @@ try {
     ['Tablet hoch', 1024, 1366, 4],
     ['Handy', 402, 874, 4]
   ]) {
-    const ctx = await browser.newContext({ viewport: { width: w, height: h }, locale: 'de-DE' });
+    const ctx = await klassischerKontext({ viewport: { width: w, height: h }, locale: 'de-DE' });
     const wp = await ctx.newPage();
     wp.on('pageerror', (e) => fail(`Endwertung ${label}: Seitenfehler: ${e.message}`));
     await wp.goto(BASE_URL);
@@ -757,7 +778,7 @@ try {
   // gestern spielen will, braucht die Tageswahl — sonst käme er nur über den
   // Browser hin, mit getrennter Bestenliste.
   {
-    const ctx = await browser.newContext({ viewport: { width: 402, height: 874 }, locale: 'de-DE' });
+    const ctx = await klassischerKontext({ viewport: { width: 402, height: 874 }, locale: 'de-DE' });
     const dp = await ctx.newPage();
     dp.on('pageerror', (e) => fail(`Tageswahl: Seitenfehler: ${e.message}`));
     await dp.goto(BASE_URL);
@@ -826,7 +847,7 @@ try {
         };
       });
     };
-    const ctx = await browser.newContext({ viewport: { width: 1180, height: 820 }, locale: 'de-DE' });
+    const ctx = await klassischerKontext({ viewport: { width: 1180, height: 820 }, locale: 'de-DE' });
     const lp = await ctx.newPage();
     lp.on('pageerror', (e) => fail(`Landpartie: Seitenfehler: ${e.message}`));
     const a = await starte(lp);
@@ -861,7 +882,7 @@ try {
     if (!gelegt) fail('Landpartie: Material liegt nicht auf dem freien Feld');
 
     // Tages-Determinismus: frischer Kontext, gleiches Datum → gleiche Karte
-    const ctx2 = await browser.newContext({ viewport: { width: 1180, height: 820 }, locale: 'de-DE' });
+    const ctx2 = await klassischerKontext({ viewport: { width: 1180, height: 820 }, locale: 'de-DE' });
     const lp2 = await ctx2.newPage();
     const b = await starte(lp2);
     if (JSON.stringify(a.terrain) !== JSON.stringify(b.terrain)) {
@@ -880,7 +901,7 @@ try {
       ['Tablet quer', 1180, 820, 4],
       ['Handy hoch', 402, 874, 2]
     ]) {
-      const mctx = await browser.newContext({ viewport: { width: w, height: h }, locale: 'de-DE' });
+      const mctx = await klassischerKontext({ viewport: { width: w, height: h }, locale: 'de-DE' });
       const mp = await mctx.newPage();
       mp.on('pageerror', (e) => fail(`Landpartie ${label} ${players}P: Seitenfehler: ${e.message}`));
       await mp.goto(BASE_URL);
@@ -949,7 +970,7 @@ try {
     // wirklich in der Partie ankommen — und dass der Bahnhof baubar bleibt:
     // Die Landschaft darf die unterste Reihe (die Strecke) nicht zulegen.
     {
-      const kctx = await browser.newContext({ viewport: { width: 1180, height: 820 }, locale: 'de-DE' });
+      const kctx = await klassischerKontext({ viewport: { width: 1180, height: 820 }, locale: 'de-DE' });
       const kp = await kctx.newPage();
       kp.on('pageerror', (e) => fail(`Landpartie+Erweiterungen: Seitenfehler: ${e.message}`));
       await kp.goto(BASE_URL);
@@ -1034,7 +1055,7 @@ try {
       ['Tablet quer', 1180, 820, 4, false, 'offen'],
       ['Tablet hoch', 1024, 1366, 4, false, 'offen']
     ]) {
-      const gctx = await browser.newContext({ viewport: { width: w, height: h }, locale: 'de-DE' });
+      const gctx = await klassischerKontext({ viewport: { width: w, height: h }, locale: 'de-DE' });
       const gp = await gctx.newPage();
       gp.on('pageerror', (e) => fail(`Landpartie-Grenze: Seitenfehler: ${e.message}`));
       await gp.goto(BASE_URL);
@@ -1070,7 +1091,7 @@ try {
       townHall: true, train: true, cavern: true
     };
     const starte = async (modus) => {
-      const ctx = await browser.newContext({ viewport: { width: 402, height: 874 }, locale: 'de-DE' });
+      const ctx = await klassischerKontext({ viewport: { width: 402, height: 874 }, locale: 'de-DE' });
       const dp = await ctx.newPage();
       dp.on('pageerror', (e) => fail(`Challenge pur: Seitenfehler: ${e.message}`));
       await dp.addInitScript((v) => {
@@ -1139,7 +1160,7 @@ try {
   // übereinander. Geprüft wird beides: die Auswahl ist weg, und ein Spielstand
   // mit kollidierenden Ecken wird trotzdem richtig aufgebaut.
   {
-    const ctx = await browser.newContext({ viewport: { width: 1180, height: 820 }, locale: 'de-DE' });
+    const ctx = await klassischerKontext({ viewport: { width: 1180, height: 820 }, locale: 'de-DE' });
     const zp = await ctx.newPage();
     zp.on('pageerror', (e) => fail(`Zwei Plätze: Seitenfehler: ${e.message}`));
     await zp.goto(BASE_URL);
@@ -1214,7 +1235,7 @@ try {
   // KEIN Affiliate-Link — bliebe eine Partner-ID im Link hängen, wäre das
   // Projekt nicht mehr rein privat (Werbekennzeichnung, Impressum).
   {
-    const ctx = await browser.newContext({ viewport: { width: 402, height: 874 }, locale: 'de-DE' });
+    const ctx = await klassischerKontext({ viewport: { width: 402, height: 874 }, locale: 'de-DE' });
     const kp = await ctx.newPage();
     kp.on('pageerror', (e) => fail(`Kauf-Link: Seitenfehler: ${e.message}`));
     await kp.goto(BASE_URL);
@@ -1264,11 +1285,64 @@ try {
     console.log('✓ Kauf-Link: Startbildschirm und Ergebnis, neuer Tab, reine Suche ohne Partner-ID');
   }
 
+  // Standard-Welt: Ohne gespeicherte Wahl zeigt die App das Drachenreich —
+  // eigene Namen, eigene Texte, eigene Artworks. Geprüft wird auch der Splash:
+  // Er wird vor dem JS gesetzt, sonst blitzt kurz die klassische Welt auf.
+  {
+    const ctx = await browser.newContext({ viewport: { width: 402, height: 874 }, locale: 'de-DE' });
+    const dp = await ctx.newPage();
+    dp.on('pageerror', (e) => fail(`Standard-Welt: Seitenfehler: ${e.message}`));
+    await dp.goto(BASE_URL);
+    // Noch VOR dem Splash-Ende messen: das Attribut kommt aus dem Inline-Skript
+    const frueh = await dp.evaluate(() => document.documentElement.dataset.theme);
+    if (frueh !== 'fantasy') fail(`Standard-Welt: Splash steht auf „${frueh}" statt fantasy`);
+    await dp.locator('#splash').waitFor({ state: 'detached', timeout: 10000 });
+    const neu7 = dp.locator('button', { hasText: 'Neues Spiel' });
+    if (await neu7.count()) await neu7.click();
+    await dp.locator('.seg button', { hasText: '1' }).first().click();
+    await dp.locator('.bar button.big').click();
+    await dp.locator('.board').first().waitFor({ timeout: 8000 });
+    await dp.waitForTimeout(300);
+    const w = await dp.evaluate(() => ({
+      theme: document.documentElement.dataset.theme,
+      gespeichert: localStorage.getItem('tinytowns.theme'),
+      karten: [...document.querySelectorAll('.mini .name')].map((e) => e.textContent)
+    }));
+    if (w.theme !== 'fantasy') fail(`Standard-Welt: data-theme „${w.theme}"`);
+    // Die Wahl wird NICHT geschrieben, solange niemand sie trifft — sonst
+    // könnte ein späterer Standardwechsel alte Geräte nie mehr erreichen.
+    if (w.gespeichert !== null) fail(`Standard-Welt: ungefragt „${w.gespeichert}" gespeichert`);
+    // Hütte heißt hier Kate: Die Auslage trägt die Namen des Drachenreichs
+    if (!w.karten.includes('Kate')) fail(`Standard-Welt: klassische Auslage (${w.karten})`);
+    if (w.karten.includes('Hütte')) fail('Standard-Welt: klassische Kartennamen in der Auslage');
+
+    // Gegenprobe: Wer die klassische Welt wählt, bekommt sie auch
+    const ctx2 = await browser.newContext({ viewport: { width: 402, height: 874 }, locale: 'de-DE' });
+    const cp = await ctx2.newPage();
+    await cp.addInitScript(() => localStorage.setItem('tinytowns.theme', 'classic'));
+    await cp.goto(BASE_URL);
+    const frueh2 = await cp.evaluate(() => document.documentElement.dataset.theme);
+    if (frueh2) fail(`Klassische Wahl: Splash setzt „${frueh2}" statt nichts`);
+    await cp.locator('#splash').waitFor({ state: 'detached', timeout: 10000 });
+    const neu8 = cp.locator('button', { hasText: 'Neues Spiel' });
+    if (await neu8.count()) await neu8.click();
+    await cp.locator('.seg button', { hasText: '1' }).first().click();
+    await cp.locator('.bar button.big').click();
+    await cp.locator('.board').first().waitFor({ timeout: 8000 });
+    const k = await cp.evaluate(() =>
+      [...document.querySelectorAll('.mini .name')].map((e) => e.textContent)
+    );
+    if (!k.includes('Hütte')) fail(`Klassische Wahl: keine klassische Auslage (${k})`);
+    await ctx.close();
+    await ctx2.close();
+    console.log('✓ Standard-Welt: Drachenreich ab dem Splash, klassische Wahl bleibt möglich');
+  }
+
   // Der Name der App ist „Baumeister"; das Originalspiel wird nur beschreibend
   // genannt (Fußzeile, Kauf-Link). Fällt das auseinander, heißt die App wieder
   // wie die Marke — genau das soll die Umbenennung verhindern.
   {
-    const ctx = await browser.newContext({ viewport: { width: 402, height: 874 }, locale: 'de-DE' });
+    const ctx = await klassischerKontext({ viewport: { width: 402, height: 874 }, locale: 'de-DE' });
     const np = await ctx.newPage();
     np.on('pageerror', (e) => fail(`Name: Seitenfehler: ${e.message}`));
     await np.goto(BASE_URL);
@@ -1309,7 +1383,7 @@ try {
   // Installations-Hinweis: Auf iOS gibt es keine Schnittstelle dafür, also muss
   // dort eine Anleitung erscheinen — und einmal weggeklickt bleibt sie weg.
   {
-    const iosCtx = await browser.newContext({
+    const iosCtx = await klassischerKontext({
       viewport: { width: 402, height: 874 },
       userAgent: 'Mozilla/5.0 (iPhone; CPU iPhone OS 17_5 like Mac OS X) AppleWebKit/605.1.15',
       hasTouch: true,
@@ -1497,7 +1571,7 @@ try {
   // und Viewport 874, oberer Inset 62, unterer 34. Erwartet wird, dass html,
   // Hülle und Spieltisch die volle Höhe nutzen und alle Bedienelemente
   // hineinpassen — ohne Scrollen.
-  const pwaContext = await browser.newContext({
+  const pwaContext = await klassischerKontext({
     viewport: { width: 402, height: 874 },
     screen: { width: 402, height: 874 },
     hasTouch: true,

@@ -4,7 +4,9 @@ A digital adaptation of the board game *Tiny Towns* (base game) — a purely cli
 web app (PWA) for **tablets and phones**. The classic mode puts **2–4 players around
 one tablet in landscape**: everyone plays simultaneously at the four corners of the
 device, with the game's 7 building cards in the middle — or each player joins with
-their own device. Beside it stands **Countryside** (🏞), our own variant on a taller
+their own device. It plays in a **dragon realm** by default — crofts, elfwood and
+moongrain, all of it our own — with a Mars colony and the classic forest town a
+tap away in the 🎨 picker. Beside it stands **Countryside** (🏞), our own variant on a taller
 5×6 board with a river, mountains and a lake you cannot build on, and three extra
 waterfront cards that score next to them. Solo, daily challenge, learning mode and
 several expansions are all in the box.
@@ -15,13 +17,13 @@ several expansions are all in the box.
 
 **One tablet, four towns.** Everyone plays at the same time; each corner is
 rotated toward its player, and the round's building cards sit in the middle.
-The Master Builder (👑) has named wood — everyone places it on their own board.
+The Master Builder (👑) has named elfwood — everyone places it on their own board.
 
 ![Four players around one tablet](docs/screenshots/tablet-table.png)
 
 **Countryside: a taller board with a landscape in it.** 5 wide and 6 high — the
 shape of a phone held upright. The river, the ridge and the lake are unbuildable,
-and the three waterfront cards (here Ferry Landing, Ore Mine, Watermill) only
+and the three waterfront cards (here Crag Eyrie, Ferry Pier, Fisher's Croft) only
 score next to the matching terrain. Every player gets the same map, so the towns
 stay comparable. Next to it a solo game on a phone: your own board large, the
 deck's three face-up resources below it.
@@ -63,8 +65,11 @@ while Anna and Ben are on their phones — the state is identical on every devic
     (sources in `schema.md`).
   - *Tiny Trees* — seed tokens: building over a seed grants a free resource; as the
     last empty square, the seed becomes a tree (2 points).
-- **Themes (per device):** the classic forest town, a **Mars colony**, or a
-  **dragon realm** — same rules, different world. Every card (base game,
+- **Themes (per device):** the **dragon realm** (the default), a **Mars colony**,
+  or the classic forest town — same rules, different world. The dragon realm
+  leads because its names, texts and artwork are original throughout: out of the
+  box the app shows none of the original game's wording. The classic world is
+  one tap away for anyone who wants the names they know. Every card (base game,
   monuments, Fortune, station) gets its own name, rule text, and artwork, and the
   vocabulary changes with it: on Mars you supply habitats in a colony with
   regolith and ice, coins become power cells; in the dragon realm you provision
