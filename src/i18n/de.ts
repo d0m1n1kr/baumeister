@@ -9,7 +9,9 @@ export const de = {
   themeMars: 'Mars-Kolonie',
   themeFantasy: 'Drachenreich',
   language: 'Sprache',
-  appTitle: 'Tiny Towns',
+  appTitle: 'Baumeister',
+  basedOn:
+    "Umsetzung des Brettspiels Tiny Towns von Peter McPherson (AEG). Fanprojekt, nicht vom Verlag autorisiert.",
   newGame: 'Neues Spiel',
   resumeGame: 'Weiterspielen',
   players: 'Spieler',
@@ -215,6 +217,8 @@ export const de = {
   soloOfferTitle: 'Wähle 1 der 3 ausliegenden Materialien',
   soloDeckCount: (n: number) => `Nachziehstapel: ${n} Karten`,
   soloDaily: 'Tages-Challenge',
+  buyOriginal: "Dir gefällt das Spiel? Kauf das Original hier:",
+  buyOriginalLink: "Tiny Towns bei Amazon",
   dailyPure:
     'Die Tages-Challenge spielt immer pur: Basisspiel mit Monumenten. Nur so ist ein Datum weltweit dieselbe Partie — schon abgeschaltete Monumente würden ein anderes Material-Deck ergeben.',
   soloDailyHint: 'Fester Zufall des Tages — weltweit dieselben Karten und Materialien. Vergleiche deine Punkte!',

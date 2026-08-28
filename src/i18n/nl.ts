@@ -9,7 +9,9 @@ export const nl: Translation = {
   themeMars: 'Marskolonie',
   themeFantasy: 'Drakenrijk',
   language: 'Taal',
-  appTitle: 'Tiny Towns',
+  appTitle: 'Baumeister',
+  basedOn:
+    "Bewerking van het bordspel Tiny Towns van Peter McPherson (AEG). Fanproject, niet gelieerd aan de uitgever.",
   newGame: 'Nieuw spel',
   resumeGame: 'Verdergaan',
   players: 'Spelers',
@@ -190,7 +192,7 @@ export const nl: Translation = {
   scanTitle: 'QR-code scannen',
   scanPrompt: 'Houd de QR-code van de host voor de camera',
   cameraError: 'Camera niet beschikbaar — geef toegang of typ de code in.',
-  scanInvalid: 'Geen Tiny Towns-code',
+  scanInvalid: 'Geen Baumeister-code',
   connecting: 'Verbinden …',
   relayStatus: (open: number, total: number) => `Signalering: ${open}/${total} relays bereikbaar`,
   waitingForHost: 'Wachten tot de host start …',
@@ -215,6 +217,8 @@ export const nl: Translation = {
   soloOfferTitle: 'Kies 1 van de 3 open grondstoffen',
   soloDeckCount: (n: number) => `Trekstapel: ${n} kaarten`,
   soloDaily: 'Dagelijkse uitdaging',
+  buyOriginal: "Vind je het spel leuk? Koop het origineel hier:",
+  buyOriginalLink: "Tiny Towns op Amazon",
   dailyPure:
     'De dagelijkse uitdaging speelt altijd puur: basisspel met monumenten. Alleen zo is een datum wereldwijd hetzelfde spel — monumenten uitzetten zou al een andere materiaalstapel geven.',
   soloDailyHint: 'Vast dagtoeval — wereldwijd dezelfde kaarten en grondstoffen. Vergelijk je punten!',

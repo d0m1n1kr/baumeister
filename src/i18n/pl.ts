@@ -9,7 +9,9 @@ export const pl: Translation = {
   themeMars: 'Kolonia marsjańska',
   themeFantasy: 'Kraina smoków',
   language: 'Język',
-  appTitle: 'Tiny Towns',
+  appTitle: 'Baumeister',
+  basedOn:
+    "Adaptacja gry planszowej Tiny Towns autorstwa Petera McPhersona (AEG). Projekt fanowski, niezwiązany z wydawcą.",
   newGame: 'Nowa gra',
   resumeGame: 'Kontynuuj',
   players: 'Gracze',
@@ -190,7 +192,7 @@ export const pl: Translation = {
   scanTitle: 'Skanuj kod QR',
   scanPrompt: 'Pokaż kamerze kod QR gospodarza',
   cameraError: 'Kamera niedostępna — zezwól na dostęp lub wpisz kod.',
-  scanInvalid: 'To nie jest kod Tiny Towns',
+  scanInvalid: 'To nie jest kod Baumeister',
   connecting: 'Łączenie …',
   relayStatus: (open: number, total: number) => `Sygnalizacja: ${open}/${total} przekaźników osiągalnych`,
   waitingForHost: 'Czekam, aż gospodarz rozpocznie …',
@@ -215,6 +217,8 @@ export const pl: Translation = {
   soloOfferTitle: 'Wybierz 1 z 3 odkrytych surowców',
   soloDeckCount: (n: number) => `Talia: ${n} kart`,
   soloDaily: 'Wyzwanie dnia',
+  buyOriginal: "Podoba Ci się gra? Kup oryginał tutaj:",
+  buyOriginalLink: "Tiny Towns na Amazonie",
   dailyPure:
     'Wyzwanie dnia zawsze toczy się czysto: gra podstawowa z monumentami. Tylko wtedy ta sama data to ta sama partia na całym świecie — już wyłączenie monumentów dałoby inną talię materiałów.',
   soloDailyHint: 'Stały los dnia — te same karty i surowce na całym świecie. Porównaj punkty!',

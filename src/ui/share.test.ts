@@ -97,3 +97,22 @@ describe('hashWithoutDaily', () => {
     expect(hashWithoutDaily('#')).toBe('');
   });
 });
+
+describe('Kauf-Link bleibt in der App', () => {
+  it('der geteilte Text enthält keinen Amazon-Link', () => {
+    // Amazon verbietet Partner-Links außerhalb der Website (E-Mail, Dateien,
+    // Nachrichten). Der geteilte Text wandert genau dorthin.
+    const text = shareText({
+      title: 'Tiny Towns',
+      rank: 'Baumeister',
+      score: 21,
+      points: 'Punkte',
+      dailyId: '2026-08-27',
+      dailyLabel: 'Tages-Challenge',
+      buildings: [{ name: 'Hütte', count: 3 }],
+      url: 'https://d0m1n1kr.github.io/tiny-towns/#daily=2026-08-27'
+    });
+    expect(text).not.toMatch(/amazon/i);
+    expect(text).not.toMatch(/tag=/);
+  });
+});

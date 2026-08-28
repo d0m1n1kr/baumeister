@@ -19,9 +19,9 @@ export default defineConfig({
       registerType: 'prompt',
       includeAssets: ['icons/icon.svg', 'icons/apple-touch-icon.png'],
       manifest: {
-        name: 'Tiny Towns',
-        short_name: 'Tiny Towns',
-        description: 'Tiny Towns for tablets and phones — play on one device or together with your own devices',
+        name: 'Baumeister',
+        short_name: 'Baumeister',
+        description: 'Baumeister — a fan-made adaptation of the board game Tiny Towns for tablets and phones: play on one device or together with your own devices',
         lang: 'en',
         // Feste Identität, Geltungsbereich und Startadresse: Erst damit kann
         // Chrome/Android einen geteilten Link (#daily=…, #join=…) an die

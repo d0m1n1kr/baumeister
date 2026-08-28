@@ -9,7 +9,9 @@ export const en: Translation = {
   themeMars: 'Mars colony',
   themeFantasy: 'Dragon realm',
   language: 'Language',
-  appTitle: 'Tiny Towns',
+  appTitle: 'Baumeister',
+  basedOn:
+    "An adaptation of the board game Tiny Towns by Peter McPherson (AEG). Fan project, not affiliated with the publisher.",
   newGame: 'New game',
   resumeGame: 'Resume',
   players: 'Players',
@@ -190,7 +192,7 @@ export const en: Translation = {
   scanTitle: 'Scan QR code',
   scanPrompt: 'Hold the host’s QR code in front of the camera',
   cameraError: 'Camera unavailable — allow access or type in the code.',
-  scanInvalid: 'Not a Tiny Towns join code',
+  scanInvalid: 'Not a Baumeister join code',
   connecting: 'Connecting …',
   relayStatus: (open: number, total: number) => `Signaling: ${open}/${total} relays reachable`,
   waitingForHost: 'Waiting for the host to start …',
@@ -215,6 +217,8 @@ export const en: Translation = {
   soloOfferTitle: 'Choose 1 of the 3 face-up resources',
   soloDeckCount: (n: number) => `Draw pile: ${n} cards`,
   soloDaily: 'Daily challenge',
+  buyOriginal: "Enjoying the game? Buy the original here:",
+  buyOriginalLink: "Tiny Towns on Amazon",
   dailyPure:
     'The daily challenge always plays pure: base game with monuments. Only then is a date the same game worldwide — even switching monuments off would deal a different resource deck.',
   soloDailyHint: 'Fixed daily seed — the same cards and resources worldwide. Compare your scores!',
