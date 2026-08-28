@@ -8,11 +8,11 @@ import { pickTheme, SKINNED_THEMES, THEME_RESOURCES, THEME_STRINGS } from './ind
  */
 const FORBIDDEN: Record<string, { de: RegExp[]; en: RegExp[] }> = {
   mars: {
-    de: [/Hütte/, /gefüttert/, /füttert/i, /\bStadt\b/, /Gebäude/, /Münze/, /Truhe/],
+    de: [/hütte/i, /gefüttert/i, /füttert/i, /\bStadt\b/, /gebäude/i, /münze/i, /truhe/i],
     en: [/cottage/i, /\bfed\b/i, /\btown\b/i, /building/i, /\bcoins?\b/i, /\bchest\b/i]
   },
   fantasy: {
-    de: [/Hütte/, /gefüttert/, /füttert/i, /\bStadt\b/, /Gebäude/, /Münze/, /Truhe/],
+    de: [/hütte/i, /gefüttert/i, /füttert/i, /\bStadt\b/, /gebäude/i, /münze/i, /truhe/i],
     en: [/cottage/i, /\bfed\b/i, /\btown\b/i, /building/i, /\bcoins?\b/i, /\bchest\b/i]
   }
 };
@@ -44,6 +44,41 @@ describe.each(SKINNED_THEMES)('Theme "%s": Vollständigkeit', (id) => {
         for (const re of FORBIDDEN[id][lang]) {
           expect(text[lang]!, `${card.id} (${lang}): "${re}" übrig`).not.toMatch(re);
         }
+      }
+    }
+  });
+
+  /**
+   * Nennt sich ein Kartentext selbst, muss er den Namen SEINER Fassung nennen.
+   * Der Fehler, den das verhindert: Der Felshorst erklärte sich mit „keine
+   * weitere Zinnenklause" — ein Gebäude, das es im Spiel nicht gibt. Geprüft
+   * wird nur die eine Richtung: Wo der klassische Text sich selbst nennt, muss
+   * es auch die Theme-Fassung tun. (Umgekehrt darf ein Theme deutlicher sein
+   * als das Original — die englische Hütte heißt sich dort „this building".)
+   */
+  it('Kartentexte nennen sich beim eigenen Namen, nicht beim fremden', () => {
+    // Zusammensetzungen und Plural mitnehmen: „Bootshaus" steckt in
+    // „Bootshäuser", „Herberge" im Namen „Herberge zum Greif".
+    const norm = (s: string) =>
+      s.toLowerCase().replace(/ä/g, 'a').replace(/ö/g, 'o').replace(/ü/g, 'u')
+        .replace(/ß/g, 'ss').replace(/'/g, '');
+    const nenntSich = (name: string, text: string) => {
+      const t = norm(text);
+      if (t.includes(norm(name))) return true; // „High Dome" steht wörtlich da
+      // Sonst genügt ein kennzeichnendes Wort des Namens ab 6 Zeichen: Das
+      // fängt Beugung und Zusammensetzung („des Denkmals", „Bootshäuser"),
+      // lässt aber kurze Allerweltswörter außen vor — „train" steht in jedem
+      // Zug-Text und wäre keine Selbstnennung.
+      return norm(name).split(/\s+/).some((wort) => wort.length >= 6 && t.includes(wort));
+    };
+    for (const card of themed) {
+      const themed_ = card.themes![id];
+      for (const lang of ['de', 'en'] as const) {
+        if (!nenntSich(card.name[lang]!, card.text[lang]!)) continue;
+        expect(
+          nenntSich(themed_.name[lang]!, themed_.text[lang]!),
+          `${card.id} (${lang}): Text nennt nicht „${themed_.name[lang]}" — ${themed_.text[lang]}`
+        ).toBe(true);
       }
     }
   });

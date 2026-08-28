@@ -9,8 +9,8 @@
     "en": "Watermill"
   },
   "text": {
-    "de": "2 Punkte je angrenzendem roten Gebäude (Nahrung) — aber nur, wenn die Mühle selbst an den Fluss grenzt. Ohne Fluss mahlt sie nicht.",
-    "en": "2 points for each adjacent red building (food) — but only if the mill itself touches the river. Away from the river it does not grind."
+    "de": "2 Punkte je angrenzendem roten Gebäude (Nahrung) — aber nur, wenn die Wassermühle selbst an den Fluss grenzt. Ohne Fluss mahlt sie nicht.",
+    "en": "2 points for each adjacent red building (food) — but only if the Watermill itself touches the river. Away from the river it does not grind."
   },
   "pattern": [
     [
@@ -41,8 +41,8 @@
         "en": "Dust Turbine"
       },
       "text": {
-        "de": "2 Punkte je angrenzendem roten Modul (Nahrung) — aber nur, wenn die Pumpstation selbst an den Canyon grenzt.",
-        "en": "2 points for each adjacent red module (food) — but only if the pumping station itself touches the canyon."
+        "de": "2 Punkte je angrenzendem roten Modul (Nahrung) — aber nur, wenn die Staubturbine selbst an den Canyon grenzt.",
+        "en": "2 points for each adjacent red module (food) — but only if the Dust Turbine itself touches the canyon."
       },
       "art": "mars_watermill.svg"
     },
@@ -52,8 +52,8 @@
         "en": "Mistmill"
       },
       "text": {
-        "de": "2 Punkte je angrenzendem roten Bauwerk (Nahrung) — aber nur, wenn die Mühle selbst an den Nebelfluss grenzt.",
-        "en": "2 points for each adjacent red structure (food) — but only if the mill itself touches the mistflow."
+        "de": "2 Punkte je angrenzendem roten Bauwerk (Nahrung) — aber nur, wenn die Nebelmühle selbst an den Nebelfluss grenzt.",
+        "en": "2 points for each adjacent red structure (food) — but only if the Mistmill itself touches the mistflow."
       },
       "art": "fantasy_watermill.svg"
     }
