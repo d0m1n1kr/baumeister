@@ -19,6 +19,7 @@
   import CreditsFooter from './CreditsFooter.svelte';
   import LanguagePicker from './LanguagePicker.svelte';
   import ThemePicker from './ThemePicker.svelte';
+  import BuyOriginal from './BuyOriginal.svelte';
   import HelpDialog from './HelpDialog.svelte';
   import { learn } from './learn.svelte';
   import { install } from './install.svelte';
@@ -510,6 +511,10 @@
         </div>
         {/if}
       </section>
+
+      <!-- Hinweis aufs Originalspiel: bewusst am Ende, hinter allem, was zum
+           Spielen nötig ist. Kein Skript, nur ein Link. -->
+      <BuyOriginal />
     </div>
   </div>
 

@@ -1,5 +1,6 @@
 <script lang="ts">
   import { game } from '../store/gameStore.svelte';
+  import BuyOriginal from './BuyOriginal.svelte';
   import { session } from '../net/session.svelte';
   import { catalog } from '../data';
   import { scoreGame } from '../engine/scoring';
@@ -217,6 +218,9 @@
       </ol>
     </div>
   {/if}
+
+  <!-- Nach der Wertung ist der Moment, in dem das Spiel gefallen hat -->
+  <BuyOriginal />
 
   <div class="actions">
     {#if solo}

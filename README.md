@@ -196,6 +196,16 @@ while Anna and Ben are on their phones — the state is identical on every devic
   directions: it overrides the remembered choices for that visit and is not
   written back, so one shared link cannot silently turn your default into
   "1 player, daily challenge".
+- **Buy the original:** the start screen and the score screen carry one line —
+  "Enjoying the game? Buy the original here:" — linking to *Tiny Towns* on the
+  Amazon store of the interface language (`src/data/affiliate.ts`, one row per
+  country). It is a plain `<a>`: no script, no tracker, nothing loaded, so the
+  app stays offline-capable and the link only leaves the app when tapped. Fill
+  in an associate `tag` and the same link starts earning — and the advertising
+  disclosure appears automatically, because without a tag that sentence would
+  simply be untrue. The link deliberately never travels into the shared text or
+  the score image: Amazon's terms do not allow associate links outside the site,
+  and a test guards it.
 - **PWA:** fully offline-capable (all assets are precached on first visit; game
   logic and game state live entirely in the client). The start screen offers to
   install the app: on Chromium the system dialog via `beforeinstallprompt`, on

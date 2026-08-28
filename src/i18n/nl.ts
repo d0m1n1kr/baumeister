@@ -215,6 +215,10 @@ export const nl: Translation = {
   soloOfferTitle: 'Kies 1 van de 3 open grondstoffen',
   soloDeckCount: (n: number) => `Trekstapel: ${n} kaarten`,
   soloDaily: 'Dagelijkse uitdaging',
+  buyOriginal: "Vind je het spel leuk? Koop het origineel hier:",
+  buyOriginalLink: "Tiny Towns op Amazon",
+  affiliateNote:
+    "Advertentie · Als Amazon-partner verdien ik aan in aanmerking komende aankopen.",
   dailyPure:
     'De dagelijkse uitdaging speelt altijd puur: basisspel met monumenten. Alleen zo is een datum wereldwijd hetzelfde spel — monumenten uitzetten zou al een andere materiaalstapel geven.',
   soloDailyHint: 'Vast dagtoeval — wereldwijd dezelfde kaarten en grondstoffen. Vergelijk je punten!',

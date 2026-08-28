@@ -1209,6 +1209,62 @@ try {
     console.log('✓ Zwei Spieler: keine Ecken-Wahl, Bretter nie im selben Feld');
   }
 
+  // Hinweis aufs Originalspiel: steht im Startbildschirm und im Ergebnis, führt
+  // zu Amazon und öffnet einen neuen Tab. Ohne eingetragene Partner-ID ist es
+  // ein gewöhnlicher Shop-Link — dann darf auch kein Werbehinweis dastehen,
+  // der wäre unwahr.
+  {
+    const ctx = await browser.newContext({ viewport: { width: 402, height: 874 }, locale: 'de-DE' });
+    const kp = await ctx.newPage();
+    kp.on('pageerror', (e) => fail(`Kauf-Link: Seitenfehler: ${e.message}`));
+    await kp.goto(BASE_URL);
+    await kp.locator('#splash').waitFor({ state: 'detached', timeout: 10000 });
+    const neu6 = kp.locator('button', { hasText: 'Neues Spiel' });
+    if (await neu6.count()) await neu6.click();
+
+    const pruefe = async (wo) => {
+      const link = kp.locator('.buy a.link');
+      if ((await link.count()) !== 1) fail(`Kauf-Link (${wo}): ${await link.count()} Links statt 1`);
+      const l = await link.first().evaluate((a) => ({
+        href: a.href, ziel: a.target, rel: a.rel, text: a.textContent.trim(),
+        breit: Math.round(a.getBoundingClientRect().width)
+      }));
+      if (!/^https:\/\/www\.amazon\./.test(l.href)) fail(`Kauf-Link (${wo}): führt zu ${l.href}`);
+      if (l.ziel !== '_blank') fail(`Kauf-Link (${wo}): öffnet nicht in neuem Tab`);
+      // noopener: sonst kann die Zielseite auf das offene Spiel zugreifen
+      if (!l.rel.includes('noopener')) fail(`Kauf-Link (${wo}): rel ohne noopener (${l.rel})`);
+      if (!l.rel.includes('sponsored')) fail(`Kauf-Link (${wo}): rel ohne sponsored (${l.rel})`);
+      if (l.breit < 44) fail(`Kauf-Link (${wo}): nur ${l.breit}px breit`);
+      const frage = await kp.locator('.buy .ask').first().textContent();
+      if (!/Original/.test(frage)) fail(`Kauf-Link (${wo}): Text passt nicht („${frage}")`);
+      // Partner-ID im Link ⇔ Werbehinweis sichtbar
+      const mitId = /[?&]tag=/.test(l.href);
+      const hinweis = (await kp.locator('.buy .note').count()) > 0;
+      if (mitId !== hinweis) {
+        fail(`Kauf-Link (${wo}): Partner-ID ${mitId ? 'gesetzt' : 'fehlt'}, Werbehinweis ${hinweis ? 'da' : 'fehlt'}`);
+      }
+    };
+    await pruefe('Startbildschirm');
+
+    // Ergebnisbildschirm: Solo-Partie starten und auf „vorbei" setzen
+    await kp.locator('.seg button', { hasText: '1' }).first().click();
+    await kp.locator('.bar button.big').click();
+    await kp.locator('.board').first().waitFor({ timeout: 8000 });
+    await kp.evaluate(() => {
+      const st = JSON.parse(localStorage.getItem('tinytowns.save.v1'));
+      st.players.forEach((p) => { p.done = true; p.monument = undefined; p.monumentOptions = undefined; });
+      st.phase = { t: 'gameOver' };
+      localStorage.setItem('tinytowns.save.v1', JSON.stringify(st));
+    });
+    await kp.reload();
+    await kp.locator('#splash').waitFor({ state: 'detached', timeout: 10000 });
+    await kp.locator('button', { hasText: 'Weiterspielen' }).click();
+    await kp.locator('button.share').first().waitFor({ timeout: 10000 });
+    await pruefe('Ergebnisbildschirm');
+    await ctx.close();
+    console.log('✓ Kauf-Link: Startbildschirm und Ergebnis, neuer Tab, Hinweis nur mit Partner-ID');
+  }
+
   // Manifest: Ohne id/scope/start_url kann Chrome einen geteilten Link nicht an
   // die installierte App geben — und navigate-existing hält es bei einem
   // Fenster. (Auf iOS hilft beides nicht, dort führt die Tageswahl hin.)

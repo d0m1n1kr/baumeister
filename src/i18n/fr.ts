@@ -215,6 +215,10 @@ export const fr: Translation = {
   soloOfferTitle: 'Choisis 1 des 3 ressources visibles',
   soloDeckCount: (n: number) => `Pioche : ${n} cartes`,
   soloDaily: 'Défi du jour',
+  buyOriginal: "Le jeu vous plaît ? Achetez l'original ici :",
+  buyOriginalLink: "Tiny Towns sur Amazon",
+  affiliateNote:
+    "Publicité · En tant que Partenaire Amazon, je réalise un bénéfice sur les achats remplissant les conditions requises.",
   dailyPure:
     "Le défi du jour se joue toujours pur : jeu de base avec monuments. C'est la seule façon qu'une date soit la même partie partout — désactiver les monuments donnerait déjà une autre pioche de matériaux.",
   soloDailyHint: 'Aléa fixe du jour — les mêmes cartes et ressources partout dans le monde. Compare tes scores !',

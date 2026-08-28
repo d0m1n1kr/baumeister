@@ -215,6 +215,10 @@ export const pt: Translation = {
   soloOfferTitle: 'Escolhe 1 dos 3 recursos à vista',
   soloDeckCount: (n: number) => `Baralho: ${n} cartas`,
   soloDaily: 'Desafio diário',
+  buyOriginal: "Gostas do jogo? Compra o original aqui:",
+  buyOriginalLink: "Tiny Towns na Amazon",
+  affiliateNote:
+    "Publicidade · Como Associado da Amazon, recebo uma comissão pelas compras elegíveis.",
   dailyPure:
     'O desafio diário é sempre puro: jogo base com monumentos. Só assim uma data é o mesmo jogo em todo o mundo — desligar os monumentos já daria outro baralho de materiais.',
   soloDailyHint: 'Acaso fixo do dia — as mesmas cartas e recursos em todo o mundo. Compara os teus pontos!',
