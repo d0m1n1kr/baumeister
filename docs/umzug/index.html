@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="de">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Baumeister — neue Adresse</title>
+    <meta name="robots" content="noindex" />
+    <!--
+      Weiche für die alte Adresse. Das Spiel liegt jetzt unter /baumeister/.
+
+      Warum per JavaScript und nicht nur per meta-refresh: Geteilte Links
+      tragen ihre Fracht im Fragment (#daily=2026-08-27&mode=land, #join=AB2C3D).
+      Ein meta-refresh nimmt das Fragment nicht zuverlässig mit — hier wird es
+      ausdrücklich angehängt, damit eine geteilte Challenge auch nach dem Umzug
+      genau dieselbe Partie öffnet. Der meta-refresh im <noscript> ist nur der
+      Rückfall ohne JavaScript.
+    -->
+    <script>
+      (function () {
+        var ziel = 'https://d0m1n1kr.github.io/baumeister/';
+        location.replace(ziel + location.search + location.hash);
+      })();
+    </script>
+    <noscript>
+      <meta http-equiv="refresh" content="0; url=https://d0m1n1kr.github.io/baumeister/" />
+    </noscript>
+    <style>
+      body {
+        margin: 0;
+        min-height: 100vh;
+        display: grid;
+        place-items: center;
+        background: #1b1430;
+        color: #e8e2f5;
+        font: 16px/1.5 system-ui, -apple-system, "Segoe UI", sans-serif;
+        text-align: center;
+        padding: 24px;
+        box-sizing: border-box;
+      }
+      a { color: #f2c14e; }
+    </style>
+  </head>
+  <body>
+    <p>
+      🐉 Das Spiel heißt jetzt <strong>Baumeister</strong> und liegt unter<br />
+      <a href="https://d0m1n1kr.github.io/baumeister/">d0m1n1kr.github.io/baumeister/</a>
+    </p>
+  </body>
+</html>

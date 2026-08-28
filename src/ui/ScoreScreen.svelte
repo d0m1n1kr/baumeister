@@ -120,7 +120,7 @@
           },
           readPalette(document.documentElement)
         );
-        const file = blob ? new File([blob], 'tiny-towns.png', { type: 'image/png' }) : null;
+        const file = blob ? new File([blob], 'baumeister.png', { type: 'image/png' }) : null;
         ({ via } = await shareImageOrText(file, text, t.appTitle));
       } else {
         ({ via } = await shareOrCopy(text, t.appTitle));

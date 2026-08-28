@@ -11,7 +11,7 @@ tap away in the 🎨 picker. Beside it stands **Countryside** (🏞), our own va
 waterfront cards that score next to them. Solo, daily challenge, learning mode and
 several expansions are all in the box.
 
-**▶ Play: [d0m1n1kr.github.io/tiny-towns](https://d0m1n1kr.github.io/tiny-towns/)**
+**▶ Play: [d0m1n1kr.github.io/baumeister](https://d0m1n1kr.github.io/baumeister/)**
 
 ## In the game
 

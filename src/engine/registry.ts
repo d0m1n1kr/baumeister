@@ -223,6 +223,11 @@ export function dailySeed(dailyId: string, variant = ''): number {
   // variant ('land') trennt die Seed-Stämme: Die Landpartie desselben Tages
   // bekommt eine ANDERE Auslage als die klassische Challenge — sonst wäre die
   // eine ein Spoiler der anderen.
+  //
+  // Der Stamm heißt weiter „tiny-towns", obwohl die App inzwischen Baumeister
+  // heißt: Er geht in den Hash JEDER Tages-Challenge ein. Ihn umzubenennen
+  // würde alle Tageskarten neu würfeln — auch die vergangenen, deren
+  // Ergebnisse in Bestenlisten stehen. Der Name hier ist Datum, nicht Titel.
   for (const c of `tiny-towns-${variant}${dailyId}`) {
     h ^= c.charCodeAt(0);
     h = Math.imul(h, 16777619);
