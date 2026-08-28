@@ -11,6 +11,12 @@ import type { PeerId, Transport, TransportFactory, TransportHandlers } from './t
 // selbst wird weiter unten dynamisch geladen.
 import type { JsonValue } from 'trystero';
 
+// Namensraum der Räume bei den Vermittlungs-Relays. Bleibt beim alten Namen:
+// Wer ihn ändert, trennt Geräte auf altem und neuem Stand vollständig — sie
+// suchen dann in verschiedenen Räumen und finden einander nie, statt sich zu
+// treffen und die Fassung zu vergleichen (PROTOCOL_VERSION). Ein Wechsel wäre
+// nur zusammen mit einer Übergangsfrist sinnvoll, in der beide Namen belauscht
+// werden — dafür ist der Gewinn zu klein.
 const APP_ID = 'tiny-towns-d0m1n1kr';
 
 /**

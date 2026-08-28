@@ -11,7 +11,7 @@ const base: ShareInfo = {
     { name: 'Hütte', count: 5 },
     { name: 'Bauernhof', count: 2 }
   ],
-  url: 'https://example.test/tiny-towns/'
+  url: 'https://example.test/baumeister/'
 };
 
 describe('shareText', () => {
@@ -42,7 +42,7 @@ describe('shareText', () => {
 
   it('setzt den Link in die letzte Zeile', () => {
     const lines = shareText(base).split('\n');
-    expect(lines[lines.length - 1]).toBe('https://example.test/tiny-towns/');
+    expect(lines[lines.length - 1]).toBe('https://example.test/baumeister/');
   });
 });
 
@@ -110,7 +110,7 @@ describe('Kauf-Link bleibt in der App', () => {
       dailyId: '2026-08-27',
       dailyLabel: 'Tages-Challenge',
       buildings: [{ name: 'Hütte', count: 3 }],
-      url: 'https://d0m1n1kr.github.io/tiny-towns/#daily=2026-08-27'
+      url: 'https://d0m1n1kr.github.io/baumeister/#daily=2026-08-27'
     });
     expect(text).not.toMatch(/amazon/i);
     expect(text).not.toMatch(/tag=/);

@@ -3,7 +3,7 @@ import { codeFromScan } from './index';
 
 describe('codeFromScan', () => {
   it('zieht den Code aus einem kompletten Beitritts-Link', () => {
-    expect(codeFromScan('https://d0m1n1kr.github.io/tiny-towns/#join=AB2C3D')).toBe('AB2C3D');
+    expect(codeFromScan('https://d0m1n1kr.github.io/baumeister/#join=AB2C3D')).toBe('AB2C3D');
     expect(codeFromScan('http://localhost:5173/?transport=channel#join=xk7m2p')).toBe('XK7M2P');
   });
 
