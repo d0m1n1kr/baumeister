@@ -145,8 +145,8 @@ export const nl: Translation = {
   shareFailed: 'Delen is niet gelukt',
   playAgain: 'Nog een keer',
 
-  aliceMode: 'Alice-modus',
-  aliceModeHint: 'Alle kaarten permanent met tekst tonen',
+  detailMode: "Detailmodus",
+  detailModeHint: "Alle kaarten permanent met tekst tonen",
   flipCards: 'Kaarten draaien voor de overkant',
 
   townHallMode: 'Stadhuis-modus',
@@ -310,7 +310,7 @@ export const nl: Translation = {
     guestSteps: [
       'Scan de QR-code of typ de kamercode, kies een naam — je plaats komt automatisch.',
       'Je ziet je eigen bord groot, de tegenstanders klein; je monument ligt voor jou open.',
-      '“📖 Alice-modus” toont alle kaarten permanent met tekst.',
+      "“📖 Detailmodus” toont alle kaarten permanent met tekst.",
       'Even weg of herladen? De app doet vanzelf weer mee. Lukt het niet: host-apparaat wekken of daar de plaats opnieuw laten toewijzen.'
     ]
   },

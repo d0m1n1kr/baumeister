@@ -145,8 +145,8 @@ export const de = {
   shareFailed: 'Teilen hat nicht geklappt',
   playAgain: 'Neue Partie',
 
-  aliceMode: 'Alice-Modus',
-  aliceModeHint: 'Alle Karten dauerhaft mit Beschreibung zeigen',
+  detailMode: "Detail-Modus",
+  detailModeHint: "Alle Karten dauerhaft mit Beschreibung zeigen",
   flipCards: 'Kartenauslage für die Gegenseite drehen',
 
   townHallMode: 'Rathaus-Modus',
@@ -310,7 +310,7 @@ export const de = {
     guestSteps: [
       'QR-Code scannen oder Raum-Code eintippen, Namen wählen — dein Platz kommt automatisch.',
       'Du siehst dein Brett groß, die Gegner klein; dein Monument liegt für dich offen.',
-      '„📖 Alice-Modus" zeigt alle Karten dauerhaft mit Beschreibung.',
+      "„📖 Detail-Modus\" zeigt alle Karten dauerhaft mit Beschreibung.",
       'Kurz weg oder neu geladen? Die App tritt automatisch wieder bei. Klappt es nicht: Host-Gerät wecken oder dort den Platz neu vergeben lassen.'
     ]
   },

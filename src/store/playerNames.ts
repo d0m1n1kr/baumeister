@@ -2,7 +2,7 @@
 //
 // Wer zu Hause immer mit denselben Leuten spielt, soll die Namen einmal
 // eintippen und nicht jedes Mal wieder. Wie die anderen Präferenzen
-// (Ton, Thema, Alice-, Lernmodus) liegen sie im localStorage und gehören zum
+// (Ton, Thema, Detail-, Lernmodus) liegen sie im localStorage und gehören zum
 // Gerät, nicht zum Spielstand — die Engine weiß nichts davon.
 //
 // `sanitize` ist rein und ohne Browser-Abhängigkeit, damit es geprüft werden

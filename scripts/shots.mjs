@@ -1,5 +1,9 @@
 // Erzeugt die Screenshots für das README — reproduzierbar statt von Hand.
 //
+// Die Bilder sind ENGLISCH, weil das README es ist: locale 'en-US', und die
+// Bedienelemente werden über ihre englischen Beschriftungen gesucht. Wer hier
+// die Sprache ändert, muss auch die Beschriftungen unten mitziehen.
+//
 // Warum als Skript: Die Bilder veralten mit jedem Design-Schritt, und von Hand
 // gemachte Aufnahmen sind nicht wiederholbar (andere Auslage, anderer Zufall,
 // andere Fenstergröße). Hier steht jede Aufnahme als Rezept: Viewport,
@@ -37,7 +41,7 @@ async function waitForServer() {
 
 /** Erstbesuch: kein alter Spielstand, keine Lern-Einladung im Bild. */
 async function frischerKontext(browser, viewport, extra = '') {
-  const ctx = await browser.newContext({ viewport, locale: 'de-DE' });
+  const ctx = await browser.newContext({ viewport, locale: 'en-US' });
   const page = await ctx.newPage();
   page.on('pageerror', (e) => console.error('SEITENFEHLER', e.message));
   await page.addInitScript(() => {
@@ -46,7 +50,7 @@ async function frischerKontext(browser, viewport, extra = '') {
   });
   await page.goto(BASE + extra);
   await page.locator('#splash').waitFor({ state: 'detached', timeout: 15000 });
-  const neu = page.locator('button', { hasText: 'Neues Spiel' });
+  const neu = page.locator('button', { hasText: 'New game' });
   if (await neu.count()) await neu.click();
   return { ctx, page };
 }
@@ -88,7 +92,7 @@ async function fuelleBretter(page, plan) {
   }, plan);
   await page.reload();
   await page.locator('#splash').waitFor({ state: 'detached', timeout: 15000 });
-  await page.locator('button', { hasText: 'Weiterspielen' }).click();
+  await page.locator('button', { hasText: 'Resume' }).click();
   await page.locator('.board').first().waitFor({ timeout: 10000 });
   await page.waitForTimeout(900); // Bau-Animationen ausklingen lassen
 }
@@ -132,7 +136,7 @@ async function spieleRunden(sitze, runden) {
     }
     // Die Runde endet erst, wenn jeder „Fertig" gedrückt hat
     for (const { page } of sitze) {
-      const fertig = page.locator('button', { hasText: 'Fertig' }).first();
+      const fertig = page.locator('button', { hasText: 'Done' }).first();
       if (await fertig.count()) await fertig.click();
     }
   }
@@ -141,10 +145,10 @@ async function spieleRunden(sitze, runden) {
 /** Monument-Draft im echten Ablauf durchklicken (Mehrgerätemodus, kein Reload). */
 async function draftDurchklicken(page) {
   for (let runde = 0; runde < 4; runde++) {
-    const knopf = page.locator('button', { hasText: 'Monument wählen' }).first();
+    const knopf = page.locator('button', { hasText: 'Choose monument' }).first();
     if (!(await knopf.count())) return;
     await knopf.click();
-    const bestaetigen = page.locator('.box button.primary', { hasText: 'Bestätigen' });
+    const bestaetigen = page.locator('.box button.primary', { hasText: 'Confirm' });
     if (await bestaetigen.count()) await bestaetigen.first().click();
     await page.locator('.pickCard').first().waitFor({ timeout: 10000 });
     await page.locator('.pickCard button.primary').first().click();
@@ -192,7 +196,7 @@ try {
     await ctx.close();
   }
 
-  // ---------- 3. Solo am Handy (Alice-Modus: Karten offen) ----------
+  // ---------- 3. Solo am Handy ----------
   {
     const { ctx, page } = await frischerKontext(browser, { width: 402, height: 874 });
     await page.locator('.seg button', { hasText: '1' }).first().click();
@@ -209,7 +213,7 @@ try {
   // ---------- 4./5./6. Mehrgerätemodus: Lobby, Gast, Host-Tisch ----------
   // BroadcastChannel wirkt nur innerhalb EINES Kontexts → beide Tabs darin.
   {
-    const ctx = await browser.newContext({ viewport: { width: 1180, height: 820 }, locale: 'de-DE' });
+    const ctx = await browser.newContext({ viewport: { width: 1180, height: 820 }, locale: 'en-US' });
     const host = await ctx.newPage();
     host.on('pageerror', (e) => console.error('HOST-SEITENFEHLER', e.message));
     await host.addInitScript(() => {
@@ -218,12 +222,12 @@ try {
     });
     await host.goto(`${BASE}?transport=channel`);
     await host.locator('#splash').waitFor({ state: 'detached', timeout: 15000 });
-    const neu = host.locator('button', { hasText: 'Neues Spiel' });
+    const neu = host.locator('button', { hasText: 'New game' });
     if (await neu.count()) await neu.click();
     await host.locator('.seg button', { hasText: '3' }).first().click();
     await host.locator('.players input').nth(0).fill('Dominik');
-    await host.locator('.seg button', { hasText: 'Mit eigenen' }).click();
-    await host.locator('button', { hasText: 'Raum öffnen' }).click();
+    await host.locator('.seg button', { hasText: 'With your own' }).click();
+    await host.locator('button', { hasText: 'Open room' }).click();
     const code = (await host.locator('.value').first().textContent())?.trim();
 
     // Zwei Gäste treten bei, damit die Lobby belegt aussieht
@@ -236,8 +240,8 @@ try {
       g.on('pageerror', (e) => console.error(`GAST-SEITENFEHLER (${name})`, e.message));
       await g.setViewportSize(viewport);
       await g.goto(`${BASE}?transport=channel#join=${code}`);
-      await g.locator('input[placeholder="Dein Name"]').fill(name);
-      await g.locator('button', { hasText: 'Beitreten' }).click();
+      await g.locator('input[placeholder="Your name"]').fill(name);
+      await g.locator('button', { hasText: 'Join' }).click();
       await host.locator('.seats li', { hasText: name }).waitFor({ timeout: 15000 });
       gaeste.push(g);
     }
@@ -245,13 +249,13 @@ try {
     await host.screenshot({ path: `${OUT}lan-lobby.png` });
     shots.push('lan-lobby.png');
 
-    await host.locator('button', { hasText: 'Spiel starten' }).click();
+    await host.locator('button', { hasText: 'Start game' }).click();
     await host.locator('.table').waitFor({ timeout: 15000 });
     for (const g of gaeste) await g.locator('.solo').waitFor({ timeout: 15000 });
 
     // Monumente wählen (sonst stünde der Tisch im Draft), dann ansagen
     for (const seite of [host, ...gaeste]) await draftDurchklicken(seite);
-    await host.locator('button', { hasText: 'Monument wählen' }).first().waitFor({ state: 'detached', timeout: 15000 });
+    await host.locator('button', { hasText: 'Choose monument' }).first().waitFor({ state: 'detached', timeout: 15000 });
     const hostSitz = await host.evaluate(
       () => JSON.parse(localStorage.getItem('tinytowns.save.v1')).config.players
         .findIndex((p) => p.name === 'Dominik')

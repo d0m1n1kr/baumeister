@@ -145,8 +145,8 @@ export const es: Translation = {
   shareFailed: 'No se pudo compartir',
   playAgain: 'Jugar otra vez',
 
-  aliceMode: 'Modo Alice',
-  aliceModeHint: 'Mostrar todas las cartas con su texto permanentemente',
+  detailMode: "Modo detalle",
+  detailModeHint: "Mostrar todas las cartas con su texto permanentemente",
   flipCards: 'Girar las cartas hacia el lado opuesto',
 
   townHallMode: 'Modo Ayuntamiento',
@@ -310,7 +310,7 @@ export const es: Translation = {
     guestSteps: [
       'Escanea el QR o escribe el código de sala, elige un nombre — tu asiento se asigna automáticamente.',
       'Ves tu tablero en grande y a los rivales en pequeño; tu monumento está visible para ti.',
-      '«📖 Modo Alice» muestra todas las cartas con su texto permanentemente.',
+      "«📖 Modo detalle» muestra todas las cartas con su texto permanentemente.",
       '¿Te fuiste un momento o recargaste? La app se reincorpora sola. Si no: despierta el dispositivo anfitrión o reasigna el asiento allí.'
     ]
   },

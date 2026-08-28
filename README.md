@@ -23,8 +23,8 @@ The Master Builder (👑) has named elfwood — everyone places it on their own 
 
 **Countryside: a taller board with a landscape in it.** 5 wide and 6 high — the
 shape of a phone held upright. The river, the ridge and the lake are unbuildable,
-and the three waterfront cards (here Crag Eyrie, Ferry Pier, Fisher's Croft) only
-score next to the matching terrain. Every player gets the same map, so the towns
+and the three waterfront cards (here Ferry Pier, Fisher's Croft, Dwarven Digs)
+only score next to the matching terrain. Every player gets the same map, so the towns
 stay comparable. Next to it a solo game on a phone: your own board large, the
 deck's three face-up resources below it.
 
@@ -107,8 +107,8 @@ while Anna and Ben are on their phones — the state is identical on every devic
   ("Everyone else look away!").
 - **Card zoom:** tapping enlarges any card, rotated toward the tapping player;
   mini cards show build patterns, feature icons, and schematic artwork.
-  In the single-board view (own device), **Alice mode** keeps all cards with their
-  descriptions permanently visible — no more tapping required.
+  In the single-board view (own device), **detail mode** (📖) keeps all cards with
+  their descriptions permanently visible — no more tapping required.
 - **Solo mode (official variant):** 15 resource cards as a deck, 3 face up, one is
   chosen and rotates face-down to the bottom. With the official rank table
   (up to "Master Architect"), a per-device highscore list, and a **daily challenge**
@@ -235,7 +235,8 @@ node scripts/shots.mjs        # regenerates the screenshots in docs/screenshots/
 ```
 
 The screenshots above are generated, not hand-made: `scripts/shots.mjs` drives a
-real Chromium through the app and writes all six files. Every shot is a recipe
+real Chromium through the app — in English, like this README — and writes all
+six files. Every shot is a recipe
 (viewport, player count, mode, game state), so after a design change the images
 are one command away from being current again — and they show the app as it
 really renders, not as it once looked.
