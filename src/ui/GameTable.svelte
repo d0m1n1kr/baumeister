@@ -53,8 +53,17 @@
 
 <div class="table" class:two={twoPlayer} class:single class:sideways>
   {#each st.players as p, i}
-    <div class="slot" style="grid-area: {single ? 'bottom' : twoPlayer ? (p.corner >= 2 ? 'top' : 'bottom') : cornerArea(p.corner)}">
-      <PlayerCorner player={i} wide={twoPlayer || single} solo={single} />
+    <!-- Zu zweit gibt es nur zwei Plätze: einer unten, einer oben. Die Zuordnung
+         hängt am Sitzplatz, nicht an der Ecke — sonst könnten zwei Spieler mit
+         Ecken derselben Tischhälfte (0 und 1 sind beide „unten") im selben Feld
+         landen und ihre Bretter lägen übereinander. -->
+    <div class="slot" style="grid-area: {single ? 'bottom' : twoPlayer ? (i === 0 ? 'bottom' : 'top') : cornerArea(p.corner)}">
+      <PlayerCorner
+        player={i}
+        wide={twoPlayer || single}
+        solo={single}
+        rotate={twoPlayer ? (i === 0 ? 0 : 180) : undefined}
+      />
     </div>
   {/each}
   <div class="center">

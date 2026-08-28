@@ -1133,6 +1133,82 @@ try {
     console.log('✓ Tages-Challenge pur: gemerkte Häkchen schlagen nicht durch, freies Solo behält sie');
   }
 
+  // Zu zweit gibt es nur zwei Plätze: unten und oben. Vier Ecken zur Wahl zu
+  // stellen war nicht nur sinnlos — „unten links" und „unten rechts" fielen auf
+  // dieselbe Tischhälfte, beide Bretter landeten im selben Feld und lagen
+  // übereinander. Geprüft wird beides: die Auswahl ist weg, und ein Spielstand
+  // mit kollidierenden Ecken wird trotzdem richtig aufgebaut.
+  {
+    const ctx = await browser.newContext({ viewport: { width: 1180, height: 820 }, locale: 'de-DE' });
+    const zp = await ctx.newPage();
+    zp.on('pageerror', (e) => fail(`Zwei Plätze: Seitenfehler: ${e.message}`));
+    await zp.goto(BASE_URL);
+    await zp.locator('#splash').waitFor({ state: 'detached', timeout: 10000 });
+    const neu5 = zp.locator('button', { hasText: 'Neues Spiel' });
+    if (await neu5.count()) await neu5.click();
+
+    // Ecken-Wahl: zu zweit keine, ab drei Spielern eine je Spieler
+    for (const [anzahl, erwartet] of [[2, 0], [3, 3], [4, 4]]) {
+      await zp.locator('.seg button', { hasText: String(anzahl) }).first().click();
+      await zp.waitForTimeout(150);
+      const da = await zp.locator('.playerRow select').count();
+      if (da !== erwartet) {
+        fail(`Zwei Plätze: bei ${anzahl} Spielern ${da} Ecken-Auswahlen statt ${erwartet}`);
+      }
+    }
+
+    await zp.locator('.seg button', { hasText: '2' }).first().click();
+    await zp.locator('.bar button.big').click();
+    await zp.locator('.board').first().waitFor({ timeout: 8000 });
+    await zp.waitForTimeout(400);
+
+    const messen = async (wann) => {
+      const g = await zp.evaluate(() => {
+        const slots = [...document.querySelectorAll('.slot')].map((s) => {
+          const r = s.getBoundingClientRect();
+          return { area: getComputedStyle(s).gridArea, top: Math.round(r.top), unten: Math.round(r.bottom) };
+        });
+        const bretter = [...document.querySelectorAll('.board')].map((b) => {
+          const r = b.getBoundingClientRect();
+          return { top: Math.round(r.top), unten: Math.round(r.bottom) };
+        });
+        return { slots, bretter, ecken: JSON.parse(localStorage.getItem('tinytowns.save.v1')).config.players.map((p) => p.corner) };
+      });
+      if (g.slots.length !== 2) fail(`Zwei Plätze (${wann}): ${g.slots.length} Plätze gerendert`);
+      if (g.slots[0].area === g.slots[1].area) {
+        fail(`Zwei Plätze (${wann}): beide im Feld „${g.slots[0].area}" — Bretter liegen übereinander`);
+      }
+      if (g.bretter.length !== 2) fail(`Zwei Plätze (${wann}): ${g.bretter.length} Bretter`);
+      // Ein Brett oben, eines unten: die Kästen dürfen sich nicht überlappen
+      const [a, b] = g.bretter.sort((x, y) => x.top - y.top);
+      if (a.unten > b.top) fail(`Zwei Plätze (${wann}): Bretter überlappen (${a.unten} > ${b.top})`);
+      return g;
+    };
+    await messen('frisch gestartet');
+
+    // Alter Spielstand mit zwei Ecken derselben Tischhälfte (0 und 1): Das
+    // Layout darf sich davon nicht mehr beirren lassen.
+    await zp.evaluate(() => {
+      const st = JSON.parse(localStorage.getItem('tinytowns.save.v1'));
+      st.config.players[0].corner = 0;
+      st.config.players[1].corner = 1;
+      st.players[0].corner = 0;
+      st.players[1].corner = 1;
+      localStorage.setItem('tinytowns.save.v1', JSON.stringify(st));
+    });
+    await zp.reload();
+    await zp.locator('#splash').waitFor({ state: 'detached', timeout: 10000 });
+    await zp.locator('button', { hasText: 'Weiterspielen' }).click();
+    await zp.locator('.board').first().waitFor({ timeout: 8000 });
+    await zp.waitForTimeout(400);
+    const alt = await messen('alter Spielstand, Ecken 0 und 1');
+    if (JSON.stringify(alt.ecken) !== JSON.stringify([0, 1])) {
+      fail(`Zwei Plätze: Testaufbau griff nicht (Ecken ${alt.ecken})`);
+    }
+    await ctx.close();
+    console.log('✓ Zwei Spieler: keine Ecken-Wahl, Bretter nie im selben Feld');
+  }
+
   // Manifest: Ohne id/scope/start_url kann Chrome einen geteilten Link nicht an
   // die installierte App geben — und navigate-existing hält es bei einem
   // Fenster. (Auf iOS hilft beides nicht, dort führt die Tageswahl hin.)
