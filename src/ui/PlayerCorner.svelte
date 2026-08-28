@@ -24,8 +24,9 @@
   let {
     player,
     wide = false,
-    solo = false
-  }: { player: number; wide?: boolean; solo?: boolean } = $props();
+    solo = false,
+    rotate = undefined
+  }: { player: number; wide?: boolean; solo?: boolean; rotate?: number } = $props();
 
   /** Im Mehrgerätemodus darf jedes Gerät nur seine eigenen Plätze bedienen. */
   const canControl = $derived(session.controls(player));
@@ -39,7 +40,9 @@
 
   const st = $derived(game.state!);
   const p = $derived(st.players[player]);
-  const rotation = $derived(solo ? 0 : cornerRotation(p.corner));
+  // `rotate` überstimmt die Ecke: Zu zweit richtet sich die Drehung nach dem
+  // Sitzplatz (unten/oben), damit sie zur Tischhälfte passt.
+  const rotation = $derived(solo ? 0 : rotate ?? cornerRotation(p.corner));
   const isMB = $derived(st.masterBuilder === player);
   const inRound = $derived(st.phase.t === 'round');
   const namedResource = $derived(st.phase.t === 'round' ? st.phase.resource : null);

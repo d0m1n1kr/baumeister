@@ -108,11 +108,13 @@
   // Datum weltweit dieselbe Partie. Erzwungen wird das in buildGameConfig; hier
   // verschwinden bloß die Häkchen, die dort ohnehin nichts mehr bewirken.
   const dailyPur = $derived(solo && daily);
+  // Die Ecken-Wahl gibt es erst ab drei Spielern (siehe Markup).
+  const eckenWahl = $derived(!solo && count > 2);
   // Die Spielerzeilen teilen sich ein Raster. Es muss genau so viele Spalten
   // haben, wie eine Zeile Elemente rendert — sonst rutschen die Felder der
   // nächsten Zeile in die freien Spalten der vorigen.
   const rowColumns = $derived(
-    ['minmax(0, 1fr)', !solo ? 'auto' : '', multiDevice ? 'auto' : ''].filter(Boolean).join(' ')
+    ['minmax(0, 1fr)', eckenWahl ? 'auto' : '', multiDevice ? 'auto' : ''].filter(Boolean).join(' ')
   );
   let remote = $state([false, true, true, true]);
   let error = $state('');
@@ -422,7 +424,10 @@
                   >✕</button>
                 {/if}
               </span>
-              {#if !solo}
+              <!-- Erst ab drei Spielern hat die Ecke eine Bedeutung: Zu zweit
+                   sitzt man sich gegenüber (unten/oben), da gibt es nichts zu
+                   wählen — vier Namen für zwei Plätze verwirrten nur. -->
+              {#if eckenWahl}
                 <select
                   value={corners[i]}
                   onchange={(e) => setCorner(i, Number((e.currentTarget as HTMLSelectElement).value))}
