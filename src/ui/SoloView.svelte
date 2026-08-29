@@ -8,6 +8,7 @@
   import MiniBoard from './MiniBoard.svelte';
   import CardStrip from './CardStrip.svelte';
   import ConfirmDialog from './ConfirmDialog.svelte';
+  import { keepPanelsSteady } from './panelReserve.svelte';
 
   const st = $derived(game.state!);
   /** Eigener Platz: beim Gast der zugewiesene, beim Host sein erster lokaler. */
@@ -17,6 +18,11 @@
   const others = $derived(st.players.map((_, i) => i).filter((i) => i !== me));
   /** Eigenes Monument mit in die offene Kartenleiste — hier schaut niemand mit. */
   const myMonument = $derived(st.players[me]?.monument?.card);
+
+  // Auch hier steht genau ein Panel unter dem Brett, und sein Inhalt wechselt
+  // mit der Phase. Ohne Höhenmarke rutschte das Brett bei jeder Materialansage
+  // auf und ab — dieselbe Unruhe wie am Spieltisch.
+  keepPanelsSteady(() => game.state);
 
   let confirmLeave = $state(false);
 </script>

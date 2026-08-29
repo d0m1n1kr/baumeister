@@ -1332,6 +1332,84 @@ try {
     console.log('✓ Detail-Modus: alte „Alice"-Einstellung gilt weiter und wandert beim Umschalten mit');
   }
 
+  // Ruhiges Brett im Einzelspiel: Ob gerade ein Material angesagt ist oder
+  // nicht, darf das Brett nicht verschieben. Zwei Stellen wuchsen mit der
+  // Ansage:
+  //   1. die Materialmarke in der Kopfzeile der Kartenleiste (+14 px) — sie
+  //      war nur da, solange ein Material angesagt war,
+  //   2. das Panel unter dem Brett: Im Solo gibt es nur ein Panel, und die
+  //      Höhenreservierung sprang deshalb gar nicht erst an. Der Inhalt
+  //      wechselt aber mit der Phase (Wähler 99, Runde 56, nach dem Legen 116),
+  //      das Brett rutschte um bis zu 30 px auf und ab.
+  // Gemessen wird über drei volle Runden.
+  for (const [label, w, h] of [
+    ['Handy hoch', 402, 874],
+    ['Handy quer', 874, 402],
+    ['Tablet quer', 1180, 820]
+  ]) {
+    const ctx = await klassischerKontext({ viewport: { width: w, height: h }, locale: 'de-DE' });
+    const rp = await ctx.newPage();
+    rp.on('pageerror', (e) => fail(`Ruhiges Brett ${label}: Seitenfehler: ${e.message}`));
+    await rp.goto(BASE_URL);
+    await rp.locator('#splash').waitFor({ state: 'detached', timeout: 10000 });
+    const neuR = rp.locator('button', { hasText: 'Neues Spiel' });
+    if (await neuR.count()) await neuR.click();
+    await rp.locator('.seg button', { hasText: '1' }).first().click();
+    await rp.locator('.opt.toggle input[type="checkbox"]').first().click(); // ohne Monumente
+    await rp.locator('.bar button.big').click();
+    await rp.locator('.picker').first().waitFor({ timeout: 5000 });
+
+    const messen = async () => {
+      await rp.waitForTimeout(600); // Messtakt der Panelreservierung abwarten
+      return rp.evaluate(() => {
+        const kasten = (sel) => {
+          const r = document.querySelector(sel).getBoundingClientRect();
+          return { y: Math.round(r.y), x: Math.round(r.x), b: Math.round(r.width), h: Math.round(r.height) };
+        };
+        return { brett: kasten('.board'), kopf: kasten('.info') };
+      });
+    };
+    const gleich = (a, b) => a.y === b.y && a.x === b.x && a.b === b.b && a.h === b.h;
+    const zeig = (m) => `y=${m.y} x=${m.x} ${m.b}×${m.h}`;
+
+    const stand = [];
+    for (let runde = 1; runde <= 3; runde++) {
+      const vor = await messen();
+      await rp.locator('.picker .chip, .picker .offerChip').first().click();
+      await rp.locator('.pendingWrap').first().waitFor({ timeout: 5000 });
+      const nach = await messen();
+      // Der Kern der Beschwerde: Die Materialmarke steht in der Kopfzeile der
+      // Kartenleiste. Erschiene sie erst mit der Ansage, wüchse die Leiste in
+      // dem Moment und schöbe alles darunter weg. Also: keine Bewegung, von
+      // der ersten Runde an.
+      if (!gleich(vor.kopf, nach.kopf)) {
+        fail(`Ruhiges Brett ${label}: die Ansage ändert die Kopfzeile der Leiste `
+          + `(${zeig(vor.kopf)} → ${zeig(nach.kopf)})`);
+      }
+      // Ab der zweiten Runde steht auch das Brett bombenfest: Die
+      // Panelreservierung ist eine Höchstmarke und hat sich dann eingependelt.
+      if (runde > 1 && !gleich(vor.brett, nach.brett)) {
+        fail(`Ruhiges Brett ${label}: die Ansage verschiebt in Runde ${runde} das Brett `
+          + `(${zeig(vor.brett)} → ${zeig(nach.brett)})`);
+      }
+      await rp.locator('.board .cell:not(:has(.building)):not(:has(.res))').first().click();
+      await rp.locator('button', { hasText: '✓ Fertig' }).first().click();
+      await rp.locator('.picker').first().waitFor({ timeout: 5000 });
+      stand.push([`Runde ${runde}`, (await messen()).brett]);
+    }
+    // Die Höchstmarke darf sich in der ersten Runde einpendeln (sie lernt den
+    // vollsten Panelinhalt erst kennen) — danach bewegt sich nichts mehr.
+    const [, zweite] = stand[1];
+    for (const [wann, m] of stand.slice(1)) {
+      if (!gleich(zweite, m)) {
+        fail(`Ruhiges Brett ${label}: nach ${wann} steht das Brett anders `
+          + `(${zeig(zweite)} → ${zeig(m)})`);
+      }
+    }
+    await ctx.close();
+    console.log(`✓ Ruhiges Brett (${label}): die Materialansage verschiebt es nicht`);
+  }
+
   // Standard-Welt: Ohne gespeicherte Wahl zeigt die App das Drachenreich —
   // eigene Namen, eigene Texte, eigene Artworks. Geprüft wird auch der Splash:
   // Er wird vor dem JS gesetzt, sonst blitzt kurz die klassische Welt auf.
