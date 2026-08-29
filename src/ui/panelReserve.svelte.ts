@@ -36,15 +36,21 @@ const STEP = 8;
  * Wie viel Höhe jedes Panel reservieren soll.
  *
  * Rein und ohne DOM, damit die Regel prüfbar ist:
- * - Unter zwei Panels gibt es nichts abzustimmen — 0, also keine Wirkung.
+ * - Ohne Panel gibt es nichts zu reservieren — 0.
  * - Sonst der größte Bedarf, den irgendein Panel jetzt hat ODER früher hatte
  *   (`current`), aufgerundet auf die Stufe — das ist die Höchstmarke.
  * - Höchstens die Hälfte der kleinsten Zeile: Ein überlanges Panel (fremde
  *   Sprache, Lerntipp) darf dem Brett nicht den Platz nehmen. Der Rest bleibt
  *   scrollbar.
+ *
+ * Das gilt auch für EIN einzelnes Panel (Solo an einem Gerät): Dort ist nichts
+ * abzustimmen, aber die Höchstmarke wirkt trotzdem — sie ist es, die das Brett
+ * ruhig hält. Der Panelinhalt wechselt mit der Phase (Materialwähler 99,
+ * Runde 56, nach dem Legen 116), und ohne Marke rutschte das Brett bei jeder
+ * Ansage um bis zu 30 px auf und ab.
  */
 export function reserveFor(panels: PanelBox[], current = 0): number {
-  if (panels.length < 2) return 0;
+  if (panels.length === 0) return 0;
   const need = Math.max(current, ...panels.map((p) => p.content));
   const rows = panels.map((p) => p.row).filter((h) => h > 0);
   const cap = rows.length ? Math.floor(Math.min(...rows) / 2) : Infinity;
@@ -91,3 +97,33 @@ class PanelReserve {
 }
 
 export const panelReserve = new PanelReserve();
+
+/**
+ * Die Reservierung an eine Ansicht hängen: bei jeder Zustandsänderung neu
+ * messen, dazu ein kurzer Takt für alles, was ohne Zustandswechsel wirkt
+ * (Sprache, Thema, Schriftladen), und bei Größenänderung die Marke verwerfen.
+ *
+ * Beide Ansichten mit Panel brauchen das — der Spieltisch und die
+ * Einzelansicht. Wer nicht misst, lässt die Marke einer fremden Ansicht
+ * stehen; deshalb setzt das Aufräumen sie zurück.
+ *
+ * Aufruf nur im Kopf einer Komponente (die Effekte gehören an deren Leben).
+ */
+export function keepPanelsSteady(read: () => unknown): void {
+  $effect(() => {
+    read();
+    panelReserve.measure();
+  });
+  $effect(() => {
+    // Resize heißt neuer Rahmen: Die Höchstmarke des alten Layouts gilt nicht.
+    const onResize = () => panelReserve.measure(true);
+    const onTick = () => panelReserve.measure();
+    window.addEventListener('resize', onResize);
+    const timer = setInterval(onTick, 500);
+    return () => {
+      window.removeEventListener('resize', onResize);
+      clearInterval(timer);
+      panelReserve.px = 0;
+    };
+  });
+}

@@ -1124,8 +1124,11 @@
     .corner.wide .panel { align-items: center; width: 100%; flex: 0 1 auto; min-height: var(--panelReserve, 0px); }
     /* Solo: Das Panel nimmt nur, was es braucht — der Rest gehört dem Brett.
        Mit flex:1 auf beiden teilten sie sich den Platz, und das Brett blieb
-       klein, obwohl unter dem einzigen Knopf 200 px frei standen. */
-    .corner.soloCorner .panel { flex: 0 1 auto; min-height: 0; overflow-y: auto; }
+       klein, obwohl unter dem einzigen Knopf 200 px frei standen.
+       Die Reservierung bleibt aber als Untergrenze: Ohne sie fiel das Panel
+       zwischen den Phasen von 116 auf 56 px zurück und das Brett rutschte bei
+       jeder Materialansage auf und ab. */
+    .corner.soloCorner .panel { flex: 0 1 auto; min-height: var(--panelReserve, 0px); overflow-y: auto; }
     .corner.wide header { justify-content: center; }
     /* Solo: Das Brett nimmt den Platz, der nach dem Panel übrig ist — statt
        einer festen Viewport-Größe, die weder mitwächst noch zurückweicht.

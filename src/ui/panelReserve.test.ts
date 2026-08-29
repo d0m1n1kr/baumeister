@@ -2,9 +2,18 @@ import { describe, expect, it } from 'vitest';
 import { reserveFor } from './panelReserve.svelte';
 
 describe('reserveFor', () => {
-  it('stimmt nichts ab, wo es nur ein Panel gibt (Einzelansicht, Solo)', () => {
+  it('reserviert nichts, wo es kein Panel gibt', () => {
     expect(reserveFor([])).toBe(0);
-    expect(reserveFor([{ content: 75, row: 366 }])).toBe(0);
+  });
+
+  it('hält auch das einzelne Panel (Solo an einem Gerät) auf seiner Marke', () => {
+    // Solo: nichts abzustimmen, aber der Inhalt wechselt mit der Phase —
+    // Materialwähler 99, Runde 56, nach dem Legen 116. Ohne Marke rutschte
+    // das Brett bei jeder Ansage auf und ab.
+    const ansage = reserveFor([{ content: 99, row: 700 }]);
+    const runde = reserveFor([{ content: 56, row: 700 }], ansage);
+    const danach = reserveFor([{ content: 116, row: 700 }], runde);
+    expect({ ansage, runde, danach }).toEqual({ ansage: 104, runde: 104, danach: 120 });
   });
 
   it('gibt allen die Höhe, die das inhaltsreichste Panel braucht', () => {

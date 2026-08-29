@@ -1,7 +1,7 @@
 <script lang="ts">
   import { game } from '../store/gameStore.svelte';
   import { catalog } from '../data';
-  import type { CardDef } from '../engine/types';
+  import { RESOURCES, type CardDef } from '../engine/types';
   import { RESOURCE_CSS } from './helpers';
   import { cardText, t } from '../i18n';
   import { trainStopPlayer } from '../engine/game';
@@ -138,12 +138,22 @@
       <!-- Im Solo steht derselbe Name schon über dem Brett -->
       <span class="mb">{st.config.townHall ? '🏛' : '👑'} {st.players[st.masterBuilder].name}</span>
     {/if}
-    {#if named}
-      <span class="named">
-        <span class="dot" style="background: {RESOURCE_CSS[named]}"></span>
-        {t.resourceNames[named]}
+    <!-- Die Materialmarke steht IMMER in der Kopfzeile, auch wenn gerade
+         nichts angesagt ist — dann nur unsichtbar. Sonst wüchse die Leiste in
+         dem Moment, in dem ein Material gewählt wird, und schöbe das Brett
+         darunter weg: bei jeder Ansage ein Sprung.
+         Auch die Breite ist reserviert: Alle Materialnamen liegen im selben
+         Rasterfeld übereinander, sichtbar ist nur der angesagte. Damit hängt
+         die Größe der Kopfzeile am längsten Namen der Sprache, nicht am
+         gerade angesagten Material. -->
+    <span class="named" class:leer={!named}>
+      <span class="dot" style={named ? `background: ${RESOURCE_CSS[named]}` : ''}></span>
+      <span class="wort">
+        {#each RESOURCES as r}
+          <span class:aktiv={r === named}>{t.resourceNames[r]}</span>
+        {/each}
       </span>
-    {/if}
+    </span>
     {#if st.train}
       <span class="trainInfo" title={trainStatus}>
         🚂
@@ -251,6 +261,11 @@
     .trainWhere { display: none; }
   }
   .named { display: flex; align-items: center; gap: 5px; color: var(--text); font-weight: 600; }
+  /* Platz halten, nichts zeigen — die Kopfzeile behält ihre Maße */
+  .named.leer { visibility: hidden; }
+  .wort { display: grid; }
+  .wort > span { grid-area: 1 / 1; visibility: hidden; white-space: nowrap; }
+  .wort > span.aktiv { visibility: visible; }
   .dot { width: 12px; height: 12px; border-radius: 50%; display: inline-block; border: 1px solid rgba(0,0,0,0.4); }
   .cards {
     flex: 1;

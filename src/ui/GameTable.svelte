@@ -7,7 +7,7 @@
   import PlayerCorner from './PlayerCorner.svelte';
   import CardStrip from './CardStrip.svelte';
   import ConfirmDialog from './ConfirmDialog.svelte';
-  import { panelReserve } from './panelReserve.svelte';
+  import { keepPanelsSteady } from './panelReserve.svelte';
 
   const st = $derived(game.state!);
   const twoPlayer = $derived(st.players.length === 2);
@@ -28,27 +28,9 @@
   const sideways = $derived((twoPlayer || single) && shortLandscape);
 
   // Panelhöhe über alle Ecken abstimmen, damit die Bretter einer Reihe gleich
-  // groß bleiben (siehe panelReserve). Der Panelinhalt hängt am Zustand, also
-  // ist jede Zustandsänderung der Auslöser; Resize und ein kurzer Takt fangen
-  // ab, was ohne Zustandswechsel wirkt (Sprache, Thema, Schriftladen).
-  $effect(() => {
-    void st;
-    panelReserve.measure();
-  });
-  $effect(() => {
-    // Resize heißt neuer Rahmen: Die Höchstmarke des alten Layouts gilt nicht.
-    const onResize = () => panelReserve.measure(true);
-    const onTick = () => panelReserve.measure();
-    window.addEventListener('resize', onResize);
-    const timer = setInterval(onTick, 500);
-    return () => {
-      window.removeEventListener('resize', onResize);
-      clearInterval(timer);
-      // Beim Wechsel in die Einzelansicht misst niemand mehr nach — ein alter
-      // Wert wäre dort eine Reservierung ohne Grund.
-      panelReserve.px = 0;
-    };
-  });
+  // groß bleiben, und über die Phasen hinweg halten, damit das Brett nicht bei
+  // jeder Materialansage springt (siehe panelReserve).
+  keepPanelsSteady(() => st);
 </script>
 
 <div class="table" class:two={twoPlayer} class:single class:sideways>

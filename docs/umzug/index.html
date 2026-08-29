@@ -17,8 +17,55 @@
     -->
     <script>
       (function () {
-        var ziel = 'https://d0m1n1kr.github.io/baumeister/';
-        location.replace(ziel + location.search + location.hash);
+        var ziel = 'https://d0m1n1kr.github.io/baumeister/' + location.search + location.hash;
+
+        // Falls diese Seite doch unter einem alten Service Worker geladen wird:
+        // ihn entfernen, damit der nächste Besuch nicht wieder in der alten App
+        // landet. Höchstens einen Wimpernschlag darauf warten — die
+        // Weiterleitung ist wichtiger als das Aufräumen.
+        //
+        // Nur der EIGENE Pfad wird aufgeräumt: github.io ist ein Ursprung für
+        // alle Projektseiten, getRegistrations() und caches.keys() sehen also
+        // auch die neue App unter /baumeister/. Die darf hier nichts abbekommen.
+        var eigen = location.origin + location.pathname.replace(/[^/]*$/, '');
+
+        function aufraeumen() {
+          var arbeiten = [];
+          if (navigator.serviceWorker) {
+            arbeiten.push(
+              navigator.serviceWorker.getRegistrations().then(function (regs) {
+                return Promise.all(
+                  regs
+                    .filter(function (r) { return r.scope.indexOf(eigen) === 0; })
+                    .map(function (r) { return r.unregister(); })
+                );
+              })
+            );
+          }
+          if (window.caches) {
+            arbeiten.push(
+              caches.keys().then(function (namen) {
+                return Promise.all(
+                  namen
+                    .filter(function (n) { return n.indexOf(eigen) !== -1; })
+                    .map(function (n) { return caches.delete(n); })
+                );
+              })
+            );
+          }
+          return Promise.all(arbeiten);
+        }
+
+        function weiter() { location.replace(ziel); }
+
+        try {
+          Promise.race([
+            aufraeumen(),
+            new Promise(function (r) { setTimeout(r, 600); })
+          ]).then(weiter, weiter);
+        } catch (e) {
+          weiter();
+        }
       })();
     </script>
     <noscript>
